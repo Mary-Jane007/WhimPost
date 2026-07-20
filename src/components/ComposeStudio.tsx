@@ -50,6 +50,8 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
     "paper"
   );
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [preview, setPreview] = useState<"letter" | "envelope">("letter");
 
@@ -138,6 +140,23 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
     );
   }
 
+  async function onPickImage(file: File | null) {
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    const form = new FormData();
+    form.append("image", file);
+    const res = await fetch("/api/uploads", { method: "POST", body: form });
+    const data = await res.json();
+    setUploading(false);
+    if (!res.ok) {
+      setError(data.error || "Could not upload image");
+      return;
+    }
+    setImageUrl(data.url);
+    setPreview("letter");
+  }
+
   async function sendLetter() {
     if (!recipientId) {
       setError("Add a friend before sending a letter");
@@ -158,6 +177,7 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
         stampStyle,
         stickers,
         scraps,
+        imageUrl,
       }),
     });
     const data = await res.json();
@@ -252,21 +272,50 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
           </div>
 
           {tab === "paper" && (
-            <div className="option-grid">
-              {PAPER_OPTIONS.map((opt) => (
+            <div className="palette-stack">
+              <div className="option-grid">
+                {PAPER_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={`option-chip paper-swatch paper-${opt.id} ${paperStyle === opt.id ? "active" : ""}`}
+                    onClick={() => {
+                      setPaperStyle(opt.id);
+                      setPreview("letter");
+                    }}
+                  >
+                    <strong>{opt.name}</strong>
+                    <span>{opt.hint}</span>
+                  </button>
+                ))}
+              </div>
+              <h3>Photo keepsake</h3>
+              <label className="photo-upload">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={(e) => onPickImage(e.target.files?.[0] || null)}
+                  disabled={uploading}
+                />
+                <span>
+                  {uploading
+                    ? "Tucking the photo in…"
+                    : imageUrl
+                      ? "Replace photo"
+                      : "Upload an image"}
+                </span>
+              </label>
+              {imageUrl ? (
                 <button
-                  key={opt.id}
                   type="button"
-                  className={`option-chip paper-swatch paper-${opt.id} ${paperStyle === opt.id ? "active" : ""}`}
-                  onClick={() => {
-                    setPaperStyle(opt.id);
-                    setPreview("letter");
-                  }}
+                  className="tiny-chip"
+                  onClick={() => setImageUrl(null)}
                 >
-                  <strong>{opt.name}</strong>
-                  <span>{opt.hint}</span>
+                  Remove photo
                 </button>
-              ))}
+              ) : (
+                <p className="compose-hint">JPG, PNG, WebP, or GIF · under 4MB</p>
+              )}
             </div>
           )}
 
@@ -382,9 +431,11 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
               subject={subject}
               stickers={stickers}
               scraps={scraps}
+              imageUrl={imageUrl}
               editable
               onBodyChange={setBody}
               onSubjectChange={setSubject}
+              onRemoveImage={() => setImageUrl(null)}
               selectedId={selectedId}
               onSelectItem={setSelectedId}
               onMoveItem={moveItem}

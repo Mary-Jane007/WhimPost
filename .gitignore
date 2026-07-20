@@ -39,3 +39,5 @@ next-env.d.ts
 # database
 /data/*.db
 /data/*.db-*
+/data/uploads/**
+!/data/uploads/.gitkeep
