@@ -70,6 +70,14 @@ const SYSTEM_SENDERS: Partial<Record<VillageId, SystemVillageSender>> = {
     forestName: "The Moon Dock",
     bio: "Where dreams become letters.",
   },
+  bramblewood: {
+    id: "system-bramblewood",
+    username: "bramblewood_fox",
+    displayName: "Bramblewood",
+    email: "system+bramblewood@whimpost.local",
+    forestName: "Explorer's Guild",
+    bio: "Where every path hides a story.",
+  },
 };
 
 const WELCOME_TEMPLATES: Partial<Record<VillageId, WelcomeTemplate>> = {
@@ -320,6 +328,91 @@ Welcome to **Moonmere**.
       },
     ],
   },
+  bramblewood: {
+    subject: "Welcome to Bramblewood",
+    body: `**Greetings, explorer,**
+
+We were beginning to wonder when you'd find us.
+
+The foxes insisted you'd taken the longer trail.
+
+The ravens claimed you were distracted by something interesting.
+
+As usual, they were probably both right.
+
+Welcome to **Bramblewood**, where every winding path hides a story, every forgotten ruin whispers a mystery, and every letter is the beginning of another adventure.
+
+Before setting off, we've packed a travel satchel for you — the first pieces of your Bramblewood collection.
+
+Inside you'll find:
+
+* 🦊 A soft fox tail for luck on every trail.
+* 🍁 A pressed maple leaf from the dens.
+* 🕯️ A Hello Fall candle to warm your satchel.
+* 🧭 A compass that occasionally points toward wonder instead of north.
+
+These are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the trails. Your cottage will fill as your collection grows.
+
+Should you stumble upon something extraordinary, write about it.
+
+The village has always loved a good tale.
+
+And remember—
+
+The finest adventures are rarely planned.
+
+Welcome to **Bramblewood**.
+
+*May curiosity always know the way.*`,
+    paperStyle: "parchment",
+    envelopeStyle: "kraft",
+    waxSeal: "spiral",
+    stampStyle: "fox-seated",
+    stickers: [
+      {
+        id: "welcome-fox",
+        kind: "bramble-fox-sitting",
+        x: 92,
+        y: 8,
+        scale: 0.68,
+        rotation: 10,
+      },
+      {
+        id: "welcome-maple",
+        kind: "bramble-maple-leaf",
+        x: 8,
+        y: 10,
+        scale: 0.58,
+        rotation: -14,
+      },
+      {
+        id: "welcome-compass",
+        kind: "bramble-compass",
+        x: 9,
+        y: 88,
+        scale: 0.55,
+        rotation: -6,
+      },
+      {
+        id: "welcome-mushroom",
+        kind: "bramble-mushroom",
+        x: 93,
+        y: 92,
+        scale: 0.55,
+        rotation: 8,
+      },
+    ],
+    scraps: [
+      {
+        id: "welcome-stain",
+        kind: "tea-stain",
+        x: 8,
+        y: 6,
+        scale: 0.5,
+        rotation: -8,
+      },
+    ],
+  },
 };
 
 export function isSystemUsername(username: string) {
@@ -391,6 +484,12 @@ const WELCOME_COLLECTION_GIFTS: Partial<
     "clover-blossoms",
   ],
   moonmere: ["moon-lilies", "moon-pearls", "moon-lanterns", "moon-dreams"],
+  bramblewood: [
+    "bramble-fox-tails",
+    "bramble-maple",
+    "bramble-candles",
+    "bramble-compasses",
+  ],
 };
 
 function grantWelcomeCollectionGifts(
