@@ -201,6 +201,7 @@ export const VILLAGE_SYSTEM_SENDER_IDS: Partial<Record<VillageId, string>> = {
   clovermeadow: "system-clovermeadow",
   moonmere: "system-moonmere",
   bramblewood: "system-bramblewood",
+  hearthwick: "system-hearthwick",
 };
 
 export function villageIdFromSystemSender(

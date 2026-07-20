@@ -78,6 +78,14 @@ const SYSTEM_SENDERS: Partial<Record<VillageId, SystemVillageSender>> = {
     forestName: "Explorer's Guild",
     bio: "Where every path hides a story.",
   },
+  hearthwick: {
+    id: "system-hearthwick",
+    username: "hearthwick_hedgehog",
+    displayName: "Hearthwick",
+    email: "system+hearthwick@whimpost.local",
+    forestName: "The Hearth Hall",
+    bio: "Where every stranger is welcomed home.",
+  },
 };
 
 const WELCOME_TEMPLATES: Partial<Record<VillageId, WelcomeTemplate>> = {
@@ -413,6 +421,90 @@ Welcome to **Bramblewood**.
       },
     ],
   },
+  hearthwick: {
+    subject: "Welcome to Hearthwick",
+    body: `**Dear neighbor,**
+
+The kettle has been waiting for you.
+
+Not for long—just long enough to brew the perfect cup.
+
+Welcome to **Hearthwick**, where windows glow warmly at dusk, fresh bread cools on every windowsill, and no one stays a stranger for very long.
+
+You'll soon discover that letters here travel with more than words.
+
+They carry recipes.
+Stories.
+Laughter.
+Comfort.
+
+Sometimes they simply arrive to remind someone they are not alone.
+
+On your kitchen table, we've left a small welcome basket.
+
+Inside you'll find:
+
+* ![Hearth Muffins](/stickers/collectibles/hearthwick/hearth-muffins.png) A loaf of warm honey bread.
+* ![Recipes](/stickers/collectibles/hearthwick/hearth-recipes.png) A sprig of lavender.
+* ![Knit Blankets](/stickers/collectibles/hearthwick/hearth-blankets.png) A cozy blanket stitched by village hands.
+* ![Fireside Notes](/stickers/collectibles/hearthwick/hearth-letters.png) And a bundle of handmade stationery, ready for the conversations waiting ahead.
+
+When evening falls, you'll always find someone by the hearth with an empty chair beside them.
+
+We hope you'll pull it a little closer to the fire.
+
+Welcome to **Hearthwick**.
+
+*May every letter you send feel like coming home.*`,
+    paperStyle: "cream",
+    envelopeStyle: "kraft",
+    waxSeal: "heart",
+    stampStyle: "mushroom-amanita",
+    stickers: [
+      {
+        id: "welcome-pie",
+        kind: "pie",
+        x: 92,
+        y: 8,
+        scale: 0.62,
+        rotation: 8,
+      },
+      {
+        id: "welcome-candle",
+        kind: "candle-jar",
+        x: 8,
+        y: 10,
+        scale: 0.58,
+        rotation: -12,
+      },
+      {
+        id: "welcome-honey",
+        kind: "honey-jar",
+        x: 9,
+        y: 88,
+        scale: 0.55,
+        rotation: -6,
+      },
+      {
+        id: "welcome-jam",
+        kind: "jam-jar",
+        x: 93,
+        y: 92,
+        scale: 0.55,
+        rotation: 10,
+      },
+    ],
+    scraps: [
+      {
+        id: "welcome-stain",
+        kind: "tea-stain",
+        x: 8,
+        y: 6,
+        scale: 0.5,
+        rotation: -8,
+      },
+    ],
+  },
 };
 
 export function isSystemUsername(username: string) {
@@ -489,6 +581,12 @@ const WELCOME_COLLECTION_GIFTS: Partial<
     "bramble-maple",
     "bramble-candles",
     "bramble-compasses",
+  ],
+  hearthwick: [
+    "hearth-muffins",
+    "hearth-recipes",
+    "hearth-blankets",
+    "hearth-letters",
   ],
 };
 
