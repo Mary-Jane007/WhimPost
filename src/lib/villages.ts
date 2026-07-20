@@ -45,8 +45,8 @@ export type CollectibleKind =
   | "hearth-teacups"
   | "hearth-blankets"
   | "hearth-muffins"
-  | "hearth-lavender"
-  | "hearth-candles"
+  | "hearth-recipes"
+  | "hearth-cinnamon-rolls"
   | "hearth-embers"
   | "hearth-kettles"
   | "hearth-letters";
