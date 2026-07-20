@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 export function NoticeBoard({
@@ -75,9 +76,18 @@ export function NoticeBoard({
           <li key={n.id}>
             <p>{n.body}</p>
             <span>
-              {n.anonymous
-                ? "A kind stranger"
-                : `${n.author?.displayName} (@${n.author?.username})`}
+              {n.anonymous ? (
+                "A kind stranger"
+              ) : n.author ? (
+                <>
+                  <Link href={`/profile/${n.author.username}`}>
+                    {n.author.displayName}
+                  </Link>{" "}
+                  (@{n.author.username})
+                </>
+              ) : (
+                "A villager"
+              )}
             </span>
           </li>
         ))}
