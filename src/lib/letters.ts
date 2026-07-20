@@ -19,28 +19,72 @@ function parseJsonArray<T>(raw: string): T[] {
   }
 }
 
+type UserRow = {
+  id: string;
+  username: string;
+  display_name: string;
+  bio: string;
+  forest_name: string;
+  created_at: string;
+  is_owner: number;
+  village_id: string | null;
+  reputation: number;
+};
+
+const USER_SELECT = `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
+              village_id, reputation
+       FROM users`;
+
 export function getUserById(id: string): UserPublic | null {
+  const db = getDb();
+  const row = db.prepare(`${USER_SELECT} WHERE id = ?`).get(id) as
+    | UserRow
+    | undefined;
+  return row ? mapUser(row) : null;
+}
+
+export function getUserByUsername(username: string): UserPublic | null {
+  const db = getDb();
+  const row = db
+    .prepare(`${USER_SELECT} WHERE username = ? COLLATE NOCASE`)
+    .get(username.trim()) as UserRow | undefined;
+  return row ? mapUser(row) : null;
+}
+
+export type FriendshipRelation =
+  | { status: "none" }
+  | { status: "friends" }
+  | { status: "pending_out" }
+  | { status: "pending_in"; requestId: string };
+
+export function getFriendshipRelation(
+  viewerId: string,
+  otherId: string
+): FriendshipRelation {
+  if (viewerId === otherId) return { status: "none" };
   const db = getDb();
   const row = db
     .prepare(
-      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, reputation
-       FROM users WHERE id = ?`
+      `SELECT id, status, requester_id, addressee_id FROM friendships
+       WHERE (requester_id = ? AND addressee_id = ?)
+          OR (requester_id = ? AND addressee_id = ?)`
     )
-    .get(id) as
+    .get(viewerId, otherId, otherId, viewerId) as
     | {
         id: string;
-        username: string;
-        display_name: string;
-        bio: string;
-        forest_name: string;
-        created_at: string;
-        is_owner: number;
-        village_id: string | null;
-        reputation: number;
+        status: string;
+        requester_id: string;
+        addressee_id: string;
       }
     | undefined;
-  return row ? mapUser(row) : null;
+
+  if (!row) return { status: "none" };
+  if (row.status === "accepted") return { status: "friends" };
+  if (row.status === "pending") {
+    if (row.requester_id === viewerId) return { status: "pending_out" };
+    return { status: "pending_in", requestId: row.id };
+  }
+  return { status: "none" };
 }
 
 function parseImage(row: LetterRecord): PlacedImage | null {

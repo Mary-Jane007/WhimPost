@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import type { UserPublic } from "@/lib/types";
 
@@ -129,7 +130,9 @@ export function FriendsPanel({
               .map((u) => (
                 <li key={u.id}>
                   <div>
-                    <strong>{u.displayName}</strong>
+                    <Link href={`/profile/${u.username}`} className="user-link">
+                      <strong>{u.displayName}</strong>
+                    </Link>
                     <span>@{u.username}</span>
                     {u.forestName && <em>{u.forestName}</em>}
                   </div>
@@ -151,7 +154,12 @@ export function FriendsPanel({
             {incoming.map((req) => (
               <li key={req.id}>
                 <div>
-                  <strong>{req.user.displayName}</strong>
+                  <Link
+                    href={`/profile/${req.user.username}`}
+                    className="user-link"
+                  >
+                    <strong>{req.user.displayName}</strong>
+                  </Link>
                   <span>@{req.user.username}</span>
                 </div>
                 <div className="row-actions">
@@ -179,7 +187,12 @@ export function FriendsPanel({
             {outgoing.map((req) => (
               <li key={req.id}>
                 <div>
-                  <strong>{req.user.displayName}</strong>
+                  <Link
+                    href={`/profile/${req.user.username}`}
+                    className="user-link"
+                  >
+                    <strong>{req.user.displayName}</strong>
+                  </Link>
                   <span>@{req.user.username}</span>
                 </div>
                 <em className="pending-tag">Pending</em>
@@ -200,14 +213,24 @@ export function FriendsPanel({
             {friends.map((f) => (
               <li key={f.id}>
                 <div>
-                  <strong>{f.displayName}</strong>
+                  <Link href={`/profile/${f.username}`} className="user-link">
+                    <strong>{f.displayName}</strong>
+                  </Link>
                   <span>@{f.username}</span>
                   {f.forestName && <em>{f.forestName}</em>}
                   {f.bio && <p>{f.bio}</p>}
                 </div>
-                <a className="btn-secondary" href={`/compose?to=${f.username}`}>
-                  Write
-                </a>
+                <div className="row-actions">
+                  <Link
+                    className="btn-secondary"
+                    href={`/profile/${f.username}`}
+                  >
+                    Profile
+                  </Link>
+                  <a className="btn-secondary" href={`/compose?to=${f.username}`}>
+                    Write
+                  </a>
+                </div>
               </li>
             ))}
           </ul>

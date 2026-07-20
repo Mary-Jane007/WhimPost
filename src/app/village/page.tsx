@@ -271,16 +271,29 @@ export default async function VillagePage() {
               return (
                 <li key={neighbor.id}>
                   <div>
-                    <strong>{neighbor.displayName}</strong>
+                    <Link
+                      href={`/profile/${neighbor.username}`}
+                      className="user-link"
+                    >
+                      <strong>{neighbor.displayName}</strong>
+                    </Link>
                     <span>@{neighbor.username}</span>
                     <em>{neighbor.reputation} rep</em>
                   </div>
-                  <Link
-                    className="btn-secondary"
-                    href={`/compose?to=${neighbor.username}`}
-                  >
-                    Write
-                  </Link>
+                  <div className="row-actions">
+                    <Link
+                      className="btn-secondary"
+                      href={`/profile/${neighbor.username}`}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      className="btn-secondary"
+                      href={`/compose?to=${neighbor.username}`}
+                    >
+                      Write
+                    </Link>
+                  </div>
                 </li>
               );
             })}

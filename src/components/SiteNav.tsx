@@ -10,6 +10,7 @@ const links = [
   { href: "/sent", label: "Sent" },
   { href: "/compose", label: "Write" },
   { href: "/friends", label: "Friends" },
+  { href: "/profile", label: "Profile" },
 ];
 
 export function SiteNav({ user }: { user: UserPublic | null }) {
@@ -55,10 +56,15 @@ export function SiteNav({ user }: { user: UserPublic | null }) {
           <button type="button" className="nav-ghost" onClick={logout}>
             Sign out
           </button>
-          <span className="nav-user">
+          <Link
+            href={`/profile/${user.username}`}
+            className={
+              pathname.startsWith("/profile") ? "nav-user active" : "nav-user"
+            }
+          >
             {user.displayName}
             {user.isOwner ? <span className="owner-badge">Owner</span> : null}
-          </span>
+          </Link>
         </nav>
       ) : (
         <nav className="nav-links" aria-label="Main">

@@ -31,7 +31,9 @@ export function LetterReader({
         </Link>
         <p>
           {perspective === "inbox" ? "From" : "To"}{" "}
-          <strong>{counterpart.displayName}</strong>
+          <Link href={`/profile/${counterpart.username}`} className="user-link">
+            <strong>{counterpart.displayName}</strong>
+          </Link>
           <span className="muted"> @{counterpart.username}</span>
         </p>
         {letter.sentAt && (
