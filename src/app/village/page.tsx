@@ -236,17 +236,9 @@ export default async function VillagePage() {
             const have = stats.collectibles[key] || 0;
             return (
               <div key={key} className="collectible-chip">
-                {meta.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={meta.image}
-                    alt=""
-                    className="collectible-icon"
-                    draggable={false}
-                  />
-                ) : (
-                  <span aria-hidden>{meta.emoji}</span>
-                )}
+                <span className="collectible-emoji" aria-hidden>
+                  {meta.emoji}
+                </span>
                 <strong>{meta.name}</strong>
                 <em>
                   {have}/{meta.max}

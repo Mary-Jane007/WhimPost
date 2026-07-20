@@ -1992,6 +1992,12 @@ body.theme-clovermeadow .village-sticker-pack {
   margin-bottom: 0.15rem;
 }
 
+.collectible-emoji {
+  font-size: 1.55rem;
+  line-height: 1;
+  margin-bottom: 0.1rem;
+}
+
 .collectible-chip strong {
   font-size: 0.92rem;
 }

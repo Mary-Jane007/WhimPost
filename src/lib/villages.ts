@@ -222,49 +222,41 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     emoji: "🦋",
     name: "Pink Butterflies",
     max: 20,
-    image: "/stickers/villages/clovermeadow/collectibles/butterfly.png",
   },
   "clover-bunnies": {
     emoji: "🐰",
     name: "Meadow Bunnies",
     max: 15,
-    image: "/stickers/villages/clovermeadow/collectibles/bunny.png",
   },
   "clover-lotus": {
     emoji: "🪷",
     name: "Pink Lotus",
     max: 12,
-    image: "/stickers/villages/clovermeadow/collectibles/lotus.png",
   },
   "clover-ribbon": {
     emoji: "🎀",
     name: "Pink Ribbons",
     max: 18,
-    image: "/stickers/villages/clovermeadow/collectibles/ribbon.png",
   },
   "clover-cherries": {
     emoji: "🍒",
     name: "Gingham Cherries",
     max: 16,
-    image: "/stickers/villages/clovermeadow/collectibles/cherries.png",
   },
   "clover-honey": {
     emoji: "🍯",
     name: "Village Honey",
     max: 14,
-    image: "/stickers/villages/clovermeadow/collectibles/honey.png",
   },
   "clover-blossoms": {
     emoji: "🌸",
     name: "Cherry Blossoms",
     max: 22,
-    image: "/stickers/villages/clovermeadow/collectibles/blossom.png",
   },
   "clover-hearts": {
     emoji: "💗",
     name: "Soft Hearts",
     max: 20,
-    image: "/stickers/villages/clovermeadow/collectibles/heart.png",
   },
 };
 
