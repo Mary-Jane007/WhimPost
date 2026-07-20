@@ -140,20 +140,6 @@ export function LetterPaper({
         <LetterBodyText body={body} />
       )}
 
-      {mascot ? (
-        <div className="letter-mascot" title={mascot.name}>
-          {mascot.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={mascot.image} alt={mascot.name} draggable={false} />
-          ) : (
-            <span className="letter-mascot-emoji" aria-hidden>
-              {mascot.emoji}
-            </span>
-          )}
-          <em>{mascot.name}</em>
-        </div>
-      ) : null}
-
       {image ? (
         <div
           className={`placed-item letter-photo-item ${selectedId === PHOTO_SELECT_ID ? "selected" : ""}`}
@@ -219,6 +205,20 @@ export function LetterPaper({
           <StickerArt kind={sticker.kind} className="w-14 h-14" />
         </div>
       ))}
+
+      {mascot ? (
+        <div className="letter-mascot" title={mascot.name}>
+          {mascot.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={mascot.image} alt={mascot.name} draggable={false} />
+          ) : (
+            <span className="letter-mascot-emoji" aria-hidden>
+              {mascot.emoji}
+            </span>
+          )}
+          <em>{mascot.name}</em>
+        </div>
+      ) : null}
     </div>
   );
 }

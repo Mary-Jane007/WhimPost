@@ -2400,7 +2400,7 @@ body.theme-clovermeadow .form-error {
   position: absolute;
   right: 0.85rem;
   bottom: 0.85rem;
-  z-index: 5;
+  z-index: 8;
   display: grid;
   justify-items: center;
   gap: 0.2rem;
