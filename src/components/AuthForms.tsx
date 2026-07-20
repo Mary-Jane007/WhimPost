@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { VILLAGES, type VillageId } from "@/lib/villages";
+import { VillageMascot } from "@/components/VillageMascot";
 
 export function LoginForm() {
   const [login, setLogin] = useState("");
@@ -169,9 +170,7 @@ export function RegisterForm() {
               }
               onClick={() => setVillageId(v.id)}
             >
-              <span className="village-mascot" aria-hidden>
-                {v.mascot}
-              </span>
+              <VillageMascot village={v} size="md" />
               <strong>{v.name}</strong>
               <em>{v.motto}</em>
               <span className="village-belongs">{v.belongs.slice(0, 2).join(" · ")}</span>

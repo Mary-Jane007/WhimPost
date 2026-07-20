@@ -31,6 +31,8 @@ export interface VillageInfo {
   belongs: string[];
   mascot: string;
   mascotName: string;
+  /** Optional illustrated mascot image (replaces emoji when set). */
+  mascotImage?: string;
   color: string;
   colorSoft: string;
   tasks: string[];
@@ -67,6 +69,7 @@ export const VILLAGES: VillageInfo[] = [
     belongs: ["Friendly souls", "Encouragers", "Optimists", "Smile-makers"],
     mascot: "🐝",
     mascotName: "Bee",
+    mascotImage: "/villages/clovermeadow/mascot.png",
     color: "#d4849a",
     colorSoft: "#f2c4d0",
     tasks: [
