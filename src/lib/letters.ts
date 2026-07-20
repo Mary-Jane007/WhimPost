@@ -21,7 +21,7 @@ export function getUserById(id: string): UserPublic | null {
   const db = getDb();
   const row = db
     .prepare(
-      `SELECT id, username, display_name, bio, forest_name, created_at
+      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner
        FROM users WHERE id = ?`
     )
     .get(id) as
@@ -32,6 +32,7 @@ export function getUserById(id: string): UserPublic | null {
         bio: string;
         forest_name: string;
         created_at: string;
+        is_owner: number;
       }
     | undefined;
   return row ? mapUser(row) : null;
@@ -80,7 +81,7 @@ export function listFriends(userId: string): UserPublic[] {
   const db = getDb();
   const rows = db
     .prepare(
-      `SELECT u.id, u.username, u.display_name, u.bio, u.forest_name, u.created_at
+      `SELECT u.id, u.username, u.display_name, u.bio, u.forest_name, u.created_at, u.is_owner
        FROM friendships f
        JOIN users u ON u.id = CASE
          WHEN f.requester_id = ? THEN f.addressee_id
@@ -97,6 +98,7 @@ export function listFriends(userId: string): UserPublic[] {
     bio: string;
     forest_name: string;
     created_at: string;
+    is_owner: number;
   }>;
   return rows.map(mapUser);
 }

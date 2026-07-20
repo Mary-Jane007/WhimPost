@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const db = getDb();
   const rows = db
     .prepare(
-      `SELECT id, username, display_name, bio, forest_name, created_at
+      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner
        FROM users
        WHERE id != ?
          AND (
@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
     bio: string;
     forest_name: string;
     created_at: string;
+    is_owner: number;
   }>;
 
   return NextResponse.json({ users: rows.map(mapUser) });

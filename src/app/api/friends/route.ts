@@ -12,7 +12,7 @@ export async function GET() {
 
   const incoming = db
     .prepare(
-      `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated
+      `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated, u.is_owner
        FROM friendships f
        JOIN users u ON u.id = f.requester_id
        WHERE f.addressee_id = ? AND f.status = 'pending'
@@ -27,11 +27,12 @@ export async function GET() {
     bio: string;
     forest_name: string;
     ucreated: string;
+    is_owner: number;
   }>;
 
   const outgoing = db
     .prepare(
-      `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated
+      `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated, u.is_owner
        FROM friendships f
        JOIN users u ON u.id = f.addressee_id
        WHERE f.requester_id = ? AND f.status = 'pending'
@@ -46,6 +47,7 @@ export async function GET() {
     bio: string;
     forest_name: string;
     ucreated: string;
+    is_owner: number;
   }>;
 
   return NextResponse.json({
@@ -60,6 +62,7 @@ export async function GET() {
         bio: r.bio,
         forest_name: r.forest_name,
         created_at: r.ucreated,
+        is_owner: r.is_owner,
       }),
     })),
     outgoing: outgoing.map((r) => ({
@@ -72,6 +75,7 @@ export async function GET() {
         bio: r.bio,
         forest_name: r.forest_name,
         created_at: r.ucreated,
+        is_owner: r.is_owner,
       }),
     })),
   });

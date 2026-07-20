@@ -34,4 +34,6 @@ Create two accounts in separate browsers (or normal + private), add each other a
 - `npm start` — run production server
 - `npm run lint` — ESLint
 
-The SQLite database is stored at `data/whimpost.db` (gitignored).
+## Ownership
+
+The first account that **registers or signs in** when no owner exists yet is remembered as the **site owner** (stored in SQLite as `users.is_owner`). Later accounts stay regular members.

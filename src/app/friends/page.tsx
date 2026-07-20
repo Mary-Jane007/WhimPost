@@ -14,7 +14,7 @@ export default async function FriendsPage() {
   const incoming = (
     db
       .prepare(
-        `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated
+        `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated, u.is_owner
          FROM friendships f
          JOIN users u ON u.id = f.requester_id
          WHERE f.addressee_id = ? AND f.status = 'pending'
@@ -29,6 +29,7 @@ export default async function FriendsPage() {
       bio: string;
       forest_name: string;
       ucreated: string;
+      is_owner: number;
     }>
   ).map((r) => ({
     id: r.id,
@@ -40,13 +41,14 @@ export default async function FriendsPage() {
       bio: r.bio,
       forest_name: r.forest_name,
       created_at: r.ucreated,
+      is_owner: r.is_owner,
     }),
   }));
 
   const outgoing = (
     db
       .prepare(
-        `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated
+        `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated, u.is_owner
          FROM friendships f
          JOIN users u ON u.id = f.addressee_id
          WHERE f.requester_id = ? AND f.status = 'pending'
@@ -61,6 +63,7 @@ export default async function FriendsPage() {
       bio: string;
       forest_name: string;
       ucreated: string;
+      is_owner: number;
     }>
   ).map((r) => ({
     id: r.id,
@@ -72,6 +75,7 @@ export default async function FriendsPage() {
       bio: r.bio,
       forest_name: r.forest_name,
       created_at: r.ucreated,
+      is_owner: r.is_owner,
     }),
   }));
 

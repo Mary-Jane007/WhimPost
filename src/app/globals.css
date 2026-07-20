@@ -152,10 +152,23 @@ select {
 
 .nav-user {
   opacity: 0.65;
-  max-width: 8rem;
+  max-width: 12rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.owner-badge {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--forest-deep);
+  background: linear-gradient(180deg, #d4af37, #c9a227);
+  padding: 0.15rem 0.4rem;
+  opacity: 1;
 }
 
 .btn-primary,
