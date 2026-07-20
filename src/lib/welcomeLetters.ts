@@ -62,6 +62,14 @@ const SYSTEM_SENDERS: Partial<Record<VillageId, SystemVillageSender>> = {
     forestName: "The Community Garden",
     bio: "Where kindness grows.",
   },
+  moonmere: {
+    id: "system-moonmere",
+    username: "moonmere_moth",
+    displayName: "Moonmere",
+    email: "system+moonmere@whimpost.local",
+    forestName: "The Moon Dock",
+    bio: "Where dreams become letters.",
+  },
 };
 
 const WELCOME_TEMPLATES: Partial<Record<VillageId, WelcomeTemplate>> = {
@@ -223,6 +231,95 @@ Welcome home.
       },
     ],
   },
+  moonmere: {
+    subject: "Welcome to Moonmere",
+    body: `**To the traveler beneath the stars,**
+
+Last night, the lake held an extra reflection.
+
+Not of the moon.
+
+Of you.
+
+Welcome to **Moonmere**, where lanterns glow long after sunset and conversations linger like ripples across quiet water.
+
+Some villagers write after midnight.
+Some write after watching the rain.
+Some simply wait until their heart has something gentle to say.
+
+There is no wrong time to begin.
+
+Waiting at your window is a silver lantern — the first pieces of your Moonmere collection.
+
+Inside it you'll find:
+
+* 🪷 Night lily petals from the lakeshore blooms.
+* 🫧 A mere pearl, smooth as the water's hush.
+* 🏮 A dock lantern that burns with a quiet light.
+* 💭 A dream note that asks only one question:
+
+*"What have you been dreaming about lately?"*
+
+These are only the beginning. Write letters, welcome friends, and gather more keepsakes as starlight settles on the dock. Your cottage will fill as your collection grows.
+
+You needn't have the answer today.
+
+Moonmere has always believed that the best letters arrive when they're ready.
+
+Until then, the lake will keep your secrets, and the stars will keep you company.
+
+Welcome to **Moonmere**.
+
+*May your words drift softly into waiting hearts.*`,
+    paperStyle: "night",
+    envelopeStyle: "ink",
+    waxSeal: "moon",
+    stampStyle: "moon-full",
+    stickers: [
+      {
+        id: "welcome-moon-full",
+        kind: "moon-full-engraving",
+        x: 92,
+        y: 8,
+        scale: 0.62,
+        rotation: 8,
+      },
+      {
+        id: "welcome-luna-moth",
+        kind: "moon-luna-moth",
+        x: 8,
+        y: 10,
+        scale: 0.58,
+        rotation: -14,
+      },
+      {
+        id: "welcome-lantern",
+        kind: "moon-lantern-star",
+        x: 90,
+        y: 88,
+        scale: 0.6,
+        rotation: -6,
+      },
+      {
+        id: "welcome-quote",
+        kind: "moon-quote",
+        x: 10,
+        y: 90,
+        scale: 0.55,
+        rotation: 6,
+      },
+    ],
+    scraps: [
+      {
+        id: "welcome-stain",
+        kind: "tea-stain",
+        x: 8,
+        y: 6,
+        scale: 0.5,
+        rotation: -8,
+      },
+    ],
+  },
 };
 
 export function isSystemUsername(username: string) {
@@ -293,6 +390,7 @@ const WELCOME_COLLECTION_GIFTS: Partial<
     "clover-honey",
     "clover-blossoms",
   ],
+  moonmere: ["moon-lilies", "moon-pearls", "moon-lanterns", "moon-dreams"],
 };
 
 function grantWelcomeCollectionGifts(
