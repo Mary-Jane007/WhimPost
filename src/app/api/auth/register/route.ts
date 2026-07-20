@@ -1,8 +1,9 @@
 import { hashSync } from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { NextRequest, NextResponse } from "next/server";
-import { createSessionToken, jsonError, setSessionCookie } from "@/lib/auth";
+import { createSessionToken, jsonError, mapUser, setSessionCookie } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { claimOwnerIfUnset } from "@/lib/owner";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -37,14 +38,30 @@ export async function POST(req: NextRequest) {
 
   const id = uuidv4();
   db.prepare(
-    `INSERT INTO users (id, username, display_name, email, password_hash, forest_name)
-     VALUES (?, ?, ?, ?, ?, ?)`
+    `INSERT INTO users (id, username, display_name, email, password_hash, forest_name, is_owner)
+     VALUES (?, ?, ?, ?, ?, ?, 0)`
   ).run(id, username, displayName, email, hashSync(password, 10), forestName);
+
+  // First account to sign up / in becomes the remembered site owner.
+  claimOwnerIfUnset(db, id);
+
+  const user = db
+    .prepare(
+      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner
+       FROM users WHERE id = ?`
+    )
+    .get(id) as {
+    id: string;
+    username: string;
+    display_name: string;
+    bio: string;
+    forest_name: string;
+    created_at: string;
+    is_owner: number;
+  };
 
   const token = await createSessionToken({ userId: id, username });
   await setSessionCookie(token);
 
-  return NextResponse.json({
-    user: { id, username, displayName, forestName },
-  });
+  return NextResponse.json({ user: mapUser(user) });
 }

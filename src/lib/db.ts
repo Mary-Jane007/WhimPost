@@ -25,6 +25,7 @@ function createDb() {
       password_hash TEXT NOT NULL,
       bio TEXT DEFAULT '',
       forest_name TEXT DEFAULT '',
+      is_owner INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -59,6 +60,12 @@ function createDb() {
     CREATE INDEX IF NOT EXISTS idx_letters_sender ON letters(sender_id, sent_at);
     CREATE INDEX IF NOT EXISTS idx_friendships_users ON friendships(requester_id, addressee_id);
   `);
+
+  // Migrate older databases that predate the owner flag.
+  const cols = db.prepare(`PRAGMA table_info(users)`).all() as Array<{ name: string }>;
+  if (!cols.some((c) => c.name === "is_owner")) {
+    db.exec(`ALTER TABLE users ADD COLUMN is_owner INTEGER NOT NULL DEFAULT 0`);
+  }
 
   return db;
 }

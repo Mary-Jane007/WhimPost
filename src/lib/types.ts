@@ -73,6 +73,7 @@ export interface UserPublic {
   bio: string;
   forestName: string;
   createdAt: string;
+  isOwner: boolean;
 }
 
 export interface FriendshipRow {

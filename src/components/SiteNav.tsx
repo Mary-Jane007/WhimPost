@@ -44,7 +44,10 @@ export function SiteNav({ user }: { user: UserPublic | null }) {
           <button type="button" className="nav-ghost" onClick={logout}>
             Sign out
           </button>
-          <span className="nav-user">{user.displayName}</span>
+          <span className="nav-user">
+            {user.displayName}
+            {user.isOwner ? <span className="owner-badge">Owner</span> : null}
+          </span>
         </nav>
       ) : (
         <nav className="nav-links" aria-label="Main">

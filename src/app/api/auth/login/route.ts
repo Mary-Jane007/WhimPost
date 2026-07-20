@@ -2,6 +2,7 @@ import { compareSync } from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, jsonError, mapUser, setSessionCookie } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { claimOwnerIfUnset } from "@/lib/owner";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
   const db = getDb();
   const row = db
     .prepare(
-      `SELECT id, username, display_name, bio, forest_name, created_at, password_hash, email
+      `SELECT id, username, display_name, bio, forest_name, created_at, password_hash, email, is_owner
        FROM users
        WHERE username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE`
     )
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
         created_at: string;
         password_hash: string;
         email: string;
+        is_owner: number;
       }
     | undefined;
 
@@ -35,11 +37,29 @@ export async function POST(req: NextRequest) {
     return jsonError("Those credentials don't match any forest mailbox", 401);
   }
 
+  // The account you sign in with becomes the remembered site owner
+  // when no owner has been claimed yet.
+  claimOwnerIfUnset(db, row.id);
+  const refreshed = db
+    .prepare(
+      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner
+       FROM users WHERE id = ?`
+    )
+    .get(row.id) as {
+    id: string;
+    username: string;
+    display_name: string;
+    bio: string;
+    forest_name: string;
+    created_at: string;
+    is_owner: number;
+  };
+
   const token = await createSessionToken({
-    userId: row.id,
-    username: row.username,
+    userId: refreshed.id,
+    username: refreshed.username,
   });
   await setSessionCookie(token);
 
-  return NextResponse.json({ user: mapUser(row) });
+  return NextResponse.json({ user: mapUser(refreshed) });
 }
