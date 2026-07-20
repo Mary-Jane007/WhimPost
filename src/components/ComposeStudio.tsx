@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
-import { LetterPaper } from "@/components/LetterPaper";
+import { LetterPaper, PHOTO_SELECT_ID } from "@/components/LetterPaper";
 import { EnvelopeFace } from "@/components/EnvelopeFace";
 import { StickerArt, ScrapArt } from "@/components/stickers/StickerArt";
 import type { UserPublic } from "@/lib/types";
@@ -16,6 +16,7 @@ import {
   WAX_OPTIONS,
   type EnvelopeStyle,
   type PaperStyle,
+  type PlacedImage,
   type PlacedScrap,
   type PlacedSticker,
   type ScrapKind,
@@ -51,7 +52,7 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
   );
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [image, setImage] = useState<PlacedImage | null>(null);
   const [error, setError] = useState("");
   const [preview, setPreview] = useState<"letter" | "envelope">("letter");
 
@@ -88,10 +89,14 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
     id: string,
     x: number,
     y: number,
-    type: "sticker" | "scrap"
+    type: "sticker" | "scrap" | "image"
   ) {
     const nx = Math.min(96, Math.max(4, x));
     const ny = Math.min(96, Math.max(4, y));
+    if (type === "image") {
+      setImage((current) => (current ? { ...current, x: nx, y: ny } : current));
+      return;
+    }
     if (type === "sticker") {
       setStickers((items) =>
         items.map((i) => (i.id === id ? { ...i, x: nx, y: ny } : i))
@@ -105,6 +110,11 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
 
   function removeSelected() {
     if (!selectedId) return;
+    if (selectedId === PHOTO_SELECT_ID) {
+      setImage(null);
+      setSelectedId(null);
+      return;
+    }
     setStickers((s) => s.filter((i) => i.id !== selectedId));
     setScraps((s) => s.filter((i) => i.id !== selectedId));
     setSelectedId(null);
@@ -112,6 +122,20 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
 
   function nudgeSelected(field: "rotation" | "scale", delta: number) {
     if (!selectedId) return;
+    if (selectedId === PHOTO_SELECT_ID) {
+      setImage((current) =>
+        current
+          ? {
+              ...current,
+              [field]:
+                field === "scale"
+                  ? Math.min(2.5, Math.max(0.35, current.scale + delta))
+                  : current.rotation + delta,
+            }
+          : current
+      );
+      return;
+    }
     setStickers((items) =>
       items.map((i) =>
         i.id === selectedId
@@ -153,7 +177,14 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
       setError(data.error || "Could not upload image");
       return;
     }
-    setImageUrl(data.url);
+    setImage({
+      url: data.url,
+      x: 50,
+      y: 58,
+      scale: 1,
+      rotation: -1,
+    });
+    setSelectedId(PHOTO_SELECT_ID);
     setPreview("letter");
   }
 
@@ -177,7 +208,7 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
         stampStyle,
         stickers,
         scraps,
-        imageUrl,
+        image,
       }),
     });
     const data = await res.json();
@@ -300,19 +331,16 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
                 <span>
                   {uploading
                     ? "Tucking the photo in…"
-                    : imageUrl
+                    : image
                       ? "Replace photo"
                       : "Upload an image"}
                 </span>
               </label>
-              {imageUrl ? (
-                <button
-                  type="button"
-                  className="tiny-chip"
-                  onClick={() => setImageUrl(null)}
-                >
-                  Remove photo
-                </button>
+              {image ? (
+                <p className="compose-hint">
+                  Drag the photo on the letter. Use the corner handle or +/− to
+                  resize.
+                </p>
               ) : (
                 <p className="compose-hint">JPG, PNG, WebP, or GIF · under 4MB</p>
               )}
@@ -401,7 +429,11 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
 
           {selectedId && (
             <div className="selection-tools">
-              <p>Selected decoration</p>
+              <p>
+                {selectedId === PHOTO_SELECT_ID
+                  ? "Selected photo"
+                  : "Selected decoration"}
+              </p>
               <div className="tool-row">
                 <button type="button" onClick={() => nudgeSelected("rotation", -8)}>
                   ↺
@@ -431,11 +463,15 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
               subject={subject}
               stickers={stickers}
               scraps={scraps}
-              imageUrl={imageUrl}
+              image={image}
               editable
               onBodyChange={setBody}
               onSubjectChange={setSubject}
-              onRemoveImage={() => setImageUrl(null)}
+              onRemoveImage={() => {
+                setImage(null);
+                setSelectedId(null);
+              }}
+              onImageChange={setImage}
               selectedId={selectedId}
               onSelectItem={setSelectedId}
               onMoveItem={moveItem}
@@ -450,8 +486,8 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
             />
           )}
           <p className="compose-hint">
-            Drag stickers and scraps across the page. Seal when your letter feels
-            complete.
+            Drag stickers, scraps, and photos across the page. Use the gold corner
+            on a photo to resize. Seal when your letter feels complete.
           </p>
         </section>
       </div>

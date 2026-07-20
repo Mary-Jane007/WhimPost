@@ -36,6 +36,7 @@ function migrate(db: Database.Database) {
     "collectibles_json TEXT NOT NULL DEFAULT '{}'"
   );
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
+  ensureColumn(db, "letters", "image_json", "image_json TEXT");
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS village_notes (
@@ -96,6 +97,7 @@ function createDb() {
       status TEXT NOT NULL CHECK(status IN ('draft', 'sent')) DEFAULT 'sent',
       is_read INTEGER NOT NULL DEFAULT 0,
       image_url TEXT,
+      image_json TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       sent_at TEXT
     );
