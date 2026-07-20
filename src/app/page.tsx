@@ -42,17 +42,11 @@ export default async function HomePage() {
         <StickerArt kind="frogs-tandem" />
         <StickerArt kind="fox-seated" />
         <StickerArt kind="mushroom-amanita" />
-        <StickerArt kind="fawn-resting" />
         <StickerArt kind="jam-jar" />
         <StickerArt kind="moon-full" />
-        <StickerArt kind="picnic-basket" />
-        <StickerArt kind="dragonfly" />
-        <StickerArt kind="honey-bear" />
-        <StickerArt kind="pretzel" />
       </div>
 
       <section className="landing-section forest-panel">
-        <ForestStickers density="auth" />
         <h2>Mail that feels handmade</h2>
         <p>
           WhimPost is a quiet place to write real letters online — parchment and
@@ -61,11 +55,6 @@ export default async function HomePage() {
         </p>
         <div className="feature-flow">
           <div className="feature-visual">
-            <div className="feature-stickers" aria-hidden>
-              <StickerArt kind="fox-seated" className="w-14 h-14" />
-              <StickerArt kind="frog-crown" className="w-14 h-14" />
-              <StickerArt kind="mushroom-amanita" className="w-14 h-14" />
-            </div>
             <div className="demo-envelope">
               <EnvelopeFace
                 style="sage"
