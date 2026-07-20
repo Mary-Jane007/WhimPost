@@ -23,7 +23,7 @@ export default async function RootLayout({
       ? (user.villageId as VillageId)
       : null;
   const theme = getVillageTheme(villageId);
-  const themeClass = villageId === "clovermeadow" ? "theme-clovermeadow" : "";
+  const themeClass = theme && villageId ? `theme-${villageId}` : "";
 
   const themeStyle = theme
     ? ({

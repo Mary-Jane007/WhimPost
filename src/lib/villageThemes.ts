@@ -10,8 +10,18 @@ export type VillageThemeTokens = {
   bgGlow: string;
 };
 
-/** Per-village visual identity. Only Clovermeadow is fully styled for now. */
+/** Per-village visual identity. */
 export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
+  mosshollow: {
+    color: "#1a3d2e",
+    colorSoft: "#6b8f71",
+    accent: "#c4a574",
+    cream: "#e8dcc8",
+    ink: "#1f2a1e",
+    gold: "#c9a227",
+    bgGlow:
+      "radial-gradient(ellipse at 16% 10%, rgba(95, 127, 101, 0.38), transparent 48%), radial-gradient(ellipse at 88% 8%, rgba(201, 162, 39, 0.12), transparent 38%), radial-gradient(ellipse at 50% 100%, rgba(18, 28, 22, 0.95), transparent 55%), linear-gradient(165deg, #0c120e 0%, #152019 30%, #1a2a22 58%, #0e1510 100%)",
+  },
   clovermeadow: {
     color: "#d4849a",
     colorSoft: "#f2c4d0",

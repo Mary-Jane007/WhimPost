@@ -2419,3 +2419,106 @@ body.theme-clovermeadow .form-error {
 .paper-night .letter-mascot em {
   color: rgba(243, 230, 208, 0.65);
 }
+
+/* —— Mosshollow dark-academia forest library theme —— */
+body.theme-mosshollow {
+  --forest-deep: #0c120e;
+  --forest: #1a2a22;
+  --blush: #8b7355;
+  --sage: #6b8f71;
+}
+
+body.theme-mosshollow .site-nav {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 18, 14, 0.96),
+    rgba(26, 61, 46, 0.55)
+  );
+  border-bottom-color: rgba(201, 162, 39, 0.18);
+}
+
+body.theme-mosshollow .brand-icon,
+body.theme-mosshollow .nav-links a:hover,
+body.theme-mosshollow .open-cue {
+  color: var(--gold);
+}
+
+body.theme-mosshollow .btn-primary {
+  background: linear-gradient(145deg, #3d6b52, #1a3d2e);
+  color: #e8dcc8;
+  border-color: rgba(201, 162, 39, 0.35);
+}
+
+body.theme-mosshollow .btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+body.theme-mosshollow .btn-secondary {
+  border-color: rgba(107, 143, 113, 0.45);
+  color: var(--cream);
+}
+
+body.theme-mosshollow .forest-backdrop {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 18, 14, 0.4) 0%,
+      rgba(18, 32, 24, 0.62) 45%,
+      rgba(10, 16, 12, 0.88) 100%
+    ),
+    radial-gradient(ellipse at 18% 12%, rgba(95, 127, 101, 0.32), transparent 44%),
+    radial-gradient(ellipse at 82% 18%, rgba(201, 162, 39, 0.1), transparent 38%),
+    linear-gradient(165deg, #0c120e, #1a2a22 52%, #0e1510);
+  opacity: 0.78;
+}
+
+body.theme-mosshollow .app-main.forest-panel,
+body.theme-mosshollow .village-panel {
+  border-color: rgba(107, 143, 113, 0.28);
+  background:
+    linear-gradient(
+      165deg,
+      rgba(232, 220, 200, 0.06),
+      rgba(26, 42, 34, 0.55)
+    );
+}
+
+body.theme-mosshollow .village-page {
+  border-color: color-mix(in srgb, var(--village-color, #1a3d2e) 50%, transparent);
+}
+
+body.theme-mosshollow .village-motto {
+  color: color-mix(in srgb, var(--village-soft, #6b8f71) 75%, #e8dcc8);
+}
+
+body.theme-mosshollow .forest-stickers-mosshollow .forest-sticker {
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45)) saturate(0.92);
+}
+
+body.theme-mosshollow .welcome-modal {
+  background: linear-gradient(165deg, #ebe0cb, #d4c4a4);
+  border-color: rgba(107, 143, 113, 0.5);
+  color: #1f2a1e;
+}
+
+body.theme-mosshollow .welcome-modal-title {
+  color: #1a3d2e;
+}
+
+body.theme-mosshollow .welcome-modal-kicker,
+body.theme-mosshollow .welcome-modal-lead {
+  color: rgba(31, 42, 30, 0.72);
+}
+
+body.theme-mosshollow .form-error {
+  color: #c9a227;
+}
+
+body.theme-mosshollow .collectible-chip {
+  border-color: rgba(107, 143, 113, 0.28);
+  background: rgba(12, 18, 14, 0.45);
+}
+
+body.theme-mosshollow .paper-moss {
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}

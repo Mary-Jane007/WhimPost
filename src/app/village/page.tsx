@@ -134,7 +134,9 @@ export default async function VillagePage() {
         kinds={
           village.id === "clovermeadow"
             ? ["butterfly-green", "gingham-bow", "sunflower"]
-            : ["fox-seated", "mushroom-amanita", "moon-full"]
+            : village.id === "mosshollow"
+              ? ["mushroom-amanita", "leafy-branch", "skeleton-key"]
+              : ["fox-seated", "mushroom-amanita", "moon-full"]
         }
         villageStickers={
           village.id === "clovermeadow"

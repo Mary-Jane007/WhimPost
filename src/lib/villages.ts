@@ -63,11 +63,11 @@ export const VILLAGES: VillageInfo[] = [
     name: "Mosshollow",
     motto: "Where stories are preserved.",
     theme:
-      "An ancient village beneath towering oaks. The library is carved into a giant tree, and every letter is treated like a treasure.",
+      "An overgrown library village beneath towering oaks — moss on stone arches, pressed ferns in journals, and every letter kept like a treasure among the shelves.",
     belongs: ["Readers", "Writers", "Quiet thinkers", "Long-letter lovers"],
     mascot: "🦉",
     mascotName: "Owl",
-    color: "#1f4d3a",
+    color: "#1a3d2e",
     colorSoft: "#6b8f71",
     tasks: [
       "Write one thoughtful letter each week",
