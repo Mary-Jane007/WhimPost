@@ -154,14 +154,16 @@ A compliment tucked into an envelope.
 A thoughtful question.
 A gentle reminder that someone, somewhere, is thinking of you.
 
-Beside your doorstep, we've left a woven basket.
+Beside your doorstep, we've left a woven basket — the first pieces of your Clovermeadow collection.
 
 Inside you'll discover:
 
-* A packet of wildflower seeds.
-* A ribbon for tying your letters.
-* Fresh honey from the village bees.
-* And a tiny notebook for collecting moments that made you smile.
+* 🦋 A pink meadow butterfly for your jar.
+* 🎀 A soft ribbon for tying kindness into letters.
+* 🍯 A spoon of village honey from the bees.
+* 🌸 A handful of cherry blossoms to start your shelf.
+
+These are only the beginning. Write letters, welcome friends, and gather more keepsakes as kindness grows. Your cottage will fill as your collection blooms.
 
 We hope you'll help our gardens grow—not only with flowers, but with the warmth your words bring to others.
 
@@ -285,6 +287,12 @@ const WELCOME_COLLECTION_GIFTS: Partial<
   Record<VillageId, CollectibleKind[]>
 > = {
   mosshollow: ["mushrooms", "leaves", "feathers", "lost-pages"],
+  clovermeadow: [
+    "clover-butterflies",
+    "clover-ribbon",
+    "clover-honey",
+    "clover-blossoms",
+  ],
 };
 
 function grantWelcomeCollectionGifts(
