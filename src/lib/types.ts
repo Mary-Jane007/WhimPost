@@ -126,6 +126,7 @@ export interface LetterRecord {
   scrap_json: string;
   status: "draft" | "sent";
   is_read: number;
+  image_url: string | null;
   created_at: string;
   sent_at: string | null;
 }
@@ -140,6 +141,7 @@ export interface LetterView {
   stampStyle: StampStyle;
   stickers: PlacedSticker[];
   scraps: PlacedScrap[];
+  imageUrl: string | null;
   status: "draft" | "sent";
   isRead: boolean;
   createdAt: string;

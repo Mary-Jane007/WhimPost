@@ -133,14 +133,23 @@ export async function POST(req: NextRequest) {
         )
     : [];
 
+  let imageUrl: string | null = null;
+  if (body.imageUrl) {
+    const candidate = String(body.imageUrl);
+    if (!/^\/api\/uploads\/[a-f0-9-]+\.(jpg|jpeg|png|webp|gif)$/i.test(candidate)) {
+      return jsonError("Invalid image attachment");
+    }
+    imageUrl = candidate;
+  }
+
   const id = uuidv4();
   const db = getDb();
   db.prepare(
     `INSERT INTO letters (
       id, sender_id, recipient_id, subject, body,
       paper_style, envelope_style, wax_seal, stamp_style,
-      stickers_json, scrap_json, status, is_read, sent_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sent', 0, datetime('now'))`
+      stickers_json, scrap_json, status, is_read, image_url, sent_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sent', 0, ?, datetime('now'))`
   ).run(
     id,
     user.id,
@@ -152,7 +161,8 @@ export async function POST(req: NextRequest) {
     waxSeal,
     stampStyle,
     JSON.stringify(stickers),
-    JSON.stringify(scraps)
+    JSON.stringify(scraps),
+    imageUrl
   );
 
   rewardLetterSent(db, user.id, letterBody.length);

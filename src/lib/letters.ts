@@ -56,6 +56,7 @@ export function toLetterView(row: LetterRecord): LetterView | null {
     stampStyle: row.stamp_style,
     stickers: parseJsonArray<PlacedSticker>(row.stickers_json),
     scraps: parseJsonArray<PlacedScrap>(row.scrap_json),
+    imageUrl: row.image_url || null,
     status: row.status,
     isRead: Boolean(row.is_read),
     createdAt: row.created_at,

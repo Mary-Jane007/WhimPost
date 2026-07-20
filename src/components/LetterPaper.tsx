@@ -22,9 +22,11 @@ export function LetterPaper({
   subject,
   stickers,
   scraps,
+  imageUrl = null,
   editable = false,
   onBodyChange,
   onSubjectChange,
+  onRemoveImage,
   selectedId,
   onSelectItem,
   onMoveItem,
@@ -35,9 +37,11 @@ export function LetterPaper({
   subject: string;
   stickers: PlacedSticker[];
   scraps: PlacedScrap[];
+  imageUrl?: string | null;
   editable?: boolean;
   onBodyChange?: (v: string) => void;
   onSubjectChange?: (v: string) => void;
+  onRemoveImage?: () => void;
   selectedId?: string | null;
   onSelectItem?: (id: string | null) => void;
   onMoveItem?: (id: string, x: number, y: number, type: "sticker" | "scrap") => void;
@@ -97,6 +101,25 @@ export function LetterPaper({
       ) : (
         <div className="letter-body-display">{body}</div>
       )}
+
+      {imageUrl ? (
+        <figure className="letter-photo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageUrl} alt="Attached to this letter" />
+          {editable && onRemoveImage ? (
+            <button
+              type="button"
+              className="letter-photo-remove"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemoveImage();
+              }}
+            >
+              Remove photo
+            </button>
+          ) : null}
+        </figure>
+      ) : null}
 
       {scraps.map((scrap) => (
         <div
