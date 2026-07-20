@@ -5,6 +5,10 @@ import { createSessionToken, jsonError, mapUser, setSessionCookie } from "@/lib/
 import { getDb } from "@/lib/db";
 import { claimOwnerIfUnset } from "@/lib/owner";
 import { isVillageId } from "@/lib/villages";
+import {
+  deliverWelcomeLetter,
+  isSystemUsername,
+} from "@/lib/welcomeLetters";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -19,6 +23,9 @@ export async function POST(req: NextRequest) {
 
   if (!/^[a-zA-Z0-9_]{3,24}$/.test(username)) {
     return jsonError("Username must be 3–24 letters, numbers, or underscores");
+  }
+  if (isSystemUsername(username)) {
+    return jsonError("That username is reserved by the forest", 409);
   }
   if (displayName.length < 2 || displayName.length > 40) {
     return jsonError("Display name must be 2–40 characters");
@@ -58,6 +65,7 @@ export async function POST(req: NextRequest) {
   );
 
   claimOwnerIfUnset(db, id);
+  deliverWelcomeLetter(db, id, villageId);
 
   const user = db
     .prepare(

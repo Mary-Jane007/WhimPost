@@ -19,6 +19,11 @@ import {
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
 import { NoticeBoard } from "@/components/NoticeBoard";
 import { PageCrest } from "@/components/PageCrest";
+import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
+import {
+  deliverWelcomeLetter,
+  getUnreadWelcomeLetter,
+} from "@/lib/welcomeLetters";
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -36,6 +41,8 @@ export default async function VillagePage() {
   }
 
   const village = getVillage(stats.villageId)!;
+  deliverWelcomeLetter(db, user.id, stats.villageId);
+  const welcomeLetter = getUnreadWelcomeLetter(db, user.id, stats.villageId);
   const villageRep = getVillageReputation(db, stats.villageId);
   const members = getVillageMemberCount(db, stats.villageId);
   const unlock = villageUnlockLevel(villageRep);
@@ -121,6 +128,7 @@ export default async function VillagePage() {
       }
     >
       <PageCrest kinds={["fox-seated", "mushroom-amanita", "moon-full"]} />
+      {welcomeLetter ? <WelcomeLetterModal letter={welcomeLetter} /> : null}
 
       <header className="village-hero">
         <p className="village-mascot-lg" aria-hidden>

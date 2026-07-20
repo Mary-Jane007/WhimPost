@@ -1,5 +1,6 @@
 "use client";
 
+import { LetterBodyText } from "@/components/LetterBodyText";
 import { StickerArt, ScrapArt } from "@/components/stickers/StickerArt";
 import type {
   PaperStyle,
@@ -130,7 +131,7 @@ export function LetterPaper({
           maxLength={8000}
         />
       ) : (
-        <div className="letter-body-display">{body}</div>
+        <LetterBodyText body={body} />
       )}
 
       {image ? (
