@@ -3,14 +3,27 @@
 import { useState } from "react";
 import { VILLAGES, type VillageId } from "@/lib/villages";
 
-export function VillageJoinPicker() {
-  const [villageId, setVillageId] = useState<VillageId | "">("");
+export function VillageJoinPicker({
+  currentVillageId = null,
+  mode = "join",
+}: {
+  currentVillageId?: VillageId | null;
+  mode?: "join" | "change";
+}) {
+  const [villageId, setVillageId] = useState<VillageId | "">(
+    currentVillageId || ""
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const changing = mode === "change";
 
   async function join() {
     if (!villageId) {
       setError("Pick a village first");
+      return;
+    }
+    if (changing && villageId === currentVillageId) {
+      setError("You're already settled here");
       return;
     }
     setLoading(true);
@@ -30,39 +43,65 @@ export function VillageJoinPicker() {
   }
 
   return (
-    <div className="village-join">
-      <h1>Choose your village</h1>
-      <p className="lede">
-        Every WhimPost soul belongs somewhere. Pick the place that feels like home.
-      </p>
+    <div className={`village-join ${changing ? "village-join-change" : ""}`}>
+      {!changing ? (
+        <>
+          <h1>Choose your village</h1>
+          <p className="lede">
+            Every WhimPost soul belongs somewhere. Pick the place that feels like
+            home.
+          </p>
+        </>
+      ) : (
+        <p className="lede village-change-lead">
+          Your belongings travel with you. Reputation stays yours; the new
+          village will greet you in its own way.
+        </p>
+      )}
       <div className="village-picker-grid">
-        {VILLAGES.map((v) => (
-          <button
-            key={v.id}
-            type="button"
-            className={`village-card ${villageId === v.id ? "selected" : ""}`}
-            style={
-              {
-                "--village-color": v.color,
-                "--village-soft": v.colorSoft,
-              } as React.CSSProperties
-            }
-            onClick={() => setVillageId(v.id)}
-          >
-            <span className="village-mascot">{v.mascot}</span>
-            <strong>{v.name}</strong>
-            <em>{v.motto}</em>
-          </button>
-        ))}
+        {VILLAGES.map((v) => {
+          const isCurrent = currentVillageId === v.id;
+          return (
+            <button
+              key={v.id}
+              type="button"
+              className={`village-card ${villageId === v.id ? "selected" : ""} ${
+                isCurrent ? "current" : ""
+              }`}
+              style={
+                {
+                  "--village-color": v.color,
+                  "--village-soft": v.colorSoft,
+                } as React.CSSProperties
+              }
+              onClick={() => setVillageId(v.id)}
+            >
+              <span className="village-mascot">{v.mascot}</span>
+              <strong>{v.name}</strong>
+              <em>{v.motto}</em>
+              {isCurrent ? <span className="village-current-tag">Home</span> : null}
+            </button>
+          );
+        })}
       </div>
       {error && <p className="form-error">{error}</p>}
       <button
         type="button"
         className="btn-primary"
-        disabled={!villageId || loading}
+        disabled={
+          !villageId ||
+          loading ||
+          (changing && villageId === currentVillageId)
+        }
         onClick={join}
       >
-        {loading ? "Arriving…" : "Enter the village"}
+        {loading
+          ? changing
+            ? "Moving…"
+            : "Arriving…"
+          : changing
+            ? "Move to this village"
+            : "Enter the village"}
       </button>
     </div>
   );

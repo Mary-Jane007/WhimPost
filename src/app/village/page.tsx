@@ -17,6 +17,7 @@ import {
   type CollectibleKind,
 } from "@/lib/villages";
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
+import { VillageChangePanel } from "@/components/VillageChangePanel";
 import { NoticeBoard } from "@/components/NoticeBoard";
 import { PageCrest } from "@/components/PageCrest";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
@@ -24,6 +25,7 @@ import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
+import type { VillageId } from "@/lib/villages";
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -280,6 +282,11 @@ export default async function VillagePage() {
           ))}
         </div>
       </section>
+
+      <VillageChangePanel
+        currentVillageId={stats.villageId as VillageId}
+        currentVillageName={village.name}
+      />
     </main>
   );
 }
