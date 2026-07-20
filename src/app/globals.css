@@ -1713,6 +1713,7 @@ select {
 }
 
 .village-card {
+  position: relative;
   text-align: left;
   display: grid;
   gap: 0.2rem;
@@ -2001,6 +2002,53 @@ select {
 .village-join h1 {
   font-family: var(--font-display);
   margin: 0;
+}
+
+.village-join-change {
+  margin-top: 0.5rem;
+}
+
+.village-change-lead {
+  margin: 0 0 0.75rem;
+  color: rgba(243, 230, 208, 0.78);
+}
+
+.village-change-panel .btn-secondary {
+  justify-self: start;
+}
+
+.village-change-cancel {
+  margin-bottom: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: var(--font-stamp);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0;
+}
+
+.village-change-cancel:hover {
+  color: var(--cream);
+}
+
+.village-card.current {
+  border-style: dashed;
+}
+
+.village-current-tag {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  font-family: var(--font-stamp);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--village-color, var(--gold));
+  background: rgba(243, 230, 208, 0.18);
+  padding: 0.15rem 0.35rem;
 }
 
 /* Letter photo upload */

@@ -15,6 +15,9 @@ export async function POST(req: NextRequest) {
   if (!isVillageId(villageId)) return jsonError("Unknown village");
 
   const db = getDb();
+  if (user.villageId === villageId) {
+    return jsonError("You're already settled in that village");
+  }
   db.prepare(`UPDATE users SET village_id = ? WHERE id = ?`).run(
     villageId,
     user.id
