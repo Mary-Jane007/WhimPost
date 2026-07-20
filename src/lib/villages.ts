@@ -344,9 +344,10 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     max: 22,
   },
   "hearth-cinnamon-rolls": {
-    emoji: "🍥",
+    emoji: "🧁",
     name: "Cinnamon Rolls",
     max: 16,
+    image: "/stickers/villages/hearthwick/cinnamon-roll.png",
   },
   "hearth-embers": {
     emoji: "🔥",
