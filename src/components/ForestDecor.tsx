@@ -71,7 +71,6 @@ export function ForestStickers({
 export function CollageScraps({ className = "" }: { className?: string }) {
   return (
     <div className={`collage-scraps ${className}`} aria-hidden>
-      <p className="scrap scrap-stone">Nature is God</p>
       <p className="scrap scrap-trees">The trees can hear you if you talk to them</p>
       <p className="scrap scrap-wild">Find me where the wild things are</p>
       <p className="scrap scrap-earth">Touch the earth and remember who you are</p>
