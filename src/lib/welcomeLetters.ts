@@ -101,10 +101,10 @@ A small satchel has been prepared for you — the first pieces of your Mosshollo
 
 Inside you'll find:
 
-* 🍄 A soft woodland mushroom for your jar.
-* 🍃 A pressed oak leaf, the first of many.
-* 🪶 A feather from the library owl.
-* 📖 A lost page, waiting to join your shelf of stories.
+* ![Mushrooms](/stickers/collectibles/forest/mushrooms.png) A soft woodland mushroom for your jar.
+* ![Leaves](/stickers/collectibles/forest/leaves.png) A pressed oak leaf, the first of many.
+* ![Feathers](/stickers/collectibles/forest/feathers.png) A feather from the library owl.
+* ![Lost Pages](/stickers/collectibles/forest/lost-pages.png) A lost page, waiting to join your shelf of stories.
 
 These are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the village. Your cottage will fill as your collection grows.
 
@@ -174,10 +174,10 @@ Beside your doorstep, we've left a woven basket — the first pieces of your Clo
 
 Inside you'll discover:
 
-* 🦋 A pink meadow butterfly for your jar.
-* 🎀 A soft ribbon for tying kindness into letters.
-* 🍯 A spoon of village honey from the bees.
-* 🌸 A handful of cherry blossoms to start your shelf.
+* ![Pink Butterflies](/stickers/collectibles/clovermeadow/clover-butterflies.png) A pink meadow butterfly for your jar.
+* ![Pink Ribbons](/stickers/collectibles/clovermeadow/clover-ribbon.png) A soft ribbon for tying kindness into letters.
+* ![Village Honey](/stickers/collectibles/clovermeadow/clover-honey.png) A spoon of village honey from the bees.
+* ![Cherry Blossoms](/stickers/collectibles/clovermeadow/clover-blossoms.png) A handful of cherry blossoms to start your shelf.
 
 These are only the beginning. Write letters, welcome friends, and gather more keepsakes as kindness grows. Your cottage will fill as your collection blooms.
 
@@ -261,10 +261,10 @@ Waiting at your window is a silver lantern — the first pieces of your Moonmere
 
 Inside it you'll find:
 
-* 🪷 Night lily petals from the lakeshore blooms.
-* 🫧 A mere pearl, smooth as the water's hush.
-* 🏮 A dock lantern that burns with a quiet light.
-* 💭 A dream note that asks only one question:
+* ![Night Lilies](/stickers/collectibles/moonmere/moon-lilies.png) Night lily petals from the lakeshore blooms.
+* ![Mere Pearls](/stickers/collectibles/moonmere/moon-pearls.png) A mere pearl, smooth as the water's hush.
+* ![Dock Lanterns](/stickers/collectibles/moonmere/moon-lanterns.png) A dock lantern that burns with a quiet light.
+* ![Dream Notes](/stickers/collectibles/moonmere/moon-dreams.png) A dream note that asks only one question:
 
 *"What have you been dreaming about lately?"*
 
@@ -346,10 +346,10 @@ Before setting off, we've packed a travel satchel for you — the first pieces o
 
 Inside you'll find:
 
-* 🦊 A soft fox tail for luck on every trail.
-* 🍁 A pressed maple leaf from the dens.
-* 🕯️ A Hello Fall candle to warm your satchel.
-* 🧭 A compass that occasionally points toward wonder instead of north.
+* ![Fox Tails](/stickers/collectibles/bramblewood/bramble-fox-tails.png) A soft fox tail for luck on every trail.
+* ![Maple Leaves](/stickers/collectibles/bramblewood/bramble-maple.png) A pressed maple leaf from the dens.
+* ![Hello Fall Candles](/stickers/collectibles/bramblewood/bramble-candles.png) A Hello Fall candle to warm your satchel.
+* ![Wonder Compasses](/stickers/collectibles/bramblewood/bramble-compasses.png) A compass that occasionally points toward wonder instead of north.
 
 These are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the trails. Your cottage will fill as your collection grows.
 
