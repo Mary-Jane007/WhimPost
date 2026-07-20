@@ -42,14 +42,14 @@ export type CollectibleKind =
   | "moon-dreams"
   | "moon-dust"
   // Bramblewood
-  | "bramble-maps"
-  | "bramble-feathers"
-  | "bramble-compasses"
-  | "bramble-keys"
-  | "bramble-leaves"
+  | "bramble-fox-tails"
+  | "bramble-maple"
+  | "bramble-amber"
   | "bramble-mushrooms"
-  | "bramble-acorns"
-  | "bramble-tales";
+  | "bramble-candles"
+  | "bramble-compasses"
+  | "bramble-monarchs"
+  | "bramble-pinecones";
 
 export type CollectibleMeta = {
   emoji: string;
@@ -324,45 +324,45 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     name: "Fairy Dust",
     max: 15,
   },
-  "bramble-maps": {
-    emoji: "🗺️",
-    name: "Weathered Maps",
-    max: 18,
-  },
-  "bramble-feathers": {
-    emoji: "🪶",
-    name: "Raven Feathers",
+  "bramble-fox-tails": {
+    emoji: "🦊",
+    name: "Fox Tails",
     max: 16,
+  },
+  "bramble-maple": {
+    emoji: "🍁",
+    name: "Maple Leaves",
+    max: 28,
+  },
+  "bramble-amber": {
+    emoji: "🟠",
+    name: "Amber Berries",
+    max: 22,
+  },
+  "bramble-mushrooms": {
+    emoji: "🍄",
+    name: "Spotted Mushrooms",
+    max: 20,
+  },
+  "bramble-candles": {
+    emoji: "🕯️",
+    name: "Hello Fall Candles",
+    max: 14,
   },
   "bramble-compasses": {
     emoji: "🧭",
     name: "Wonder Compasses",
     max: 12,
   },
-  "bramble-keys": {
-    emoji: "🔑",
-    name: "Brass Keys",
-    max: 14,
+  "bramble-monarchs": {
+    emoji: "🦋",
+    name: "Monarch Wings",
+    max: 18,
   },
-  "bramble-leaves": {
-    emoji: "🍂",
-    name: "Autumn Leaves",
-    max: 28,
-  },
-  "bramble-mushrooms": {
-    emoji: "🍄",
-    name: "Trail Mushrooms",
-    max: 22,
-  },
-  "bramble-acorns": {
-    emoji: "🌰",
-    name: "Path Acorns",
+  "bramble-pinecones": {
+    emoji: "🌲",
+    name: "Pinecones",
     max: 24,
-  },
-  "bramble-tales": {
-    emoji: "📜",
-    name: "Trail Tales",
-    max: 20,
   },
 };
 
@@ -399,14 +399,14 @@ const MOON_COLLECTIBLES: CollectibleKind[] = [
 ];
 
 const BRAMBLE_COLLECTIBLES: CollectibleKind[] = [
-  "bramble-maps",
-  "bramble-feathers",
-  "bramble-compasses",
-  "bramble-keys",
-  "bramble-leaves",
+  "bramble-fox-tails",
+  "bramble-maple",
+  "bramble-amber",
   "bramble-mushrooms",
-  "bramble-acorns",
-  "bramble-tales",
+  "bramble-candles",
+  "bramble-compasses",
+  "bramble-monarchs",
+  "bramble-pinecones",
 ];
 
 /** Which collectibles appear for each village. */

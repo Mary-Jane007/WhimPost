@@ -346,10 +346,10 @@ Before setting off, we've packed a travel satchel for you — the first pieces o
 
 Inside you'll find:
 
-* 🗺️ A weathered map with several places still left blank.
-* 🪶 A feather from a curious raven.
+* 🦊 A soft fox tail for luck on every trail.
+* 🍁 A pressed maple leaf from the dens.
+* 🕯️ A Hello Fall candle to warm your satchel.
 * 🧭 A compass that occasionally points toward wonder instead of north.
-* 🔑 A tiny brass key whose lock has yet to be discovered.
 
 These are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the trails. Your cottage will fill as your collection grows.
 
@@ -485,10 +485,10 @@ const WELCOME_COLLECTION_GIFTS: Partial<
   ],
   moonmere: ["moon-lilies", "moon-pearls", "moon-lanterns", "moon-dreams"],
   bramblewood: [
-    "bramble-maps",
-    "bramble-feathers",
+    "bramble-fox-tails",
+    "bramble-maple",
+    "bramble-candles",
     "bramble-compasses",
-    "bramble-keys",
   ],
 };
 
