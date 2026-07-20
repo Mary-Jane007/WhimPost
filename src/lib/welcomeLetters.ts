@@ -48,6 +48,14 @@ const SYSTEM_SENDERS: Partial<Record<VillageId, SystemVillageSender>> = {
     forestName: "The Great Library",
     bio: "Where stories are preserved.",
   },
+  clovermeadow: {
+    id: "system-clovermeadow",
+    username: "clovermeadow_bee",
+    displayName: "Clovermeadow",
+    email: "system+clovermeadow@whimpost.local",
+    forestName: "The Community Garden",
+    bio: "Where kindness grows.",
+  },
 };
 
 const WELCOME_TEMPLATES: Partial<Record<VillageId, WelcomeTemplate>> = {
@@ -119,6 +127,89 @@ Welcome to **Mosshollow**.
         y: 6,
         scale: 0.55,
         rotation: -10,
+      },
+    ],
+  },
+  clovermeadow: {
+    subject: "Welcome to Clovermeadow",
+    body: `Dear friend,
+
+The flowers began blooming a little earlier today.
+
+We suspect they heard someone new was arriving.
+
+Welcome to **Clovermeadow**, where every cottage keeps a kettle warm, every path leads to a friendly hello, and every letter has the chance to brighten someone's day.
+
+Here, kindness is planted one small act at a time.
+
+A compliment tucked into an envelope.
+A thoughtful question.
+A gentle reminder that someone, somewhere, is thinking of you.
+
+Beside your doorstep, we've left a woven basket.
+
+Inside you'll discover:
+
+* A packet of wildflower seeds.
+* A ribbon for tying your letters.
+* Fresh honey from the village bees.
+* And a tiny notebook for collecting moments that made you smile.
+
+We hope you'll help our gardens grow—not only with flowers, but with the warmth your words bring to others.
+
+Take your time.
+
+There's no rush in a meadow.
+
+Welcome home.
+
+*May your letters bloom wherever they are read.*`,
+    paperStyle: "floral",
+    envelopeStyle: "blush",
+    waxSeal: "heart",
+    stampStyle: "dragonfly",
+    stickers: [
+      {
+        id: "welcome-sunflower",
+        kind: "sunflower",
+        x: 93,
+        y: 7,
+        scale: 0.7,
+        rotation: 14,
+      },
+      {
+        id: "welcome-butterfly",
+        kind: "butterfly-green",
+        x: 7,
+        y: 8,
+        scale: 0.62,
+        rotation: -16,
+      },
+      {
+        id: "welcome-honey",
+        kind: "honey-jar",
+        x: 91,
+        y: 90,
+        scale: 0.65,
+        rotation: -8,
+      },
+      {
+        id: "welcome-narcissus",
+        kind: "narcissus",
+        x: 94,
+        y: 96,
+        scale: 0.55,
+        rotation: 10,
+      },
+    ],
+    scraps: [
+      {
+        id: "welcome-stain",
+        kind: "tea-stain",
+        x: 8,
+        y: 94,
+        scale: 0.5,
+        rotation: 12,
       },
     ],
   },

@@ -62,7 +62,7 @@ export const VILLAGES: VillageInfo[] = [
   {
     id: "clovermeadow",
     name: "Clovermeadow",
-    motto: "Kindness grows here.",
+    motto: "Where kindness grows.",
     theme: "Flower fields, cottages, gardens, and bees.",
     belongs: ["Friendly souls", "Encouragers", "Optimists", "Smile-makers"],
     mascot: "🐝",
