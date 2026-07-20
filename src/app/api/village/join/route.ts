@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError, mapUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { isVillageId } from "@/lib/villages";
+import { deliverWelcomeLetter } from "@/lib/welcomeLetters";
 
 /** Join or switch village (for accounts created before villages existed). */
 export async function POST(req: NextRequest) {
@@ -18,6 +19,7 @@ export async function POST(req: NextRequest) {
     villageId,
     user.id
   );
+  deliverWelcomeLetter(db, user.id, villageId);
 
   const row = db
     .prepare(
