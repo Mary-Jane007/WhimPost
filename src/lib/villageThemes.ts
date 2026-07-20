@@ -32,6 +32,16 @@ export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
     bgGlow:
       "radial-gradient(ellipse at 18% 8%, rgba(242, 196, 208, 0.55), transparent 45%), radial-gradient(ellipse at 85% 10%, rgba(168, 196, 168, 0.28), transparent 40%), radial-gradient(ellipse at 50% 100%, rgba(120, 70, 90, 0.45), transparent 55%), linear-gradient(165deg, #3a2430 0%, #4a2f3a 32%, #5c3a48 62%, #3a2430 100%)",
   },
+  moonmere: {
+    color: "#2a3548",
+    colorSoft: "#8a9b88",
+    accent: "#7a8fa8",
+    cream: "#ebe4d4",
+    ink: "#2a241c",
+    gold: "#c4a574",
+    bgGlow:
+      "radial-gradient(ellipse at 16% 8%, rgba(138, 155, 136, 0.28), transparent 46%), radial-gradient(ellipse at 88% 12%, rgba(122, 143, 168, 0.22), transparent 42%), radial-gradient(ellipse at 50% 100%, rgba(18, 22, 32, 0.92), transparent 55%), linear-gradient(165deg, #12161e 0%, #1a2230 30%, #243040 58%, #10141c 100%)",
+  },
 };
 
 export type CloverStickerId =
@@ -185,10 +195,114 @@ export const CLOVERMEADOW_DECOR: {
   { id: "flowers-sage", className: "decor-flower-br2" },
 ];
 
+export type MoonmereStickerId =
+  | "moon-full"
+  | "moon-crescent"
+  | "moth-sage"
+  | "luna-moth"
+  | "butterfly-etching"
+  | "fairy-moon"
+  | "fairy-starry"
+  | "starfield"
+  | "lantern-star"
+  | "quote-from-moon"
+  | "ticket-observatory"
+  | "library-card"
+  | "stamp-daphne"
+  | "wallpaper-floral"
+  | "pine-forest";
+
+export const MOONMERE_STICKERS: {
+  id: MoonmereStickerId;
+  name: string;
+  src: string;
+}[] = [
+  { id: "moon-full", name: "Full Moon", src: "/stickers/villages/moonmere/moon-full.png" },
+  {
+    id: "moon-crescent",
+    name: "Man in the Moon",
+    src: "/stickers/villages/moonmere/moon-crescent.png",
+  },
+  { id: "moth-sage", name: "Sage Moth", src: "/stickers/villages/moonmere/moth-sage.png" },
+  { id: "luna-moth", name: "Luna Moth", src: "/stickers/villages/moonmere/luna-moth.png" },
+  {
+    id: "butterfly-etching",
+    name: "Etched Butterfly",
+    src: "/stickers/villages/moonmere/butterfly-etching.png",
+  },
+  { id: "fairy-moon", name: "Moon Fairy", src: "/stickers/villages/moonmere/fairy-moon.png" },
+  {
+    id: "fairy-starry",
+    name: "Starry Fairy",
+    src: "/stickers/villages/moonmere/fairy-starry.png",
+  },
+  { id: "starfield", name: "Night Sky", src: "/stickers/villages/moonmere/starfield.png" },
+  {
+    id: "lantern-star",
+    name: "Star Lantern",
+    src: "/stickers/villages/moonmere/lantern-star.png",
+  },
+  {
+    id: "quote-from-moon",
+    name: "From the Moon",
+    src: "/stickers/villages/moonmere/quote-from-moon.png",
+  },
+  {
+    id: "ticket-observatory",
+    name: "Observatory Ticket",
+    src: "/stickers/villages/moonmere/ticket-observatory.png",
+  },
+  {
+    id: "library-card",
+    name: "Moon Poems Card",
+    src: "/stickers/villages/moonmere/library-card.png",
+  },
+  {
+    id: "stamp-daphne",
+    name: "Daphne Stamp",
+    src: "/stickers/villages/moonmere/stamp-daphne.png",
+  },
+  {
+    id: "wallpaper-floral",
+    name: "Floral Scrap",
+    src: "/stickers/villages/moonmere/wallpaper-floral.png",
+  },
+  {
+    id: "pine-forest",
+    name: "Night Pines",
+    src: "/stickers/villages/moonmere/pine-forest.png",
+  },
+];
+
+export const MOONMERE_DECOR: {
+  id: MoonmereStickerId;
+  className: string;
+}[] = [
+  { id: "moon-crescent", className: "decor-fern-tl" },
+  { id: "fairy-moon", className: "decor-mushroom-tr" },
+  { id: "moon-full", className: "decor-moon-tr" },
+  { id: "moth-sage", className: "decor-fox-bl" },
+  { id: "luna-moth", className: "decor-moth-br" },
+  { id: "starfield", className: "decor-leaf-ml" },
+  { id: "fairy-starry", className: "decor-butterfly-mr" },
+  { id: "lantern-star", className: "decor-acorn-bm" },
+  { id: "quote-from-moon", className: "decor-crow-tm" },
+  { id: "stamp-daphne", className: "decor-sun-tr2" },
+  { id: "pine-forest", className: "decor-spiral-bl2" },
+  { id: "wallpaper-floral", className: "decor-flower-br2" },
+];
+
 export function cloverStickerSrc(id: CloverStickerId) {
   return (
     CLOVERMEADOW_STICKERS.find((s) => s.id === id)?.src ||
     `/stickers/villages/clovermeadow/${id}.png`
+  );
+}
+
+export function moonmereStickerSrc(id: MoonmereStickerId) {
+  return (
+    MOONMERE_STICKERS.find((s) => s.id === id)?.src ||
+    `/stickers/villages/moonmere/${id}.png`
   );
 }
 

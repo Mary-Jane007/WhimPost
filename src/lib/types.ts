@@ -114,7 +114,23 @@ export type StickerKind =
   | "moss-roses-dried"
   | "moss-babys-breath"
   | "moss-moth"
-  | "moss-tag-365";
+  | "moss-tag-365"
+  // Moonmere village pack
+  | "moon-full-engraving"
+  | "moon-crescent-face"
+  | "moon-moth-sage"
+  | "moon-luna-moth"
+  | "moon-butterfly-etching"
+  | "moon-fairy-reach"
+  | "moon-fairy-starry"
+  | "moon-starfield"
+  | "moon-lantern-star"
+  | "moon-quote"
+  | "moon-ticket"
+  | "moon-library-card"
+  | "moon-stamp-daphne"
+  | "moon-wallpaper"
+  | "moon-pine-forest";
 
 export type ScrapKind =
   | "quote-trees"
@@ -594,6 +610,97 @@ export const STICKER_OPTIONS: {
     name: "Botanical Tag",
     villageId: "mosshollow",
     src: "/stickers/villages/mosshollow/pack/tag-365.png",
+  },
+  // Moonmere-only pack
+  {
+    id: "moon-full-engraving",
+    name: "Engraved Moon",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/moon-full.png",
+  },
+  {
+    id: "moon-crescent-face",
+    name: "Man in the Moon",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/moon-crescent.png",
+  },
+  {
+    id: "moon-moth-sage",
+    name: "Sage Moth",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/moth-sage.png",
+  },
+  {
+    id: "moon-luna-moth",
+    name: "Luna Moth",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/luna-moth.png",
+  },
+  {
+    id: "moon-butterfly-etching",
+    name: "Etched Butterfly",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/butterfly-etching.png",
+  },
+  {
+    id: "moon-fairy-reach",
+    name: "Moon Fairy",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/fairy-moon.png",
+  },
+  {
+    id: "moon-fairy-starry",
+    name: "Starry Fairy",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/fairy-starry.png",
+  },
+  {
+    id: "moon-starfield",
+    name: "Night Sky",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/starfield.png",
+  },
+  {
+    id: "moon-lantern-star",
+    name: "Star Lantern",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/lantern-star.png",
+  },
+  {
+    id: "moon-quote",
+    name: "From the Moon",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/quote-from-moon.png",
+  },
+  {
+    id: "moon-ticket",
+    name: "Observatory Ticket",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/ticket-observatory.png",
+  },
+  {
+    id: "moon-library-card",
+    name: "Moon Poems Card",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/library-card.png",
+  },
+  {
+    id: "moon-stamp-daphne",
+    name: "Daphne Stamp",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/stamp-daphne.png",
+  },
+  {
+    id: "moon-wallpaper",
+    name: "Floral Scrap",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/wallpaper-floral.png",
+  },
+  {
+    id: "moon-pine-forest",
+    name: "Night Pines",
+    villageId: "moonmere",
+    src: "/stickers/villages/moonmere/pine-forest.png",
   },
 ];
 
