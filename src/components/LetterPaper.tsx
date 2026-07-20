@@ -27,6 +27,7 @@ export function LetterPaper({
   stickers,
   scraps,
   image = null,
+  mascot = null,
   editable = false,
   onBodyChange,
   onSubjectChange,
@@ -43,6 +44,11 @@ export function LetterPaper({
   stickers: PlacedSticker[];
   scraps: PlacedScrap[];
   image?: PlacedImage | null;
+  mascot?: {
+    emoji: string;
+    name: string;
+    image?: string;
+  } | null;
   editable?: boolean;
   onBodyChange?: (v: string) => void;
   onSubjectChange?: (v: string) => void;
@@ -133,6 +139,20 @@ export function LetterPaper({
       ) : (
         <LetterBodyText body={body} />
       )}
+
+      {mascot ? (
+        <div className="letter-mascot" title={mascot.name}>
+          {mascot.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={mascot.image} alt={mascot.name} draggable={false} />
+          ) : (
+            <span className="letter-mascot-emoji" aria-hidden>
+              {mascot.emoji}
+            </span>
+          )}
+          <em>{mascot.name}</em>
+        </div>
+      ) : null}
 
       {image ? (
         <div
