@@ -179,6 +179,7 @@ export const VILLAGE_MAP = Object.fromEntries(
 export const VILLAGE_SYSTEM_SENDER_IDS: Partial<Record<VillageId, string>> = {
   mosshollow: "system-mosshollow",
   clovermeadow: "system-clovermeadow",
+  moonmere: "system-moonmere",
 };
 
 export function villageIdFromSystemSender(
