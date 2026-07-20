@@ -1400,6 +1400,19 @@ body.theme-clovermeadow .village-sticker-pack {
   z-index: 2;
 }
 
+.forest-sticker,
+.forest-stickers .sparkle,
+.forest-sticker * {
+  pointer-events: none;
+}
+
+.page-shell > .site-nav,
+.page-shell > main,
+.page-shell > .app-main {
+  position: relative;
+  z-index: 3;
+}
+
 .forest-sticker {
   position: absolute;
   display: block;

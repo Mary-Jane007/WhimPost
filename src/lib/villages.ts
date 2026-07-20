@@ -41,6 +41,15 @@ export type CollectibleKind =
   | "moon-lilies"
   | "moon-dreams"
   | "moon-dust"
+  // Bramblewood
+  | "bramble-fox-tails"
+  | "bramble-maple"
+  | "bramble-pumpkins"
+  | "bramble-mushrooms"
+  | "bramble-candles"
+  | "bramble-compasses"
+  | "bramble-monarchs"
+  | "bramble-pinecones"
   // Hearthwick
   | "hearth-teacups"
   | "hearth-blankets"
@@ -142,13 +151,14 @@ export const VILLAGES: VillageInfo[] = [
     id: "bramblewood",
     name: "Bramblewood",
     motto: "Adventure begins beyond the trees.",
-    theme: "Forest paths, foxes, and hidden ruins.",
+    theme:
+      "A warm-orange autumn wood of fox dens and fallen leaves — Hello Fall candles, knit socks by the fire, teapot steam, and every letter sealed with a little woodland luck.",
     belongs: ["Curious minds", "Explorers", "Storytellers", "Adventurers"],
     mascot: "🦊",
     mascotName: "Fox",
     mascotImage: "/villages/bramblewood/mascot.png",
-    color: "#b85c38",
-    colorSoft: "#d4a484",
+    color: "#e07020",
+    colorSoft: "#f0a868",
     tasks: [
       "Solve weekly riddles",
       "Find hidden collectibles around WhimPost",
@@ -190,6 +200,7 @@ export const VILLAGE_SYSTEM_SENDER_IDS: Partial<Record<VillageId, string>> = {
   mosshollow: "system-mosshollow",
   clovermeadow: "system-clovermeadow",
   moonmere: "system-moonmere",
+  bramblewood: "system-bramblewood",
 };
 
 export function villageIdFromSystemSender(
@@ -374,6 +385,54 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     max: 15,
     image: "/stickers/collectibles/moonmere/moon-dust.png",
   },
+  "bramble-fox-tails": {
+    emoji: "🦊",
+    name: "Fox Tails",
+    max: 16,
+    image: "/stickers/collectibles/bramblewood/bramble-fox-tails.png",
+  },
+  "bramble-maple": {
+    emoji: "🍁",
+    name: "Maple Leaves",
+    max: 28,
+    image: "/stickers/collectibles/bramblewood/bramble-maple.png",
+  },
+  "bramble-pumpkins": {
+    emoji: "🎃",
+    name: "Pumpkins",
+    max: 22,
+    image: "/stickers/collectibles/bramblewood/bramble-pumpkins.png",
+  },
+  "bramble-mushrooms": {
+    emoji: "🍄",
+    name: "Spotted Mushrooms",
+    max: 20,
+    image: "/stickers/collectibles/bramblewood/bramble-mushrooms.png",
+  },
+  "bramble-candles": {
+    emoji: "🕯️",
+    name: "Hello Fall Candles",
+    max: 14,
+    image: "/stickers/collectibles/bramblewood/bramble-candles.png",
+  },
+  "bramble-compasses": {
+    emoji: "🧭",
+    name: "Wonder Compasses",
+    max: 12,
+    image: "/stickers/collectibles/bramblewood/bramble-compasses.png",
+  },
+  "bramble-monarchs": {
+    emoji: "🦋",
+    name: "Monarch Wings",
+    max: 18,
+    image: "/stickers/collectibles/bramblewood/bramble-monarchs.png",
+  },
+  "bramble-pinecones": {
+    emoji: "🌲",
+    name: "Pinecones",
+    max: 24,
+    image: "/stickers/collectibles/bramblewood/bramble-pinecones.png",
+  },
   "hearth-teacups": {
     emoji: "🍵",
     name: "Teacups",
@@ -456,6 +515,18 @@ const MOON_COLLECTIBLES: CollectibleKind[] = [
   "moon-dust",
 ];
 
+const BRAMBLE_COLLECTIBLES: CollectibleKind[] = [
+  "bramble-fox-tails",
+  "bramble-maple",
+  "bramble-pumpkins",
+  "bramble-mushrooms",
+  "bramble-candles",
+  "bramble-compasses",
+  "bramble-monarchs",
+  "bramble-pinecones",
+];
+
+
 const HEARTH_COLLECTIBLES: CollectibleKind[] = [
   "hearth-teacups",
   "hearth-blankets",
@@ -472,7 +543,7 @@ export const VILLAGE_COLLECTIBLES: Record<VillageId, CollectibleKind[]> = {
   mosshollow: FOREST_COLLECTIBLES,
   clovermeadow: CLOVER_COLLECTIBLES,
   moonmere: MOON_COLLECTIBLES,
-  bramblewood: FOREST_COLLECTIBLES,
+  bramblewood: BRAMBLE_COLLECTIBLES,
   hearthwick: HEARTH_COLLECTIBLES,
 };
 
