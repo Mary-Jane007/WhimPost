@@ -20,6 +20,7 @@ import {
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
 import { VillageChangePanel } from "@/components/VillageChangePanel";
 import { NoticeBoard } from "@/components/NoticeBoard";
+import { CollectibleIcon } from "@/components/CollectibleIcon";
 import { PageCrest } from "@/components/PageCrest";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
 import { VillageMascot } from "@/components/VillageMascot";
@@ -264,19 +265,7 @@ export default async function VillagePage() {
             const have = liveStats.collectibles[key] || 0;
             return (
               <div key={key} className="collectible-chip">
-                {meta.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={meta.image}
-                    alt=""
-                    className="collectible-icon"
-                    draggable={false}
-                  />
-                ) : (
-                  <span className="collectible-emoji" aria-hidden>
-                    {meta.emoji}
-                  </span>
-                )}
+                <CollectibleIcon kind={key} />
                 <strong>{meta.name}</strong>
                 <em>
                   {have}/{meta.max}
