@@ -140,7 +140,9 @@ export default async function VillagePage() {
               ? ["mushroom-amanita", "leafy-branch", "skeleton-key"]
               : village.id === "moonmere"
                 ? ["moon-full", "moon-crescent", "butterfly-green"]
-                : ["fox-seated", "mushroom-amanita", "moon-full"]
+                : village.id === "hearthwick"
+                  ? ["candle-jar", "jam-jar", "leafy-branch"]
+                  : ["fox-seated", "mushroom-amanita", "moon-full"]
         }
         villageStickers={
           village.id === "clovermeadow"
@@ -151,7 +153,13 @@ export default async function VillagePage() {
                   { village: "moonmere", id: "luna-moth" },
                   { village: "moonmere", id: "fairy-moon" },
                 ]
-              : undefined
+              : village.id === "hearthwick"
+                ? [
+                    { village: "hearthwick", id: "teapot" },
+                    { village: "hearthwick", id: "lavender" },
+                    { village: "hearthwick", id: "candle" },
+                  ]
+                : undefined
         }
       />
       {welcomeLetter ? <WelcomeLetterModal letter={welcomeLetter} /> : null}

@@ -2,8 +2,10 @@ import { StickerArt } from "@/components/stickers/StickerArt";
 import type { StickerKind } from "@/lib/types";
 import {
   CLOVERMEADOW_DECOR,
+  HEARTHWICK_DECOR,
   MOONMERE_DECOR,
   cloverStickerSrc,
+  hearthwickStickerSrc,
   moonmereStickerSrc,
 } from "@/lib/villageThemes";
 import type { VillageId } from "@/lib/villages";
@@ -151,6 +153,33 @@ export function ForestStickers({
             id={item.id}
             className={item.className}
             src={moonmereStickerSrc(item.id)}
+          />
+        ))}
+        <span className="sparkle s1" />
+        <span className="sparkle s2" />
+        <span className="sparkle s3" />
+        <span className="sparkle s4" />
+        <span className="sparkle s5" />
+      </div>
+    );
+  }
+
+  if (villageId === "hearthwick" && density !== "landing") {
+    const items =
+      density === "auth"
+        ? HEARTHWICK_DECOR.filter((_, i) => i % 2 === 0)
+        : HEARTHWICK_DECOR;
+    return (
+      <div
+        className={`forest-stickers forest-stickers-${density} forest-stickers-hearthwick`}
+        aria-hidden
+      >
+        {items.map((item) => (
+          <VillageDecorImg
+            key={`${item.id}-${item.className}`}
+            id={item.id}
+            className={item.className}
+            src={hearthwickStickerSrc(item.id)}
           />
         ))}
         <span className="sparkle s1" />
