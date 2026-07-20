@@ -36,10 +36,18 @@ export async function verifySessionToken(token: string) {
 
 export async function setSessionCookie(token: string) {
   const cookieStore = await cookies();
+  // Only mark Secure on real HTTPS deploys. Production `next start` on
+  // http://localhost would otherwise drop the session in the browser.
+  const secure =
+    process.env.COOKIE_SECURE === "true" ||
+    process.env.VERCEL === "1" ||
+    (process.env.NODE_ENV === "production" &&
+      Boolean(process.env.WHIMPOST_HTTPS));
+
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure,
     path: "/",
     maxAge: 60 * 60 * 24 * 14,
   });

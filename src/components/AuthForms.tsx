@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export function LoginForm() {
-  const router = useRouter();
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,8 +24,7 @@ export function LoginForm() {
       setError(data.error || "Could not sign in");
       return;
     }
-    router.push("/inbox");
-    router.refresh();
+    window.location.assign("/inbox");
   }
 
   return (
@@ -63,7 +60,6 @@ export function LoginForm() {
 }
 
 export function RegisterForm() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -93,8 +89,7 @@ export function RegisterForm() {
       setError(data.error || "Could not create mailbox");
       return;
     }
-    router.push("/friends");
-    router.refresh();
+    window.location.assign("/friends");
   }
 
   return (
