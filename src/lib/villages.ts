@@ -40,7 +40,16 @@ export type CollectibleKind =
   | "moon-lanterns"
   | "moon-lilies"
   | "moon-dreams"
-  | "moon-dust";
+  | "moon-dust"
+  // Bramblewood
+  | "bramble-maps"
+  | "bramble-feathers"
+  | "bramble-compasses"
+  | "bramble-keys"
+  | "bramble-leaves"
+  | "bramble-mushrooms"
+  | "bramble-acorns"
+  | "bramble-tales";
 
 export type CollectibleMeta = {
   emoji: string;
@@ -181,6 +190,7 @@ export const VILLAGE_SYSTEM_SENDER_IDS: Partial<Record<VillageId, string>> = {
   mosshollow: "system-mosshollow",
   clovermeadow: "system-clovermeadow",
   moonmere: "system-moonmere",
+  bramblewood: "system-bramblewood",
 };
 
 export function villageIdFromSystemSender(
@@ -314,6 +324,46 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     name: "Fairy Dust",
     max: 15,
   },
+  "bramble-maps": {
+    emoji: "🗺️",
+    name: "Weathered Maps",
+    max: 18,
+  },
+  "bramble-feathers": {
+    emoji: "🪶",
+    name: "Raven Feathers",
+    max: 16,
+  },
+  "bramble-compasses": {
+    emoji: "🧭",
+    name: "Wonder Compasses",
+    max: 12,
+  },
+  "bramble-keys": {
+    emoji: "🔑",
+    name: "Brass Keys",
+    max: 14,
+  },
+  "bramble-leaves": {
+    emoji: "🍂",
+    name: "Autumn Leaves",
+    max: 28,
+  },
+  "bramble-mushrooms": {
+    emoji: "🍄",
+    name: "Trail Mushrooms",
+    max: 22,
+  },
+  "bramble-acorns": {
+    emoji: "🌰",
+    name: "Path Acorns",
+    max: 24,
+  },
+  "bramble-tales": {
+    emoji: "📜",
+    name: "Trail Tales",
+    max: 20,
+  },
 };
 
 const FOREST_COLLECTIBLES: CollectibleKind[] = [
@@ -348,12 +398,23 @@ const MOON_COLLECTIBLES: CollectibleKind[] = [
   "moon-dust",
 ];
 
+const BRAMBLE_COLLECTIBLES: CollectibleKind[] = [
+  "bramble-maps",
+  "bramble-feathers",
+  "bramble-compasses",
+  "bramble-keys",
+  "bramble-leaves",
+  "bramble-mushrooms",
+  "bramble-acorns",
+  "bramble-tales",
+];
+
 /** Which collectibles appear for each village. */
 export const VILLAGE_COLLECTIBLES: Record<VillageId, CollectibleKind[]> = {
   mosshollow: FOREST_COLLECTIBLES,
   clovermeadow: CLOVER_COLLECTIBLES,
   moonmere: MOON_COLLECTIBLES,
-  bramblewood: FOREST_COLLECTIBLES,
+  bramblewood: BRAMBLE_COLLECTIBLES,
   hearthwick: FOREST_COLLECTIBLES,
 };
 
