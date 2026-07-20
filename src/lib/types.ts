@@ -86,7 +86,35 @@ export type StickerKind =
   | "clover-cd"
   | "clover-teddy"
   | "clover-bunny"
-  | "clover-gummy";
+  | "clover-gummy"
+  // Mosshollow village pack
+  | "moss-typewriter"
+  | "moss-letters-bundle"
+  | "moss-ink-bottle"
+  | "moss-books-stack"
+  | "moss-quote-beauty"
+  | "moss-quote-memories"
+  | "moss-quote-things"
+  | "moss-globe"
+  | "moss-suitcase"
+  | "moss-travel-tag"
+  | "moss-ticket"
+  | "moss-polaroids"
+  | "moss-clock-face"
+  | "moss-pocket-watch"
+  | "moss-camera"
+  | "moss-lantern"
+  | "moss-gramophone"
+  | "moss-vinyl"
+  | "moss-hand-mirror"
+  | "moss-padlock-heart"
+  | "moss-teacup"
+  | "moss-stamp-green"
+  | "moss-stamp-red"
+  | "moss-roses-dried"
+  | "moss-babys-breath"
+  | "moss-moth"
+  | "moss-tag-365";
 
 export type ScrapKind =
   | "quote-trees"
@@ -403,6 +431,169 @@ export const STICKER_OPTIONS: {
     name: "Gummy Bear",
     villageId: "clovermeadow",
     src: "/stickers/villages/clovermeadow/pack/gummy-bear.png",
+  },
+  // Mosshollow-only pack
+  {
+    id: "moss-typewriter",
+    name: "Typewriter",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/typewriter.png",
+  },
+  {
+    id: "moss-letters-bundle",
+    name: "Letter Bundle",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/letters-bundle.png",
+  },
+  {
+    id: "moss-ink-bottle",
+    name: "Ink Bottle",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/ink-bottle.png",
+  },
+  {
+    id: "moss-books-stack",
+    name: "Leather Books",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/books-stack.png",
+  },
+  {
+    id: "moss-quote-beauty",
+    name: "Beauty Tag",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/quote-beauty.png",
+  },
+  {
+    id: "moss-quote-memories",
+    name: "Memories Plaque",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/quote-memories.png",
+  },
+  {
+    id: "moss-quote-things",
+    name: "Wax Seal Scrap",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/quote-things.png",
+  },
+  {
+    id: "moss-globe",
+    name: "Desk Globe",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/globe.png",
+  },
+  {
+    id: "moss-suitcase",
+    name: "Travel Suitcase",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/suitcase.png",
+  },
+  {
+    id: "moss-travel-tag",
+    name: "Travel Tag",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/travel-tag.png",
+  },
+  {
+    id: "moss-ticket",
+    name: "Admit One",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/ticket.png",
+  },
+  {
+    id: "moss-polaroids",
+    name: "Polaroids",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/polaroids.png",
+  },
+  {
+    id: "moss-clock-face",
+    name: "Station Clock",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/clock-face.png",
+  },
+  {
+    id: "moss-pocket-watch",
+    name: "Pocket Watch",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/pocket-watch.png",
+  },
+  {
+    id: "moss-camera",
+    name: "Film Camera",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/camera.png",
+  },
+  {
+    id: "moss-lantern",
+    name: "Oil Lantern",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/lantern.png",
+  },
+  {
+    id: "moss-gramophone",
+    name: "Gramophone",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/gramophone.png",
+  },
+  {
+    id: "moss-vinyl",
+    name: "Vintage Melodies",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/vinyl.png",
+  },
+  {
+    id: "moss-hand-mirror",
+    name: "Ornate Mirror",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/hand-mirror.png",
+  },
+  {
+    id: "moss-padlock-heart",
+    name: "Heart Padlock",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/padlock-heart.png",
+  },
+  {
+    id: "moss-teacup",
+    name: "Rose Teacup",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/teacup.png",
+  },
+  {
+    id: "moss-stamp-green",
+    name: "Green Stamp",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/stamp-green.png",
+  },
+  {
+    id: "moss-stamp-red",
+    name: "Red Stamp",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/stamp-red.png",
+  },
+  {
+    id: "moss-roses-dried",
+    name: "Dried Roses",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/roses-dried.png",
+  },
+  {
+    id: "moss-babys-breath",
+    name: "Baby's Breath",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/babys-breath.png",
+  },
+  {
+    id: "moss-moth",
+    name: "Moth",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/moth.png",
+  },
+  {
+    id: "moss-tag-365",
+    name: "Botanical Tag",
+    villageId: "mosshollow",
+    src: "/stickers/villages/mosshollow/pack/tag-365.png",
   },
 ];
 
