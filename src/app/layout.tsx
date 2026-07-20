@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
-import { ForestStickers } from "@/components/ForestDecor";
+import { SiteForestStickers } from "@/components/SiteForestStickers";
 import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default async function RootLayout({
       <body>
         <div className="forest-backdrop" aria-hidden />
         <div className="page-shell">
-          <ForestStickers density="site" />
+          <SiteForestStickers />
           <SiteNav user={user} />
           {children}
         </div>

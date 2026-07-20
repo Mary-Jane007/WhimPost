@@ -22,17 +22,10 @@ const SITEWIDE: DecorItem[] = [
 ];
 
 const LANDING_EXTRA: DecorItem[] = [
-  { kind: "mushrooms-pair", className: "decor-landing-mush-1" },
   { kind: "fox-seated", className: "decor-landing-fox" },
   { kind: "frogs-tandem", className: "decor-landing-moth" },
-  { kind: "fawn-standing", className: "decor-landing-crow" },
-  { kind: "butterfly-green", className: "decor-landing-bfly" },
-  { kind: "moon-crescent", className: "decor-landing-sun" },
-  { kind: "moon-full", className: "decor-landing-moon" },
-  { kind: "picnic-basket", className: "decor-landing-spiral" },
-  { kind: "leafy-branch", className: "decor-landing-fern" },
-  { kind: "honey-bear", className: "decor-landing-flower" },
-  { kind: "rabbit-hood", className: "decor-landing-leaf" },
+  { kind: "mushroom-amanita", className: "decor-landing-mush-1" },
+  { kind: "moon-crescent", className: "decor-landing-moon" },
   { kind: "jam-jar", className: "decor-landing-acorn" },
 ];
 
@@ -43,7 +36,7 @@ export function ForestStickers({
 }) {
   const items =
     density === "landing"
-      ? [...SITEWIDE, ...LANDING_EXTRA]
+      ? LANDING_EXTRA
       : density === "auth"
         ? SITEWIDE.filter((_, i) => i % 2 === 0)
         : SITEWIDE;
