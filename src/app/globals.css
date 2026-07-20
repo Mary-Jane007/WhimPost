@@ -2537,3 +2537,610 @@ body.theme-mosshollow .collectible-chip {
 body.theme-mosshollow .paper-moss {
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
 }
+
+/* —— Cottage profile —— */
+.cottage-main {
+  width: min(1120px, calc(100% - 1.25rem));
+  padding-top: 1.25rem;
+}
+
+.cottage-profile {
+  display: grid;
+  gap: 1rem;
+}
+
+.cottage-topbar {
+  display: grid;
+  gap: 0.85rem;
+  align-items: end;
+}
+
+@media (min-width: 720px) {
+  .cottage-topbar {
+    grid-template-columns: 1fr minmax(200px, 280px);
+  }
+}
+
+.cottage-kicker {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-stamp);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(243, 230, 208, 0.55);
+}
+
+.cottage-nameplate h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4vw, 2.7rem);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.cottage-handle {
+  margin: 0.25rem 0 0;
+  color: rgba(243, 230, 208, 0.7);
+}
+
+.cottage-meter {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  background: rgba(20, 28, 18, 0.45);
+}
+
+.cottage-meter-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-stamp);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cottage-meter-head em {
+  font-style: normal;
+  opacity: 0.7;
+}
+
+.cottage-meter-bar {
+  margin: 0.45rem 0 0.35rem;
+  height: 0.45rem;
+  background: rgba(243, 230, 208, 0.1);
+  overflow: hidden;
+}
+
+.cottage-meter-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--village-soft, #6b8f71) 70%, #c9a227),
+    var(--gold)
+  );
+  transition: width 0.6s ease;
+}
+
+.cottage-meter-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(243, 230, 208, 0.6);
+}
+
+.cottage-stage {
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 900px) {
+  .cottage-stage {
+    grid-template-columns: minmax(0, 1.45fr) minmax(240px, 0.7fr);
+    align-items: stretch;
+  }
+}
+
+.cottage-room {
+  position: relative;
+  isolation: isolate;
+  min-height: min(58vh, 520px);
+  height: clamp(360px, 58vh, 560px);
+  overflow: hidden;
+  border: 1px solid rgba(243, 230, 208, 0.14);
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.25),
+    0 24px 50px rgba(0, 0, 0, 0.35);
+  background: #1a2218;
+}
+
+.cottage-back-wall {
+  position: absolute;
+  inset: 0 0 32% 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 220, 170, 0.07),
+      transparent 40%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(62, 48, 32, 0.35) 0 14px,
+      rgba(48, 36, 24, 0.45) 14px 28px
+    ),
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--village-color, #1a3d2e) 55%, #2a2218),
+      #243028 70%,
+      #1c241c
+    );
+  z-index: 0;
+}
+
+.cottage-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(0, 0, 0, 0.28)
+    ),
+    repeating-linear-gradient(
+      95deg,
+      #3a2c1c 0 18px,
+      #2f2418 18px 36px
+    );
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
+  z-index: 1;
+}
+
+.cottage-window-glow {
+  position: absolute;
+  top: 12%;
+  right: 14%;
+  width: 22%;
+  height: 28%;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 236, 190, 0.55),
+      rgba(255, 210, 140, 0.12) 55%,
+      transparent 72%
+    );
+  filter: blur(1px);
+  animation: cottageWindow 5.5s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cottage-mantel-shelf {
+  position: absolute;
+  left: 34%;
+  top: 46%;
+  width: 32%;
+  height: 0.55rem;
+  background: linear-gradient(180deg, #6a5135, #3d2e1c);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.cottage-decor {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.15rem;
+  color: inherit;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.cottage-decor-sm { font-size: 1.35rem; }
+.cottage-decor-md { font-size: 1.85rem; }
+.cottage-decor-lg { font-size: 2.45rem; }
+
+.cottage-decor.is-unlocked {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+}
+
+.cottage-decor.is-unlocked .cottage-decor-glyph {
+  display: block;
+  animation: cottageFloat 6s ease-in-out infinite;
+}
+
+.cottage-decor.is-unlocked:nth-of-type(3n) .cottage-decor-glyph {
+  animation-delay: -1.5s;
+}
+
+.cottage-decor.is-unlocked:nth-of-type(4n) .cottage-decor-glyph {
+  animation-delay: -3s;
+}
+
+.cottage-decor.is-locked {
+  opacity: 0.7;
+}
+
+.cottage-decor.is-locked .cottage-decor-glyph {
+  display: none;
+}
+
+.cottage-decor-ghost {
+  display: grid;
+  place-items: center;
+  width: 2.4em;
+  height: 2.4em;
+  border: 1.5px dashed rgba(243, 230, 208, 0.28);
+  background: rgba(20, 24, 18, 0.35);
+  filter: grayscale(1) brightness(0.55);
+  opacity: 0.55;
+  font-size: 0.72em;
+}
+
+.cottage-decor.is-locked:hover .cottage-decor-ghost,
+.cottage-decor.is-selected .cottage-decor-ghost {
+  opacity: 0.85;
+  border-color: rgba(212, 175, 55, 0.55);
+}
+
+.cottage-decor.is-unlocked:hover,
+.cottage-decor.is-selected {
+  transform: translate(-50%, -50%) scale(1.1);
+  z-index: 5;
+}
+
+.cottage-layer-ceiling { z-index: 4; }
+.cottage-layer-wall { z-index: 3; }
+.cottage-layer-mid { z-index: 4; }
+.cottage-layer-floor { z-index: 5; }
+
+.cottage-plaque {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  z-index: 6;
+  width: min(78%, 280px);
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  background:
+    linear-gradient(165deg, #d9c7a0, #c4ae82 55%, #b39a6c);
+  color: #2a2218;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  font: inherit;
+}
+
+.cottage-plaque strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  margin-bottom: 0.15rem;
+}
+
+.cottage-plaque span {
+  display: block;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  opacity: 0.85;
+}
+
+.cottage-village-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  background: rgba(12, 16, 12, 0.55);
+  border: 1px solid rgba(243, 230, 208, 0.15);
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.cottage-sidepanel {
+  min-height: 220px;
+}
+
+.cottage-inspect {
+  height: 100%;
+  padding: 1.1rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--village-soft, #6b8f71) 14%, transparent),
+      rgba(24, 32, 22, 0.72)
+    );
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  animation: riseIn 0.45s ease both;
+}
+
+.cottage-inspect-kicker {
+  margin: 0;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.cottage-inspect h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cottage-inspect p {
+  margin: 0;
+  color: rgba(243, 230, 208, 0.78);
+  line-height: 1.5;
+}
+
+.cottage-unlock-tip {
+  padding: 0.45rem 0.55rem;
+  border-left: 2px solid var(--gold);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--cream) !important;
+  font-family: var(--font-stamp);
+  font-size: 0.85rem;
+}
+
+.cottage-journey-list {
+  list-style: none;
+  margin: 0.35rem 0 0.5rem;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cottage-journey-list button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.55rem;
+  align-items: center;
+  text-align: left;
+  padding: 0.55rem 0.6rem;
+  border: 1px dashed rgba(243, 230, 208, 0.22);
+  background: rgba(0, 0, 0, 0.2);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.cottage-journey-list button span {
+  grid-row: span 2;
+  font-size: 1.35rem;
+  filter: grayscale(0.4);
+  opacity: 0.7;
+}
+
+.cottage-journey-list strong {
+  font-family: var(--font-display);
+}
+
+.cottage-journey-list em {
+  grid-column: 2;
+  font-style: normal;
+  font-size: 0.85rem;
+  color: rgba(243, 230, 208, 0.6);
+}
+
+.cottage-panel-close {
+  justify-self: start;
+  background: none;
+  border: none;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: var(--font-stamp);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0;
+  margin-bottom: 0.25rem;
+}
+
+.cottage-edit-wrap .profile-edit {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.profile-edit {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.profile-edit h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+.profile-edit label {
+  display: grid;
+  gap: 0.3rem;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(243, 230, 208, 0.7);
+}
+
+.profile-edit input,
+.profile-edit textarea {
+  font-family: var(--font-letter);
+  font-size: 1.05rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.cottage-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.65rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  background: rgba(16, 22, 16, 0.55);
+}
+
+.cottage-tool,
+.profile-actions .cottage-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid rgba(243, 230, 208, 0.28);
+  background: rgba(243, 230, 208, 0.06);
+  color: var(--cream);
+  text-decoration: none;
+  font-family: var(--font-stamp);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.cottage-tool:hover,
+.profile-actions .cottage-tool:hover {
+  border-color: rgba(212, 175, 55, 0.55);
+  background: rgba(212, 175, 55, 0.1);
+  transform: translateY(-1px);
+}
+
+.cottage-tool-primary,
+.profile-actions .cottage-tool-primary {
+  background: linear-gradient(180deg, #d4af37, #b8922a);
+  border-color: transparent;
+  color: #1f2a1e;
+}
+
+.cottage-tool-primary:hover,
+.profile-actions .cottage-tool-primary:hover {
+  background: linear-gradient(180deg, #e0c04a, #c9a227);
+  border-color: transparent;
+}
+
+.cottage-tool.is-disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.cottage-tool-actions,
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.profile-actions .form-error {
+  width: 100%;
+  margin: 0;
+}
+
+@keyframes cottageFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes cottageWindow {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+body.theme-clovermeadow .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(255, 210, 220, 0.12), transparent 42%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(120, 70, 85, 0.28) 0 14px,
+      rgba(90, 50, 65, 0.35) 14px 28px
+    ),
+    linear-gradient(165deg, #5c3344, #3d2430 70%, #2a1a22);
+}
+
+body.theme-clovermeadow .cottage-floor {
+  background:
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.25)),
+    repeating-linear-gradient(
+      95deg,
+      #5a3a40 0 18px,
+      #4a3036 18px 36px
+    );
+}
+
+body.theme-clovermeadow .cottage-plaque {
+  background: linear-gradient(165deg, #f3d6de, #e8bfcb 55%, #d9a8b6);
+  border-color: rgba(212, 132, 154, 0.55);
+}
+
+body.theme-mosshollow .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(180, 200, 160, 0.08), transparent 40%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(40, 55, 40, 0.4) 0 14px,
+      rgba(28, 40, 28, 0.5) 14px 28px
+    ),
+    linear-gradient(165deg, #1a3d2e, #152820 70%, #101a14);
+}
+
+body.theme-mosshollow .cottage-window-glow {
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(190, 220, 170, 0.4),
+      rgba(140, 170, 120, 0.1) 55%,
+      transparent 72%
+    );
+}
+
+@media (max-width: 640px) {
+  .cottage-room {
+    height: 380px;
+  }
+
+  .cottage-decor-lg { font-size: 1.9rem; }
+  .cottage-decor-md { font-size: 1.5rem; }
+  .cottage-decor-sm { font-size: 1.2rem; }
+
+  .cottage-toolbar {
+    justify-content: stretch;
+  }
+
+  .cottage-tool,
+  .profile-actions .cottage-tool {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

@@ -29,13 +29,16 @@ export function ProfileEditor({ user }: { user: UserPublic }) {
       setError(data.error || "Could not save profile");
       return;
     }
-    setMessage("Profile updated");
+    setMessage("Plaque polished");
     router.refresh();
   }
 
   return (
     <form className="profile-edit" onSubmit={save}>
-      <h2>Edit your profile</h2>
+      <h2>Cottage plaque</h2>
+      <p className="section-lead">
+        Names and a short note visitors read on your door.
+      </p>
       <label>
         Display name
         <input
@@ -55,19 +58,19 @@ export function ProfileEditor({ user }: { user: UserPublic }) {
         />
       </label>
       <label>
-        Bio
+        Plaque note
         <textarea
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           maxLength={280}
           rows={4}
-          placeholder="A few words about you…"
+          placeholder="A few words for visitors…"
         />
       </label>
       {error && <p className="form-error">{error}</p>}
       {message && <p className="form-success">{message}</p>}
       <button type="submit" className="btn-primary" disabled={saving}>
-        {saving ? "Saving…" : "Save profile"}
+        {saving ? "Saving…" : "Hang the plaque"}
       </button>
     </form>
   );
