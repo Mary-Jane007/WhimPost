@@ -3,7 +3,13 @@ import { v4 as uuidv4 } from "uuid";
 import type Database from "better-sqlite3";
 import { toLetterView } from "@/lib/letters";
 import type { LetterRecord, LetterView } from "@/lib/types";
-import { isVillageId, type VillageId } from "@/lib/villages";
+import { grantCollectible } from "@/lib/villageProgress";
+import {
+  isVillageId,
+  parseCollectibles,
+  type CollectibleKind,
+  type VillageId,
+} from "@/lib/villages";
 
 type SystemVillageSender = {
   id: string;
@@ -75,14 +81,16 @@ Should you ever lose your words, wander to the Great Library. The trees have a r
 
 Your neighbors are eager to know you—not through perfect introductions, but through honest letters, curious questions, and the pages you'll leave behind.
 
-A small satchel has been prepared for you.
+A small satchel has been prepared for you — the first pieces of your Mosshollow collection.
 
 Inside you'll find:
 
-* A fountain pen that never minds mistakes.
-* A pressed oak leaf to mark your favorite page.
-* A warm cup of woodland tea.
-* And a blank journal, patiently waiting for its first sentence.
+* 🍄 A soft woodland mushroom for your jar.
+* 🍃 A pressed oak leaf, the first of many.
+* 🪶 A feather from the library owl.
+* 📖 A lost page, waiting to join your shelf of stories.
+
+These are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the village. Your cottage will fill as your collection grows.
 
 May your mailbox always be full, your thoughts never hurried, and your stories find a home among ours.
 
@@ -252,7 +260,7 @@ export function ensureVillageSystemUser(
   return sender.id;
 }
 
-/** Keep welcome-letter decorations aligned with the current template. */
+/** Keep welcome-letter body & decorations aligned with the current template. */
 export function syncWelcomeLetterDecorations(db: Database.Database) {
   for (const [villageId, template] of Object.entries(WELCOME_TEMPLATES)) {
     if (!template) continue;
@@ -260,14 +268,44 @@ export function syncWelcomeLetterDecorations(db: Database.Database) {
     if (!senderId) continue;
     db.prepare(
       `UPDATE letters
-       SET stickers_json = ?, scrap_json = ?
+       SET body = ?, stickers_json = ?, scrap_json = ?
        WHERE sender_id = ? AND subject = ?`
     ).run(
+      template.body,
       JSON.stringify(template.stickers),
       JSON.stringify(template.scraps),
       senderId,
       template.subject
     );
+  }
+}
+
+/** Starter keepsakes mentioned in the welcome letter — a gentle collection boost. */
+const WELCOME_COLLECTION_GIFTS: Partial<
+  Record<VillageId, CollectibleKind[]>
+> = {
+  mosshollow: ["mushrooms", "leaves", "feathers", "lost-pages"],
+};
+
+function grantWelcomeCollectionGifts(
+  db: Database.Database,
+  recipientId: string,
+  villageId: VillageId
+) {
+  const gifts = WELCOME_COLLECTION_GIFTS[villageId];
+  if (!gifts?.length) return;
+
+  const row = db
+    .prepare(`SELECT collectibles_json FROM users WHERE id = ?`)
+    .get(recipientId) as { collectibles_json: string } | undefined;
+  if (!row) return;
+
+  const bag = parseCollectibles(row.collectibles_json);
+  // Already started this collection — don't double-gift.
+  if (gifts.some((kind) => (bag[kind] || 0) > 0)) return;
+
+  for (const kind of gifts) {
+    grantCollectible(db, recipientId, kind, 1);
   }
 }
 
@@ -293,6 +331,8 @@ export function deliverWelcomeLetter(
     .get(recipientId, senderId, template.subject) as LetterRecord | undefined;
 
   if (existing) {
+    // Backfill starter gifts for villagers who got the letter before gifts existed.
+    grantWelcomeCollectionGifts(db, recipientId, villageId);
     return toLetterView(existing);
   }
 
@@ -316,6 +356,8 @@ export function deliverWelcomeLetter(
     JSON.stringify(template.stickers),
     JSON.stringify(template.scraps)
   );
+
+  grantWelcomeCollectionGifts(db, recipientId, villageId);
 
   const row = db.prepare(`SELECT * FROM letters WHERE id = ?`).get(id) as
     | LetterRecord
