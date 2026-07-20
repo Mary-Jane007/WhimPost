@@ -39,16 +39,16 @@ export default async function HomePage() {
       </section>
 
       <div className="motif-strip" aria-hidden>
-        <StickerArt kind="fox" />
-        <StickerArt kind="mushroom" />
-        <StickerArt kind="moth" />
-        <StickerArt kind="sun" />
-        <StickerArt kind="crow" />
-        <StickerArt kind="moon" />
-        <StickerArt kind="butterfly" />
-        <StickerArt kind="fern" />
-        <StickerArt kind="spiral" />
-        <StickerArt kind="flower" />
+        <StickerArt kind="frogs-tandem" />
+        <StickerArt kind="fox-seated" />
+        <StickerArt kind="mushroom-amanita" />
+        <StickerArt kind="fawn-resting" />
+        <StickerArt kind="jam-jar" />
+        <StickerArt kind="moon-full" />
+        <StickerArt kind="picnic-basket" />
+        <StickerArt kind="dragonfly" />
+        <StickerArt kind="honey-bear" />
+        <StickerArt kind="pretzel" />
       </div>
 
       <section className="landing-section forest-panel">
@@ -62,16 +62,16 @@ export default async function HomePage() {
         <div className="feature-flow">
           <div className="feature-visual">
             <div className="feature-stickers" aria-hidden>
-              <StickerArt kind="fox" className="w-14 h-14" />
-              <StickerArt kind="moth" className="w-14 h-14" />
-              <StickerArt kind="mushroom" className="w-14 h-14" />
+              <StickerArt kind="fox-seated" className="w-14 h-14" />
+              <StickerArt kind="frog-crown" className="w-14 h-14" />
+              <StickerArt kind="mushroom-amanita" className="w-14 h-14" />
             </div>
             <div className="demo-envelope">
               <EnvelopeFace
                 style="sage"
                 toName="Your friend"
                 fromName="The woods"
-                stampStyle="moth"
+                stampStyle="frog-crown"
                 waxSeal="spiral"
               />
             </div>
@@ -85,8 +85,8 @@ export default async function HomePage() {
               <li>
                 <strong>Compose at your desk</strong>
                 <span>
-                  Choose paper and envelopes, then scatter foxes, moths, mushrooms,
-                  and quote scraps across the page.
+                  Choose paper and envelopes, then scatter frogs, foxes, jam jars,
+                  and picnic scraps across the page.
                 </span>
               </li>
               <li>

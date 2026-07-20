@@ -857,6 +857,12 @@ select {
   outline-offset: 4px;
 }
 
+.sticker-item .sticker-img {
+  width: 3.5rem;
+  height: 3.5rem;
+  filter: drop-shadow(1px 2px 1px rgba(0, 0, 0, 0.15));
+}
+
 .sticker-item svg {
   filter: drop-shadow(1px 2px 1px rgba(0, 0, 0, 0.15));
 }
@@ -1482,13 +1488,40 @@ select {
   opacity: 0.9;
 }
 
-.page-crest svg {
+.motif-strip svg,
+.motif-strip .sticker-img {
+  width: 3.4rem;
+  height: 3.4rem;
+  animation: softPulse 5s ease-in-out infinite;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+}
+
+.motif-strip svg:nth-child(2),
+.motif-strip .sticker-img:nth-child(2) {
+  animation-delay: 0.4s;
+}
+.motif-strip svg:nth-child(3),
+.motif-strip .sticker-img:nth-child(3) {
+  animation-delay: 0.8s;
+}
+.motif-strip svg:nth-child(4),
+.motif-strip .sticker-img:nth-child(4) {
+  animation-delay: 1.2s;
+}
+
+.page-crest svg,
+.page-crest .sticker-img {
+  width: 2.75rem;
+  height: 2.75rem;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
   animation: softPulse 5s ease-in-out infinite;
 }
 
-.page-crest svg:nth-child(2) { animation-delay: 0.4s; }
-.page-crest svg:nth-child(3) { animation-delay: 0.8s; }
+.page-crest svg:nth-child(2),
+.page-crest .sticker-img:nth-child(2) { animation-delay: 0.4s; }
+.page-crest svg:nth-child(3),
+.page-crest .sticker-img:nth-child(3) { animation-delay: 0.8s; }
+
 
 .auth-page {
   position: relative;
@@ -1551,12 +1584,42 @@ select {
   z-index: 2;
 }
 
-.motif-strip svg {
-  width: 3.1rem;
-  height: 3.1rem;
-  animation: softPulse 5s ease-in-out infinite;
-  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+.sticker-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
 }
+
+.forest-sticker .sticker-img,
+.motif-strip .sticker-img,
+.page-crest .sticker-img,
+.auth-stickers .sticker-img,
+.feature-stickers .sticker-img,
+.sticker-btn .sticker-img {
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.25));
+}
+
+.motif-strip .sticker-img {
+  width: 3.4rem;
+  height: 3.4rem;
+}
+
+.sticker-btn {
+  background: rgba(243, 230, 208, 0.12) !important;
+}
+
+.sticker-btn .sticker-img {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+.postage-stamp .sticker-img {
+  padding: 0.1rem;
+}
+
 
 @keyframes stickerFloat {
   0%,

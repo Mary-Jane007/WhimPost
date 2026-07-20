@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
   const paperStyle = String(body.paperStyle || "parchment") as PaperStyle;
   const envelopeStyle = String(body.envelopeStyle || "kraft") as EnvelopeStyle;
   const waxSeal = String(body.waxSeal || "fern") as WaxSeal;
-  const stampStyle = String(body.stampStyle || "mushroom") as StampStyle;
+  const stampStyle = String(body.stampStyle || "mushroom-amanita") as StampStyle;
 
   if (!recipientId) return jsonError("Choose a friend to write to");
   if (!letterBody) return jsonError("Your letter needs some words");

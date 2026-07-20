@@ -24,7 +24,7 @@ export default async function ComposePage({
 
   return (
     <main className="app-main forest-panel">
-      <PageCrest kinds={["moth", "butterfly", "flower"]} />
+      <PageCrest kinds={["frogs-tandem", "butterfly-green", "narcissus"]} />
       <header className="page-header">
         <h1>Write a letter</h1>
         <p>
