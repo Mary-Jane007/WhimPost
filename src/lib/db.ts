@@ -25,6 +25,31 @@ function ensureColumn(
   }
 }
 
+function migrate(db: Database.Database) {
+  ensureColumn(db, "users", "is_owner", "is_owner INTEGER NOT NULL DEFAULT 0");
+  ensureColumn(db, "users", "village_id", "village_id TEXT");
+  ensureColumn(db, "users", "reputation", "reputation INTEGER NOT NULL DEFAULT 0");
+  ensureColumn(
+    db,
+    "users",
+    "collectibles_json",
+    "collectibles_json TEXT NOT NULL DEFAULT '{}'"
+  );
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS village_notes (
+      id TEXT PRIMARY KEY,
+      village_id TEXT NOT NULL,
+      author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      body TEXT NOT NULL,
+      anonymous INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_users_village ON users(village_id);
+    CREATE INDEX IF NOT EXISTS idx_village_notes ON village_notes(village_id, created_at);
+  `);
+}
+
 function createDb() {
   const db = new Database(dbPath);
   db.pragma("journal_mode = WAL");
@@ -73,38 +98,21 @@ function createDb() {
       sent_at TEXT
     );
 
-    CREATE TABLE IF NOT EXISTS village_notes (
-      id TEXT PRIMARY KEY,
-      village_id TEXT NOT NULL,
-      author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      body TEXT NOT NULL,
-      anonymous INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
     CREATE INDEX IF NOT EXISTS idx_letters_recipient ON letters(recipient_id, sent_at);
     CREATE INDEX IF NOT EXISTS idx_letters_sender ON letters(sender_id, sent_at);
     CREATE INDEX IF NOT EXISTS idx_friendships_users ON friendships(requester_id, addressee_id);
-    CREATE INDEX IF NOT EXISTS idx_users_village ON users(village_id);
-    CREATE INDEX IF NOT EXISTS idx_village_notes ON village_notes(village_id, created_at);
   `);
 
-  ensureColumn(db, "users", "is_owner", "is_owner INTEGER NOT NULL DEFAULT 0");
-  ensureColumn(db, "users", "village_id", "village_id TEXT");
-  ensureColumn(db, "users", "reputation", "reputation INTEGER NOT NULL DEFAULT 0");
-  ensureColumn(
-    db,
-    "users",
-    "collectibles_json",
-    "collectibles_json TEXT NOT NULL DEFAULT '{}'"
-  );
-
+  migrate(db);
   return db;
 }
 
 export function getDb() {
   if (!globalForDb.whimpostDb) {
     globalForDb.whimpostDb = createDb();
+  } else {
+    // Keep existing connections current when schema grows.
+    migrate(globalForDb.whimpostDb);
   }
   return globalForDb.whimpostDb;
 }
