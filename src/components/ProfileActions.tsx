@@ -57,42 +57,48 @@ export function ProfileActions({
   return (
     <div className="profile-actions">
       {status.status === "friends" && (
-        <Link className="btn-primary" href={`/compose?to=${username}`}>
-          Write a letter
+        <Link className="cottage-tool cottage-tool-primary" href={`/compose?to=${username}`}>
+          <span aria-hidden>✉</span>
+          Write
         </Link>
       )}
       {status.status === "none" && (
         <button
           type="button"
-          className="btn-primary"
+          className="cottage-tool cottage-tool-primary"
           onClick={sendRequest}
           disabled={busy}
         >
+          <span aria-hidden>🌼</span>
           {busy ? "Sending…" : "Add friend"}
         </button>
       )}
       {status.status === "pending_out" && (
-        <span className="pending-tag">Invitation pending</span>
+        <span className="cottage-tool is-disabled">
+          <span aria-hidden>⏳</span>
+          Pending
+        </span>
       )}
       {status.status === "pending_in" && (
-        <div className="row-actions">
+        <>
           <button
             type="button"
-            className="btn-primary"
+            className="cottage-tool cottage-tool-primary"
             onClick={() => respond("accept")}
             disabled={busy}
           >
+            <span aria-hidden>✓</span>
             Accept
           </button>
           <button
             type="button"
-            className="btn-secondary"
+            className="cottage-tool"
             onClick={() => respond("decline")}
             disabled={busy}
           >
             Decline
           </button>
-        </div>
+        </>
       )}
       {error && <p className="form-error">{error}</p>}
     </div>
