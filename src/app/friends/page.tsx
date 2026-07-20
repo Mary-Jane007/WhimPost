@@ -15,7 +15,7 @@ export default async function FriendsPage() {
   const incoming = (
     db
       .prepare(
-        `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated, u.is_owner
+        `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated, u.is_owner, u.village_id, u.reputation
          FROM friendships f
          JOIN users u ON u.id = f.requester_id
          WHERE f.addressee_id = ? AND f.status = 'pending'
@@ -31,6 +31,8 @@ export default async function FriendsPage() {
       forest_name: string;
       ucreated: string;
       is_owner: number;
+      village_id: string | null;
+      reputation: number;
     }>
   ).map((r) => ({
     id: r.id,
@@ -43,13 +45,15 @@ export default async function FriendsPage() {
       forest_name: r.forest_name,
       created_at: r.ucreated,
       is_owner: r.is_owner,
+      village_id: r.village_id,
+      reputation: r.reputation,
     }),
   }));
 
   const outgoing = (
     db
       .prepare(
-        `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated, u.is_owner
+        `SELECT f.id, f.created_at, u.id as uid, u.username, u.display_name, u.bio, u.forest_name, u.created_at as ucreated, u.is_owner, u.village_id, u.reputation
          FROM friendships f
          JOIN users u ON u.id = f.addressee_id
          WHERE f.requester_id = ? AND f.status = 'pending'
@@ -65,6 +69,8 @@ export default async function FriendsPage() {
       forest_name: string;
       ucreated: string;
       is_owner: number;
+      village_id: string | null;
+      reputation: number;
     }>
   ).map((r) => ({
     id: r.id,
@@ -77,6 +83,8 @@ export default async function FriendsPage() {
       forest_name: r.forest_name,
       created_at: r.ucreated,
       is_owner: r.is_owner,
+      village_id: r.village_id,
+      reputation: r.reputation,
     }),
   }));
 

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { areFriends, toLetterView } from "@/lib/letters";
+import { rewardLetterSent } from "@/lib/villageProgress";
 import type {
   EnvelopeStyle,
   LetterRecord,
@@ -153,6 +154,8 @@ export async function POST(req: NextRequest) {
     JSON.stringify(stickers),
     JSON.stringify(scraps)
   );
+
+  rewardLetterSent(db, user.id, letterBody.length);
 
   const row = db.prepare(`SELECT * FROM letters WHERE id = ?`).get(id) as LetterRecord;
   const letter = toLetterView(row);

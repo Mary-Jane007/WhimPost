@@ -11,7 +11,7 @@ import { StickerArt } from "@/components/stickers/StickerArt";
 
 export default async function HomePage() {
   const user = await getCurrentUser();
-  if (user) redirect("/inbox");
+  if (user) redirect("/village");
 
   return (
     <main className="landing-main">

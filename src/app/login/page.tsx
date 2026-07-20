@@ -6,7 +6,7 @@ import { StickerArt } from "@/components/stickers/StickerArt";
 
 export default async function LoginPage() {
   const user = await getCurrentUser();
-  if (user) redirect("/inbox");
+  if (user) redirect("/village");
 
   return (
     <main className="auth-page">

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { UserPublic } from "@/lib/types";
 
 const links = [
+  { href: "/village", label: "Village" },
   { href: "/inbox", label: "Inbox" },
   { href: "/sent", label: "Sent" },
   { href: "/compose", label: "Write" },
@@ -23,9 +24,19 @@ export function SiteNav({ user }: { user: UserPublic | null }) {
 
   return (
     <header className="site-nav">
-      <Link href={user ? "/inbox" : "/"} className="brand-mark">
+      <Link href={user ? "/village" : "/"} className="brand-mark">
         <span className="brand-icon" aria-hidden>
-          ✿
+          {user?.villageId === "mosshollow"
+            ? "🦉"
+            : user?.villageId === "clovermeadow"
+              ? "🐝"
+              : user?.villageId === "moonmere"
+                ? "🦋"
+                : user?.villageId === "bramblewood"
+                  ? "🦊"
+                  : user?.villageId === "hearthwick"
+                    ? "🦔"
+                    : "✿"}
         </span>
         <span className="brand-text">WhimPost</span>
       </Link>

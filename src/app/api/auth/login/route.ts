@@ -15,7 +15,8 @@ export async function POST(req: NextRequest) {
   const db = getDb();
   const row = db
     .prepare(
-      `SELECT id, username, display_name, bio, forest_name, created_at, password_hash, email, is_owner
+      `SELECT id, username, display_name, bio, forest_name, created_at, password_hash, email, is_owner,
+              village_id, reputation
        FROM users
        WHERE username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE`
     )
@@ -30,6 +31,8 @@ export async function POST(req: NextRequest) {
         password_hash: string;
         email: string;
         is_owner: number;
+        village_id: string | null;
+        reputation: number;
       }
     | undefined;
 
@@ -42,7 +45,8 @@ export async function POST(req: NextRequest) {
   claimOwnerIfUnset(db, row.id);
   const refreshed = db
     .prepare(
-      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner
+      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
+              village_id, reputation
        FROM users WHERE id = ?`
     )
     .get(row.id) as {
@@ -53,6 +57,8 @@ export async function POST(req: NextRequest) {
     forest_name: string;
     created_at: string;
     is_owner: number;
+    village_id: string | null;
+    reputation: number;
   };
 
   const token = await createSessionToken({

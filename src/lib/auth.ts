@@ -73,6 +73,8 @@ export function mapUser(row: {
   forest_name: string;
   created_at: string;
   is_owner?: number | boolean | null;
+  village_id?: string | null;
+  reputation?: number | null;
 }): UserPublic {
   return {
     id: row.id,
@@ -82,6 +84,8 @@ export function mapUser(row: {
     forestName: row.forest_name || "",
     createdAt: row.created_at,
     isOwner: Boolean(row.is_owner),
+    villageId: row.village_id || null,
+    reputation: Number(row.reputation) || 0,
   };
 }
 
@@ -91,7 +95,8 @@ export async function getCurrentUser(): Promise<UserPublic | null> {
   const db = getDb();
   const row = db
     .prepare(
-      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner
+      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
+              village_id, reputation
        FROM users WHERE id = ?`
     )
     .get(session.userId) as
@@ -103,6 +108,8 @@ export async function getCurrentUser(): Promise<UserPublic | null> {
         forest_name: string;
         created_at: string;
         is_owner: number;
+        village_id: string | null;
+        reputation: number;
       }
     | undefined;
   if (!row) return null;

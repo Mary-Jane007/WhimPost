@@ -100,6 +100,8 @@ export interface UserPublic {
   forestName: string;
   createdAt: string;
   isOwner: boolean;
+  villageId: string | null;
+  reputation: number;
 }
 
 export interface FriendshipRow {
