@@ -163,7 +163,7 @@ export const VILLAGES: VillageInfo[] = [
     name: "Hearthwick",
     motto: "Every stranger is welcomed home.",
     theme:
-      "A firelit cottage of stone hearths and knitted blankets — teapot steam, lavender on the mantel, warm muffins by the fire, and every letter read with a cup in hand.",
+      "A cozy apothecary cottage of amber potions and dried blooms — hedgehog herbalists at wooden tables, cinnamon and berries, lavender jars, and every letter steeped in hearthside warmth.",
     belongs: ["Cozy hearts", "Good listeners", "Calm souls", "Tea lovers"],
     mascot: "🦔",
     mascotName: "Hedgehog",
