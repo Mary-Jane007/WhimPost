@@ -256,9 +256,19 @@ export default async function VillagePage() {
             const have = liveStats.collectibles[key] || 0;
             return (
               <div key={key} className="collectible-chip">
-                <span className="collectible-emoji" aria-hidden>
-                  {meta.emoji}
-                </span>
+                {meta.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={meta.image}
+                    alt=""
+                    className="collectible-icon"
+                    draggable={false}
+                  />
+                ) : (
+                  <span className="collectible-emoji" aria-hidden>
+                    {meta.emoji}
+                  </span>
+                )}
                 <strong>{meta.name}</strong>
                 <em>
                   {have}/{meta.max}
