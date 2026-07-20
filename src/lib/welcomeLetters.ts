@@ -89,36 +89,36 @@ Welcome to **Mosshollow**.
       {
         id: "welcome-leaf",
         kind: "leafy-branch",
-        x: 86,
-        y: 14,
-        scale: 1.1,
-        rotation: 12,
+        x: 93,
+        y: 7,
+        scale: 0.72,
+        rotation: 18,
       },
       {
         id: "welcome-mushroom",
         kind: "mushroom-amanita",
-        x: 12,
-        y: 78,
-        scale: 0.95,
-        rotation: -8,
+        x: 7,
+        y: 93,
+        scale: 0.68,
+        rotation: -12,
       },
       {
         id: "welcome-moon",
         kind: "moon-crescent",
-        x: 88,
-        y: 72,
-        scale: 0.9,
-        rotation: 6,
+        x: 93,
+        y: 93,
+        scale: 0.62,
+        rotation: 8,
       },
     ],
     scraps: [
       {
-        id: "welcome-quote",
-        kind: "quote-trees",
-        x: 18,
-        y: 18,
-        scale: 0.85,
-        rotation: -4,
+        id: "welcome-stain",
+        kind: "tea-stain",
+        x: 8,
+        y: 6,
+        scale: 0.55,
+        rotation: -10,
       },
     ],
   },
@@ -161,6 +161,25 @@ export function ensureVillageSystemUser(
   return sender.id;
 }
 
+/** Keep welcome-letter decorations aligned with the current template. */
+export function syncWelcomeLetterDecorations(db: Database.Database) {
+  for (const [villageId, template] of Object.entries(WELCOME_TEMPLATES)) {
+    if (!template) continue;
+    const senderId = ensureVillageSystemUser(db, villageId as VillageId);
+    if (!senderId) continue;
+    db.prepare(
+      `UPDATE letters
+       SET stickers_json = ?, scrap_json = ?
+       WHERE sender_id = ? AND subject = ?`
+    ).run(
+      JSON.stringify(template.stickers),
+      JSON.stringify(template.scraps),
+      senderId,
+      template.subject
+    );
+  }
+}
+
 /** Idempotent: creates one unread welcome letter per villager per village. */
 export function deliverWelcomeLetter(
   db: Database.Database,
@@ -171,6 +190,8 @@ export function deliverWelcomeLetter(
   const template = WELCOME_TEMPLATES[villageId];
   const senderId = ensureVillageSystemUser(db, villageId);
   if (!template || !senderId) return null;
+
+  syncWelcomeLetterDecorations(db);
 
   const existing = db
     .prepare(
@@ -220,6 +241,8 @@ export function getUnreadWelcomeLetter(
   const sender = SYSTEM_SENDERS[villageId];
   const template = WELCOME_TEMPLATES[villageId];
   if (!sender || !template) return null;
+
+  syncWelcomeLetterDecorations(db);
 
   const row = db
     .prepare(
