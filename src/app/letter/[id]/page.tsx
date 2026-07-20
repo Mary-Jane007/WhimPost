@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { toLetterView } from "@/lib/letters";
 import { LetterReader } from "@/components/LetterReader";
 import type { LetterRecord } from "@/lib/types";
+import { syncWelcomeLetterDecorations } from "@/lib/welcomeLetters";
 
 export default async function LetterPage({
   params,
@@ -15,6 +16,7 @@ export default async function LetterPage({
 
   const { id } = await params;
   const db = getDb();
+  syncWelcomeLetterDecorations(db);
   const row = db.prepare(`SELECT * FROM letters WHERE id = ?`).get(id) as
     | LetterRecord
     | undefined;
