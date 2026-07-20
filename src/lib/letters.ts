@@ -3,6 +3,7 @@ import { mapUser } from "./auth";
 import type {
   LetterRecord,
   LetterView,
+  PlacedImage,
   PlacedScrap,
   PlacedSticker,
   UserPublic,
@@ -41,6 +42,35 @@ export function getUserById(id: string): UserPublic | null {
   return row ? mapUser(row) : null;
 }
 
+function parseImage(row: LetterRecord): PlacedImage | null {
+  if (row.image_json) {
+    try {
+      const parsed = JSON.parse(row.image_json) as Partial<PlacedImage>;
+      if (parsed && typeof parsed.url === "string") {
+        return {
+          url: parsed.url,
+          x: Math.min(96, Math.max(4, Number(parsed.x) || 50)),
+          y: Math.min(96, Math.max(4, Number(parsed.y) || 58)),
+          scale: Math.min(2.5, Math.max(0.35, Number(parsed.scale) || 1)),
+          rotation: Number(parsed.rotation) || 0,
+        };
+      }
+    } catch {
+      /* fall through */
+    }
+  }
+  if (row.image_url) {
+    return {
+      url: row.image_url,
+      x: 50,
+      y: 58,
+      scale: 1,
+      rotation: -1,
+    };
+  }
+  return null;
+}
+
 export function toLetterView(row: LetterRecord): LetterView | null {
   const sender = getUserById(row.sender_id);
   const recipient = getUserById(row.recipient_id);
@@ -56,7 +86,7 @@ export function toLetterView(row: LetterRecord): LetterView | null {
     stampStyle: row.stamp_style,
     stickers: parseJsonArray<PlacedSticker>(row.stickers_json),
     scraps: parseJsonArray<PlacedScrap>(row.scrap_json),
-    imageUrl: row.image_url || null,
+    image: parseImage(row),
     status: row.status,
     isRead: Boolean(row.is_read),
     createdAt: row.created_at,

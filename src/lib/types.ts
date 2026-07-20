@@ -92,6 +92,14 @@ export interface PlacedScrap {
   rotation: number;
 }
 
+export interface PlacedImage {
+  url: string;
+  x: number;
+  y: number;
+  scale: number;
+  rotation: number;
+}
+
 export interface UserPublic {
   id: string;
   username: string;
@@ -127,6 +135,7 @@ export interface LetterRecord {
   status: "draft" | "sent";
   is_read: number;
   image_url: string | null;
+  image_json: string | null;
   created_at: string;
   sent_at: string | null;
 }
@@ -141,7 +150,7 @@ export interface LetterView {
   stampStyle: StampStyle;
   stickers: PlacedSticker[];
   scraps: PlacedScrap[];
-  imageUrl: string | null;
+  image: PlacedImage | null;
   status: "draft" | "sent";
   isRead: boolean;
   createdAt: string;

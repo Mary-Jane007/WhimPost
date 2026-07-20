@@ -3,9 +3,12 @@
 import { StickerArt, ScrapArt } from "@/components/stickers/StickerArt";
 import type {
   PaperStyle,
+  PlacedImage,
   PlacedScrap,
   PlacedSticker,
 } from "@/lib/types";
+
+export const PHOTO_SELECT_ID = "__letter_photo__";
 
 const paperClass: Record<PaperStyle, string> = {
   parchment: "paper-parchment",
@@ -22,11 +25,12 @@ export function LetterPaper({
   subject,
   stickers,
   scraps,
-  imageUrl = null,
+  image = null,
   editable = false,
   onBodyChange,
   onSubjectChange,
   onRemoveImage,
+  onImageChange,
   selectedId,
   onSelectItem,
   onMoveItem,
@@ -37,20 +41,26 @@ export function LetterPaper({
   subject: string;
   stickers: PlacedSticker[];
   scraps: PlacedScrap[];
-  imageUrl?: string | null;
+  image?: PlacedImage | null;
   editable?: boolean;
   onBodyChange?: (v: string) => void;
   onSubjectChange?: (v: string) => void;
   onRemoveImage?: () => void;
+  onImageChange?: (image: PlacedImage) => void;
   selectedId?: string | null;
   onSelectItem?: (id: string | null) => void;
-  onMoveItem?: (id: string, x: number, y: number, type: "sticker" | "scrap") => void;
+  onMoveItem?: (
+    id: string,
+    x: number,
+    y: number,
+    type: "sticker" | "scrap" | "image"
+  ) => void;
   className?: string;
 }) {
   const handlePointerDown = (
     e: React.PointerEvent,
     id: string,
-    type: "sticker" | "scrap"
+    type: "sticker" | "scrap" | "image"
   ) => {
     if (!editable || !onMoveItem) return;
     e.preventDefault();
@@ -64,6 +74,27 @@ export function LetterPaper({
       const x = ((ev.clientX - rect.left) / rect.width) * 100;
       const y = ((ev.clientY - rect.top) / rect.height) * 100;
       onMoveItem(id, x, y, type);
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
+
+  const handleResizePointerDown = (e: React.PointerEvent) => {
+    if (!editable || !image || !onImageChange) return;
+    e.preventDefault();
+    e.stopPropagation();
+    onSelectItem?.(PHOTO_SELECT_ID);
+    const startX = e.clientX;
+    const startScale = image.scale;
+
+    const move = (ev: PointerEvent) => {
+      const delta = (ev.clientX - startX) / 120;
+      const next = Math.min(2.5, Math.max(0.35, startScale + delta));
+      onImageChange({ ...image, scale: next });
     };
     const up = () => {
       window.removeEventListener("pointermove", move);
@@ -102,11 +133,28 @@ export function LetterPaper({
         <div className="letter-body-display">{body}</div>
       )}
 
-      {imageUrl ? (
-        <figure className="letter-photo">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageUrl} alt="Attached to this letter" />
-          {editable && onRemoveImage ? (
+      {image ? (
+        <div
+          className={`placed-item letter-photo-item ${selectedId === PHOTO_SELECT_ID ? "selected" : ""}`}
+          style={{
+            left: `${image.x}%`,
+            top: `${image.y}%`,
+            transform: `translate(-50%, -50%) rotate(${image.rotation}deg) scale(${image.scale})`,
+          }}
+          onPointerDown={(e) => handlePointerDown(e, PHOTO_SELECT_ID, "image")}
+        >
+          <figure className="letter-photo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={image.url} alt="Attached to this letter" draggable={false} />
+            {editable ? (
+              <span
+                className="photo-resize-handle"
+                onPointerDown={handleResizePointerDown}
+                title="Drag to resize"
+              />
+            ) : null}
+          </figure>
+          {editable && onRemoveImage && selectedId === PHOTO_SELECT_ID ? (
             <button
               type="button"
               className="letter-photo-remove"
@@ -118,7 +166,7 @@ export function LetterPaper({
               Remove photo
             </button>
           ) : null}
-        </figure>
+        </div>
       ) : null}
 
       {scraps.map((scrap) => (

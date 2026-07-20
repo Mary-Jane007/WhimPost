@@ -2009,21 +2009,25 @@ select {
 
 .letter-photo {
   position: relative;
-  z-index: 2;
-  margin: 1rem 0 0;
-  padding: 0.45rem;
-  background: rgba(243, 230, 208, 0.55);
-  border: 1px solid rgba(92, 58, 30, 0.2);
+  margin: 0;
+  padding: 0.35rem;
+  background: rgba(243, 230, 208, 0.7);
+  border: 1px solid rgba(92, 58, 30, 0.22);
   box-shadow: 2px 3px 0 rgba(60, 40, 20, 0.12);
-  max-width: 100%;
-  transform: rotate(-1.2deg);
+  width: 11rem;
+}
+
+.letter-photo-item {
+  z-index: 4;
 }
 
 .letter-photo img {
   display: block;
   width: 100%;
-  max-height: 16rem;
+  height: auto;
+  max-height: 9rem;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .paper-night .letter-photo {
@@ -2031,16 +2035,29 @@ select {
   border-color: rgba(243, 230, 208, 0.2);
 }
 
+.photo-resize-handle {
+  position: absolute;
+  right: -0.2rem;
+  bottom: -0.2rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  border: 2px solid #5c3a1e;
+  background: #d4af37;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
 .letter-photo-remove {
-  margin-top: 0.45rem;
+  display: block;
+  margin-top: 0.35rem;
   width: 100%;
   border: 1px solid rgba(92, 58, 30, 0.25);
-  background: rgba(243, 230, 208, 0.85);
+  background: rgba(243, 230, 208, 0.9);
   color: var(--ink);
-  padding: 0.35rem 0.5rem;
+  padding: 0.3rem 0.45rem;
   cursor: pointer;
   font-family: var(--font-stamp);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
