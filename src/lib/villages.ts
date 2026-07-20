@@ -338,14 +338,14 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     name: "Hearth Muffins",
     max: 20,
   },
-  "hearth-lavender": {
-    emoji: "💜",
-    name: "Lavender Sprigs",
+  "hearth-recipes": {
+    emoji: "📝",
+    name: "Recipes",
     max: 22,
   },
-  "hearth-candles": {
-    emoji: "🕯️",
-    name: "Mantel Candles",
+  "hearth-cinnamon-rolls": {
+    emoji: "🍥",
+    name: "Cinnamon Rolls",
     max: 16,
   },
   "hearth-embers": {
@@ -401,8 +401,8 @@ const HEARTH_COLLECTIBLES: CollectibleKind[] = [
   "hearth-teacups",
   "hearth-blankets",
   "hearth-muffins",
-  "hearth-lavender",
-  "hearth-candles",
+  "hearth-recipes",
+  "hearth-cinnamon-rolls",
   "hearth-embers",
   "hearth-kettles",
   "hearth-letters",
