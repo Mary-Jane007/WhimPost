@@ -31,7 +31,16 @@ export type CollectibleKind =
   | "clover-cherries"
   | "clover-honey"
   | "clover-blossoms"
-  | "clover-hearts";
+  | "clover-hearts"
+  // Moonmere
+  | "moon-shards"
+  | "moon-moths"
+  | "moon-starlight"
+  | "moon-pearls"
+  | "moon-lanterns"
+  | "moon-lilies"
+  | "moon-dreams"
+  | "moon-dust";
 
 export type CollectibleMeta = {
   emoji: string;
@@ -263,6 +272,46 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     name: "Soft Hearts",
     max: 20,
   },
+  "moon-shards": {
+    emoji: "🌙",
+    name: "Moonshards",
+    max: 20,
+  },
+  "moon-moths": {
+    emoji: "🦋",
+    name: "Luna Moths",
+    max: 16,
+  },
+  "moon-starlight": {
+    emoji: "✨",
+    name: "Starlight",
+    max: 25,
+  },
+  "moon-pearls": {
+    emoji: "🫧",
+    name: "Mere Pearls",
+    max: 14,
+  },
+  "moon-lanterns": {
+    emoji: "🏮",
+    name: "Dock Lanterns",
+    max: 12,
+  },
+  "moon-lilies": {
+    emoji: "🪷",
+    name: "Night Lilies",
+    max: 18,
+  },
+  "moon-dreams": {
+    emoji: "💭",
+    name: "Dream Notes",
+    max: 22,
+  },
+  "moon-dust": {
+    emoji: "🌟",
+    name: "Fairy Dust",
+    max: 15,
+  },
 };
 
 const FOREST_COLLECTIBLES: CollectibleKind[] = [
@@ -286,11 +335,22 @@ const CLOVER_COLLECTIBLES: CollectibleKind[] = [
   "clover-hearts",
 ];
 
+const MOON_COLLECTIBLES: CollectibleKind[] = [
+  "moon-shards",
+  "moon-moths",
+  "moon-starlight",
+  "moon-pearls",
+  "moon-lanterns",
+  "moon-lilies",
+  "moon-dreams",
+  "moon-dust",
+];
+
 /** Which collectibles appear for each village. */
 export const VILLAGE_COLLECTIBLES: Record<VillageId, CollectibleKind[]> = {
   mosshollow: FOREST_COLLECTIBLES,
   clovermeadow: CLOVER_COLLECTIBLES,
-  moonmere: FOREST_COLLECTIBLES,
+  moonmere: MOON_COLLECTIBLES,
   bramblewood: FOREST_COLLECTIBLES,
   hearthwick: FOREST_COLLECTIBLES,
 };
