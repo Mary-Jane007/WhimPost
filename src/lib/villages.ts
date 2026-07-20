@@ -107,6 +107,7 @@ export const VILLAGES: VillageInfo[] = [
     belongs: ["Dreamers", "Philosophers", "Night owls", "Deep thinkers"],
     mascot: "🦋",
     mascotName: "Luna moth",
+    mascotImage: "/villages/moonmere/mascot.png",
     color: "#1a2744",
     colorSoft: "#6b7fa8",
     tasks: [
@@ -126,6 +127,7 @@ export const VILLAGES: VillageInfo[] = [
     belongs: ["Curious minds", "Explorers", "Storytellers", "Adventurers"],
     mascot: "🦊",
     mascotName: "Fox",
+    mascotImage: "/villages/bramblewood/mascot.png",
     color: "#b85c38",
     colorSoft: "#d4a484",
     tasks: [
@@ -145,6 +147,7 @@ export const VILLAGES: VillageInfo[] = [
     belongs: ["Cozy hearts", "Good listeners", "Calm souls", "Tea lovers"],
     mascot: "🦔",
     mascotName: "Hedgehog",
+    mascotImage: "/villages/hearthwick/mascot.png",
     color: "#6b4226",
     colorSoft: "#c4a484",
     tasks: [
