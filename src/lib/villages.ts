@@ -103,13 +103,14 @@ export const VILLAGES: VillageInfo[] = [
     id: "moonmere",
     name: "Moonmere",
     motto: "Where dreams become letters.",
-    theme: "A peaceful lakeside village lit by lanterns.",
+    theme:
+      "A lakeside village of lanterns and engraved moons — moths at the dock, fairies in the starlight, and every letter written like a dream pressed into parchment.",
     belongs: ["Dreamers", "Philosophers", "Night owls", "Deep thinkers"],
     mascot: "🦋",
     mascotName: "Luna moth",
     mascotImage: "/villages/moonmere/mascot.png",
-    color: "#1a2744",
-    colorSoft: "#6b7fa8",
+    color: "#2a3548",
+    colorSoft: "#8a9b88",
     tasks: [
       "Answer a Question of the Day",
       "Write about dreams",

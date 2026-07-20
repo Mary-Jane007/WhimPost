@@ -2,8 +2,9 @@ import { StickerArt } from "@/components/stickers/StickerArt";
 import type { StickerKind } from "@/lib/types";
 import {
   CLOVERMEADOW_DECOR,
+  MOONMERE_DECOR,
   cloverStickerSrc,
-  type CloverStickerId,
+  moonmereStickerSrc,
 } from "@/lib/villageThemes";
 import type { VillageId } from "@/lib/villages";
 
@@ -54,15 +55,17 @@ const LANDING_EXTRA: DecorItem[] = [
 function VillageDecorImg({
   id,
   className,
+  src,
 }: {
-  id: CloverStickerId;
+  id: string;
   className: string;
+  src: string;
 }) {
   return (
     <span className={`forest-sticker ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={cloverStickerSrc(id)}
+        src={src}
         alt=""
         className="sticker-img"
         draggable={false}
@@ -93,6 +96,7 @@ export function ForestStickers({
             key={`${item.id}-${item.className}`}
             id={item.id}
             className={item.className}
+            src={cloverStickerSrc(item.id)}
           />
         ))}
         <span className="sparkle s1" />
@@ -121,6 +125,33 @@ export function ForestStickers({
           >
             <StickerArt kind={item.kind} />
           </span>
+        ))}
+        <span className="sparkle s1" />
+        <span className="sparkle s2" />
+        <span className="sparkle s3" />
+        <span className="sparkle s4" />
+        <span className="sparkle s5" />
+      </div>
+    );
+  }
+
+  if (villageId === "moonmere" && density !== "landing") {
+    const items =
+      density === "auth"
+        ? MOONMERE_DECOR.filter((_, i) => i % 2 === 0)
+        : MOONMERE_DECOR;
+    return (
+      <div
+        className={`forest-stickers forest-stickers-${density} forest-stickers-moonmere`}
+        aria-hidden
+      >
+        {items.map((item) => (
+          <VillageDecorImg
+            key={`${item.id}-${item.className}`}
+            id={item.id}
+            className={item.className}
+            src={moonmereStickerSrc(item.id)}
+          />
         ))}
         <span className="sparkle s1" />
         <span className="sparkle s2" />
