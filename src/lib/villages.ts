@@ -67,6 +67,7 @@ export const VILLAGES: VillageInfo[] = [
     belongs: ["Readers", "Writers", "Quiet thinkers", "Long-letter lovers"],
     mascot: "🦉",
     mascotName: "Owl",
+    mascotImage: "/villages/mosshollow/mascot.png",
     color: "#1a3d2e",
     colorSoft: "#6b8f71",
     tasks: [
