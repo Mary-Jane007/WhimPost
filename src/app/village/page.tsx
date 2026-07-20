@@ -45,12 +45,14 @@ export default async function VillagePage() {
 
   const village = getVillage(stats.villageId)!;
   deliverWelcomeLetter(db, user.id, stats.villageId);
+  // Re-read after welcome gifts so collectibles (and cottage unlocks) are current.
+  const liveStats = getUserVillageStats(db, user.id);
   const welcomeLetter = getUnreadWelcomeLetter(db, user.id, stats.villageId);
   const villageRep = getVillageReputation(db, stats.villageId);
   const members = getVillageMemberCount(db, stats.villageId);
   const unlock = villageUnlockLevel(villageRep);
   const nextRank =
-    RANK_LADDER.find((r) => r.minRep > stats.reputation) || null;
+    RANK_LADDER.find((r) => r.minRep > liveStats.reputation) || null;
 
   const neighbors = db
     .prepare(
@@ -161,12 +163,12 @@ export default async function VillagePage() {
       <div className="village-stats">
         <div>
           <strong>
-            {stats.rank.emoji} {stats.rank.label}
+            {liveStats.rank.emoji} {liveStats.rank.label}
           </strong>
-          <span>Your forest rank · {stats.reputation} personal reputation</span>
+          <span>Your forest rank · {liveStats.reputation} personal reputation</span>
           {nextRank && (
             <em>
-              {nextRank.minRep - stats.reputation} more to become {nextRank.label}
+              {nextRank.minRep - liveStats.reputation} more to become {nextRank.label}
             </em>
           )}
         </div>
@@ -229,13 +231,13 @@ export default async function VillagePage() {
       <section className="village-panel">
         <h2>Hidden collectibles</h2>
         <p className="section-lead">
-          Keepsakes unique to {village.name} — gather them as you write letters
-          and welcome friends.
+          Keepsakes unique to {village.name} — your welcome satchel starts the
+          shelf; write letters and welcome friends to gather more.
         </p>
         <div className="collectible-grid">
           {collectiblesForVillage(village.id).map((key) => {
             const meta = COLLECTIBLE_META[key];
-            const have = stats.collectibles[key] || 0;
+            const have = liveStats.collectibles[key] || 0;
             return (
               <div key={key} className="collectible-chip">
                 <span className="collectible-emoji" aria-hidden>
