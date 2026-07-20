@@ -155,9 +155,9 @@ export default async function VillagePage() {
                 ]
               : village.id === "hearthwick"
                 ? [
-                    { village: "hearthwick", id: "teapot" },
-                    { village: "hearthwick", id: "lavender" },
-                    { village: "hearthwick", id: "candle" },
+                    { village: "hearthwick", id: "hedgehog" },
+                    { village: "hearthwick", id: "potion-bottles" },
+                    { village: "hearthwick", id: "lavender-bouquet" },
                   ]
                 : undefined
         }

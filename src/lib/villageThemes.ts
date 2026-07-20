@@ -318,13 +318,20 @@ export function moonmereStickerSrc(id: MoonmereStickerId) {
 
 export type HearthwickStickerId =
   | "hedgehog"
-  | "teapot"
-  | "teacup"
-  | "muffin"
-  | "knit-blanket"
-  | "flower-basket"
-  | "candle"
-  | "lavender";
+  | "apothecary-table"
+  | "potion-bottles"
+  | "lavender-bouquet"
+  | "pink-flower"
+  | "maple-leaves"
+  | "vintage-books"
+  | "wooden-crate"
+  | "walnuts"
+  | "herbal-jar"
+  | "ceramic-crock"
+  | "red-berries"
+  | "cinnamon-sticks"
+  | "leaf-jar"
+  | "paintbrush";
 
 export const HEARTHWICK_STICKERS: {
   id: HearthwickStickerId;
@@ -333,43 +340,78 @@ export const HEARTHWICK_STICKERS: {
 }[] = [
   {
     id: "hedgehog",
-    name: "Hearth Hedgehog",
+    name: "Herbalist Hedgehog",
     src: "/stickers/villages/hearthwick/hedgehog.png",
   },
   {
-    id: "teapot",
-    name: "Leaf Teapot",
-    src: "/stickers/villages/hearthwick/teapot.png",
+    id: "apothecary-table",
+    name: "Apothecary Table",
+    src: "/stickers/villages/hearthwick/apothecary-table.png",
   },
   {
-    id: "teacup",
-    name: "Flower Teacup",
-    src: "/stickers/villages/hearthwick/teacup.png",
+    id: "potion-bottles",
+    name: "Amber Potions",
+    src: "/stickers/villages/hearthwick/potion-bottles.png",
   },
   {
-    id: "muffin",
-    name: "Berry Muffin",
-    src: "/stickers/villages/hearthwick/muffin.png",
+    id: "lavender-bouquet",
+    name: "Dried Bouquet",
+    src: "/stickers/villages/hearthwick/lavender-bouquet.png",
   },
   {
-    id: "knit-blanket",
-    name: "Knit Blanket",
-    src: "/stickers/villages/hearthwick/knit-blanket.png",
+    id: "pink-flower",
+    name: "Pink Bloom",
+    src: "/stickers/villages/hearthwick/pink-flower.png",
   },
   {
-    id: "flower-basket",
-    name: "Flower Basket",
-    src: "/stickers/villages/hearthwick/flower-basket.png",
+    id: "maple-leaves",
+    name: "Maple Leaves",
+    src: "/stickers/villages/hearthwick/maple-leaves.png",
   },
   {
-    id: "candle",
-    name: "Mantel Candle",
-    src: "/stickers/villages/hearthwick/candle.png",
+    id: "vintage-books",
+    name: "Herb Books",
+    src: "/stickers/villages/hearthwick/vintage-books.png",
   },
   {
-    id: "lavender",
-    name: "Lavender Sprig",
-    src: "/stickers/villages/hearthwick/lavender.png",
+    id: "wooden-crate",
+    name: "Wood Crate",
+    src: "/stickers/villages/hearthwick/wooden-crate.png",
+  },
+  {
+    id: "walnuts",
+    name: "Walnuts",
+    src: "/stickers/villages/hearthwick/walnuts.png",
+  },
+  {
+    id: "herbal-jar",
+    name: "Herbal Jar",
+    src: "/stickers/villages/hearthwick/herbal-jar.png",
+  },
+  {
+    id: "ceramic-crock",
+    name: "Ceramic Crock",
+    src: "/stickers/villages/hearthwick/ceramic-crock.png",
+  },
+  {
+    id: "red-berries",
+    name: "Red Berries",
+    src: "/stickers/villages/hearthwick/red-berries.png",
+  },
+  {
+    id: "cinnamon-sticks",
+    name: "Cinnamon Sticks",
+    src: "/stickers/villages/hearthwick/cinnamon-sticks.png",
+  },
+  {
+    id: "leaf-jar",
+    name: "Leaf Jar",
+    src: "/stickers/villages/hearthwick/leaf-jar.png",
+  },
+  {
+    id: "paintbrush",
+    name: "Herb Brush",
+    src: "/stickers/villages/hearthwick/paintbrush.png",
   },
 ];
 
@@ -377,12 +419,12 @@ export const HEARTHWICK_DECOR: {
   id: HearthwickStickerId;
   className: string;
 }[] = [
-  { id: "lavender", className: "decor-fern-tl" },
-  { id: "candle", className: "decor-mushroom-tr" },
-  { id: "teapot", className: "decor-fox-bl" },
-  { id: "knit-blanket", className: "decor-moth-br" },
-  { id: "muffin", className: "decor-butterfly-mr" },
-  { id: "flower-basket", className: "decor-sun-tr2" },
+  { id: "lavender-bouquet", className: "decor-fern-tl" },
+  { id: "potion-bottles", className: "decor-mushroom-tr" },
+  { id: "hedgehog", className: "decor-fox-bl" },
+  { id: "maple-leaves", className: "decor-moth-br" },
+  { id: "pink-flower", className: "decor-butterfly-mr" },
+  { id: "vintage-books", className: "decor-sun-tr2" },
 ];
 
 export function hearthwickStickerSrc(id: HearthwickStickerId) {
