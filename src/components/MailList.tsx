@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { EnvelopeFace } from "@/components/EnvelopeFace";
-import { letterBodyPreview } from "@/components/LetterBodyText";
+import { letterBodyPreview } from "@/lib/letterText";
 import type { LetterView } from "@/lib/types";
 
 export function MailList({
