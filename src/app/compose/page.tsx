@@ -32,7 +32,7 @@ export default async function ComposePage({
           shut.
         </p>
       </header>
-      <ComposeStudio friends={ordered} />
+      <ComposeStudio friends={ordered} villageId={user.villageId} />
     </main>
   );
 }

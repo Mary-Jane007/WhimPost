@@ -1,3 +1,5 @@
+import type { VillageId } from "@/lib/villages";
+
 export type PaperStyle =
   | "parchment"
   | "cream"
@@ -62,7 +64,29 @@ export type StickerKind =
   | "ticket"
   | "dice"
   | "cassette"
-  | "pretzel";
+  | "pretzel"
+  // Clovermeadow village pack
+  | "clover-wax-seal"
+  | "clover-bow-loose"
+  | "clover-bow-tight"
+  | "clover-button"
+  | "clover-blossom"
+  | "clover-blossom-branch"
+  | "clover-orchid"
+  | "clover-cherries"
+  | "clover-butterfly-crystal"
+  | "clover-butterfly-silk"
+  | "clover-butterfly-small"
+  | "clover-shell"
+  | "clover-conch"
+  | "clover-moon"
+  | "clover-star"
+  | "clover-camera"
+  | "clover-phone"
+  | "clover-cd"
+  | "clover-teddy"
+  | "clover-bunny"
+  | "clover-gummy";
 
 export type ScrapKind =
   | "quote-trees"
@@ -203,7 +227,12 @@ export const STAMP_OPTIONS: { id: StampStyle; name: string }[] = [
   { id: "moon-full", name: "Moon" },
 ];
 
-export const STICKER_OPTIONS: { id: StickerKind; name: string }[] = [
+export const STICKER_OPTIONS: {
+  id: StickerKind;
+  name: string;
+  villageId?: VillageId;
+  src?: string;
+}[] = [
   { id: "frogs-tandem", name: "Tandem Frogs" },
   { id: "frog-crown", name: "Crown Frog" },
   { id: "frogs-kiss", name: "Kissing Frogs" },
@@ -242,7 +271,154 @@ export const STICKER_OPTIONS: { id: StickerKind; name: string }[] = [
   { id: "ticket", name: "Ticket" },
   { id: "dice", name: "Dice" },
   { id: "cassette", name: "Cassette" },
+  // Clovermeadow-only pack
+  {
+    id: "clover-wax-seal",
+    name: "Bow Wax Seal",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/wax-seal-bow.png",
+  },
+  {
+    id: "clover-bow-loose",
+    name: "Satin Bow",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/bow-satin-loose.png",
+  },
+  {
+    id: "clover-bow-tight",
+    name: "Ribbon Bow",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/bow-satin-tight.png",
+  },
+  {
+    id: "clover-button",
+    name: "Pink Button",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/button-pink.png",
+  },
+  {
+    id: "clover-blossom",
+    name: "Cherry Blossom",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/blossom-single.png",
+  },
+  {
+    id: "clover-blossom-branch",
+    name: "Blossom Branch",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/blossom-branch.png",
+  },
+  {
+    id: "clover-orchid",
+    name: "Orchid",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/orchid-pink.png",
+  },
+  {
+    id: "clover-cherries",
+    name: "Gingham Cherries",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/cherries-ribbon.png",
+  },
+  {
+    id: "clover-butterfly-crystal",
+    name: "Crystal Butterfly",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/butterfly-crystal.png",
+  },
+  {
+    id: "clover-butterfly-silk",
+    name: "Silk Butterfly",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/butterfly-silk.png",
+  },
+  {
+    id: "clover-butterfly-small",
+    name: "Tiny Wings",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/butterfly-small.png",
+  },
+  {
+    id: "clover-shell",
+    name: "Scallop Shell",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/shell-1.png",
+  },
+  {
+    id: "clover-conch",
+    name: "Conch Shell",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/shell-2.png",
+  },
+  {
+    id: "clover-moon",
+    name: "Blush Moon",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/moon-pink.png",
+  },
+  {
+    id: "clover-star",
+    name: "Pink Star",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/star-pink.png",
+  },
+  {
+    id: "clover-camera",
+    name: "Sticker Camera",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/camera-cyber.png",
+  },
+  {
+    id: "clover-phone",
+    name: "Rotary Phone",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/phone-rotary.png",
+  },
+  {
+    id: "clover-cd",
+    name: "Kate Bush CD",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/cd-kate.png",
+  },
+  {
+    id: "clover-teddy",
+    name: "Bow Teddy",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/teddy-bows.png",
+  },
+  {
+    id: "clover-bunny",
+    name: "Plush Bunny",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/bunny-plush.png",
+  },
+  {
+    id: "clover-gummy",
+    name: "Gummy Bear",
+    villageId: "clovermeadow",
+    src: "/stickers/villages/clovermeadow/pack/gummy-bear.png",
+  },
 ];
+
+export function stickerSrc(kind: StickerKind) {
+  const opt = STICKER_OPTIONS.find((o) => o.id === kind);
+  return opt?.src || `/stickers/${kind}.png`;
+}
+
+export function stickersForVillage(villageId: string | null | undefined) {
+  return STICKER_OPTIONS.filter(
+    (o) => !o.villageId || o.villageId === villageId
+  );
+}
+
+export function villagePackStickers(villageId: string | null | undefined) {
+  if (!villageId) return [];
+  return STICKER_OPTIONS.filter((o) => o.villageId === villageId);
+}
+
+export function sharedStickers() {
+  return STICKER_OPTIONS.filter((o) => !o.villageId);
+}
 
 export const SCRAP_OPTIONS: { id: ScrapKind; name: string; text: string }[] = [
   {

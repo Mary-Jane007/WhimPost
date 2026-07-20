@@ -12,8 +12,9 @@ import {
   PAPER_OPTIONS,
   SCRAP_OPTIONS,
   STAMP_OPTIONS,
-  STICKER_OPTIONS,
   WAX_OPTIONS,
+  sharedStickers,
+  villagePackStickers,
   type EnvelopeStyle,
   type PaperStyle,
   type PlacedImage,
@@ -24,6 +25,7 @@ import {
   type StickerKind,
   type WaxSeal,
 } from "@/lib/types";
+import { getVillage } from "@/lib/villages";
 
 function scatter(seed: number, index: number) {
   const n = seed * 17 + index * 41;
@@ -35,7 +37,13 @@ function scatter(seed: number, index: number) {
   };
 }
 
-export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
+export function ComposeStudio({
+  friends,
+  villageId = null,
+}: {
+  friends: UserPublic[];
+  villageId?: string | null;
+}) {
   const router = useRouter();
   const [recipientId, setRecipientId] = useState(friends[0]?.id || "");
   const [subject, setSubject] = useState("");
@@ -60,6 +68,13 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
     () => friends.find((f) => f.id === recipientId),
     [friends, recipientId]
   );
+  const forestStickers = useMemo(() => sharedStickers(), []);
+  const villageStickers = useMemo(
+    () => villagePackStickers(villageId),
+    [villageId]
+  );
+  const village = getVillage(villageId);
+  const villagePackName = village ? `${village.name} pack` : null;
 
   function addSticker(kind: StickerKind) {
     const place = scatter(stickers.length + 3, stickers.length);
@@ -395,19 +410,44 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
           )}
 
           {tab === "stickers" && (
-            <div className="sticker-grid">
-              {STICKER_OPTIONS.map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  className="sticker-btn"
-                  onClick={() => addSticker(opt.id)}
-                  title={opt.name}
-                >
-                  <StickerArt kind={opt.id} className="w-12 h-12" />
-                  <span>{opt.name}</span>
-                </button>
-              ))}
+            <div className="sticker-panel">
+              {villageStickers.length > 0 && (
+                <div className="village-sticker-pack">
+                  <h3>
+                    {villagePackName || "Village pack"}
+                    <span className="pack-lock">Only for your village</span>
+                  </h3>
+                  <div className="sticker-grid">
+                    {villageStickers.map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        className="sticker-btn village-sticker-btn"
+                        onClick={() => addSticker(opt.id)}
+                        title={opt.name}
+                      >
+                        <StickerArt kind={opt.id} className="w-12 h-12" />
+                        <span>{opt.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <h3>Forest stickers</h3>
+              <div className="sticker-grid">
+                {forestStickers.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className="sticker-btn"
+                    onClick={() => addSticker(opt.id)}
+                    title={opt.name}
+                  >
+                    <StickerArt kind={opt.id} className="w-12 h-12" />
+                    <span>{opt.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

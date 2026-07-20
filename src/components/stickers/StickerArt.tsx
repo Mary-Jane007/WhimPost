@@ -1,9 +1,5 @@
 import type { ScrapKind, StickerKind, StampStyle, WaxSeal } from "@/lib/types";
-import { SCRAP_OPTIONS, STICKER_OPTIONS } from "@/lib/types";
-
-const STICKER_SRC: Record<StickerKind, string> = Object.fromEntries(
-  STICKER_OPTIONS.map((opt) => [opt.id, `/stickers/${opt.id}.png`])
-) as Record<StickerKind, string>;
+import { SCRAP_OPTIONS, STICKER_OPTIONS, stickerSrc } from "@/lib/types";
 
 export function StickerArt({
   kind,
@@ -12,8 +8,7 @@ export function StickerArt({
   kind: StickerKind;
   className?: string;
 }) {
-  const src = STICKER_SRC[kind];
-  if (!src) return null;
+  const src = stickerSrc(kind);
   const label = STICKER_OPTIONS.find((o) => o.id === kind)?.name || "Sticker";
 
   return (

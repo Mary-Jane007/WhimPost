@@ -1041,6 +1041,57 @@ select {
   grid-template-columns: repeat(3, 1fr);
 }
 
+.sticker-panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.sticker-panel > h3 {
+  margin: 0;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(243, 230, 208, 0.72);
+}
+
+.village-sticker-pack {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(242, 196, 208, 0.35);
+  background: rgba(212, 132, 154, 0.1);
+}
+
+.village-sticker-pack h3 {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--village-soft, #f2c4d0);
+}
+
+.pack-lock {
+  font-family: var(--font-stamp);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(243, 230, 208, 0.55);
+}
+
+.village-sticker-btn {
+  border-color: rgba(242, 196, 208, 0.28);
+}
+
+body.theme-clovermeadow .village-sticker-pack {
+  border-color: rgba(242, 196, 208, 0.45);
+  background: rgba(255, 244, 247, 0.08);
+}
+
 .sticker-btn,
 .scrap-btn {
   display: grid;
