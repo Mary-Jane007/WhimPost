@@ -1,5 +1,6 @@
 import { getDb } from "./db";
 import { mapUser } from "./auth";
+import { mascotForSystemSender } from "./villages";
 import type {
   LetterRecord,
   LetterView,
@@ -93,6 +94,7 @@ export function toLetterView(row: LetterRecord): LetterView | null {
     sentAt: row.sent_at,
     sender,
     recipient,
+    mascot: mascotForSystemSender(row.sender_id),
   };
 }
 

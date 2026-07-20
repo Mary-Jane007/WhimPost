@@ -79,6 +79,7 @@ export function LetterReader({
               stickers={letter.stickers}
               scraps={letter.scraps}
               image={letter.image}
+              mascot={letter.mascot}
             />
           </motion.div>
         )}

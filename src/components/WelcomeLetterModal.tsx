@@ -80,6 +80,7 @@ export function WelcomeLetterModal({ letter }: { letter: LetterView }) {
                 stickers={letter.stickers}
                 scraps={letter.scraps}
                 image={letter.image}
+                mascot={letter.mascot}
               />
               <button
                 type="button"

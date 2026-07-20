@@ -181,6 +181,12 @@ export interface LetterView {
   sentAt: string | null;
   sender: UserPublic;
   recipient: UserPublic;
+  /** Present on village welcome letters — the village mascot. */
+  mascot?: {
+    emoji: string;
+    name: string;
+    image?: string;
+  } | null;
 }
 
 export const PAPER_OPTIONS: {

@@ -2366,3 +2366,42 @@ body.theme-clovermeadow .welcome-modal-title {
 body.theme-clovermeadow .form-error {
   color: #e8a0b5;
 }
+
+.letter-mascot {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 5;
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  pointer-events: none;
+  max-width: 6.5rem;
+}
+
+.letter-mascot img {
+  width: 5.5rem;
+  height: 5.5rem;
+  object-fit: contain;
+  border-radius: 0.45rem;
+  filter: drop-shadow(0 4px 10px rgba(60, 40, 20, 0.22));
+}
+
+.letter-mascot-emoji {
+  font-size: 3.2rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(60, 40, 20, 0.2));
+}
+
+.letter-mascot em {
+  font-family: var(--font-stamp);
+  font-size: 0.58rem;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(47, 36, 24, 0.65);
+}
+
+.paper-night .letter-mascot em {
+  color: rgba(243, 230, 208, 0.65);
+}

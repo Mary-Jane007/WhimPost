@@ -144,6 +144,37 @@ export const VILLAGE_MAP = Object.fromEntries(
   VILLAGES.map((v) => [v.id, v])
 ) as Record<VillageId, VillageInfo>;
 
+/** System sender user ids used for village welcome letters. */
+export const VILLAGE_SYSTEM_SENDER_IDS: Partial<Record<VillageId, string>> = {
+  mosshollow: "system-mosshollow",
+  clovermeadow: "system-clovermeadow",
+};
+
+export function villageIdFromSystemSender(
+  senderId: string
+): VillageId | null {
+  const found = (
+    Object.entries(VILLAGE_SYSTEM_SENDER_IDS) as Array<[VillageId, string]>
+  ).find(([, id]) => id === senderId);
+  return found ? found[0] : null;
+}
+
+export function mascotForSystemSender(senderId: string): {
+  emoji: string;
+  name: string;
+  image?: string;
+} | null {
+  const villageId = villageIdFromSystemSender(senderId);
+  if (!villageId) return null;
+  const village = getVillage(villageId);
+  if (!village) return null;
+  return {
+    emoji: village.mascot,
+    name: village.mascotName,
+    image: village.mascotImage,
+  };
+}
+
 export const SHARED_FEATURES = [
   { emoji: "🏘️", name: "Village Square" },
   { emoji: "📮", name: "Post Office" },
