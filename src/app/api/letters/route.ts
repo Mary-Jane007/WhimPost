@@ -85,11 +85,17 @@ export async function POST(req: NextRequest) {
   if (!waxIds.has(waxSeal)) return jsonError("Unknown wax seal");
   if (!stampIds.has(stampStyle)) return jsonError("Unknown stamp");
 
+  const stickerMeta = new Map(STICKER_OPTIONS.map((o) => [o.id, o]));
   const stickers = Array.isArray(body.stickers)
     ? body.stickers
-        .filter(
-          (s: { kind?: string }) => s && stickerIds.has(s.kind as StickerKind)
-        )
+        .filter((s: { kind?: string }) => {
+          if (!s || !stickerIds.has(s.kind as StickerKind)) return false;
+          const meta = stickerMeta.get(s.kind as StickerKind);
+          if (meta?.villageId && meta.villageId !== user.villageId) {
+            return false;
+          }
+          return true;
+        })
         .slice(0, 24)
         .map(
           (s: {
