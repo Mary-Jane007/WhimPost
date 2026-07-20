@@ -42,6 +42,16 @@ export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
     bgGlow:
       "radial-gradient(ellipse at 16% 8%, rgba(138, 155, 136, 0.28), transparent 46%), radial-gradient(ellipse at 88% 12%, rgba(122, 143, 168, 0.22), transparent 42%), radial-gradient(ellipse at 50% 100%, rgba(18, 22, 32, 0.92), transparent 55%), linear-gradient(165deg, #12161e 0%, #1a2230 30%, #243040 58%, #10141c 100%)",
   },
+  hearthwick: {
+    color: "#8b5a2b",
+    colorSoft: "#e2c39a",
+    accent: "#d4783a",
+    cream: "#f3e6d4",
+    ink: "#2c1e14",
+    gold: "#e8b86d",
+    bgGlow:
+      "radial-gradient(ellipse at 18% 10%, rgba(232, 184, 109, 0.38), transparent 46%), radial-gradient(ellipse at 82% 14%, rgba(212, 120, 58, 0.28), transparent 42%), radial-gradient(ellipse at 50% 100%, rgba(44, 30, 20, 0.92), transparent 55%), linear-gradient(165deg, #2c1e14 0%, #4a3224 30%, #6b4226 58%, #241810 100%)",
+  },
 };
 
 export type CloverStickerId =
@@ -303,6 +313,82 @@ export function moonmereStickerSrc(id: MoonmereStickerId) {
   return (
     MOONMERE_STICKERS.find((s) => s.id === id)?.src ||
     `/stickers/villages/moonmere/${id}.png`
+  );
+}
+
+export type HearthwickStickerId =
+  | "hedgehog"
+  | "teapot"
+  | "teacup"
+  | "muffin"
+  | "knit-blanket"
+  | "flower-basket"
+  | "candle"
+  | "lavender";
+
+export const HEARTHWICK_STICKERS: {
+  id: HearthwickStickerId;
+  name: string;
+  src: string;
+}[] = [
+  {
+    id: "hedgehog",
+    name: "Hearth Hedgehog",
+    src: "/stickers/villages/hearthwick/hedgehog.png",
+  },
+  {
+    id: "teapot",
+    name: "Leaf Teapot",
+    src: "/stickers/villages/hearthwick/teapot.png",
+  },
+  {
+    id: "teacup",
+    name: "Flower Teacup",
+    src: "/stickers/villages/hearthwick/teacup.png",
+  },
+  {
+    id: "muffin",
+    name: "Berry Muffin",
+    src: "/stickers/villages/hearthwick/muffin.png",
+  },
+  {
+    id: "knit-blanket",
+    name: "Knit Blanket",
+    src: "/stickers/villages/hearthwick/knit-blanket.png",
+  },
+  {
+    id: "flower-basket",
+    name: "Flower Basket",
+    src: "/stickers/villages/hearthwick/flower-basket.png",
+  },
+  {
+    id: "candle",
+    name: "Mantel Candle",
+    src: "/stickers/villages/hearthwick/candle.png",
+  },
+  {
+    id: "lavender",
+    name: "Lavender Sprig",
+    src: "/stickers/villages/hearthwick/lavender.png",
+  },
+];
+
+export const HEARTHWICK_DECOR: {
+  id: HearthwickStickerId;
+  className: string;
+}[] = [
+  { id: "lavender", className: "decor-fern-tl" },
+  { id: "candle", className: "decor-mushroom-tr" },
+  { id: "teapot", className: "decor-fox-bl" },
+  { id: "knit-blanket", className: "decor-moth-br" },
+  { id: "muffin", className: "decor-butterfly-mr" },
+  { id: "flower-basket", className: "decor-sun-tr2" },
+];
+
+export function hearthwickStickerSrc(id: HearthwickStickerId) {
+  return (
+    HEARTHWICK_STICKERS.find((s) => s.id === id)?.src ||
+    `/stickers/villages/hearthwick/${id}.png`
   );
 }
 

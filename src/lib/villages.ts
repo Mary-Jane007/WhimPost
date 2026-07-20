@@ -40,7 +40,16 @@ export type CollectibleKind =
   | "moon-lanterns"
   | "moon-lilies"
   | "moon-dreams"
-  | "moon-dust";
+  | "moon-dust"
+  // Hearthwick
+  | "hearth-teacups"
+  | "hearth-blankets"
+  | "hearth-muffins"
+  | "hearth-lavender"
+  | "hearth-candles"
+  | "hearth-embers"
+  | "hearth-kettles"
+  | "hearth-letters";
 
 export type CollectibleMeta = {
   emoji: string;
@@ -153,13 +162,14 @@ export const VILLAGES: VillageInfo[] = [
     id: "hearthwick",
     name: "Hearthwick",
     motto: "Every stranger is welcomed home.",
-    theme: "Warm fireplaces, bakeries, and tea shops.",
+    theme:
+      "A firelit cottage of stone hearths and knitted blankets — teapot steam, lavender on the mantel, warm muffins by the fire, and every letter read with a cup in hand.",
     belongs: ["Cozy hearts", "Good listeners", "Calm souls", "Tea lovers"],
     mascot: "🦔",
     mascotName: "Hedgehog",
     mascotImage: "/villages/hearthwick/mascot.png",
-    color: "#6b4226",
-    colorSoft: "#c4a484",
+    color: "#8b5a2b",
+    colorSoft: "#e2c39a",
     tasks: [
       "Host tea conversations",
       "Share recipes",
@@ -167,7 +177,7 @@ export const VILLAGES: VillageInfo[] = [
       "Keep the village fire burning by staying active",
     ],
     building: "The Hearth Hall",
-    buildingEmoji: "☕",
+    buildingEmoji: "🫖",
   },
 ];
 
@@ -313,6 +323,46 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     name: "Fairy Dust",
     max: 15,
   },
+  "hearth-teacups": {
+    emoji: "🍵",
+    name: "Teacups",
+    max: 18,
+  },
+  "hearth-blankets": {
+    emoji: "🧶",
+    name: "Knit Blankets",
+    max: 14,
+  },
+  "hearth-muffins": {
+    emoji: "🧁",
+    name: "Hearth Muffins",
+    max: 20,
+  },
+  "hearth-lavender": {
+    emoji: "💜",
+    name: "Lavender Sprigs",
+    max: 22,
+  },
+  "hearth-candles": {
+    emoji: "🕯️",
+    name: "Mantel Candles",
+    max: 16,
+  },
+  "hearth-embers": {
+    emoji: "🔥",
+    name: "Hearth Embers",
+    max: 24,
+  },
+  "hearth-kettles": {
+    emoji: "🫖",
+    name: "Leaf Teapots",
+    max: 12,
+  },
+  "hearth-letters": {
+    emoji: "💌",
+    name: "Fireside Notes",
+    max: 25,
+  },
 };
 
 const FOREST_COLLECTIBLES: CollectibleKind[] = [
@@ -347,13 +397,24 @@ const MOON_COLLECTIBLES: CollectibleKind[] = [
   "moon-dust",
 ];
 
+const HEARTH_COLLECTIBLES: CollectibleKind[] = [
+  "hearth-teacups",
+  "hearth-blankets",
+  "hearth-muffins",
+  "hearth-lavender",
+  "hearth-candles",
+  "hearth-embers",
+  "hearth-kettles",
+  "hearth-letters",
+];
+
 /** Which collectibles appear for each village. */
 export const VILLAGE_COLLECTIBLES: Record<VillageId, CollectibleKind[]> = {
   mosshollow: FOREST_COLLECTIBLES,
   clovermeadow: CLOVER_COLLECTIBLES,
   moonmere: MOON_COLLECTIBLES,
   bramblewood: FOREST_COLLECTIBLES,
-  hearthwick: FOREST_COLLECTIBLES,
+  hearthwick: HEARTH_COLLECTIBLES,
 };
 
 export function collectiblesForVillage(
