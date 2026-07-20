@@ -21,6 +21,7 @@ import { VillageChangePanel } from "@/components/VillageChangePanel";
 import { NoticeBoard } from "@/components/NoticeBoard";
 import { PageCrest } from "@/components/PageCrest";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
+import { VillageMascot } from "@/components/VillageMascot";
 import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
@@ -144,9 +145,7 @@ export default async function VillagePage() {
       {welcomeLetter ? <WelcomeLetterModal letter={welcomeLetter} /> : null}
 
       <header className="village-hero">
-        <p className="village-mascot-lg" aria-hidden>
-          {village.mascot}
-        </p>
+        <VillageMascot village={village} size="lg" />
         <div>
           <p className="hero-postmark">{village.mascotName} watches over you</p>
           <h1>

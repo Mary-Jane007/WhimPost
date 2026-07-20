@@ -1794,6 +1794,27 @@ body.theme-clovermeadow .village-sticker-pack {
   font-size: 1.6rem;
 }
 
+.village-mascot-sm {
+  font-size: 1.15rem;
+}
+
+.village-mascot-img {
+  display: block;
+  object-fit: contain;
+  border-radius: 0.35rem;
+  filter: drop-shadow(0 4px 10px rgba(40, 20, 30, 0.28));
+}
+
+.village-mascot.village-mascot-img {
+  width: 3.1rem;
+  height: 3.1rem;
+}
+
+.village-mascot-sm.village-mascot-img {
+  width: 2.1rem;
+  height: 2.1rem;
+}
+
 .village-card strong {
   font-family: var(--font-display);
   font-size: 1.15rem;
@@ -1835,6 +1856,13 @@ body.theme-clovermeadow .village-sticker-pack {
   margin: 0;
   line-height: 1;
   filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+}
+
+.village-mascot-lg.village-mascot-img {
+  width: min(11rem, 42vw);
+  height: min(11rem, 42vw);
+  border-radius: 0.75rem;
+  filter: drop-shadow(0 10px 22px rgba(60, 30, 45, 0.4));
 }
 
 .village-motto {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { VILLAGES, type VillageId } from "@/lib/villages";
+import { VillageMascot } from "@/components/VillageMascot";
 
 export function VillageJoinPicker({
   currentVillageId = null,
@@ -76,7 +77,7 @@ export function VillageJoinPicker({
               }
               onClick={() => setVillageId(v.id)}
             >
-              <span className="village-mascot">{v.mascot}</span>
+              <VillageMascot village={v} size="md" />
               <strong>{v.name}</strong>
               <em>{v.motto}</em>
               {isCurrent ? <span className="village-current-tag">Home</span> : null}
