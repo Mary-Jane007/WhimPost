@@ -26,6 +26,24 @@
     radial-gradient(ellipse at 85% 5%, rgba(212, 175, 55, 0.14), transparent 35%),
     radial-gradient(ellipse at 50% 100%, rgba(36, 51, 40, 0.9), transparent 55%),
     linear-gradient(165deg, #121812 0%, #1a2219 28%, #243024 62%, #1a2219 100%);
+
+  /* Whimsical organic frames — petal / cloud / leaf silhouettes */
+  --frame-panel: 1.85rem 2.6rem 2.1rem 2.35rem / 2.4rem 1.7rem 2.55rem 1.9rem;
+  --frame-panel-sm: 1.35rem 1.9rem 1.5rem 1.75rem / 1.8rem 1.25rem 1.95rem 1.4rem;
+  --frame-cloud: 2.2rem 1.4rem 2.5rem 1.6rem / 1.5rem 2.4rem 1.35rem 2.2rem;
+  --frame-petal: 42% 58% 48% 52% / 55% 42% 58% 45%;
+  --frame-bloom: 1.4rem 2rem 1.55rem 1.85rem;
+  --frame-chip: 1.15rem 1.55rem 1.3rem 1.45rem / 1.5rem 1.1rem 1.6rem 1.2rem;
+  --frame-pill: 1.1rem 1.75rem 1.25rem 1.55rem;
+  --frame-paper: 1.7rem 2.35rem 1.9rem 2.55rem / 2.15rem 1.65rem 2.4rem 1.8rem;
+  --frame-button: 1.35rem 1.85rem 1.5rem 1.65rem / 1.7rem 1.25rem 1.8rem 1.4rem;
+  --frame-input: 0.95rem 1.35rem 1.05rem 1.2rem / 1.25rem 0.9rem 1.35rem 1rem;
+  --frame-stamp-mask:
+    radial-gradient(circle at 0 50%, transparent 0.28rem, #000 0.3rem) 0 / 100% 0.85rem repeat-y,
+    radial-gradient(circle at 100% 50%, transparent 0.28rem, #000 0.3rem) 100% / 100% 0.85rem repeat-y,
+    radial-gradient(circle at 50% 0, transparent 0.28rem, #000 0.3rem) 0 0 / 0.85rem 100% repeat-x,
+    radial-gradient(circle at 50% 100%, transparent 0.28rem, #000 0.3rem) 0 100% / 0.85rem 100% repeat-x,
+    linear-gradient(#000, #000);
 }
 
 * {
@@ -98,6 +116,8 @@ select {
   position: sticky;
   top: 0;
   z-index: 20;
+  border-bottom-left-radius: 1.75rem 1.1rem;
+  border-bottom-right-radius: 2.1rem 1.35rem;
   backdrop-filter: blur(10px);
   background: linear-gradient(180deg, rgba(31, 42, 30, 0.92), rgba(31, 42, 30, 0.55));
   border-bottom: 1px solid rgba(243, 230, 208, 0.08);
@@ -160,7 +180,8 @@ select {
 
 .nav-cta {
   border: 1px solid rgba(212, 175, 55, 0.55);
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--frame-pill);
   opacity: 1 !important;
   color: var(--gold) !important;
 }
@@ -205,6 +226,7 @@ select {
   font-size: 0.85rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  border-radius: var(--frame-button);
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
@@ -414,6 +436,7 @@ select {
     linear-gradient(160deg, rgba(243, 230, 208, 0.1), rgba(31, 42, 30, 0.35)),
     rgba(36, 48, 36, 0.75);
   border: 1px solid rgba(243, 230, 208, 0.14);
+  border-radius: var(--frame-cloud);
 }
 
 .auth-panel h1 {
@@ -456,6 +479,7 @@ select {
   color: var(--ink);
   padding: 0.65rem 0.75rem;
   outline: none;
+  border-radius: var(--frame-input);
 }
 
 .auth-form input:focus,
@@ -521,9 +545,14 @@ select {
 
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 3rem 1.25rem;
   max-width: 28rem;
   margin: 2rem auto;
+  border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-cloud);
+  background:
+    radial-gradient(circle at 20% 15%, rgba(212, 175, 55, 0.1), transparent 45%),
+    rgba(31, 42, 30, 0.35);
 }
 
 .empty-state h1,
@@ -557,9 +586,10 @@ select {
 .mail-item {
   display: grid;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1rem 1.15rem;
   border: 1px solid rgba(243, 230, 208, 0.1);
   background: rgba(31, 42, 30, 0.45);
+  border-radius: var(--frame-cloud);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -612,6 +642,7 @@ select {
   width: 100%;
   aspect-ratio: 1.55 / 1;
   border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 1.35rem 1.85rem 1.5rem 1.7rem / 1.6rem 1.25rem 1.75rem 1.4rem;
   overflow: hidden;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
 }
@@ -748,7 +779,10 @@ select {
   margin: 0 auto;
   padding: 2rem 1.75rem 3rem;
   color: var(--ink);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  border-radius: var(--frame-paper);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(92, 58, 30, 0.08);
   overflow: hidden;
 }
 
@@ -917,6 +951,8 @@ select {
 .preview-toggle {
   display: inline-flex;
   border: 1px solid rgba(243, 230, 208, 0.2);
+  border-radius: var(--frame-pill);
+  overflow: hidden;
 }
 
 .preview-toggle button {
@@ -957,6 +993,7 @@ select {
 .compose-palette {
   background: rgba(31, 42, 30, 0.55);
   border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-panel-sm);
   padding: 0.85rem;
 }
 
@@ -978,6 +1015,7 @@ select {
   border: 1px solid rgba(243, 230, 208, 0.15);
   background: rgba(243, 230, 208, 0.05);
   color: var(--cream);
+  border-radius: var(--frame-chip);
 }
 
 .palette-tabs button {
@@ -1065,8 +1103,9 @@ select {
 .village-sticker-pack {
   display: grid;
   gap: 0.55rem;
-  padding: 0.7rem;
+  padding: 0.7rem 0.85rem;
   border: 1px solid rgba(242, 196, 208, 0.35);
+  border-radius: var(--frame-bloom);
   background: rgba(212, 132, 154, 0.1);
 }
 
@@ -1178,6 +1217,7 @@ body.theme-clovermeadow .village-sticker-pack {
   padding: 1.25rem;
   border: 1px solid rgba(243, 230, 208, 0.1);
   background: rgba(31, 42, 30, 0.4);
+  border-radius: var(--frame-panel-sm);
 }
 
 .friends-section h2 {
@@ -1576,9 +1616,50 @@ body.theme-clovermeadow .village-sticker-pack {
   background:
     linear-gradient(160deg, rgba(36, 48, 36, 0.55), rgba(26, 34, 25, 0.35));
   border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-panel);
   padding: 1.5rem 1.25rem 2.5rem;
   margin-top: 1rem;
   margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-main.forest-panel::before,
+.app-main.forest-panel::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+.app-main.forest-panel::before {
+  width: 7.5rem;
+  height: 7.5rem;
+  top: -2.4rem;
+  left: -2.1rem;
+  background:
+    radial-gradient(circle at 35% 40%, rgba(212, 175, 55, 0.28), transparent 58%),
+    radial-gradient(circle at 70% 65%, rgba(143, 168, 138, 0.35), transparent 55%);
+  border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+  transform: rotate(-12deg);
+}
+
+.app-main.forest-panel::after {
+  width: 8.5rem;
+  height: 8.5rem;
+  right: -2.6rem;
+  bottom: -2.8rem;
+  background:
+    radial-gradient(circle at 40% 35%, rgba(196, 164, 132, 0.28), transparent 56%),
+    radial-gradient(circle at 65% 70%, rgba(95, 127, 101, 0.32), transparent 58%);
+  border-radius: 45% 55% 40% 60% / 55% 40% 60% 45%;
+  transform: rotate(18deg);
+}
+
+.app-main.forest-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .page-crest {
@@ -1642,6 +1723,7 @@ body.theme-clovermeadow .village-sticker-pack {
     linear-gradient(160deg, rgba(243, 230, 208, 0.12), rgba(31, 42, 30, 0.55)),
     rgba(36, 48, 36, 0.82);
   border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: var(--frame-cloud);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
 
@@ -1658,6 +1740,7 @@ body.theme-clovermeadow .village-sticker-pack {
 .feature-visual {
   min-height: 18rem;
   border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-panel-sm);
   background:
     linear-gradient(145deg, rgba(95, 127, 101, 0.25), rgba(31, 42, 30, 0.5)),
     radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.18), transparent 50%);
@@ -1796,8 +1879,9 @@ body.theme-clovermeadow .village-sticker-pack {
   text-align: left;
   display: grid;
   gap: 0.2rem;
-  padding: 0.85rem;
+  padding: 0.85rem 1rem;
   border: 1px solid rgba(243, 230, 208, 0.18);
+  border-radius: var(--frame-bloom);
   background: linear-gradient(
     145deg,
     color-mix(in srgb, var(--village-soft, #6b8f71) 22%, transparent),
@@ -1915,6 +1999,7 @@ body.theme-clovermeadow .village-sticker-pack {
 .village-stats > div {
   padding: 0.9rem 1rem;
   border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-bloom);
   background: rgba(18, 24, 18, 0.35);
   display: grid;
   gap: 0.25rem;
@@ -1934,14 +2019,16 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .village-panel {
   margin-bottom: 1.15rem;
-  padding: 1.15rem;
+  padding: 1.15rem 1.25rem;
   border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-panel-sm);
   background:
     linear-gradient(
       160deg,
       color-mix(in srgb, var(--village-soft, #6b8f71) 12%, transparent),
       rgba(31, 42, 30, 0.4)
     );
+  overflow: hidden;
 }
 
 .village-panel h2 {
@@ -1968,10 +2055,11 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .feature-chip,
 .unlock-pill {
-  padding: 0.35rem 0.65rem;
+  padding: 0.35rem 0.75rem;
   border: 1px solid rgba(243, 230, 208, 0.15);
   background: rgba(243, 230, 208, 0.06);
   font-size: 0.9rem;
+  border-radius: var(--frame-pill);
 }
 
 .unlock-row {
@@ -2005,11 +2093,28 @@ body.theme-clovermeadow .village-sticker-pack {
 }
 
 .collectible-chip {
-  padding: 0.65rem;
+  padding: 0.75rem 0.7rem;
   border: 1px solid rgba(243, 230, 208, 0.12);
   background: rgba(18, 24, 18, 0.3);
   display: grid;
   gap: 0.15rem;
+  border-radius: var(--frame-petal);
+  justify-items: center;
+  text-align: center;
+  transition: transform 0.35s ease, border-color 0.25s ease;
+}
+
+.collectible-chip:nth-child(3n + 1) {
+  border-radius: 48% 52% 45% 55% / 52% 42% 58% 48%;
+}
+
+.collectible-chip:nth-child(3n + 2) {
+  border-radius: 55% 45% 52% 48% / 42% 58% 45% 55%;
+}
+
+.collectible-chip:hover {
+  transform: translateY(-3px) rotate(-1deg);
+  border-color: rgba(212, 175, 55, 0.4);
 }
 
 .collectible-icon {
@@ -2083,6 +2188,7 @@ body.theme-clovermeadow .village-sticker-pack {
 .notice-form textarea {
   width: 100%;
   border: 1px solid rgba(92, 58, 30, 0.25);
+  border-radius: var(--frame-input);
   background: rgba(243, 230, 208, 0.92);
   color: var(--ink);
   padding: 0.65rem 0.75rem;
@@ -2109,8 +2215,10 @@ body.theme-clovermeadow .village-sticker-pack {
 }
 
 .notice-list li {
-  padding: 0.7rem 0.8rem;
-  border-top: 1px solid rgba(243, 230, 208, 0.1);
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-chip);
+  background: rgba(18, 24, 18, 0.22);
 }
 
 .notice-list p {
@@ -2129,8 +2237,9 @@ body.theme-clovermeadow .village-sticker-pack {
 }
 
 .season-list span {
-  padding: 0.35rem 0.6rem;
+  padding: 0.35rem 0.7rem;
   border: 1px dashed rgba(243, 230, 208, 0.2);
+  border-radius: var(--frame-pill);
   font-size: 0.9rem;
 }
 
@@ -2200,6 +2309,7 @@ body.theme-clovermeadow .village-sticker-pack {
   gap: 0.35rem;
   padding: 0.85rem;
   border: 1px dashed rgba(243, 230, 208, 0.35);
+  border-radius: var(--frame-bloom);
   background: rgba(243, 230, 208, 0.06);
   cursor: pointer;
   font-family: var(--font-stamp) !important;
@@ -2222,6 +2332,7 @@ body.theme-clovermeadow .village-sticker-pack {
   position: relative;
   margin: 0;
   padding: 0.35rem;
+  border-radius: 1.1rem 1.45rem 1.2rem 1.35rem / 1.35rem 1.05rem 1.45rem 1.15rem;
   background: rgba(243, 230, 208, 0.7);
   border: 1px solid rgba(92, 58, 30, 0.22);
   box-shadow: 2px 3px 0 rgba(60, 40, 20, 0.12);
@@ -2293,6 +2404,7 @@ body.theme-clovermeadow .village-sticker-pack {
   overflow: auto;
   padding: 1.5rem 1.35rem 1.75rem;
   border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--frame-cloud);
   background:
     linear-gradient(165deg, rgba(243, 230, 208, 0.96), rgba(225, 208, 175, 0.94));
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
@@ -2680,7 +2792,7 @@ body.theme-mosshollow .paper-moss {
   height: clamp(360px, 58vh, 560px);
   overflow: hidden;
   border: 1px solid rgba(243, 230, 208, 0.14);
-  border-radius: 2px;
+  border-radius: var(--frame-panel-sm);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.25),
     0 24px 50px rgba(0, 0, 0, 0.35);
@@ -2810,6 +2922,7 @@ body.theme-mosshollow .paper-moss {
   width: 2.4em;
   height: 2.4em;
   border: 1.5px dashed rgba(243, 230, 208, 0.28);
+  border-radius: var(--frame-petal);
   background: rgba(20, 24, 18, 0.35);
   filter: grayscale(1) brightness(0.55);
   opacity: 0.55;
@@ -2840,9 +2953,10 @@ body.theme-mosshollow .paper-moss {
   transform: translateX(-50%);
   z-index: 6;
   width: min(78%, 280px);
-  padding: 0.55rem 0.75rem;
+  padding: 0.55rem 0.85rem;
   text-align: left;
   border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 1.2rem 1.7rem 1.35rem 1.55rem / 1.5rem 1.15rem 1.65rem 1.25rem;
   background:
     linear-gradient(165deg, #d9c7a0, #c4ae82 55%, #b39a6c);
   color: #2a2218;
@@ -2888,8 +3002,9 @@ body.theme-mosshollow .paper-moss {
 
 .cottage-inspect {
   height: 100%;
-  padding: 1.1rem;
+  padding: 1.1rem 1.2rem;
   border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-panel-sm);
   background:
     linear-gradient(
       160deg,
