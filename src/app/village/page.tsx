@@ -129,7 +129,18 @@ export default async function VillagePage() {
         } as React.CSSProperties
       }
     >
-      <PageCrest kinds={["fox-seated", "mushroom-amanita", "moon-full"]} />
+      <PageCrest
+        kinds={
+          village.id === "clovermeadow"
+            ? ["butterfly-green", "gingham-bow", "sunflower"]
+            : ["fox-seated", "mushroom-amanita", "moon-full"]
+        }
+        villageStickers={
+          village.id === "clovermeadow"
+            ? ["bow-pink", "butterfly-iridescent", "cherries-gingham"]
+            : undefined
+        }
+      />
       {welcomeLetter ? <WelcomeLetterModal letter={welcomeLetter} /> : null}
 
       <header className="village-hero">

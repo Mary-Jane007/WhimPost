@@ -67,8 +67,8 @@ export const VILLAGES: VillageInfo[] = [
     belongs: ["Friendly souls", "Encouragers", "Optimists", "Smile-makers"],
     mascot: "🐝",
     mascotName: "Bee",
-    color: "#c9a227",
-    colorSoft: "#e8d48b",
+    color: "#d4849a",
+    colorSoft: "#f2c4d0",
     tasks: [
       "Send compliments",
       "Welcome new villagers",

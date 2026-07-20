@@ -1,5 +1,11 @@
 import { StickerArt } from "@/components/stickers/StickerArt";
 import type { StickerKind } from "@/lib/types";
+import {
+  CLOVERMEADOW_DECOR,
+  cloverStickerSrc,
+  type CloverStickerId,
+} from "@/lib/villageThemes";
+import type { VillageId } from "@/lib/villages";
 
 type DecorItem = {
   kind: StickerKind;
@@ -29,11 +35,59 @@ const LANDING_EXTRA: DecorItem[] = [
   { kind: "jam-jar", className: "decor-landing-acorn" },
 ];
 
+function VillageDecorImg({
+  id,
+  className,
+}: {
+  id: CloverStickerId;
+  className: string;
+}) {
+  return (
+    <span className={`forest-sticker ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={cloverStickerSrc(id)}
+        alt=""
+        className="sticker-img"
+        draggable={false}
+      />
+    </span>
+  );
+}
+
 export function ForestStickers({
   density = "site",
+  villageId = null,
 }: {
   density?: "site" | "landing" | "auth";
+  villageId?: VillageId | null;
 }) {
+  if (villageId === "clovermeadow" && density !== "landing") {
+    const items =
+      density === "auth"
+        ? CLOVERMEADOW_DECOR.filter((_, i) => i % 2 === 0)
+        : CLOVERMEADOW_DECOR;
+    return (
+      <div
+        className={`forest-stickers forest-stickers-${density} forest-stickers-clovermeadow`}
+        aria-hidden
+      >
+        {items.map((item) => (
+          <VillageDecorImg
+            key={`${item.id}-${item.className}`}
+            id={item.id}
+            className={item.className}
+          />
+        ))}
+        <span className="sparkle s1" />
+        <span className="sparkle s2" />
+        <span className="sparkle s3" />
+        <span className="sparkle s4" />
+        <span className="sparkle s5" />
+      </div>
+    );
+  }
+
   const items =
     density === "landing"
       ? LANDING_EXTRA
