@@ -134,13 +134,13 @@ export const VILLAGES: VillageInfo[] = [
     name: "Bramblewood",
     motto: "Adventure begins beyond the trees.",
     theme:
-      "An autumn woodland of fox dens and misty pines — candlelight on jar glass, star lights in the branches, pressed leaves in open books, and every letter smelling faintly of woodsmoke.",
+      "A warm-orange autumn wood of fox dens and fallen leaves — Hello Fall candles, knit socks by the fire, teapot steam, and every letter sealed with a little woodland luck.",
     belongs: ["Curious minds", "Explorers", "Storytellers", "Adventurers"],
     mascot: "🦊",
     mascotName: "Fox",
     mascotImage: "/villages/bramblewood/mascot.png",
-    color: "#8b3a2a",
-    colorSoft: "#d4895a",
+    color: "#e07020",
+    colorSoft: "#f0a868",
     tasks: [
       "Solve weekly riddles",
       "Find hidden collectibles around WhimPost",

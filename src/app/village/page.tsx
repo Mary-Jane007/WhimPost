@@ -27,6 +27,30 @@ import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
+import {
+  bramblewoodStickerSrc,
+  type BramblewoodStickerId,
+} from "@/lib/villageThemes";
+import { villagePackStickers } from "@/lib/types";
+
+const BRAMBLE_PAGE_ACCENTS: BramblewoodStickerId[] = [
+  "fox-face",
+  "fox-standing",
+  "fox-sitting",
+  "fox-sleeping",
+  "monarch",
+  "ladybug",
+  "maple-branch",
+  "autumn-leaves",
+  "mushroom",
+  "teapot",
+  "candle-jar",
+  "bouquet",
+  "knit-socks",
+  "compass",
+  "full-moon",
+  "blankets",
+];
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -124,7 +148,9 @@ export default async function VillagePage() {
 
   return (
     <main
-      className="app-main forest-panel village-page"
+      className={`app-main forest-panel village-page${
+        village.id === "bramblewood" ? " village-page-bramblewood" : ""
+      }`}
       style={
         {
           "--village-color": village.color,
@@ -155,9 +181,9 @@ export default async function VillagePage() {
                 ]
               : village.id === "bramblewood"
                 ? [
-                    { village: "bramblewood", id: "fox-sitting" },
-                    { village: "bramblewood", id: "autumn-leaves" },
-                    { village: "bramblewood", id: "candle-jar" },
+                    { village: "bramblewood", id: "fox-face" },
+                    { village: "bramblewood", id: "monarch" },
+                    { village: "bramblewood", id: "maple-branch" },
                   ]
                 : undefined
         }
@@ -175,6 +201,21 @@ export default async function VillagePage() {
           <p>{village.theme}</p>
         </div>
       </header>
+
+      {village.id === "bramblewood" ? (
+        <div className="bramble-sticker-ribbon" aria-hidden>
+          {BRAMBLE_PAGE_ACCENTS.map((id) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={id}
+              src={bramblewoodStickerSrc(id)}
+              alt=""
+              className="bramble-ribbon-sticker"
+              draggable={false}
+            />
+          ))}
+        </div>
+      ) : null}
 
       <div className="village-stats">
         <div>
@@ -243,6 +284,28 @@ export default async function VillagePage() {
           Write a village letter
         </Link>
       </section>
+
+      {village.id === "bramblewood" ? (
+        <section className="village-panel bramble-pack-panel">
+          <h2>🦊 Special sticker pack</h2>
+          <p className="section-lead">
+            Warm-orange fox stickers for Bramblewood letters — only available
+            when you write from this village.
+          </p>
+          <div className="bramble-pack-grid">
+            {villagePackStickers("bramblewood").map((opt) => (
+              <div key={opt.id} className="bramble-pack-chip">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={opt.src} alt="" draggable={false} />
+                <span>{opt.name}</span>
+              </div>
+            ))}
+          </div>
+          <Link href="/compose" className="btn-secondary">
+            Stick them on a letter
+          </Link>
+        </section>
+      ) : null}
 
       <section className="village-panel">
         <h2>Hidden collectibles</h2>
