@@ -36,7 +36,7 @@ export default async function LetterPage({
   const perspective = row.recipient_id === user.id ? "inbox" : "sent";
 
   return (
-    <main className="app-main">
+    <main className="app-main forest-panel">
       <LetterReader
         letter={letter}
         perspective={perspective}

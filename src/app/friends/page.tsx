@@ -3,6 +3,7 @@ import { getCurrentUser, mapUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { listFriends } from "@/lib/letters";
 import { FriendsPanel } from "@/components/FriendsPanel";
+import { PageCrest } from "@/components/PageCrest";
 
 export default async function FriendsPage() {
   const user = await getCurrentUser();
@@ -80,7 +81,8 @@ export default async function FriendsPage() {
   }));
 
   return (
-    <main className="app-main">
+    <main className="app-main forest-panel">
+      <PageCrest kinds={["fox", "leaf", "acorn"]} />
       <header className="page-header">
         <h1>Friends</h1>
         <p>
