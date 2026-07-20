@@ -475,16 +475,10 @@ export const BRAMBLEWOOD_DECOR: {
 }[] = [
   { id: "maple-branch", className: "decor-fern-tl" },
   { id: "autumn-leaves", className: "decor-mushroom-tr" },
-  { id: "misty-pines", className: "decor-moon-tr" },
   { id: "fox-sleeping", className: "decor-fox-bl" },
   { id: "fox-sitting", className: "decor-moth-br" },
-  { id: "monarch", className: "decor-leaf-ml" },
   { id: "candle-jar", className: "decor-butterfly-mr" },
-  { id: "pumpkin", className: "decor-acorn-bm" },
-  { id: "teapot", className: "decor-crow-tm" },
-  { id: "bouquet", className: "decor-sun-tr2" },
-  { id: "mushroom", className: "decor-spiral-bl2" },
-  { id: "fox-face", className: "decor-flower-br2" },
+  { id: "monarch", className: "decor-sun-tr2" },
 ];
 
 export function bramblewoodStickerSrc(id: BramblewoodStickerId) {

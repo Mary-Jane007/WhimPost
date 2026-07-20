@@ -3436,35 +3436,6 @@ body.theme-bramblewood .cottage-plaque {
   border-color: rgba(224, 112, 32, 0.55);
 }
 
-.village-page-bramblewood .bramble-sticker-ribbon {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.35rem;
-  overflow-x: auto;
-  padding: 0.35rem 0.15rem 0.85rem;
-  margin: -0.35rem 0 0.65rem;
-  scrollbar-width: thin;
-}
-
-.village-page-bramblewood .bramble-ribbon-sticker {
-  flex: 0 0 auto;
-  width: 3.1rem;
-  height: 3.1rem;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(20, 10, 4, 0.35));
-  animation: brambleFloat 5.5s ease-in-out infinite;
-}
-
-.village-page-bramblewood .bramble-ribbon-sticker:nth-child(odd) {
-  animation-delay: -1.2s;
-}
-
-.village-page-bramblewood .bramble-ribbon-sticker:nth-child(3n) {
-  animation-delay: -2.4s;
-  width: 3.5rem;
-  height: 3.5rem;
-}
-
 .bramble-pack-panel {
   position: relative;
 }
@@ -3474,6 +3445,7 @@ body.theme-bramblewood .cottage-plaque {
   grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr));
   gap: 0.55rem;
   margin: 0.85rem 0 1rem;
+  max-width: 28rem;
 }
 
 .bramble-pack-chip {
@@ -3499,21 +3471,4 @@ body.theme-bramblewood .cottage-plaque {
   text-transform: uppercase;
   color: rgba(255, 241, 224, 0.78);
   line-height: 1.2;
-}
-
-@keyframes brambleFloat {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-2deg);
-  }
-  50% {
-    transform: translateY(-5px) rotate(2deg);
-  }
-}
-
-@media (max-width: 640px) {
-  .village-page-bramblewood .bramble-ribbon-sticker {
-    width: 2.6rem;
-    height: 2.6rem;
-  }
 }

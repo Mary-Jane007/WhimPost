@@ -27,30 +27,17 @@ import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
-import {
-  bramblewoodStickerSrc,
-  type BramblewoodStickerId,
-} from "@/lib/villageThemes";
 import { villagePackStickers } from "@/lib/types";
 
-const BRAMBLE_PAGE_ACCENTS: BramblewoodStickerId[] = [
-  "fox-face",
-  "fox-standing",
-  "fox-sitting",
-  "fox-sleeping",
-  "monarch",
-  "ladybug",
-  "maple-branch",
-  "autumn-leaves",
-  "mushroom",
-  "teapot",
-  "candle-jar",
-  "bouquet",
-  "knit-socks",
-  "compass",
-  "full-moon",
-  "blankets",
-];
+/** A few highlights for the village page — full pack lives in Write. */
+const BRAMBLE_PACK_PREVIEW = [
+  "bramble-fox-portrait",
+  "bramble-fox-sleeping",
+  "bramble-monarch",
+  "bramble-maple-leaf",
+  "bramble-candle",
+  "bramble-teapot",
+] as const;
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -202,21 +189,6 @@ export default async function VillagePage() {
         </div>
       </header>
 
-      {village.id === "bramblewood" ? (
-        <div className="bramble-sticker-ribbon" aria-hidden>
-          {BRAMBLE_PAGE_ACCENTS.map((id) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={id}
-              src={bramblewoodStickerSrc(id)}
-              alt=""
-              className="bramble-ribbon-sticker"
-              draggable={false}
-            />
-          ))}
-        </div>
-      ) : null}
-
       <div className="village-stats">
         <div>
           <strong>
@@ -289,17 +261,21 @@ export default async function VillagePage() {
         <section className="village-panel bramble-pack-panel">
           <h2>🦊 Special sticker pack</h2>
           <p className="section-lead">
-            Warm-orange fox stickers for Bramblewood letters — only available
-            when you write from this village.
+            Warm-orange fox stickers for Bramblewood letters — open Write to use
+            the full set.
           </p>
           <div className="bramble-pack-grid">
-            {villagePackStickers("bramblewood").map((opt) => (
-              <div key={opt.id} className="bramble-pack-chip">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={opt.src} alt="" draggable={false} />
-                <span>{opt.name}</span>
-              </div>
-            ))}
+            {villagePackStickers("bramblewood")
+              .filter((opt) =>
+                (BRAMBLE_PACK_PREVIEW as readonly string[]).includes(opt.id)
+              )
+              .map((opt) => (
+                <div key={opt.id} className="bramble-pack-chip">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={opt.src} alt="" draggable={false} />
+                  <span>{opt.name}</span>
+                </div>
+              ))}
           </div>
           <Link href="/compose" className="btn-secondary">
             Stick them on a letter
