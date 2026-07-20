@@ -44,7 +44,7 @@ export type CollectibleKind =
   // Bramblewood
   | "bramble-fox-tails"
   | "bramble-maple"
-  | "bramble-amber"
+  | "bramble-pumpkins"
   | "bramble-mushrooms"
   | "bramble-candles"
   | "bramble-compasses"
@@ -334,9 +334,9 @@ export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
     name: "Maple Leaves",
     max: 28,
   },
-  "bramble-amber": {
-    emoji: "🟠",
-    name: "Amber Berries",
+  "bramble-pumpkins": {
+    emoji: "🎃",
+    name: "Pumpkins",
     max: 22,
   },
   "bramble-mushrooms": {
@@ -401,7 +401,7 @@ const MOON_COLLECTIBLES: CollectibleKind[] = [
 const BRAMBLE_COLLECTIBLES: CollectibleKind[] = [
   "bramble-fox-tails",
   "bramble-maple",
-  "bramble-amber",
+  "bramble-pumpkins",
   "bramble-mushrooms",
   "bramble-candles",
   "bramble-compasses",
