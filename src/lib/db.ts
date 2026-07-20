@@ -47,7 +47,7 @@ function createDb() {
       paper_style TEXT NOT NULL DEFAULT 'parchment',
       envelope_style TEXT NOT NULL DEFAULT 'kraft',
       wax_seal TEXT NOT NULL DEFAULT 'fern',
-      stamp_style TEXT NOT NULL DEFAULT 'mushroom',
+      stamp_style TEXT NOT NULL DEFAULT 'mushroom-amanita',
       stickers_json TEXT NOT NULL DEFAULT '[]',
       scrap_json TEXT NOT NULL DEFAULT '[]',
       status TEXT NOT NULL CHECK(status IN ('draft', 'sent')) DEFAULT 'sent',

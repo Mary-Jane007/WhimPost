@@ -25,7 +25,7 @@ export default async function SentPage() {
 
   return (
     <main className="app-main forest-panel">
-      <PageCrest kinds={["crow", "fern", "sun"]} />
+      <PageCrest kinds={["dragonfly", "leafy-branch", "sunflower"]} />
       <header className="page-header">
         <h1>Sent</h1>
         <p>Letters you sealed and sent into the woods.</p>

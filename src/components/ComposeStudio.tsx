@@ -42,7 +42,7 @@ export function ComposeStudio({ friends }: { friends: UserPublic[] }) {
   const [paperStyle, setPaperStyle] = useState<PaperStyle>("parchment");
   const [envelopeStyle, setEnvelopeStyle] = useState<EnvelopeStyle>("kraft");
   const [waxSeal, setWaxSeal] = useState<WaxSeal>("fern");
-  const [stampStyle, setStampStyle] = useState<StampStyle>("mushroom");
+  const [stampStyle, setStampStyle] = useState<StampStyle>("mushroom-amanita");
   const [stickers, setStickers] = useState<PlacedSticker[]>([]);
   const [scraps, setScraps] = useState<PlacedScrap[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);

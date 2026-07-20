@@ -17,26 +17,52 @@ export type EnvelopeStyle =
 export type WaxSeal = "fern" | "moon" | "sun" | "mushroom" | "heart" | "spiral";
 
 export type StampStyle =
-  | "mushroom"
-  | "fox"
-  | "moth"
-  | "crow"
-  | "fern"
-  | "moon";
+  | "mushroom-amanita"
+  | "fox-seated"
+  | "frog-crown"
+  | "dragonfly"
+  | "leafy-branch"
+  | "moon-full";
 
 export type StickerKind =
-  | "fox"
-  | "moth"
-  | "mushroom"
-  | "crow"
-  | "moon"
-  | "sun"
-  | "fern"
-  | "butterfly"
-  | "flower"
-  | "spiral"
-  | "acorn"
-  | "leaf";
+  | "frogs-tandem"
+  | "frog-crown"
+  | "bear-round"
+  | "butterfly-green"
+  | "frogs-kiss"
+  | "fox-seated"
+  | "fawn-resting"
+  | "fawn-standing"
+  | "bear-cub"
+  | "rabbit-winged"
+  | "rabbit-hood"
+  | "dragonfly"
+  | "rabbit-brown"
+  | "squirrel"
+  | "jam-jar"
+  | "pinecone"
+  | "mushroom-amanita"
+  | "mushrooms-pair"
+  | "mushroom-brown"
+  | "leafy-branch"
+  | "sunflower"
+  | "narcissus"
+  | "skeleton-key"
+  | "moon-full"
+  | "moon-crescent"
+  | "camera-vintage"
+  | "ace-hearts"
+  | "hand-mirror"
+  | "honey-jar"
+  | "pie"
+  | "picnic-basket"
+  | "candle-jar"
+  | "honey-bear"
+  | "gingham-bow"
+  | "ticket"
+  | "dice"
+  | "cassette"
+  | "pretzel";
 
 export type ScrapKind =
   | "quote-trees"
@@ -156,27 +182,53 @@ export const WAX_OPTIONS: { id: WaxSeal; name: string }[] = [
 ];
 
 export const STAMP_OPTIONS: { id: StampStyle; name: string }[] = [
-  { id: "mushroom", name: "Mushroom" },
-  { id: "fox", name: "Fox" },
-  { id: "moth", name: "Moth" },
-  { id: "crow", name: "Crow" },
-  { id: "fern", name: "Fern" },
-  { id: "moon", name: "Moon" },
+  { id: "mushroom-amanita", name: "Toadstool" },
+  { id: "fox-seated", name: "Fox" },
+  { id: "frog-crown", name: "Frog" },
+  { id: "dragonfly", name: "Dragonfly" },
+  { id: "leafy-branch", name: "Leaf" },
+  { id: "moon-full", name: "Moon" },
 ];
 
 export const STICKER_OPTIONS: { id: StickerKind; name: string }[] = [
-  { id: "fox", name: "Fox" },
-  { id: "moth", name: "Moth" },
-  { id: "mushroom", name: "Mushroom" },
-  { id: "crow", name: "Crow" },
-  { id: "moon", name: "Moon" },
-  { id: "sun", name: "Sun" },
-  { id: "fern", name: "Fern" },
-  { id: "butterfly", name: "Butterfly" },
-  { id: "flower", name: "Flower" },
-  { id: "spiral", name: "Spiral" },
-  { id: "acorn", name: "Acorn" },
-  { id: "leaf", name: "Leaf" },
+  { id: "frogs-tandem", name: "Tandem Frogs" },
+  { id: "frog-crown", name: "Crown Frog" },
+  { id: "frogs-kiss", name: "Kissing Frogs" },
+  { id: "bear-round", name: "Round Bear" },
+  { id: "bear-cub", name: "Bear Cub" },
+  { id: "fox-seated", name: "Fox" },
+  { id: "fawn-resting", name: "Resting Fawn" },
+  { id: "fawn-standing", name: "Standing Fawn" },
+  { id: "rabbit-winged", name: "Winged Rabbit" },
+  { id: "rabbit-hood", name: "Hooded Rabbit" },
+  { id: "rabbit-brown", name: "Brown Rabbit" },
+  { id: "squirrel", name: "Squirrel" },
+  { id: "butterfly-green", name: "Butterfly" },
+  { id: "dragonfly", name: "Dragonfly" },
+  { id: "mushroom-amanita", name: "Red Mushroom" },
+  { id: "mushrooms-pair", name: "Mushroom Pair" },
+  { id: "mushroom-brown", name: "Brown Mushroom" },
+  { id: "pinecone", name: "Pinecone" },
+  { id: "leafy-branch", name: "Leafy Branch" },
+  { id: "sunflower", name: "Sunflower" },
+  { id: "narcissus", name: "Narcissus" },
+  { id: "jam-jar", name: "Jam Jar" },
+  { id: "honey-jar", name: "Honey Jar" },
+  { id: "honey-bear", name: "Honey Bear" },
+  { id: "pie", name: "Pie" },
+  { id: "picnic-basket", name: "Picnic Basket" },
+  { id: "pretzel", name: "Pretzel" },
+  { id: "candle-jar", name: "Candle" },
+  { id: "moon-full", name: "Full Moon" },
+  { id: "moon-crescent", name: "Crescent Moon" },
+  { id: "skeleton-key", name: "Skeleton Key" },
+  { id: "hand-mirror", name: "Hand Mirror" },
+  { id: "camera-vintage", name: "Camera" },
+  { id: "ace-hearts", name: "Ace of Hearts" },
+  { id: "gingham-bow", name: "Gingham Bow" },
+  { id: "ticket", name: "Ticket" },
+  { id: "dice", name: "Dice" },
+  { id: "cassette", name: "Cassette" },
 ];
 
 export const SCRAP_OPTIONS: { id: ScrapKind; name: string; text: string }[] = [

@@ -82,7 +82,7 @@ export default async function FriendsPage() {
 
   return (
     <main className="app-main forest-panel">
-      <PageCrest kinds={["fox", "leaf", "acorn"]} />
+      <PageCrest kinds={["fox-seated", "picnic-basket", "jam-jar"]} />
       <header className="page-header">
         <h1>Friends</h1>
         <p>

@@ -27,7 +27,7 @@ export default async function InboxPage() {
 
   return (
     <main className="app-main forest-panel">
-      <PageCrest kinds={["fox", "mushroom", "moon"]} />
+      <PageCrest kinds={["fox-seated", "mushroom-amanita", "moon-full"]} />
       <header className="page-header">
         <h1>Inbox</h1>
         <p>

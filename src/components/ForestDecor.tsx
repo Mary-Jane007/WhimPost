@@ -4,37 +4,36 @@ import type { StickerKind } from "@/lib/types";
 type DecorItem = {
   kind: StickerKind;
   className: string;
-  label?: string;
 };
 
 const SITEWIDE: DecorItem[] = [
-  { kind: "fern", className: "decor-fern-tl" },
-  { kind: "mushroom", className: "decor-mushroom-tr" },
-  { kind: "moon", className: "decor-moon-tr" },
-  { kind: "fox", className: "decor-fox-bl" },
-  { kind: "moth", className: "decor-moth-br" },
-  { kind: "leaf", className: "decor-leaf-ml" },
-  { kind: "butterfly", className: "decor-butterfly-mr" },
-  { kind: "acorn", className: "decor-acorn-bm" },
-  { kind: "crow", className: "decor-crow-tm" },
-  { kind: "sun", className: "decor-sun-tr2" },
-  { kind: "spiral", className: "decor-spiral-bl2" },
-  { kind: "flower", className: "decor-flower-br2" },
+  { kind: "leafy-branch", className: "decor-fern-tl" },
+  { kind: "mushroom-amanita", className: "decor-mushroom-tr" },
+  { kind: "moon-full", className: "decor-moon-tr" },
+  { kind: "fox-seated", className: "decor-fox-bl" },
+  { kind: "dragonfly", className: "decor-moth-br" },
+  { kind: "pinecone", className: "decor-leaf-ml" },
+  { kind: "butterfly-green", className: "decor-butterfly-mr" },
+  { kind: "gingham-bow", className: "decor-acorn-bm" },
+  { kind: "frog-crown", className: "decor-crow-tm" },
+  { kind: "sunflower", className: "decor-sun-tr2" },
+  { kind: "skeleton-key", className: "decor-spiral-bl2" },
+  { kind: "narcissus", className: "decor-flower-br2" },
 ];
 
 const LANDING_EXTRA: DecorItem[] = [
-  { kind: "mushroom", className: "decor-landing-mush-1" },
-  { kind: "fox", className: "decor-landing-fox" },
-  { kind: "moth", className: "decor-landing-moth" },
-  { kind: "crow", className: "decor-landing-crow" },
-  { kind: "butterfly", className: "decor-landing-bfly" },
-  { kind: "sun", className: "decor-landing-sun" },
-  { kind: "moon", className: "decor-landing-moon" },
-  { kind: "spiral", className: "decor-landing-spiral" },
-  { kind: "fern", className: "decor-landing-fern" },
-  { kind: "flower", className: "decor-landing-flower" },
-  { kind: "leaf", className: "decor-landing-leaf" },
-  { kind: "acorn", className: "decor-landing-acorn" },
+  { kind: "mushrooms-pair", className: "decor-landing-mush-1" },
+  { kind: "fox-seated", className: "decor-landing-fox" },
+  { kind: "frogs-tandem", className: "decor-landing-moth" },
+  { kind: "fawn-standing", className: "decor-landing-crow" },
+  { kind: "butterfly-green", className: "decor-landing-bfly" },
+  { kind: "moon-crescent", className: "decor-landing-sun" },
+  { kind: "moon-full", className: "decor-landing-moon" },
+  { kind: "picnic-basket", className: "decor-landing-spiral" },
+  { kind: "leafy-branch", className: "decor-landing-fern" },
+  { kind: "honey-bear", className: "decor-landing-flower" },
+  { kind: "rabbit-hood", className: "decor-landing-leaf" },
+  { kind: "jam-jar", className: "decor-landing-acorn" },
 ];
 
 export function ForestStickers({

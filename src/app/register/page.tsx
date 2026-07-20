@@ -13,9 +13,9 @@ export default async function RegisterPage() {
       <ForestStickers density="auth" />
       <div className="auth-panel moss-panel">
         <div className="auth-stickers" aria-hidden>
-          <StickerArt kind="moth" className="w-12 h-12" />
-          <StickerArt kind="fern" className="w-12 h-12" />
-          <StickerArt kind="sun" className="w-12 h-12" />
+          <StickerArt kind="frogs-tandem" className="w-12 h-12" />
+          <StickerArt kind="leafy-branch" className="w-12 h-12" />
+          <StickerArt kind="sunflower" className="w-12 h-12" />
         </div>
         <h1>Claim your mailbox</h1>
         <p className="lede">

@@ -13,9 +13,9 @@ export default async function LoginPage() {
       <ForestStickers density="auth" />
       <div className="auth-panel moss-panel">
         <div className="auth-stickers" aria-hidden>
-          <StickerArt kind="fox" className="w-12 h-12" />
-          <StickerArt kind="mushroom" className="w-12 h-12" />
-          <StickerArt kind="moon" className="w-12 h-12" />
+          <StickerArt kind="fox-seated" className="w-12 h-12" />
+          <StickerArt kind="mushroom-amanita" className="w-12 h-12" />
+          <StickerArt kind="moon-full" className="w-12 h-12" />
         </div>
         <h1>Welcome back</h1>
         <p className="lede">Slip into your forest mailbox.</p>
