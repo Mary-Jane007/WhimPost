@@ -141,30 +141,36 @@ export type StickerKind =
   | "moon-corner-velvet"
   | "moon-tv-vintage"
   // Bramblewood village pack
-  | "bramble-fox-portrait"
-  | "bramble-fox-standing"
   | "bramble-fox-sitting"
+  | "bramble-fox-standing"
   | "bramble-fox-sleeping"
-  | "bramble-autumn-tree"
+  | "bramble-girl-fox"
   | "bramble-monarch"
   | "bramble-moth"
   | "bramble-ladybug"
+  | "bramble-mushroom"
   | "bramble-eucalyptus"
-  | "bramble-oak-leaves"
+  | "bramble-autumn-tree"
   | "bramble-maple-leaf"
+  | "bramble-oak-leaves"
   | "bramble-wildflowers"
   | "bramble-dried-flowers"
   | "bramble-bouquet"
-  | "bramble-mushroom"
   | "bramble-full-moon"
   | "bramble-teapot"
+  | "bramble-coffee-cup"
+  | "bramble-water-bottle"
   | "bramble-pumpkin-pie"
-  | "bramble-cocoa-mug"
-  | "bramble-blankets"
   | "bramble-knit-socks"
+  | "bramble-blankets"
   | "bramble-books"
   | "bramble-candle"
-  | "bramble-compass";
+  | "bramble-compass"
+  | "bramble-bracelet"
+  | "bramble-earring-a"
+  | "bramble-earring-b"
+  | "bramble-scrunchie"
+  | "bramble-hair-claw";
 
 export type ScrapKind =
   | "quote-trees"
@@ -792,10 +798,10 @@ export const STICKER_OPTIONS: {
   },
   // Bramblewood-only pack
   {
-    id: "bramble-fox-portrait",
-    name: "Fox Portrait",
+    id: "bramble-fox-sitting",
+    name: "Sitting Fox",
     villageId: "bramblewood",
-    src: "/stickers/villages/bramblewood/pack/fox-portrait.png",
+    src: "/stickers/villages/bramblewood/pack/fox-sitting.png",
   },
   {
     id: "bramble-fox-standing",
@@ -804,22 +810,16 @@ export const STICKER_OPTIONS: {
     src: "/stickers/villages/bramblewood/pack/fox-standing.png",
   },
   {
-    id: "bramble-fox-sitting",
-    name: "Sitting Fox",
-    villageId: "bramblewood",
-    src: "/stickers/villages/bramblewood/pack/fox-sitting.png",
-  },
-  {
     id: "bramble-fox-sleeping",
     name: "Sleeping Fox",
     villageId: "bramblewood",
     src: "/stickers/villages/bramblewood/pack/fox-sleeping-leaves.png",
   },
   {
-    id: "bramble-autumn-tree",
-    name: "Autumn Tree",
+    id: "bramble-girl-fox",
+    name: "Fox Friend",
     villageId: "bramblewood",
-    src: "/stickers/villages/bramblewood/pack/autumn-tree.png",
+    src: "/stickers/villages/bramblewood/pack/girl-fox.png",
   },
   {
     id: "bramble-monarch",
@@ -840,22 +840,34 @@ export const STICKER_OPTIONS: {
     src: "/stickers/villages/bramblewood/pack/ladybug.png",
   },
   {
+    id: "bramble-mushroom",
+    name: "Fly Agaric",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/mushroom.png",
+  },
+  {
     id: "bramble-eucalyptus",
     name: "Eucalyptus",
     villageId: "bramblewood",
     src: "/stickers/villages/bramblewood/pack/eucalyptus.png",
   },
   {
-    id: "bramble-oak-leaves",
-    name: "Oak Leaves",
+    id: "bramble-autumn-tree",
+    name: "Autumn Tree",
     villageId: "bramblewood",
-    src: "/stickers/villages/bramblewood/pack/oak-leaves.png",
+    src: "/stickers/villages/bramblewood/pack/autumn-tree.png",
   },
   {
     id: "bramble-maple-leaf",
     name: "Maple Leaf",
     villageId: "bramblewood",
     src: "/stickers/villages/bramblewood/pack/maple-leaf.png",
+  },
+  {
+    id: "bramble-oak-leaves",
+    name: "Oak Leaves",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/oak-leaves.png",
   },
   {
     id: "bramble-wildflowers",
@@ -876,12 +888,6 @@ export const STICKER_OPTIONS: {
     src: "/stickers/villages/bramblewood/pack/bouquet.png",
   },
   {
-    id: "bramble-mushroom",
-    name: "Fly Agaric",
-    villageId: "bramblewood",
-    src: "/stickers/villages/bramblewood/pack/mushroom.png",
-  },
-  {
     id: "bramble-full-moon",
     name: "Warm Moon",
     villageId: "bramblewood",
@@ -894,28 +900,34 @@ export const STICKER_OPTIONS: {
     src: "/stickers/villages/bramblewood/pack/teapot.png",
   },
   {
+    id: "bramble-coffee-cup",
+    name: "Forest Latte",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/coffee-cup.png",
+  },
+  {
+    id: "bramble-water-bottle",
+    name: "Trail Bottle",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/water-bottle.png",
+  },
+  {
     id: "bramble-pumpkin-pie",
     name: "Pumpkin Pie",
     villageId: "bramblewood",
     src: "/stickers/villages/bramblewood/pack/pumpkin-pie.png",
   },
   {
-    id: "bramble-cocoa-mug",
-    name: "Cocoa Mug",
+    id: "bramble-knit-socks",
+    name: "Knit Socks",
     villageId: "bramblewood",
-    src: "/stickers/villages/bramblewood/pack/cocoa-mug.png",
+    src: "/stickers/villages/bramblewood/pack/knit-socks.png",
   },
   {
     id: "bramble-blankets",
     name: "Cozy Blankets",
     villageId: "bramblewood",
     src: "/stickers/villages/bramblewood/pack/blankets.png",
-  },
-  {
-    id: "bramble-knit-socks",
-    name: "Knit Socks",
-    villageId: "bramblewood",
-    src: "/stickers/villages/bramblewood/pack/knit-socks.png",
   },
   {
     id: "bramble-books",
@@ -934,6 +946,36 @@ export const STICKER_OPTIONS: {
     name: "Explorer Compass",
     villageId: "bramblewood",
     src: "/stickers/villages/bramblewood/pack/compass.png",
+  },
+  {
+    id: "bramble-bracelet",
+    name: "Amber Bracelet",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/bracelet.png",
+  },
+  {
+    id: "bramble-earring-a",
+    name: "Amber Drop",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/earring-a.png",
+  },
+  {
+    id: "bramble-earring-b",
+    name: "Amber Drop II",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/earring-b.png",
+  },
+  {
+    id: "bramble-scrunchie",
+    name: "Velvet Scrunchie",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/scrunchie.png",
+  },
+  {
+    id: "bramble-hair-claw",
+    name: "Tortoiseshell Claw",
+    villageId: "bramblewood",
+    src: "/stickers/villages/bramblewood/pack/hair-claw.png",
   },
 ];
 

@@ -27,17 +27,6 @@ import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
-import { villagePackStickers } from "@/lib/types";
-
-/** A few highlights for the village page — full pack lives in Write. */
-const BRAMBLE_PACK_PREVIEW = [
-  "bramble-fox-portrait",
-  "bramble-fox-sleeping",
-  "bramble-monarch",
-  "bramble-maple-leaf",
-  "bramble-candle",
-  "bramble-teapot",
-] as const;
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -256,32 +245,6 @@ export default async function VillagePage() {
           Write a village letter
         </Link>
       </section>
-
-      {village.id === "bramblewood" ? (
-        <section className="village-panel bramble-pack-panel">
-          <h2>🦊 Special sticker pack</h2>
-          <p className="section-lead">
-            Warm-orange fox stickers for Bramblewood letters — open Write to use
-            the full set.
-          </p>
-          <div className="bramble-pack-grid">
-            {villagePackStickers("bramblewood")
-              .filter((opt) =>
-                (BRAMBLE_PACK_PREVIEW as readonly string[]).includes(opt.id)
-              )
-              .map((opt) => (
-                <div key={opt.id} className="bramble-pack-chip">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={opt.src} alt="" draggable={false} />
-                  <span>{opt.name}</span>
-                </div>
-              ))}
-          </div>
-          <Link href="/compose" className="btn-secondary">
-            Stick them on a letter
-          </Link>
-        </section>
-      ) : null}
 
       <section className="village-panel">
         <h2>Hidden collectibles</h2>
