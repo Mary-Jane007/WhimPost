@@ -10,11 +10,12 @@ import {
 } from "@/lib/villageProgress";
 import {
   COLLECTIBLE_META,
+  collectiblesForVillage,
   getVillage,
   RANK_LADDER,
   SEASONAL_EVENTS,
   SHARED_FEATURES,
-  type CollectibleKind,
+  type VillageId,
 } from "@/lib/villages";
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
 import { VillageChangePanel } from "@/components/VillageChangePanel";
@@ -26,7 +27,6 @@ import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
-import type { VillageId } from "@/lib/villages";
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -227,16 +227,26 @@ export default async function VillagePage() {
       <section className="village-panel">
         <h2>Hidden collectibles</h2>
         <p className="section-lead">
-          Gather keepsakes as you write and welcome — they decorate your path
-          through the woods.
+          Keepsakes unique to {village.name} — gather them as you write letters
+          and welcome friends.
         </p>
         <div className="collectible-grid">
-          {(Object.keys(COLLECTIBLE_META) as CollectibleKind[]).map((key) => {
+          {collectiblesForVillage(village.id).map((key) => {
             const meta = COLLECTIBLE_META[key];
-            const have = stats.collectibles[key];
+            const have = stats.collectibles[key] || 0;
             return (
               <div key={key} className="collectible-chip">
-                <span aria-hidden>{meta.emoji}</span>
+                {meta.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={meta.image}
+                    alt=""
+                    className="collectible-icon"
+                    draggable={false}
+                  />
+                ) : (
+                  <span aria-hidden>{meta.emoji}</span>
+                )}
                 <strong>{meta.name}</strong>
                 <em>
                   {have}/{meta.max}
