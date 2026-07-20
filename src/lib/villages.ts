@@ -15,13 +15,30 @@ export type ForestRank =
   | "forest-guardian";
 
 export type CollectibleKind =
+  // Shared forest keepsakes (default villages)
   | "mushrooms"
   | "leaves"
   | "feathers"
   | "lost-pages"
   | "butterflies"
   | "moonstones"
-  | "acorns";
+  | "acorns"
+  // Clovermeadow
+  | "clover-butterflies"
+  | "clover-bunnies"
+  | "clover-lotus"
+  | "clover-ribbon"
+  | "clover-cherries"
+  | "clover-honey"
+  | "clover-blossoms"
+  | "clover-hearts";
+
+export type CollectibleMeta = {
+  emoji: string;
+  name: string;
+  max: number;
+  image?: string;
+};
 
 export interface VillageInfo {
   id: VillageId;
@@ -193,10 +210,7 @@ export const SEASONAL_EVENTS = [
   "🎄 Secret Winter Pen Pal",
 ];
 
-export const COLLECTIBLE_META: Record<
-  CollectibleKind,
-  { emoji: string; name: string; max: number }
-> = {
+export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
   mushrooms: { emoji: "🍄", name: "Mushrooms", max: 25 },
   leaves: { emoji: "🍃", name: "Leaves", max: 40 },
   feathers: { emoji: "🪶", name: "Feathers", max: 20 },
@@ -204,7 +218,94 @@ export const COLLECTIBLE_META: Record<
   butterflies: { emoji: "🦋", name: "Butterflies", max: 15 },
   moonstones: { emoji: "🌙", name: "Moonstones", max: 10 },
   acorns: { emoji: "🌰", name: "Acorns", max: 30 },
+  "clover-butterflies": {
+    emoji: "🦋",
+    name: "Pink Butterflies",
+    max: 20,
+    image: "/stickers/villages/clovermeadow/collectibles/butterfly.png",
+  },
+  "clover-bunnies": {
+    emoji: "🐰",
+    name: "Meadow Bunnies",
+    max: 15,
+    image: "/stickers/villages/clovermeadow/collectibles/bunny.png",
+  },
+  "clover-lotus": {
+    emoji: "🪷",
+    name: "Pink Lotus",
+    max: 12,
+    image: "/stickers/villages/clovermeadow/collectibles/lotus.png",
+  },
+  "clover-ribbon": {
+    emoji: "🎀",
+    name: "Pink Ribbons",
+    max: 18,
+    image: "/stickers/villages/clovermeadow/collectibles/ribbon.png",
+  },
+  "clover-cherries": {
+    emoji: "🍒",
+    name: "Gingham Cherries",
+    max: 16,
+    image: "/stickers/villages/clovermeadow/collectibles/cherries.png",
+  },
+  "clover-honey": {
+    emoji: "🍯",
+    name: "Village Honey",
+    max: 14,
+    image: "/stickers/villages/clovermeadow/collectibles/honey.png",
+  },
+  "clover-blossoms": {
+    emoji: "🌸",
+    name: "Cherry Blossoms",
+    max: 22,
+    image: "/stickers/villages/clovermeadow/collectibles/blossom.png",
+  },
+  "clover-hearts": {
+    emoji: "💗",
+    name: "Soft Hearts",
+    max: 20,
+    image: "/stickers/villages/clovermeadow/collectibles/heart.png",
+  },
 };
+
+const FOREST_COLLECTIBLES: CollectibleKind[] = [
+  "mushrooms",
+  "leaves",
+  "feathers",
+  "lost-pages",
+  "butterflies",
+  "moonstones",
+  "acorns",
+];
+
+const CLOVER_COLLECTIBLES: CollectibleKind[] = [
+  "clover-butterflies",
+  "clover-bunnies",
+  "clover-lotus",
+  "clover-ribbon",
+  "clover-cherries",
+  "clover-honey",
+  "clover-blossoms",
+  "clover-hearts",
+];
+
+/** Which collectibles appear for each village. */
+export const VILLAGE_COLLECTIBLES: Record<VillageId, CollectibleKind[]> = {
+  mosshollow: FOREST_COLLECTIBLES,
+  clovermeadow: CLOVER_COLLECTIBLES,
+  moonmere: FOREST_COLLECTIBLES,
+  bramblewood: FOREST_COLLECTIBLES,
+  hearthwick: FOREST_COLLECTIBLES,
+};
+
+export function collectiblesForVillage(
+  villageId: string | null | undefined
+): CollectibleKind[] {
+  if (villageId && villageId in VILLAGE_COLLECTIBLES) {
+    return VILLAGE_COLLECTIBLES[villageId as VillageId];
+  }
+  return FOREST_COLLECTIBLES;
+}
 
 export const RANK_LADDER: {
   id: ForestRank;
@@ -246,15 +347,11 @@ export function rankFromRep(rep: number) {
 }
 
 export function emptyCollectibles(): Record<CollectibleKind, number> {
-  return {
-    mushrooms: 0,
-    leaves: 0,
-    feathers: 0,
-    "lost-pages": 0,
-    butterflies: 0,
-    moonstones: 0,
-    acorns: 0,
-  };
+  const base = {} as Record<CollectibleKind, number>;
+  for (const key of Object.keys(COLLECTIBLE_META) as CollectibleKind[]) {
+    base[key] = 0;
+  }
+  return base;
 }
 
 export function parseCollectibles(raw: string | null | undefined) {

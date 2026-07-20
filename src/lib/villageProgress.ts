@@ -1,6 +1,7 @@
 import type { Database } from "better-sqlite3";
 import {
   COLLECTIBLE_META,
+  collectiblesForVillage,
   emptyCollectibles,
   parseCollectibles,
   rankFromRep,
@@ -13,6 +14,13 @@ export function addReputation(db: Database, userId: string, amount: number) {
   db.prepare(
     `UPDATE users SET reputation = reputation + ? WHERE id = ?`
   ).run(amount, userId);
+}
+
+function getUserVillageId(db: Database, userId: string): VillageId | null {
+  const row = db
+    .prepare(`SELECT village_id FROM users WHERE id = ?`)
+    .get(userId) as { village_id: string | null } | undefined;
+  return (row?.village_id as VillageId) || null;
 }
 
 export function grantCollectible(
@@ -34,32 +42,46 @@ export function grantCollectible(
   );
 }
 
-/** Rewards for sending a letter — reputation + chance at collectibles. */
+function grantFromVillagePack(
+  db: Database,
+  userId: string,
+  villageId: VillageId | null,
+  index: number
+) {
+  const pack = collectiblesForVillage(villageId);
+  if (pack.length === 0) return;
+  grantCollectible(db, userId, pack[index % pack.length]);
+}
+
+/** Rewards for sending a letter — reputation + chance at village collectibles. */
 export function rewardLetterSent(
   db: Database,
   userId: string,
   bodyLength: number
 ) {
+  const villageId = getUserVillageId(db, userId);
   addReputation(db, userId, REP_REWARDS.sendLetter);
+
   if (bodyLength >= 280) {
     addReputation(db, userId, REP_REWARDS.longLetter);
-    grantCollectible(db, userId, "leaves");
-    grantCollectible(db, userId, "lost-pages");
+    grantFromVillagePack(db, userId, villageId, 0);
+    grantFromVillagePack(db, userId, villageId, 2);
   }
   if (bodyLength >= 120) {
-    grantCollectible(db, userId, "acorns");
+    grantFromVillagePack(db, userId, villageId, 1);
   }
-  // Small whimsical drops
+
   const roll = bodyLength % 7;
-  if (roll === 0) grantCollectible(db, userId, "mushrooms");
-  if (roll === 1) grantCollectible(db, userId, "feathers");
-  if (roll === 2) grantCollectible(db, userId, "butterflies");
-  if (roll === 3) grantCollectible(db, userId, "moonstones");
+  if (roll <= 3) {
+    grantFromVillagePack(db, userId, villageId, 3 + roll);
+  }
 }
 
 export function rewardWelcome(db: Database, userId: string) {
+  const villageId = getUserVillageId(db, userId);
   addReputation(db, userId, REP_REWARDS.welcomeFriend);
-  grantCollectible(db, userId, "butterflies");
+  // First keepsake in the village pack (butterflies / pink butterflies)
+  grantFromVillagePack(db, userId, villageId, 0);
 }
 
 export function getVillageReputation(db: Database, villageId: VillageId) {
