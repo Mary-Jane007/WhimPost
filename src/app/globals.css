@@ -3271,3 +3271,129 @@ body.theme-moonmere .cottage-plaque {
   background: linear-gradient(165deg, #ebe4d4, #d8cdb8 55%, #c9bda6);
   border-color: rgba(122, 143, 168, 0.55);
 }
+
+/* —— Bramblewood autumn woodland village theme —— */
+body.theme-bramblewood {
+  --forest-deep: #1a100c;
+  --forest: #2a1810;
+  --blush: #d4895a;
+  --sage: #6b7a4a;
+}
+
+body.theme-bramblewood .site-nav {
+  background: linear-gradient(
+    180deg,
+    rgba(26, 16, 12, 0.96),
+    rgba(139, 58, 42, 0.45)
+  );
+  border-bottom-color: rgba(212, 137, 90, 0.28);
+}
+
+body.theme-bramblewood .brand-icon,
+body.theme-bramblewood .nav-links a:hover,
+body.theme-bramblewood .open-cue {
+  color: var(--gold);
+}
+
+body.theme-bramblewood .btn-primary {
+  background: linear-gradient(145deg, #d4895a, #c45c2a);
+  color: #1a100c;
+  border-color: rgba(243, 230, 208, 0.35);
+}
+
+body.theme-bramblewood .btn-primary:hover {
+  filter: brightness(1.06);
+}
+
+body.theme-bramblewood .btn-secondary {
+  border-color: rgba(212, 137, 90, 0.45);
+  color: var(--cream);
+}
+
+body.theme-bramblewood .forest-backdrop {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(26, 16, 12, 0.4) 0%,
+      rgba(42, 24, 16, 0.62) 45%,
+      rgba(20, 14, 10, 0.9) 100%
+    ),
+    radial-gradient(ellipse at 18% 12%, rgba(212, 137, 90, 0.28), transparent 44%),
+    radial-gradient(ellipse at 82% 18%, rgba(120, 70, 40, 0.24), transparent 40%),
+    radial-gradient(ellipse at 70% 8%, rgba(224, 168, 74, 0.12), transparent 28%),
+    linear-gradient(165deg, #1a100c, #3d2418 55%, #1a100c);
+  opacity: 0.82;
+}
+
+body.theme-bramblewood .app-main.forest-panel,
+body.theme-bramblewood .village-panel {
+  border-color: rgba(212, 137, 90, 0.3);
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--village-soft, #d4895a) 12%, transparent),
+      rgba(28, 18, 12, 0.55)
+    );
+}
+
+body.theme-bramblewood .village-page {
+  border-color: color-mix(in srgb, var(--village-color, #8b3a2a) 50%, transparent);
+}
+
+body.theme-bramblewood .village-motto {
+  color: color-mix(in srgb, var(--village-soft, #d4895a) 85%, white);
+}
+
+body.theme-bramblewood .forest-stickers-bramblewood .forest-sticker {
+  filter: drop-shadow(0 6px 14px rgba(12, 8, 4, 0.5)) saturate(1.05);
+}
+
+body.theme-bramblewood .welcome-modal {
+  background: linear-gradient(165deg, #f3e6d0, #e0c8a8);
+  border-color: rgba(196, 92, 42, 0.5);
+  color: #2c1a12;
+}
+
+body.theme-bramblewood .welcome-modal-title {
+  color: #8b3a2a;
+}
+
+body.theme-bramblewood .welcome-modal-kicker,
+body.theme-bramblewood .welcome-modal-lead {
+  color: rgba(44, 26, 18, 0.72);
+}
+
+body.theme-bramblewood .form-error {
+  color: #e0a84a;
+}
+
+body.theme-bramblewood .collectible-chip {
+  border-color: rgba(212, 137, 90, 0.3);
+  background: rgba(20, 12, 8, 0.45);
+}
+
+body.theme-bramblewood .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(224, 168, 74, 0.1), transparent 40%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(80, 42, 28, 0.42) 0 14px,
+      rgba(56, 30, 20, 0.52) 14px 28px
+    ),
+    linear-gradient(165deg, #8b3a2a, #3d2418 70%, #1a100c);
+}
+
+body.theme-bramblewood .cottage-window-glow {
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(224, 168, 74, 0.5),
+      rgba(212, 137, 90, 0.14) 55%,
+      transparent 72%
+    );
+}
+
+body.theme-bramblewood .cottage-plaque {
+  background: linear-gradient(165deg, #f3e6d0, #e5cfa8 55%, #d4b48a);
+  border-color: rgba(196, 92, 42, 0.55);
+}

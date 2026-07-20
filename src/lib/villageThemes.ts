@@ -42,6 +42,16 @@ export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
     bgGlow:
       "radial-gradient(ellipse at 16% 8%, rgba(138, 155, 136, 0.28), transparent 46%), radial-gradient(ellipse at 88% 12%, rgba(122, 143, 168, 0.22), transparent 42%), radial-gradient(ellipse at 50% 100%, rgba(18, 22, 32, 0.92), transparent 55%), linear-gradient(165deg, #12161e 0%, #1a2230 30%, #243040 58%, #10141c 100%)",
   },
+  bramblewood: {
+    color: "#8b3a2a",
+    colorSoft: "#d4895a",
+    accent: "#c45c2a",
+    cream: "#f3e6d0",
+    ink: "#2c1a12",
+    gold: "#e0a84a",
+    bgGlow:
+      "radial-gradient(ellipse at 14% 8%, rgba(212, 137, 90, 0.32), transparent 46%), radial-gradient(ellipse at 86% 12%, rgba(120, 70, 40, 0.28), transparent 42%), radial-gradient(ellipse at 50% 100%, rgba(28, 18, 12, 0.94), transparent 55%), linear-gradient(165deg, #1a100c 0%, #2a1810 30%, #3d2418 58%, #140e0a 100%)",
+  },
 };
 
 export type CloverStickerId =
@@ -303,6 +313,112 @@ export function moonmereStickerSrc(id: MoonmereStickerId) {
   return (
     MOONMERE_STICKERS.find((s) => s.id === id)?.src ||
     `/stickers/villages/moonmere/${id}.png`
+  );
+}
+
+export type BramblewoodStickerId =
+  | "fox-sleeping"
+  | "fox-sitting"
+  | "fox-face"
+  | "autumn-leaves"
+  | "misty-pines"
+  | "candle-jar"
+  | "star-lights"
+  | "book-leaf"
+  | "pumpkin"
+  | "red-bow"
+  | "maple-branch"
+  | "berry-sprig";
+
+export const BRAMBLEWOOD_STICKERS: {
+  id: BramblewoodStickerId;
+  name: string;
+  src: string;
+}[] = [
+  {
+    id: "fox-sleeping",
+    name: "Sleeping Fox",
+    src: "/stickers/villages/bramblewood/fox-sleeping.png",
+  },
+  {
+    id: "fox-sitting",
+    name: "Sitting Fox",
+    src: "/stickers/villages/bramblewood/fox-sitting.png",
+  },
+  {
+    id: "fox-face",
+    name: "Fox Portrait",
+    src: "/stickers/villages/bramblewood/fox-face.png",
+  },
+  {
+    id: "autumn-leaves",
+    name: "Autumn Leaves",
+    src: "/stickers/villages/bramblewood/autumn-leaves.png",
+  },
+  {
+    id: "misty-pines",
+    name: "Misty Pines",
+    src: "/stickers/villages/bramblewood/misty-pines.png",
+  },
+  {
+    id: "candle-jar",
+    name: "Autumn Candle",
+    src: "/stickers/villages/bramblewood/candle-jar.png",
+  },
+  {
+    id: "star-lights",
+    name: "Star Lights",
+    src: "/stickers/villages/bramblewood/star-lights.png",
+  },
+  {
+    id: "book-leaf",
+    name: "Pressed Leaf Book",
+    src: "/stickers/villages/bramblewood/book-leaf.png",
+  },
+  {
+    id: "pumpkin",
+    name: "Little Pumpkin",
+    src: "/stickers/villages/bramblewood/pumpkin.png",
+  },
+  {
+    id: "red-bow",
+    name: "Velvet Bow",
+    src: "/stickers/villages/bramblewood/red-bow.png",
+  },
+  {
+    id: "maple-branch",
+    name: "Maple Branch",
+    src: "/stickers/villages/bramblewood/maple-branch.png",
+  },
+  {
+    id: "berry-sprig",
+    name: "Berry Sprig",
+    src: "/stickers/villages/bramblewood/berry-sprig.png",
+  },
+];
+
+export const BRAMBLEWOOD_DECOR: {
+  id: BramblewoodStickerId;
+  className: string;
+}[] = [
+  { id: "maple-branch", className: "decor-fern-tl" },
+  { id: "autumn-leaves", className: "decor-mushroom-tr" },
+  { id: "misty-pines", className: "decor-moon-tr" },
+  { id: "fox-sleeping", className: "decor-fox-bl" },
+  { id: "fox-sitting", className: "decor-moth-br" },
+  { id: "star-lights", className: "decor-leaf-ml" },
+  { id: "candle-jar", className: "decor-butterfly-mr" },
+  { id: "pumpkin", className: "decor-acorn-bm" },
+  { id: "book-leaf", className: "decor-crow-tm" },
+  { id: "red-bow", className: "decor-sun-tr2" },
+  { id: "berry-sprig", className: "decor-spiral-bl2" },
+  { id: "fox-face", className: "decor-flower-br2" },
+];
+
+export function bramblewoodStickerSrc(id: BramblewoodStickerId) {
+  return (
+    BRAMBLEWOOD_STICKERS.find((s) => s.id === id)?.src ||
+    `/stickers/villages/bramblewood/${id}.png`
   );
 }
 
