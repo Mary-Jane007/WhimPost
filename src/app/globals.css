@@ -1649,3 +1649,335 @@ select {
     opacity: 0.55;
   }
 }
+
+/* Villages */
+.auth-page-wide {
+  padding: 2rem 1rem 3rem;
+  align-items: start;
+}
+
+.auth-panel-wide,
+.register-wide {
+  width: min(100%, 52rem);
+}
+
+.village-picker {
+  border: 1px solid rgba(243, 230, 208, 0.15);
+  padding: 0.85rem;
+  margin: 0.5rem 0 0;
+}
+
+.village-picker legend {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  padding: 0 0.35rem;
+}
+
+.village-picker-lead {
+  margin: 0 0 0.85rem;
+  color: rgba(243, 230, 208, 0.7);
+  font-size: 0.98rem;
+}
+
+.village-picker-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .village-picker-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.village-card {
+  text-align: left;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(243, 230, 208, 0.18);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--village-soft, #6b8f71) 22%, transparent),
+    rgba(31, 42, 30, 0.35)
+  );
+  color: var(--cream);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.village-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--village-color, #d4af37) 55%, white);
+}
+
+.village-card.selected {
+  border-color: var(--village-soft, var(--gold));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--village-color) 40%, transparent);
+}
+
+.village-mascot {
+  font-size: 1.6rem;
+}
+
+.village-card strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.village-card em {
+  font-style: italic;
+  color: rgba(243, 230, 208, 0.78);
+  font-size: 0.95rem;
+}
+
+.village-belongs {
+  font-family: var(--font-stamp);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.village-page {
+  border-color: color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
+}
+
+.village-hero {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 720px) {
+  .village-hero {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+  }
+}
+
+.village-mascot-lg {
+  font-size: 4rem;
+  margin: 0;
+  line-height: 1;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+}
+
+.village-motto {
+  font-style: italic;
+  color: color-mix(in srgb, var(--village-soft, #f3e6d0) 80%, white);
+  font-size: 1.25rem;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.village-stats {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 720px) {
+  .village-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.village-stats > div {
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  background: rgba(18, 24, 18, 0.35);
+  display: grid;
+  gap: 0.25rem;
+}
+
+.village-stats strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.village-stats span,
+.village-stats em {
+  color: rgba(243, 230, 208, 0.7);
+  font-size: 0.95rem;
+  font-style: normal;
+}
+
+.village-panel {
+  margin-bottom: 1.15rem;
+  padding: 1.15rem;
+  border: 1px solid rgba(243, 230, 208, 0.1);
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--village-soft, #6b8f71) 12%, transparent),
+      rgba(31, 42, 30, 0.4)
+    );
+}
+
+.village-panel h2 {
+  font-family: var(--font-display);
+  margin: 0 0 0.35rem;
+  font-size: 1.45rem;
+}
+
+.village-panel h3 {
+  font-family: var(--font-stamp);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 1rem 0 0.45rem;
+  opacity: 0.8;
+}
+
+.village-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.75rem 0;
+}
+
+.feature-chip,
+.unlock-pill {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(243, 230, 208, 0.15);
+  background: rgba(243, 230, 208, 0.06);
+  font-size: 0.9rem;
+}
+
+.unlock-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.unlock-pill.unlocked {
+  border-color: color-mix(in srgb, var(--village-soft) 50%, white);
+  color: var(--gold);
+}
+
+.belong-list,
+.task-list {
+  margin: 0.35rem 0 0.75rem;
+  padding-left: 1.1rem;
+  color: rgba(243, 230, 208, 0.85);
+}
+
+.collectible-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (min-width: 800px) {
+  .collectible-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.collectible-chip {
+  padding: 0.65rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  background: rgba(18, 24, 18, 0.3);
+  display: grid;
+  gap: 0.15rem;
+}
+
+.collectible-chip strong {
+  font-size: 0.92rem;
+}
+
+.collectible-chip em {
+  font-style: normal;
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.collect-bar {
+  height: 0.35rem;
+  background: rgba(243, 230, 208, 0.12);
+  margin-top: 0.25rem;
+  overflow: hidden;
+}
+
+.collect-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--village-color, #6b8f71),
+    var(--village-soft, #d4af37)
+  );
+}
+
+.notice-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.notice-form textarea {
+  width: 100%;
+  border: 1px solid rgba(92, 58, 30, 0.25);
+  background: rgba(243, 230, 208, 0.92);
+  color: var(--ink);
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  resize: vertical;
+}
+
+.anon-toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-letter) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 0.95rem !important;
+}
+
+.notice-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.notice-list li {
+  padding: 0.7rem 0.8rem;
+  border-top: 1px solid rgba(243, 230, 208, 0.1);
+}
+
+.notice-list p {
+  margin: 0 0 0.3rem;
+}
+
+.notice-list span {
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.season-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.season-list span {
+  padding: 0.35rem 0.6rem;
+  border: 1px dashed rgba(243, 230, 208, 0.2);
+  font-size: 0.9rem;
+}
+
+.village-join {
+  max-width: 48rem;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+}
+
+.village-join h1 {
+  font-family: var(--font-display);
+  margin: 0;
+}

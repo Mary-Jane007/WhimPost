@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, jsonError, mapUser, setSessionCookie } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { claimOwnerIfUnset } from "@/lib/owner";
+import { isVillageId } from "@/lib/villages";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -14,6 +15,7 @@ export async function POST(req: NextRequest) {
   const email = String(body.email || "").trim().toLowerCase();
   const password = String(body.password || "");
   const forestName = String(body.forestName || "").trim();
+  const villageId = String(body.villageId || "").trim();
 
   if (!/^[a-zA-Z0-9_]{3,24}$/.test(username)) {
     return jsonError("Username must be 3–24 letters, numbers, or underscores");
@@ -27,6 +29,9 @@ export async function POST(req: NextRequest) {
   if (password.length < 6) {
     return jsonError("Password must be at least 6 characters");
   }
+  if (!isVillageId(villageId)) {
+    return jsonError("Please choose a village to call home");
+  }
 
   const db = getDb();
   const existing = db
@@ -38,16 +43,26 @@ export async function POST(req: NextRequest) {
 
   const id = uuidv4();
   db.prepare(
-    `INSERT INTO users (id, username, display_name, email, password_hash, forest_name, is_owner)
-     VALUES (?, ?, ?, ?, ?, ?, 0)`
-  ).run(id, username, displayName, email, hashSync(password, 10), forestName);
+    `INSERT INTO users (
+      id, username, display_name, email, password_hash, forest_name,
+      is_owner, village_id, reputation, collectibles_json
+    ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, 0, '{}')`
+  ).run(
+    id,
+    username,
+    displayName,
+    email,
+    hashSync(password, 10),
+    forestName,
+    villageId
+  );
 
-  // First account to sign up / in becomes the remembered site owner.
   claimOwnerIfUnset(db, id);
 
   const user = db
     .prepare(
-      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner
+      `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
+              village_id, reputation
        FROM users WHERE id = ?`
     )
     .get(id) as {
@@ -58,6 +73,8 @@ export async function POST(req: NextRequest) {
     forest_name: string;
     created_at: string;
     is_owner: number;
+    village_id: string;
+    reputation: number;
   };
 
   const token = await createSessionToken({ userId: id, username });

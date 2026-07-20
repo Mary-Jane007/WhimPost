@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { rewardWelcome } from "@/lib/villageProgress";
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
@@ -18,10 +19,15 @@ export async function POST(req: NextRequest) {
   const db = getDb();
   const row = db
     .prepare(
-      `SELECT id, addressee_id, status FROM friendships WHERE id = ?`
+      `SELECT id, requester_id, addressee_id, status FROM friendships WHERE id = ?`
     )
     .get(requestId) as
-    | { id: string; addressee_id: string; status: string }
+    | {
+        id: string;
+        requester_id: string;
+        addressee_id: string;
+        status: string;
+      }
     | undefined;
 
   if (!row || row.addressee_id !== user.id) {
@@ -35,6 +41,10 @@ export async function POST(req: NextRequest) {
     action === "accept" ? "accepted" : "declined",
     requestId
   );
+
+  if (action === "accept") {
+    rewardWelcome(db, user.id);
+  }
 
   return NextResponse.json({ ok: true });
 }

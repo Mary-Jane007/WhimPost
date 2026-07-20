@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { VILLAGES, type VillageId } from "@/lib/villages";
 
 export function LoginForm() {
   const [login, setLogin] = useState("");
@@ -24,7 +25,7 @@ export function LoginForm() {
       setError(data.error || "Could not sign in");
       return;
     }
-    window.location.assign("/inbox");
+    window.location.assign("/village");
   }
 
   return (
@@ -65,11 +66,16 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [forestName, setForestName] = useState("");
   const [password, setPassword] = useState("");
+  const [villageId, setVillageId] = useState<VillageId | "">("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!villageId) {
+      setError("Choose a village to call home");
+      return;
+    }
     setLoading(true);
     setError("");
     const res = await fetch("/api/auth/register", {
@@ -81,6 +87,7 @@ export function RegisterForm() {
         email,
         password,
         forestName,
+        villageId,
       }),
     });
     const data = await res.json();
@@ -89,11 +96,11 @@ export function RegisterForm() {
       setError(data.error || "Could not create mailbox");
       return;
     }
-    window.location.assign("/friends");
+    window.location.assign("/village");
   }
 
   return (
-    <form className="auth-form" onSubmit={onSubmit}>
+    <form className="auth-form register-wide" onSubmit={onSubmit}>
       <label>
         Username
         <input
@@ -142,9 +149,44 @@ export function RegisterForm() {
           required
         />
       </label>
+
+      <fieldset className="village-picker">
+        <legend>Choose your village</legend>
+        <p className="village-picker-lead">
+          Your home shapes the colors, mascot, and spirit of your WhimPost life.
+        </p>
+        <div className="village-picker-grid">
+          {VILLAGES.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              className={`village-card ${villageId === v.id ? "selected" : ""}`}
+              style={
+                {
+                  "--village-color": v.color,
+                  "--village-soft": v.colorSoft,
+                } as React.CSSProperties
+              }
+              onClick={() => setVillageId(v.id)}
+            >
+              <span className="village-mascot" aria-hidden>
+                {v.mascot}
+              </span>
+              <strong>{v.name}</strong>
+              <em>{v.motto}</em>
+              <span className="village-belongs">{v.belongs.slice(0, 2).join(" · ")}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
       {error && <p className="form-error">{error}</p>}
-      <button type="submit" className="btn-primary" disabled={loading}>
-        {loading ? "Planting your mailbox…" : "Open my WhimPost"}
+      <button
+        type="submit"
+        className="btn-primary"
+        disabled={loading || !villageId}
+      >
+        {loading ? "Planting your mailbox…" : "Move into my village"}
       </button>
       <p className="auth-switch">
         Already have a mailbox? <Link href="/login">Sign in</Link>

@@ -6,12 +6,12 @@ import { StickerArt } from "@/components/stickers/StickerArt";
 
 export default async function RegisterPage() {
   const user = await getCurrentUser();
-  if (user) redirect("/inbox");
+  if (user) redirect("/village");
 
   return (
-    <main className="auth-page">
+    <main className="auth-page auth-page-wide">
       <ForestStickers density="auth" />
-      <div className="auth-panel moss-panel">
+      <div className="auth-panel moss-panel auth-panel-wide">
         <div className="auth-stickers" aria-hidden>
           <StickerArt kind="frogs-tandem" className="w-12 h-12" />
           <StickerArt kind="leafy-branch" className="w-12 h-12" />
@@ -19,8 +19,8 @@ export default async function RegisterPage() {
         </div>
         <h1>Claim your mailbox</h1>
         <p className="lede">
-          Choose a woodland name and begin writing letters that feel found, not
-          typed.
+          Choose a woodland name, pick your village, and begin writing letters
+          that feel found, not typed.
         </p>
         <RegisterForm />
       </div>
