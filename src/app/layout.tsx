@@ -3,6 +3,8 @@ import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteForestStickers } from "@/components/SiteForestStickers";
 import { getCurrentUser } from "@/lib/auth";
+import { getVillageTheme } from "@/lib/villageThemes";
+import { isVillageId, type VillageId } from "@/lib/villages";
 
 export const metadata: Metadata = {
   title: "WhimPost — Letters from the woods",
@@ -16,13 +18,33 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getCurrentUser();
+  const villageId =
+    user?.villageId && isVillageId(user.villageId)
+      ? (user.villageId as VillageId)
+      : null;
+  const theme = getVillageTheme(villageId);
+  const themeClass = villageId === "clovermeadow" ? "theme-clovermeadow" : "";
+
+  const themeStyle = theme
+    ? ({
+        "--village-color": theme.color,
+        "--village-soft": theme.colorSoft,
+        "--village-accent": theme.accent,
+        "--cream": theme.cream,
+        "--ink": theme.ink,
+        "--gold": theme.gold,
+        "--moss": theme.color,
+        "--moss-light": theme.colorSoft,
+        "--bg-glow": theme.bgGlow,
+      } as React.CSSProperties)
+    : undefined;
 
   return (
     <html lang="en">
-      <body>
+      <body className={themeClass} style={themeStyle}>
         <div className="forest-backdrop" aria-hidden />
         <div className="page-shell">
-          <SiteForestStickers />
+          <SiteForestStickers villageId={villageId} />
           <SiteNav user={user} />
           {children}
         </div>
