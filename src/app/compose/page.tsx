@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { listFriends } from "@/lib/letters";
 import { ComposeStudio } from "@/components/ComposeStudio";
+import { PageCrest } from "@/components/PageCrest";
 
 export default async function ComposePage({
   searchParams,
@@ -22,7 +23,8 @@ export default async function ComposePage({
     : friends;
 
   return (
-    <main className="app-main">
+    <main className="app-main forest-panel">
+      <PageCrest kinds={["moth", "butterfly", "flower"]} />
       <header className="page-header">
         <h1>Write a letter</h1>
         <p>

@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { toLetterView } from "@/lib/letters";
 import { MailList } from "@/components/MailList";
+import { PageCrest } from "@/components/PageCrest";
 import type { LetterRecord, LetterView } from "@/lib/types";
 
 export default async function SentPage() {
@@ -23,7 +24,8 @@ export default async function SentPage() {
     .filter((l): l is LetterView => Boolean(l));
 
   return (
-    <main className="app-main">
+    <main className="app-main forest-panel">
+      <PageCrest kinds={["crow", "fern", "sun"]} />
       <header className="page-header">
         <h1>Sent</h1>
         <p>Letters you sealed and sent into the woods.</p>
