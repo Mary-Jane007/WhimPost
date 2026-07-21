@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Special+Elite&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fondamento:ital@0;1&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Great+Vibes&family=Homemade+Apple&family=IM+Fell+English:ital@0;1&family=Special+Elite&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -22,7 +22,13 @@
   --font-display: "Fraunces", Georgia, serif;
   --font-letter: "Cormorant Garamond", "Times New Roman", serif;
   --font-stamp: "Special Elite", "Courier New", monospace;
+  --font-quill: "Cormorant Garamond", "Times New Roman", serif;
   --font-typewriter: "Special Elite", "Courier New", monospace;
+  --font-ink-hand: "Homemade Apple", "Segoe Script", cursive;
+  --font-soft-hand: "Caveat", "Segoe Script", cursive;
+  --font-letterpress: "IM Fell English", Georgia, serif;
+  --font-storybook: "Fondamento", Georgia, serif;
+  --font-flourish: "Great Vibes", "Segoe Script", cursive;
   --bg-glow: radial-gradient(ellipse at 18% 8%, rgba(95, 127, 101, 0.4), transparent 45%),
     radial-gradient(ellipse at 85% 5%, rgba(212, 175, 55, 0.14), transparent 35%),
     radial-gradient(ellipse at 50% 100%, rgba(36, 51, 40, 0.9), transparent 55%),
@@ -878,6 +884,148 @@ select {
   position: relative;
   z-index: 2;
   white-space: pre-wrap;
+}
+
+/* Letter font choices (compose + reader) */
+.letter-paper.font-quill .letter-subject-display,
+.letter-paper.font-quill .letter-subject-input {
+  font-family: var(--font-display);
+}
+.letter-paper.font-quill .letter-body-display,
+.letter-paper.font-quill .letter-body-input {
+  font-family: var(--font-quill);
+}
+
+.letter-paper.font-typewriter .letter-subject-display,
+.letter-paper.font-typewriter .letter-subject-input,
+.letter-paper.font-typewriter .letter-body-display,
+.letter-paper.font-typewriter .letter-body-input {
+  font-family: var(--font-typewriter);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.letter-paper.font-typewriter .letter-body-display,
+.letter-paper.font-typewriter .letter-body-input {
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.letter-paper.font-ink-hand .letter-subject-display,
+.letter-paper.font-ink-hand .letter-subject-input,
+.letter-paper.font-ink-hand .letter-body-display,
+.letter-paper.font-ink-hand .letter-body-input {
+  font-family: var(--font-ink-hand);
+  font-weight: 400;
+}
+.letter-paper.font-ink-hand .letter-subject-display,
+.letter-paper.font-ink-hand .letter-subject-input {
+  font-size: 1.55rem;
+}
+.letter-paper.font-ink-hand .letter-body-display,
+.letter-paper.font-ink-hand .letter-body-input {
+  font-size: 1.25rem;
+  line-height: 1.9;
+}
+
+.letter-paper.font-soft-hand .letter-subject-display,
+.letter-paper.font-soft-hand .letter-subject-input,
+.letter-paper.font-soft-hand .letter-body-display,
+.letter-paper.font-soft-hand .letter-body-input {
+  font-family: var(--font-soft-hand);
+  font-weight: 600;
+}
+.letter-paper.font-soft-hand .letter-subject-display,
+.letter-paper.font-soft-hand .letter-subject-input {
+  font-size: 1.85rem;
+}
+.letter-paper.font-soft-hand .letter-body-display,
+.letter-paper.font-soft-hand .letter-body-input {
+  font-size: 1.45rem;
+  line-height: 1.55;
+}
+
+.letter-paper.font-letterpress .letter-subject-display,
+.letter-paper.font-letterpress .letter-subject-input,
+.letter-paper.font-letterpress .letter-body-display,
+.letter-paper.font-letterpress .letter-body-input {
+  font-family: var(--font-letterpress);
+  font-weight: 400;
+}
+.letter-paper.font-letterpress .letter-body-display,
+.letter-paper.font-letterpress .letter-body-input {
+  font-size: 1.18rem;
+  line-height: 1.7;
+}
+
+.letter-paper.font-storybook .letter-subject-display,
+.letter-paper.font-storybook .letter-subject-input,
+.letter-paper.font-storybook .letter-body-display,
+.letter-paper.font-storybook .letter-body-input {
+  font-family: var(--font-storybook);
+  font-weight: 400;
+}
+.letter-paper.font-storybook .letter-body-display,
+.letter-paper.font-storybook .letter-body-input {
+  font-size: 1.2rem;
+  line-height: 1.75;
+}
+
+.letter-paper.font-flourish .letter-subject-display,
+.letter-paper.font-flourish .letter-subject-input,
+.letter-paper.font-flourish .letter-body-display,
+.letter-paper.font-flourish .letter-body-input {
+  font-family: var(--font-flourish);
+  font-weight: 400;
+}
+.letter-paper.font-flourish .letter-subject-display,
+.letter-paper.font-flourish .letter-subject-input {
+  font-size: 2.1rem;
+}
+.letter-paper.font-flourish .letter-body-display,
+.letter-paper.font-flourish .letter-body-input {
+  font-size: 1.65rem;
+  line-height: 1.55;
+}
+
+.font-option-grid .font-swatch {
+  text-align: left;
+  gap: 0.2rem;
+}
+
+.font-option-grid .font-sample {
+  display: block;
+  margin-top: 0.35rem;
+  font-style: normal;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: rgba(47, 36, 24, 0.82);
+}
+
+.font-swatch.font-quill .font-sample {
+  font-family: var(--font-quill);
+}
+.font-swatch.font-typewriter .font-sample {
+  font-family: var(--font-typewriter);
+  font-size: 0.92rem;
+}
+.font-swatch.font-ink-hand .font-sample {
+  font-family: var(--font-ink-hand);
+  font-size: 1rem;
+}
+.font-swatch.font-soft-hand .font-sample {
+  font-family: var(--font-soft-hand);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.font-swatch.font-letterpress .font-sample {
+  font-family: var(--font-letterpress);
+}
+.font-swatch.font-storybook .font-sample {
+  font-family: var(--font-storybook);
+}
+.font-swatch.font-flourish .font-sample {
+  font-family: var(--font-flourish);
+  font-size: 1.35rem;
 }
 
 .letter-body-display {

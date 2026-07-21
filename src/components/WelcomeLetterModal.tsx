@@ -76,6 +76,7 @@ export function WelcomeLetterModal({ letter }: { letter: LetterView }) {
               <LetterPaper
                 className="welcome-typewriter"
                 paperStyle={letter.paperStyle}
+                fontStyle={letter.fontStyle || "typewriter"}
                 body={letter.body}
                 subject={letter.subject}
                 stickers={letter.stickers}

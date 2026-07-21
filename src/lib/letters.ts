@@ -1,14 +1,25 @@
 import { getDb } from "./db";
 import { mapUser } from "./auth";
-import { mascotForSystemSender } from "./villages";
-import type {
-  LetterRecord,
-  LetterView,
-  PlacedImage,
-  PlacedScrap,
-  PlacedSticker,
-  UserPublic,
+import {
+  FONT_OPTIONS,
+  type LetterFont,
+  type LetterRecord,
+  type LetterView,
+  type PlacedImage,
+  type PlacedScrap,
+  type PlacedSticker,
+  type UserPublic,
 } from "./types";
+import { mascotForSystemSender } from "./villages";
+
+const FONT_IDS = new Set(FONT_OPTIONS.map((f) => f.id));
+
+export function normalizeLetterFont(
+  value: string | null | undefined
+): LetterFont {
+  if (value && FONT_IDS.has(value as LetterFont)) return value as LetterFont;
+  return "quill";
+}
 
 function parseJsonArray<T>(raw: string): T[] {
   try {
@@ -129,6 +140,7 @@ export function toLetterView(row: LetterRecord): LetterView | null {
     envelopeStyle: row.envelope_style,
     waxSeal: row.wax_seal,
     stampStyle: row.stamp_style,
+    fontStyle: normalizeLetterFont(row.font_style),
     stickers: parseJsonArray<PlacedSticker>(row.stickers_json),
     scraps: parseJsonArray<PlacedScrap>(row.scrap_json),
     image: parseImage(row),

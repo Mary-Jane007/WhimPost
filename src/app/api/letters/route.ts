@@ -6,6 +6,7 @@ import { areFriends, toLetterView } from "@/lib/letters";
 import { rewardLetterSent } from "@/lib/villageProgress";
 import type {
   EnvelopeStyle,
+  LetterFont,
   LetterRecord,
   PaperStyle,
   ScrapKind,
@@ -15,6 +16,7 @@ import type {
 } from "@/lib/types";
 import {
   ENVELOPE_OPTIONS,
+  FONT_OPTIONS,
   PAPER_OPTIONS,
   SCRAP_OPTIONS,
   STAMP_OPTIONS,
@@ -26,6 +28,7 @@ const paperIds = new Set(PAPER_OPTIONS.map((p) => p.id));
 const envelopeIds = new Set(ENVELOPE_OPTIONS.map((p) => p.id));
 const waxIds = new Set(WAX_OPTIONS.map((p) => p.id));
 const stampIds = new Set(STAMP_OPTIONS.map((p) => p.id));
+const fontIds = new Set(FONT_OPTIONS.map((p) => p.id));
 const stickerIds = new Set(STICKER_OPTIONS.map((p) => p.id));
 const scrapIds = new Set(SCRAP_OPTIONS.map((p) => p.id));
 
@@ -74,6 +77,7 @@ export async function POST(req: NextRequest) {
   const envelopeStyle = String(body.envelopeStyle || "kraft") as EnvelopeStyle;
   const waxSeal = String(body.waxSeal || "fern") as WaxSeal;
   const stampStyle = String(body.stampStyle || "mushroom-amanita") as StampStyle;
+  const fontStyle = String(body.fontStyle || "quill") as LetterFont;
 
   if (!recipientId) return jsonError("Choose a friend to write to");
   if (!letterBody) return jsonError("Your letter needs some words");
@@ -84,6 +88,7 @@ export async function POST(req: NextRequest) {
   if (!envelopeIds.has(envelopeStyle)) return jsonError("Unknown envelope");
   if (!waxIds.has(waxSeal)) return jsonError("Unknown wax seal");
   if (!stampIds.has(stampStyle)) return jsonError("Unknown stamp");
+  if (!fontIds.has(fontStyle)) return jsonError("Unknown letter font");
 
   const stickerMeta = new Map(STICKER_OPTIONS.map((o) => [o.id, o]));
   const stickers = Array.isArray(body.stickers)
@@ -176,9 +181,9 @@ export async function POST(req: NextRequest) {
   db.prepare(
     `INSERT INTO letters (
       id, sender_id, recipient_id, subject, body,
-      paper_style, envelope_style, wax_seal, stamp_style,
+      paper_style, envelope_style, wax_seal, stamp_style, font_style,
       stickers_json, scrap_json, status, is_read, image_url, image_json, sent_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sent', 0, ?, ?, datetime('now'))`
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sent', 0, ?, ?, datetime('now'))`
   ).run(
     id,
     user.id,
@@ -189,6 +194,7 @@ export async function POST(req: NextRequest) {
     envelopeStyle,
     waxSeal,
     stampStyle,
+    fontStyle,
     JSON.stringify(stickers),
     JSON.stringify(scraps),
     imageUrl,
