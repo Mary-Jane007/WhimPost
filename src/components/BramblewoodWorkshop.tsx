@@ -336,23 +336,26 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                       ? "Completed"
                       : "Mark Complete"}
                   </button>
+                </div>
+                <div className="bw-photo-drop bw-photo-drop-compact">
+                  <p className="bw-photo-drop-title">Your finished photo</p>
                   <button
                     type="button"
-                    className="btn-secondary"
+                    className="bw-photo-pick-btn"
                     disabled={busy}
                     onClick={() => requestPhoto("craft", craft.id)}
                   >
-                    Upload Photo
+                    📷 Add image of this craft
                   </button>
+                  {progress.photos[`craft:${craft.id}`] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={progress.photos[`craft:${craft.id}`]}
+                      alt="Your craft"
+                      className="bw-upload-preview"
+                    />
+                  ) : null}
                 </div>
-                {progress.photos[`craft:${craft.id}`] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={progress.photos[`craft:${craft.id}`]}
-                    alt="Your craft"
-                    className="bw-upload-preview"
-                  />
-                ) : null}
               </div>
               <figure className="bw-craft-example">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -665,8 +668,9 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
           <section className="bw-section">
             <h2>Craft Journal</h2>
             <p className="bw-section-lead">
-              Record finished crafts, write about the making, and tape in a
-              photo of what you created.
+              Open this tab to save a journal page: pick a craft, write about
+              it, <strong>add your photo</strong>, and optionally share it on
+              the village square.
             </p>
 
             <form className="bw-card bw-journal-form" onSubmit={submitJournalEntry}>
@@ -712,36 +716,50 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                   required
                 />
               </label>
-              <div className="bw-journal-photo-row">
+              <div className="bw-photo-drop">
+                <p className="bw-photo-drop-title">Finished craft photo</p>
+                <p className="bw-photo-drop-hint">
+                  Add a picture of what you made — you can share it to the
+                  village square below.
+                </p>
                 <input
                   ref={journalFileRef}
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
-                  hidden
+                  className="bw-photo-input"
                   onChange={(e) =>
                     void onJournalPhoto(e.target.files?.[0] || null)
                   }
                 />
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  disabled={busy || journalUploading}
-                  onClick={() => journalFileRef.current?.click()}
-                >
-                  {journalUploading
-                    ? "Uploading…"
-                    : journalPhoto
-                      ? "Change photo"
-                      : "Add finished craft photo"}
-                </button>
                 {journalPhoto ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={journalPhoto}
-                    alt="Finished craft preview"
-                    className="bw-journal-form-preview"
-                  />
-                ) : null}
+                  <div className="bw-photo-chosen">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={journalPhoto}
+                      alt="Finished craft preview"
+                      className="bw-journal-form-preview"
+                    />
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      disabled={busy || journalUploading}
+                      onClick={() => journalFileRef.current?.click()}
+                    >
+                      {journalUploading ? "Uploading…" : "Change photo"}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="bw-photo-pick-btn"
+                    disabled={busy || journalUploading}
+                    onClick={() => journalFileRef.current?.click()}
+                  >
+                    {journalUploading
+                      ? "Uploading…"
+                      : "📷 Choose image from your device"}
+                  </button>
+                )}
               </div>
               {journalCraftId ? (
                 <label className="bw-check">
