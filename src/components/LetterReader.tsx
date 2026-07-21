@@ -75,7 +75,9 @@ export function LetterReader({
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
             <LetterPaper
+              className={letter.mascot ? "welcome-typewriter" : ""}
               paperStyle={letter.paperStyle}
+              fontStyle={letter.fontStyle}
               body={letter.body}
               subject={letter.subject}
               stickers={letter.stickers}

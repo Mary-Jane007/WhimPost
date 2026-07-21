@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EnvelopeFace } from "@/components/EnvelopeFace";
+import { letterBodyPreview } from "@/lib/letterText";
 import type { LetterView } from "@/lib/types";
 
 export function MailList({
@@ -50,8 +51,7 @@ export function MailList({
                 </p>
                 <h3>{letter.subject}</h3>
                 <p className="mail-snippet">
-                  {letter.body.slice(0, 110)}
-                  {letter.body.length > 110 ? "…" : ""}
+                  {letterBodyPreview(letter.body)}
                 </p>
               </div>
             </Link>

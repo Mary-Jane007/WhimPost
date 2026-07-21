@@ -3,6 +3,8 @@ import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteForestStickers } from "@/components/SiteForestStickers";
 import { getCurrentUser } from "@/lib/auth";
+import { getDb } from "@/lib/db";
+import { getNavBadges } from "@/lib/notifications";
 import { getVillageTheme } from "@/lib/villageThemes";
 import { isVillageId, type VillageId } from "@/lib/villages";
 
@@ -24,6 +26,7 @@ export default async function RootLayout({
       : null;
   const theme = getVillageTheme(villageId);
   const themeClass = theme && villageId ? `theme-${villageId}` : "";
+  const badges = user ? getNavBadges(getDb(), user.id) : undefined;
 
   const themeStyle = theme
     ? ({
@@ -45,7 +48,7 @@ export default async function RootLayout({
         <div className="forest-backdrop" aria-hidden />
         <div className="page-shell">
           <SiteForestStickers villageId={villageId} />
-          <SiteNav user={user} />
+          <SiteNav user={user} badges={badges} />
           {children}
         </div>
       </body>

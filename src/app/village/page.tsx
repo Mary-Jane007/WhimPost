@@ -20,19 +20,23 @@ import {
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
 import { VillageChangePanel } from "@/components/VillageChangePanel";
 import { NoticeBoard } from "@/components/NoticeBoard";
+import { CollectibleIcon } from "@/components/CollectibleIcon";
 import { PageCrest } from "@/components/PageCrest";
+import { WelcomeLetterEditor } from "@/components/WelcomeLetterEditor";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
 import { VillageMascot } from "@/components/VillageMascot";
 import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
+import { markUnlocksSeen } from "@/lib/notifications";
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const db = getDb();
+  markUnlocksSeen(db, user.id);
   const stats = getUserVillageStats(db, user.id);
 
   if (!stats.villageId) {
@@ -140,7 +144,11 @@ export default async function VillagePage() {
               ? ["mushroom-amanita", "leafy-branch", "skeleton-key"]
               : village.id === "moonmere"
                 ? ["moon-full", "moon-crescent", "butterfly-green"]
-                : ["fox-seated", "mushroom-amanita", "moon-full"]
+                : village.id === "bramblewood"
+                  ? ["fox-seated", "pinecone", "candle-jar"]
+                  : village.id === "hearthwick"
+                    ? ["candle-jar", "jam-jar", "leafy-branch"]
+                    : ["fox-seated", "mushroom-amanita", "moon-full"]
         }
         villageStickers={
           village.id === "clovermeadow"
@@ -151,7 +159,19 @@ export default async function VillagePage() {
                   { village: "moonmere", id: "luna-moth" },
                   { village: "moonmere", id: "fairy-moon" },
                 ]
-              : undefined
+              : village.id === "bramblewood"
+                ? [
+                    { village: "bramblewood", id: "fox-face" },
+                    { village: "bramblewood", id: "monarch" },
+                    { village: "bramblewood", id: "maple-branch" },
+                  ]
+                : village.id === "hearthwick"
+                  ? [
+                      { village: "hearthwick", id: "hedgehog" },
+                      { village: "hearthwick", id: "potion-bottles" },
+                      { village: "hearthwick", id: "lavender-bouquet" },
+                    ]
+                  : undefined
         }
       />
       {welcomeLetter ? <WelcomeLetterModal letter={welcomeLetter} /> : null}
@@ -248,9 +268,7 @@ export default async function VillagePage() {
             const have = liveStats.collectibles[key] || 0;
             return (
               <div key={key} className="collectible-chip">
-                <span className="collectible-emoji" aria-hidden>
-                  {meta.emoji}
-                </span>
+                <CollectibleIcon kind={key} />
                 <strong>{meta.name}</strong>
                 <em>
                   {have}/{meta.max}
@@ -319,6 +337,12 @@ export default async function VillagePage() {
           ))}
         </div>
       </section>
+
+      {user.isOwner ? (
+        <WelcomeLetterEditor
+          initialVillageId={stats.villageId as VillageId}
+        />
+      ) : null}
 
       <VillageChangePanel
         currentVillageId={stats.villageId as VillageId}

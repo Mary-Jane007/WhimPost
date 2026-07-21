@@ -1,9 +1,13 @@
 import { StickerArt } from "@/components/stickers/StickerArt";
 import type { StickerKind } from "@/lib/types";
 import {
+  BRAMBLEWOOD_DECOR,
   CLOVERMEADOW_DECOR,
+  HEARTHWICK_DECOR,
   MOONMERE_DECOR,
+  bramblewoodStickerSrc,
   cloverStickerSrc,
+  hearthwickStickerSrc,
   moonmereStickerSrc,
 } from "@/lib/villageThemes";
 import type { VillageId } from "@/lib/villages";
@@ -151,6 +155,60 @@ export function ForestStickers({
             id={item.id}
             className={item.className}
             src={moonmereStickerSrc(item.id)}
+          />
+        ))}
+        <span className="sparkle s1" />
+        <span className="sparkle s2" />
+        <span className="sparkle s3" />
+        <span className="sparkle s4" />
+        <span className="sparkle s5" />
+      </div>
+    );
+  }
+
+  if (villageId === "bramblewood" && density !== "landing") {
+    const items =
+      density === "auth"
+        ? BRAMBLEWOOD_DECOR.filter((_, i) => i % 2 === 0)
+        : BRAMBLEWOOD_DECOR;
+    return (
+      <div
+        className={`forest-stickers forest-stickers-${density} forest-stickers-bramblewood`}
+        aria-hidden
+      >
+        {items.map((item) => (
+          <VillageDecorImg
+            key={`${item.id}-${item.className}`}
+            id={item.id}
+            className={item.className}
+            src={bramblewoodStickerSrc(item.id)}
+          />
+        ))}
+        <span className="sparkle s1" />
+        <span className="sparkle s2" />
+        <span className="sparkle s3" />
+        <span className="sparkle s4" />
+        <span className="sparkle s5" />
+      </div>
+    );
+  }
+
+  if (villageId === "hearthwick" && density !== "landing") {
+    const items =
+      density === "auth"
+        ? HEARTHWICK_DECOR.filter((_, i) => i % 2 === 0)
+        : HEARTHWICK_DECOR;
+    return (
+      <div
+        className={`forest-stickers forest-stickers-${density} forest-stickers-hearthwick`}
+        aria-hidden
+      >
+        {items.map((item) => (
+          <VillageDecorImg
+            key={`${item.id}-${item.className}`}
+            id={item.id}
+            className={item.className}
+            src={hearthwickStickerSrc(item.id)}
           />
         ))}
         <span className="sparkle s1" />
