@@ -27,6 +27,7 @@ export type TvChannel = {
   villageId: string;
   createdBy: string;
   createdAt: string;
+  isGlobal: boolean;
   videos: TvVideo[];
 };
 
@@ -80,6 +81,7 @@ type ChannelRow = {
   village_id: string;
   created_by: string;
   created_at: string;
+  is_global?: number | null;
 };
 
 type RoomRow = {
@@ -146,6 +148,10 @@ export function getVideoByFilename(filename: string): TvVideo | null {
 
 export function canAccessVideo(user: UserPublic, video: TvVideo) {
   if (user.isOwner) return true;
+  if (video.channelId) {
+    const channel = getChannelById(video.channelId);
+    if (channel?.isGlobal && user.villageId) return true;
+  }
   if (video.villageId && user.villageId === video.villageId) return true;
   if (areFriends(user.id, video.uploaderId)) return true;
   const friends = listFriends(user.id);
@@ -177,9 +183,12 @@ function mapChannel(row: ChannelRow): TvChannel {
     villageId: row.village_id,
     createdBy: row.created_by,
     createdAt: row.created_at,
+    isGlobal: Boolean(row.is_global),
     videos: listVideosForChannel(row.id),
   };
 }
+
+export const SHARED_CHANNEL_TITLE = "Cottage Cartoons";
 
 export function getChannelById(id: string): TvChannel | null {
   const db = getDb();
@@ -189,17 +198,88 @@ export function getChannelById(id: string): TvChannel | null {
   return row ? mapChannel(row) : null;
 }
 
-/** Owner-curated channels for one village. */
+function channelUsableInVillage(
+  channel: TvChannel,
+  villageId: string | null | undefined
+) {
+  if (channel.isGlobal) return true;
+  return Boolean(villageId && channel.villageId === villageId);
+}
+
+function videoUsableInVillage(
+  video: TvVideo,
+  villageId: string | null | undefined
+) {
+  if (video.channelId) {
+    const channel = getChannelById(video.channelId);
+    if (channel?.isGlobal) return true;
+  }
+  return Boolean(villageId && video.villageId === villageId);
+}
+
+/** Merge duplicate Cottage Cartoons rows and ensure one shared channel exists. */
+export function ensureSharedCottageCartoons() {
+  const db = getDb();
+  db.prepare(
+    `UPDATE tv_channels
+     SET is_global = 1
+     WHERE lower(trim(title)) = lower(?)`
+  ).run(SHARED_CHANNEL_TITLE);
+
+  const matches = db
+    .prepare(
+      `SELECT id, created_at FROM tv_channels
+       WHERE lower(trim(title)) = lower(?)
+       ORDER BY created_at ASC`
+    )
+    .all(SHARED_CHANNEL_TITLE) as Array<{ id: string; created_at: string }>;
+
+  if (matches.length > 1) {
+    const keeper = matches[0].id;
+    for (const extra of matches.slice(1)) {
+      db.prepare(`UPDATE tv_videos SET channel_id = ? WHERE channel_id = ?`).run(
+        keeper,
+        extra.id
+      );
+      db.prepare(
+        `UPDATE tv_rooms SET current_channel_id = ? WHERE current_channel_id = ?`
+      ).run(keeper, extra.id);
+      db.prepare(`DELETE FROM tv_channels WHERE id = ?`).run(extra.id);
+    }
+    db.prepare(`UPDATE tv_channels SET is_global = 1 WHERE id = ?`).run(keeper);
+  }
+
+  if (matches.length === 0) {
+    const owner = db
+      .prepare(`SELECT id FROM users WHERE is_owner = 1 LIMIT 1`)
+      .get() as { id: string } | undefined;
+    if (owner) {
+      createChannel({
+        title: SHARED_CHANNEL_TITLE,
+        villageId: "mosshollow",
+        createdBy: owner.id,
+        isGlobal: true,
+      });
+    }
+  } else {
+    db.prepare(`UPDATE tv_channels SET is_global = 1 WHERE id = ?`).run(
+      matches[0].id
+    );
+  }
+}
+
+/** Owner-curated channels for one village, plus shared all-village channels. */
 export function listChannelsForVillage(
   villageId: string | null | undefined
 ): TvChannel[] {
   if (!villageId) return [];
+  ensureSharedCottageCartoons();
   const db = getDb();
   const rows = db
     .prepare(
       `SELECT * FROM tv_channels
-       WHERE village_id = ?
-       ORDER BY created_at ASC
+       WHERE is_global = 1 OR village_id = ?
+       ORDER BY is_global DESC, created_at ASC
        LIMIT 40`
     )
     .all(villageId) as ChannelRow[];
@@ -233,14 +313,18 @@ export function createChannel(input: {
   title: string;
   villageId: string;
   createdBy: string;
+  isGlobal?: boolean;
 }): TvChannel {
   const db = getDb();
   const id = randomUUID();
   const title = input.title.trim().slice(0, 80) || "Untitled channel";
+  const isGlobal =
+    Boolean(input.isGlobal) ||
+    title.toLowerCase() === SHARED_CHANNEL_TITLE.toLowerCase();
   db.prepare(
-    `INSERT INTO tv_channels (id, title, village_id, created_by)
-     VALUES (?, ?, ?, ?)`
-  ).run(id, title, input.villageId, input.createdBy);
+    `INSERT INTO tv_channels (id, title, village_id, created_by, is_global)
+     VALUES (?, ?, ?, ?, ?)`
+  ).run(id, title, input.villageId, input.createdBy, isGlobal ? 1 : 0);
   return getChannelById(id)!;
 }
 
@@ -587,7 +671,7 @@ export function updateRoomPlayback(
       nextVideoId = null;
     } else {
       const channel = getChannelById(patch.channelId);
-      if (!channel || channel.villageId !== libraryVillage) {
+      if (!channel || !channelUsableInVillage(channel, libraryVillage)) {
         return {
           ok: false as const,
           error: "That channel is not on this village dial",
@@ -609,7 +693,7 @@ export function updateRoomPlayback(
       if (
         !video ||
         !canAccessVideo(user, video) ||
-        video.villageId !== libraryVillage
+        !videoUsableInVillage(video, libraryVillage)
       ) {
         return {
           ok: false as const,

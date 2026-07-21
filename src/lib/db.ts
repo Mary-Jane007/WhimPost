@@ -40,6 +40,12 @@ function migrate(db: Database.Database) {
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
   ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
   ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
+  ensureColumn(
+    db,
+    "tv_channels",
+    "is_global",
+    "is_global INTEGER NOT NULL DEFAULT 0"
+  );
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS village_notes (
@@ -76,10 +82,13 @@ function migrate(db: Database.Database) {
       title TEXT NOT NULL,
       village_id TEXT NOT NULL,
       created_by TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      is_global INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
     CREATE INDEX IF NOT EXISTS idx_tv_channels_village
       ON tv_channels(village_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_tv_channels_global
+      ON tv_channels(is_global, created_at);
 
     CREATE TABLE IF NOT EXISTS tv_rooms (
       id TEXT PRIMARY KEY,
