@@ -10,7 +10,6 @@ import {
   WORKSHOP_XP,
   featuredCraft,
   featuredPrompt,
-  featuredPuzzle,
   titleForXp,
   type WorkshopTabId,
 } from "@/lib/workshopContent";
@@ -37,16 +36,11 @@ export type WorkshopProgress = {
   plantId: string | null;
   plantWeeks: Record<string, string>;
   birds: Record<string, { spotted: boolean; photoUrl?: string }>;
-  broadcast: Record<
-    string,
-    { favorite: boolean; completed: boolean; progress: number }
-  >;
   seasonal: Record<string, boolean>;
   journal: JournalEntry[];
   featured: {
     craftId: string;
     promptId: string;
-    puzzleId: string;
   };
 };
 
@@ -141,13 +135,11 @@ export function getWorkshopProgress(userId: string): WorkshopProgress {
     plantId: row.plant_id,
     plantWeeks: parseJson<Record<string, string>>(row.plant_weeks_json, {}),
     birds: parseJson(row.birds_json, {}),
-    broadcast: parseJson(row.broadcast_json, {}),
     seasonal: parseJson(row.seasonal_json, {}),
     journal: listJournal(userId),
     featured: {
       craftId: featuredCraft().id,
       promptId: featuredPrompt().id,
-      puzzleId: featuredPuzzle().id,
     },
   };
 }
@@ -200,13 +192,6 @@ export type WorkshopAction =
   | { type: "choosePlant"; plantId: string }
   | { type: "plantWeek"; week: number; photoUrl: string }
   | { type: "bird"; birdId: string; photoUrl?: string }
-  | {
-      type: "broadcast";
-      videoId: string;
-      favorite?: boolean;
-      completed?: boolean;
-      progress?: number;
-    }
   | { type: "seasonal"; eventId: string; taskIndex: number };
 
 export function applyWorkshopAction(
@@ -233,9 +218,7 @@ export function applyWorkshopAction(
   const birds = parseJson<
     Record<string, { spotted: boolean; photoUrl?: string }>
   >(row.birds_json, {});
-  const broadcast = parseJson<
-    Record<string, { favorite: boolean; completed: boolean; progress: number }>
-  >(row.broadcast_json, {});
+  const broadcast = parseJson(row.broadcast_json, {});
   const seasonal = parseJson<Record<string, boolean>>(row.seasonal_json, {});
 
   if (action.type === "complete") {
@@ -335,35 +318,6 @@ export function applyWorkshopAction(
     } else if (action.photoUrl) {
       birds[action.birdId] = { spotted: true, photoUrl: action.photoUrl };
     }
-  } else if (action.type === "broadcast") {
-    const cur = broadcast[action.videoId] || {
-      favorite: false,
-      completed: false,
-      progress: 0,
-    };
-    if (action.favorite !== undefined) cur.favorite = action.favorite;
-    if (action.progress !== undefined) {
-      cur.progress = Math.max(0, Math.min(100, Math.floor(action.progress)));
-    }
-    if (action.completed && !cur.completed) {
-      cur.completed = true;
-      cur.progress = 100;
-      xp += WORKSHOP_XP.broadcast;
-      insertJournal({
-        userId,
-        activityType: "broadcast",
-        activityId: action.videoId,
-        activityName: "Bramblewood Broadcast",
-        xpEarned: WORKSHOP_XP.broadcast,
-        note: "I watched something gentle on the village channel.",
-      });
-    } else if (action.completed === false) {
-      cur.completed = false;
-    } else if (action.completed) {
-      cur.completed = true;
-      cur.progress = 100;
-    }
-    broadcast[action.videoId] = cur;
   } else if (action.type === "seasonal") {
     const key = `${action.eventId}:${action.taskIndex}`;
     if (!seasonal[key]) {
@@ -462,21 +416,6 @@ export function promptCompletionPayload(promptId: string, photoUrl?: string) {
     note: prompt.note,
     badge: "Creative Heart",
     photoUrl,
-  };
-}
-
-export function puzzleCompletionPayload(puzzleId: string) {
-  const puzzle = featuredPuzzle();
-  const match = puzzle.id === puzzleId ? puzzle : puzzle;
-  return {
-    type: "complete" as const,
-    key: `puzzle:${puzzleId}`,
-    activityType: "puzzle",
-    activityId: puzzleId,
-    activityName: match.title,
-    xp: WORKSHOP_XP.puzzle,
-    note: "A quiet puzzle afternoon by the workshop window.",
-    badge: "Puzzle Fox",
   };
 }
 

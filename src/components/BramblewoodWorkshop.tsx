@@ -5,7 +5,6 @@ import type { UserPublic } from "@/lib/types";
 import type { WorkshopProgress } from "@/lib/workshop";
 import {
   BIRDS,
-  BROADCAST_VIDEOS,
   CRAFTS,
   PLANTS,
   QUEST_ITEMS,
@@ -14,7 +13,6 @@ import {
   WORKSHOP_TABS,
   featuredCraft,
   featuredPrompt,
-  featuredPuzzle,
   type WorkshopTabId,
 } from "@/lib/workshopContent";
 
@@ -38,7 +36,6 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [playingId, setPlayingId] = useState<string | null>(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const pendingPhotoKey = useRef<string | null>(null);
@@ -59,7 +56,6 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
     [progress.featured.craftId]
   );
   const weeklyPrompt = featuredPrompt();
-  const puzzle = featuredPuzzle();
 
   const questDone = QUEST_ITEMS.filter((q) => progress.questChecks[q.id]).length;
   const questPct = Math.round((questDone / QUEST_ITEMS.length) * 100);
@@ -605,141 +601,6 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                         Upload photo
                       </button>
                     </div>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {tab === "puzzle" && (
-          <section className="bw-section">
-            <h2>Puzzle Table</h2>
-            <p className="bw-section-lead">A new cozy puzzle each day.</p>
-            <article className="bw-card">
-              <h3>{puzzle.title}</h3>
-              <p>{puzzle.blurb}</p>
-              <p className="bw-prompt-text">{puzzle.prompt}</p>
-              <button
-                type="button"
-                className="btn-primary"
-                disabled={busy || progress.completed[`puzzle:${puzzle.id}`]}
-                onClick={() =>
-                  void postAction({
-                    type: "complete",
-                    completeKind: "puzzle",
-                    id: puzzle.id,
-                  })
-                }
-              >
-                {progress.completed[`puzzle:${puzzle.id}`]
-                  ? "Solved today"
-                  : "Mark solved"}
-              </button>
-            </article>
-          </section>
-        )}
-
-        {tab === "broadcast" && (
-          <section className="bw-section">
-            <h2>Bramblewood Broadcast</h2>
-            <p className="bw-section-lead">
-              Exclusive creative channel for Bramblewood villagers — relaxing
-              how-tos instead of cartoons.
-            </p>
-            {playingId ? (
-              <div className="bw-player">
-                <p>
-                  Now playing:{" "}
-                  <strong>
-                    {BROADCAST_VIDEOS.find((v) => v.id === playingId)?.title}
-                  </strong>
-                </p>
-                <div className="bw-player-screen">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={
-                      BROADCAST_VIDEOS.find((v) => v.id === playingId)?.image
-                    }
-                    alt=""
-                  />
-                  <p>Soft creative hour — imagine the workshop demo unfolding.</p>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={progress.broadcast[playingId]?.progress || 0}
-                  onChange={(e) =>
-                    void postAction({
-                      type: "broadcast",
-                      videoId: playingId,
-                      progress: Number(e.target.value),
-                    })
-                  }
-                  aria-label="Continue watching progress"
-                />
-              </div>
-            ) : null}
-            <div className="bw-grid broadcast">
-              {BROADCAST_VIDEOS.map((v) => {
-                const state = progress.broadcast[v.id] || {
-                  favorite: false,
-                  completed: false,
-                  progress: 0,
-                };
-                return (
-                  <article key={v.id} className="bw-card broadcast-card">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={v.image} alt="" />
-                    <p className="bw-meta">
-                      {v.categoryEmoji} {v.category} · {v.duration}
-                    </p>
-                    <h3>{v.title}</h3>
-                    <p>{v.blurb}</p>
-                    <div className="bw-actions wrap">
-                      <button
-                        type="button"
-                        className="btn-primary"
-                        onClick={() => setPlayingId(v.id)}
-                      >
-                        Play
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-secondary"
-                        disabled={busy}
-                        onClick={() =>
-                          void postAction({
-                            type: "broadcast",
-                            videoId: v.id,
-                            favorite: !state.favorite,
-                          })
-                        }
-                      >
-                        {state.favorite ? "★ Favorited" : "☆ Favorite"}
-                      </button>
-                      <label className="bw-check">
-                        <input
-                          type="checkbox"
-                          checked={state.completed}
-                          disabled={busy}
-                          onChange={(e) =>
-                            void postAction({
-                              type: "broadcast",
-                              videoId: v.id,
-                              completed: e.target.checked,
-                            })
-                          }
-                        />
-                        Completed
-                      </label>
-                    </div>
-                    {state.progress > 0 ? (
-                      <div className="bw-progress-bar thin" aria-hidden>
-                        <span style={{ width: `${state.progress}%` }} />
-                      </div>
-                    ) : null}
                   </article>
                 );
               })}
