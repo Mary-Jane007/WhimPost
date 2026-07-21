@@ -22,6 +22,7 @@
   --font-display: "Fraunces", Georgia, serif;
   --font-letter: "Cormorant Garamond", "Times New Roman", serif;
   --font-stamp: "Special Elite", "Courier New", monospace;
+  --font-typewriter: "Special Elite", "Courier New", monospace;
   --bg-glow: radial-gradient(ellipse at 18% 8%, rgba(95, 127, 101, 0.4), transparent 45%),
     radial-gradient(ellipse at 85% 5%, rgba(212, 175, 55, 0.14), transparent 35%),
     radial-gradient(ellipse at 50% 100%, rgba(36, 51, 40, 0.9), transparent 55%),
@@ -2453,6 +2454,35 @@ body.theme-clovermeadow .village-sticker-pack {
   width: min(100%, 34rem);
   max-height: min(62vh, 36rem);
   overflow: auto;
+}
+
+/* Village welcome letters always read in vintage typewriter */
+.letter-paper.welcome-typewriter .letter-subject-display,
+.letter-paper.welcome-typewriter .letter-subject-input,
+.letter-paper.welcome-typewriter .letter-body-display,
+.letter-paper.welcome-typewriter .letter-body-input,
+.welcome-editor-preview.welcome-typewriter h3,
+.welcome-editor-preview.welcome-typewriter .letter-body-display {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.02em;
+}
+
+.letter-paper.welcome-typewriter .letter-subject-display,
+.letter-paper.welcome-typewriter .letter-subject-input,
+.welcome-editor-preview.welcome-typewriter h3 {
+  font-weight: 400;
+}
+
+.letter-paper.welcome-typewriter .letter-body-display,
+.letter-paper.welcome-typewriter .letter-body-input,
+.welcome-editor-preview.welcome-typewriter .letter-body-display {
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.welcome-editor-form .welcome-typewriter-field {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.02em;
 }
 
 .welcome-dismiss {
