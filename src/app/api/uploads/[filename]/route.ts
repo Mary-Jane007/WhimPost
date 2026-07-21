@@ -1,9 +1,12 @@
 import fs from "fs";
 import path from "path";
+import { Readable } from "stream";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { canAccessVideo, getVideoByFilename } from "@/lib/tvCorner";
+
+export const runtime = "nodejs";
 
 const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
 const MIME: Record<string, string> = {
@@ -16,6 +19,45 @@ const MIME: Record<string, string> = {
   webm: "video/webm",
   mov: "video/quicktime",
 };
+
+const RANGE_CHUNK = 2 * 1024 * 1024; // 2MB preferred range slices
+
+function fileStreamResponse(
+  filePath: string,
+  contentType: string,
+  start?: number,
+  end?: number
+) {
+  const stat = fs.statSync(filePath);
+  const from = start ?? 0;
+  const to = end ?? stat.size - 1;
+  const stream = fs.createReadStream(filePath, { start: from, end: to });
+  const webStream = Readable.toWeb(stream) as unknown as ReadableStream;
+
+  if (start === undefined && end === undefined) {
+    return new NextResponse(webStream, {
+      status: 200,
+      headers: {
+        "Content-Type": contentType,
+        "Content-Length": String(stat.size),
+        "Accept-Ranges": "bytes",
+        "Cache-Control": "private, max-age=86400",
+      },
+    });
+  }
+
+  const chunkSize = to - from + 1;
+  return new NextResponse(webStream, {
+    status: 206,
+    headers: {
+      "Content-Type": contentType,
+      "Content-Length": String(chunkSize),
+      "Content-Range": `bytes ${from}-${to}/${stat.size}`,
+      "Accept-Ranges": "bytes",
+      "Cache-Control": "private, max-age=86400",
+    },
+  });
+}
 
 export async function GET(
   req: NextRequest,
@@ -74,8 +116,16 @@ export async function GET(
     if (!match) return jsonError("Invalid range", 416);
 
     const start = Number(match[1]);
-    const end = match[2] ? Number(match[2]) : Math.min(start + 1024 * 1024 - 1, stat.size - 1);
-    if (start >= stat.size || end >= stat.size || start > end) {
+    const end = match[2]
+      ? Number(match[2])
+      : Math.min(start + RANGE_CHUNK - 1, stat.size - 1);
+    if (
+      Number.isNaN(start) ||
+      Number.isNaN(end) ||
+      start >= stat.size ||
+      end >= stat.size ||
+      start > end
+    ) {
       return new NextResponse(null, {
         status: 416,
         headers: {
@@ -84,31 +134,8 @@ export async function GET(
       });
     }
 
-    const chunkSize = end - start + 1;
-    const buffer = Buffer.alloc(chunkSize);
-    const fd = fs.openSync(filePath, "r");
-    fs.readSync(fd, buffer, 0, chunkSize, start);
-    fs.closeSync(fd);
-
-    return new NextResponse(buffer, {
-      status: 206,
-      headers: {
-        "Content-Type": contentType,
-        "Content-Length": String(chunkSize),
-        "Content-Range": `bytes ${start}-${end}/${stat.size}`,
-        "Accept-Ranges": "bytes",
-        "Cache-Control": "private, max-age=86400",
-      },
-    });
+    return fileStreamResponse(filePath, contentType, start, end);
   }
 
-  const bytes = fs.readFileSync(filePath);
-  return new NextResponse(bytes, {
-    headers: {
-      "Content-Type": contentType,
-      "Content-Length": String(stat.size),
-      "Accept-Ranges": "bytes",
-      "Cache-Control": "private, max-age=86400",
-    },
-  });
+  return fileStreamResponse(filePath, contentType);
 }

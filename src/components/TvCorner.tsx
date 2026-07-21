@@ -251,6 +251,10 @@ export function TvCorner({
       setError("Create a channel first, then upload videos to it");
       return;
     }
+    if (file.size > 5 * 1024 * 1024 * 1024) {
+      setError("Videos must be under 5GB");
+      return;
+    }
     const targetChannelId = effectiveChannelId;
     setBusy(true);
     setError(null);
@@ -852,7 +856,9 @@ export function TvCorner({
               </button>
 
               <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
-                <strong>2.</strong> Upload videos to a channel
+                <strong>2.</strong> Upload videos to a channel — shorts or full
+                movies (MP4, WebM, or MOV · up to 5GB). Large files may take a
+                while.
               </p>
               <label className="tv-upload">
                 <span>Channel</span>
@@ -899,7 +905,7 @@ export function TvCorner({
                     void onUploadClip(file);
                   }}
                 />
-                {busy ? "Tucking away…" : "Upload video to channel"}
+                {busy ? "Uploading… (large files take time)" : "Upload video to channel"}
               </label>
             </div>
           ) : (

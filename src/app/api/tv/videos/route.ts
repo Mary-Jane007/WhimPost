@@ -1,11 +1,14 @@
 import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
+import { Readable } from "stream";
+import { pipeline } from "stream/promises";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import {
   TV_ALLOWED_MIME,
   TV_MAX_BYTES,
+  TV_MAX_LABEL,
   TV_MIME_EXT,
   createVideo,
   deleteVideo,
@@ -13,12 +16,23 @@ import {
   listVideosForChannel,
 } from "@/lib/tvCorner";
 
+export const runtime = "nodejs";
+export const maxDuration = 1800; // long movie uploads
+
 const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
 
 function ensureUploadDir() {
   if (!fs.existsSync(UPLOAD_DIR)) {
     fs.mkdirSync(UPLOAD_DIR, { recursive: true });
   }
+}
+
+async function saveUploadStream(file: File, destPath: string) {
+  const webStream = file.stream();
+  const nodeStream = Readable.fromWeb(
+    webStream as unknown as import("stream/web").ReadableStream
+  );
+  await pipeline(nodeStream, fs.createWriteStream(destPath));
 }
 
 export async function GET(req: NextRequest) {
@@ -55,13 +69,13 @@ export async function POST(req: NextRequest) {
 
   const file = form.get("video");
   if (!(file instanceof File)) {
-    return jsonError("Choose a cozy clip for this channel");
+    return jsonError("Choose a cozy clip or movie for this channel");
   }
   if (!TV_ALLOWED_MIME.has(file.type)) {
     return jsonError("Use an MP4, WebM, or MOV video");
   }
   if (file.size > TV_MAX_BYTES) {
-    return jsonError("Clips must be under 80MB");
+    return jsonError(`Videos must be under ${TV_MAX_LABEL}`);
   }
 
   const titleRaw = String(form.get("title") || "").trim();
@@ -73,14 +87,29 @@ export async function POST(req: NextRequest) {
   const ext = TV_MIME_EXT[file.type] || "mp4";
   ensureUploadDir();
   const filename = `${randomUUID()}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  fs.writeFileSync(path.join(UPLOAD_DIR, filename), buffer);
+  const destPath = path.join(UPLOAD_DIR, filename);
+
+  try {
+    await saveUploadStream(file, destPath);
+  } catch {
+    if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+    return jsonError("Could not save that upload — try again", 500);
+  }
+
+  const sizeBytes = fs.existsSync(destPath)
+    ? fs.statSync(destPath).size
+    : file.size;
+
+  if (sizeBytes <= 0) {
+    if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+    return jsonError("That upload arrived empty");
+  }
 
   const video = createVideo({
     title,
     filename,
     mime: file.type,
-    sizeBytes: file.size,
+    sizeBytes,
     uploaderId: user.id,
     villageId: channel.villageId,
     channelId: channel.id,
