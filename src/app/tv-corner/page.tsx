@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { listFriends } from "@/lib/letters";
 import {
@@ -6,10 +7,9 @@ import {
   listFriendRooms,
   listVideosForUser,
 } from "@/lib/tvCorner";
-import { getVillage, type VillageId } from "@/lib/villages";
+import { getVillage, VILLAGES, type VillageId } from "@/lib/villages";
 import { TvCorner } from "@/components/TvCorner";
 import { PageCrest } from "@/components/PageCrest";
-import Link from "next/link";
 
 export default async function TvCornerPage() {
   const user = await getCurrentUser();
@@ -33,9 +33,10 @@ export default async function TvCornerPage() {
 
   const village = getVillage(user.villageId as VillageId)!;
   const room = getOrCreateVillageRoom(user, user.villageId as VillageId);
-  const videos = listVideosForUser(user);
+  const videos = listVideosForUser(user, room);
   const friendRooms = listFriendRooms(user);
   const friends = listFriends(user.id);
+  const villageOptions = VILLAGES.map((v) => ({ id: v.id, name: v.name }));
 
   return (
     <main className={`app-main forest-panel tv-corner-page village-${village.id}`}>
@@ -45,6 +46,7 @@ export default async function TvCornerPage() {
         villageName={village.name}
         mascot={village.mascot}
         mascotImage={village.mascotImage || null}
+        villageOptions={villageOptions}
         initialRoom={room}
         initialVideos={videos}
         initialFriendRooms={friendRooms}

@@ -89,6 +89,16 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_tv_presence_seen
       ON tv_presence(room_id, last_seen_at);
+
+    CREATE TABLE IF NOT EXISTS tv_chat_messages (
+      id TEXT PRIMARY KEY,
+      room_id TEXT NOT NULL REFERENCES tv_rooms(id) ON DELETE CASCADE,
+      author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_tv_chat_room
+      ON tv_chat_messages(room_id, created_at);
   `);
 }
 

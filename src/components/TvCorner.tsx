@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import type { TvRoomState, TvVideo } from "@/lib/tvCorner";
+
+type VillageOption = { id: VillageId; name: string };
 
 type Props = {
   user: UserPublic;
@@ -11,6 +13,7 @@ type Props = {
   villageName: string;
   mascot: string;
   mascotImage: string | null;
+  villageOptions: VillageOption[];
   initialRoom: TvRoomState;
   initialVideos: TvVideo[];
   initialFriendRooms: TvRoomState[];
@@ -69,9 +72,8 @@ const DECOR: Record<
   },
 };
 
-function formatSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+function channelLabel(index: number) {
+  return String(index + 1).padStart(2, "0");
 }
 
 export function TvCorner({
@@ -80,6 +82,7 @@ export function TvCorner({
   villageName,
   mascot,
   mascotImage,
+  villageOptions,
   initialRoom,
   initialVideos,
   initialFriendRooms,
@@ -93,11 +96,16 @@ export function TvCorner({
   );
   const [titleDraft, setTitleDraft] = useState("");
   const [uploadTitle, setUploadTitle] = useState("");
+  const [uploadVillageId, setUploadVillageId] = useState<VillageId>(villageId);
+  const [chatDraft, setChatDraft] = useState("");
+  const [showChannels, setShowChannels] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [chatBusy, setChatBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [powerOn, setPowerOn] = useState(true);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
   const suppressUntil = useRef(0);
   const roomIdRef = useRef(room.id);
   const applyingRemote = useRef(false);
@@ -105,6 +113,10 @@ export function TvCorner({
   useEffect(() => {
     roomIdRef.current = room.id;
   }, [room.id]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [room.messages?.length, room.id]);
 
   async function fetchScope(nextScope: ScopeTab, roomId?: string) {
     setBusy(true);
@@ -129,6 +141,7 @@ export function TvCorner({
           currentVideoId: null,
           isPlaying: false,
           watchers: [],
+          messages: [],
           title: "Friends couch",
         }));
       }
@@ -172,6 +185,8 @@ export function TvCorner({
     title?: string;
   }) {
     if (!room.id) return;
+    // Sync guard for local control; only runs from user events / handlers.
+    // eslint-disable-next-line react-hooks/purity -- not called during render
     suppressUntil.current = Date.now() + 2200;
     const res = await fetch(`/api/tv/room/${room.id}`, {
       method: "PATCH",
@@ -184,26 +199,26 @@ export function TvCorner({
       return;
     }
     setRoom(data.room);
+    if (data.videos) setVideos(data.videos);
   }
 
   async function onUpload(file: File | null) {
-    if (!file) return;
+    if (!file || !user.isOwner) return;
     setBusy(true);
     setError(null);
     try {
       const form = new FormData();
       form.append("video", file);
+      form.append("villageId", uploadVillageId);
       if (uploadTitle.trim()) form.append("title", uploadTitle.trim());
       const res = await fetch("/api/tv/videos", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
-      setVideos((prev) => [data.video, ...prev.filter((v) => v.id !== data.video.id)]);
       setUploadTitle("");
-      if (room.id) {
-        await patchRoom({
-          videoId: data.video.id,
-          isPlaying: true,
-          positionMs: 0,
+      if (uploadVillageId === (room.villageId || villageId)) {
+        setVideos((prev) => {
+          const next = prev.filter((v) => v.id !== data.video.id);
+          return [...next, data.video];
         });
       }
     } catch (err) {
@@ -214,6 +229,7 @@ export function TvCorner({
   }
 
   async function removeVideo(id: string) {
+    if (!user.isOwner) return;
     setBusy(true);
     setError(null);
     try {
@@ -223,19 +239,52 @@ export function TvCorner({
         body: JSON.stringify({ id }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not remove clip");
+      if (!res.ok) throw new Error(data.error || "Could not remove channel");
       setVideos((prev) => prev.filter((v) => v.id !== id));
       if (room.currentVideoId === id) {
         await patchRoom({ videoId: null, isPlaying: false, positionMs: 0 });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not remove clip");
+      setError(err instanceof Error ? err.message : "Could not remove channel");
     } finally {
       setBusy(false);
     }
   }
 
-  // Poll room state for watch-together sync
+  async function sendChat(e?: FormEvent) {
+    e?.preventDefault();
+    if (!room.id || !chatDraft.trim() || chatBusy) return;
+    setChatBusy(true);
+    setError(null);
+    const body = chatDraft.trim();
+    setChatDraft("");
+    try {
+      const res = await fetch(`/api/tv/room/${room.id}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not send chat");
+      setRoom(data.room);
+    } catch (err) {
+      setChatDraft(body);
+      setError(err instanceof Error ? err.message : "Could not send chat");
+    } finally {
+      setChatBusy(false);
+    }
+  }
+
+  function tuneTo(videoId: string) {
+    void patchRoom({
+      videoId,
+      isPlaying: true,
+      positionMs: 0,
+    });
+    setShowChannels(false);
+  }
+
+  // Poll room state for watch-together + chat sync
   useEffect(() => {
     if (!room.id) return;
     let cancelled = false;
@@ -250,6 +299,7 @@ export function TvCorner({
         if (cancelled || !data.room) return;
         if (data.room.id !== roomIdRef.current) return;
         setRoom(data.room);
+        if (data.videos) setVideos(data.videos);
       } catch {
         // ignore transient poll errors
       }
@@ -287,6 +337,12 @@ export function TvCorner({
 
   const decor = DECOR[villageId];
   const watchers = room.watchers || [];
+  const messages = room.messages || [];
+  const activeIndex = videos.findIndex((v) => v.id === room.currentVideoId);
+  const chatLabel =
+    room.scope === "friends"
+      ? "Friends-only chat — just this couch"
+      : `${villageName} village chat`;
 
   return (
     <div className={`tv-nook tv-nook-${villageId}`}>
@@ -306,8 +362,9 @@ export function TvCorner({
           <p className="tv-eyebrow">{villageName} evenings</p>
           <h1>TV Corner</h1>
           <p>
-            A shared vintage set for your village and friends. Upload cozy
-            cottage clips and watch them together in sync.
+            Gather round the vintage set. Switch channels from the village
+            lineup, and chat with neighbors — or keep it private on a friends
+            couch.
           </p>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -395,7 +452,9 @@ export function TvCorner({
                 ) : (
                   <div className="tv-idle">
                     <div className="tv-idle-glow" />
-                    <p className="tv-idle-channel">CH · 03</p>
+                    <p className="tv-idle-channel">
+                      CH · {activeIndex >= 0 ? channelLabel(activeIndex) : "—"}
+                    </p>
                     <p>{powerOn ? decor.idle : "The set is sleeping."}</p>
                   </div>
                 )}
@@ -422,19 +481,48 @@ export function TvCorner({
               <button
                 type="button"
                 className="tv-knob"
-                onClick={() => {
-                  const el = videoRef.current;
-                  if (!el) return;
-                  if (el.paused) void el.play();
-                  else el.pause();
-                }}
-                disabled={!room.currentVideo || !powerOn}
+                onClick={() => setShowChannels((v) => !v)}
+                disabled={!room.id || !powerOn || videos.length === 0}
+                aria-expanded={showChannels}
+                aria-controls="tv-channel-dial"
               >
                 <span />
                 Channel
               </button>
             </div>
           </div>
+
+          {showChannels ? (
+            <div
+              id="tv-channel-dial"
+              className="tv-channel-dial"
+              role="listbox"
+              aria-label="Village channels"
+            >
+              <p className="tv-channel-dial-label">
+                Choose a channel from the {villageName} lineup
+              </p>
+              <ul>
+                {videos.map((video, index) => {
+                  const active = room.currentVideoId === video.id;
+                  return (
+                    <li key={video.id}>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={active}
+                        className={active ? "active" : ""}
+                        onClick={() => tuneTo(video.id)}
+                      >
+                        <em>CH {channelLabel(index)}</em>
+                        <strong>{video.title}</strong>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
 
           <div className="tv-watchers" aria-live="polite">
             <p className="tv-watchers-label">
@@ -443,6 +531,9 @@ export function TvCorner({
                   ? `On the ${villageName} set`
                   : room.title
                 : "No friends couch yet"}
+              {room.currentVideo
+                ? ` · ${room.currentVideo.title}`
+                : ""}
             </p>
             <ul>
               {watchers.length === 0 ? (
@@ -511,9 +602,62 @@ export function TvCorner({
               )}
             </div>
           ) : null}
+
+          <div className="tv-chat" aria-label={chatLabel}>
+            <div className="tv-chat-header">
+              <h2>Chat</h2>
+              <p>{chatLabel}</p>
+            </div>
+            <div className="tv-chat-log" role="log" aria-live="polite">
+              {!room.id ? (
+                <p className="muted">Open a lounge to start chatting.</p>
+              ) : messages.length === 0 ? (
+                <p className="muted">No whispers yet — say hello by the set.</p>
+              ) : (
+                messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={
+                      msg.author.id === user.id
+                        ? "tv-chat-bubble mine"
+                        : "tv-chat-bubble"
+                    }
+                  >
+                    <span className="tv-chat-author">
+                      {msg.author.displayName}
+                    </span>
+                    <p>{msg.body}</p>
+                  </div>
+                ))
+              )}
+              <div ref={chatEndRef} />
+            </div>
+            <form className="tv-chat-compose" onSubmit={sendChat}>
+              <input
+                type="text"
+                value={chatDraft}
+                onChange={(e) => setChatDraft(e.target.value)}
+                placeholder={
+                  room.scope === "friends"
+                    ? "Message this couch…"
+                    : "Message the village…"
+                }
+                maxLength={280}
+                disabled={!room.id || chatBusy}
+                aria-label="Chat message"
+              />
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={!room.id || chatBusy || !chatDraft.trim()}
+              >
+                Send
+              </button>
+            </form>
+          </div>
         </section>
 
-        <aside className="tv-shelf" aria-label="Clip shelf">
+        <aside className="tv-shelf" aria-label="Channel dial">
           <div className="tv-shelf-mascot" aria-hidden>
             {mascotImage ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -525,64 +669,91 @@ export function TvCorner({
             <img src={decor.shelf} alt="" className="tv-shelf-trinket" />
           </div>
 
-          <h2>Clip shelf</h2>
+          <h2>Channels</h2>
           <p className="tv-shelf-copy">
-            Upload vintage cottage animations — MP4, WebM, or MOV up to 80MB.
+            Owner-curated reels for this village. Turn the Channel knob or pick
+            one below to change the program for everyone.
           </p>
 
-          <label className="tv-upload">
-            <span>Title</span>
-            <input
-              type="text"
-              value={uploadTitle}
-              onChange={(e) => setUploadTitle(e.target.value)}
-              placeholder="Moon garden loop"
-              maxLength={80}
-            />
-          </label>
-          <label className="tv-upload-file btn-primary">
-            <input
-              type="file"
-              accept="video/mp4,video/webm,video/quicktime"
-              hidden
-              disabled={busy || !room.id}
-              onChange={(e) => {
-                const file = e.target.files?.[0] || null;
-                e.target.value = "";
-                void onUpload(file);
-              }}
-            />
-            {busy ? "Tucking away…" : "Upload a clip"}
-          </label>
+          {user.isOwner ? (
+            <div className="tv-owner-upload">
+              <p className="tv-shelf-copy">
+                Upload a channel (MP4, WebM, or MOV · up to 80MB).
+              </p>
+              <label className="tv-upload">
+                <span>Village</span>
+                <select
+                  value={uploadVillageId}
+                  onChange={(e) =>
+                    setUploadVillageId(e.target.value as VillageId)
+                  }
+                >
+                  {villageOptions.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="tv-upload">
+                <span>Title</span>
+                <input
+                  type="text"
+                  value={uploadTitle}
+                  onChange={(e) => setUploadTitle(e.target.value)}
+                  placeholder="Moon garden loop"
+                  maxLength={80}
+                />
+              </label>
+              <label className="tv-upload-file btn-primary">
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  hidden
+                  disabled={busy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    e.target.value = "";
+                    void onUpload(file);
+                  }}
+                />
+                {busy ? "Tucking away…" : "Upload channel"}
+              </label>
+            </div>
+          ) : (
+            <p className="tv-shelf-copy tv-shelf-hint">
+              Only the site owner can add new channels to the dial.
+            </p>
+          )}
 
           <ul className="tv-video-list">
             {videos.length === 0 ? (
-              <li className="muted">The shelf is empty — upload the first reel.</li>
+              <li className="muted">
+                No channels yet
+                {user.isOwner
+                  ? " — upload the first reel for this village."
+                  : "."}
+              </li>
             ) : (
-              videos.map((video) => {
+              videos.map((video, index) => {
                 const active = room.currentVideoId === video.id;
-                const canDelete =
-                  user.isOwner || video.uploaderId === user.id;
                 return (
                   <li key={video.id} className={active ? "active" : ""}>
                     <button
                       type="button"
                       className="tv-video-pick"
                       disabled={!room.id || busy}
-                      onClick={() =>
-                        patchRoom({
-                          videoId: video.id,
-                          isPlaying: true,
-                          positionMs: 0,
-                        })
-                      }
+                      onClick={() => tuneTo(video.id)}
                     >
-                      <strong>{video.title}</strong>
-                      <span>
-                        {video.uploaderName} · {formatSize(video.sizeBytes)}
-                      </span>
+                      <strong>
+                        <span className="tv-ch-num">
+                          CH {channelLabel(index)}
+                        </span>{" "}
+                        {video.title}
+                      </strong>
+                      <span>Village channel</span>
                     </button>
-                    {canDelete ? (
+                    {user.isOwner ? (
                       <button
                         type="button"
                         className="tv-video-remove"
