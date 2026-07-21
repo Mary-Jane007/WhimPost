@@ -192,7 +192,15 @@ export type WorkshopAction =
   | { type: "choosePlant"; plantId: string }
   | { type: "plantWeek"; week: number; photoUrl: string }
   | { type: "bird"; birdId: string; photoUrl?: string }
-  | { type: "seasonal"; eventId: string; taskIndex: number };
+  | { type: "seasonal"; eventId: string; taskIndex: number }
+  | {
+      type: "journalEntry";
+      activityId?: string;
+      activityName: string;
+      note: string;
+      photoUrl?: string;
+      markCraftComplete?: boolean;
+    };
 
 export function applyWorkshopAction(
   userId: string,
@@ -338,6 +346,51 @@ export function applyWorkshopAction(
         panel.tasks.every((_, i) => seasonal[`${action.eventId}:${i}`]);
       if (allDone && panel) badges = addBadge(badges, panel.reward);
     }
+  } else if (action.type === "journalEntry") {
+    const name = action.activityName.trim().slice(0, 120);
+    const note = action.note.trim().slice(0, 2000);
+    if (!name || !note) {
+      return getWorkshopProgress(userId);
+    }
+
+    const craft = CRAFTS.find((c) => c.id === action.activityId);
+    const recipe = RECIPES.find((r) => r.id === action.activityId);
+    let xpEarned = WORKSHOP_XP.journal;
+    const activityId = action.activityId || `custom-${Date.now()}`;
+    const activityType = craft ? "craft" : recipe ? "recipe" : "journal";
+
+    if (action.markCraftComplete && craft) {
+      const key = `craft:${craft.id}`;
+      if (!completed[key]) {
+        completed[key] = true;
+        xpEarned += WORKSHOP_XP.craft;
+        badges = addBadge(badges, "Craftsman Badge");
+      }
+    } else if (action.markCraftComplete && recipe) {
+      const key = `recipe:${recipe.id}`;
+      if (!completed[key]) {
+        completed[key] = true;
+        xpEarned += WORKSHOP_XP.recipe;
+        badges = addBadge(badges, recipe.badge);
+      }
+    }
+
+    if (action.photoUrl) {
+      photos[`journal:${activityId}:${Date.now()}`] = action.photoUrl;
+      if (craft) photos[`craft:${craft.id}`] = action.photoUrl;
+      if (recipe) photos[`recipe:${recipe.id}`] = action.photoUrl;
+    }
+
+    xp += xpEarned;
+    insertJournal({
+      userId,
+      activityType,
+      activityId,
+      activityName: name,
+      photoUrl: action.photoUrl,
+      xpEarned,
+      note,
+    });
   }
 
   db.prepare(
