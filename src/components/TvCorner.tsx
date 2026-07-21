@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
-import type { TvChannel, TvRoomState, TvVideo } from "@/lib/tvCorner";
+import type { TvChannel, TvRoomState, TvScheduleSlot, TvVideo } from "@/lib/tvCorner";
 
 type VillageOption = { id: VillageId; name: string };
 
@@ -77,6 +77,28 @@ const DECOR: Record<
 
 function channelLabel(index: number) {
   return String(index + 1).padStart(2, "0");
+}
+
+function formatGuideClock(iso: string) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function formatDurationShort(ms: number) {
+  const totalSec = Math.max(0, Math.round(ms / 1000));
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  if (m >= 60) {
+    const h = Math.floor(m / 60);
+    const rm = m % 60;
+    return `${h}h ${rm}m`;
+  }
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function isVillageBroadcast(room: Pick<TvRoomState, "scope" | "broadcastMode">) {
+  return room.scope === "village" || room.broadcastMode === "schedule";
 }
 
 export function TvCorner({
@@ -847,28 +869,42 @@ export function TvCorner({
       setSelectedChannelId(channel.id);
       return;
     }
-    void patchRoom({
-      channelId: channel.id,
-      videoId: channel.videos[0].id,
-      isPlaying: true,
-      positionMs: 0,
-    });
+    if (isVillageBroadcast(room)) {
+      // Village lounge: tune the channel — schedule decides the airing clip.
+      void patchRoom({ channelId: channel.id });
+    } else {
+      void patchRoom({
+        channelId: channel.id,
+        videoId: channel.videos[0].id,
+        isPlaying: true,
+        positionMs: 0,
+      });
+    }
     setSelectedChannelId(channel.id);
     setShowChannels(false);
   }
 
   function tuneToVideo(video: TvVideo) {
-    void patchRoom({
-      channelId: video.channelId,
-      videoId: video.id,
-      isPlaying: true,
-      positionMs: 0,
-    });
+    if (isVillageBroadcast(room)) {
+      // Shelf pick still only changes the channel; wall-clock schedule continues.
+      void patchRoom({
+        channelId: video.channelId,
+        videoId: video.id,
+      });
+    } else {
+      void patchRoom({
+        channelId: video.channelId,
+        videoId: video.id,
+        isPlaying: true,
+        positionMs: 0,
+      });
+    }
     if (video.channelId) setSelectedChannelId(video.channelId);
     setShowChannels(false);
   }
 
   function playNextInChannel() {
+    if (isVillageBroadcast(room)) return;
     const channel = channels.find((c) => c.id === room.currentChannelId);
     if (!channel || !room.currentVideoId) return;
     const idx = channel.videos.findIndex((v) => v.id === room.currentVideoId);
@@ -904,6 +940,10 @@ export function TvCorner({
         const suppressing = now < suppressUntil.current;
 
         setRoom((prev) => {
+          // Village broadcast is server clock — always take the aired program.
+          if (isVillageBroadcast(remote)) {
+            return remote;
+          }
           // Always refresh chat + watchers.
           if (suppressing || localControlRef.current) {
             return {
@@ -963,7 +1003,15 @@ export function TvCorner({
     ].join("|");
 
     const now = Date.now();
-    if (now < suppressUntil.current && localControlRef.current) {
+    const villageBroadcast = isVillageBroadcast({
+      scope: room.scope,
+      broadcastMode: room.broadcastMode,
+    });
+    if (
+      !villageBroadcast &&
+      now < suppressUntil.current &&
+      localControlRef.current
+    ) {
       // Still own the dial — don't yank the playhead.
       lastAppliedSyncKey.current = syncKey;
       return;
@@ -1003,6 +1051,8 @@ export function TvCorner({
     room.isPlaying,
     room.positionMs,
     room.positionUpdatedAt,
+    room.scope,
+    room.broadcastMode,
     powerOn,
   ]);
 
@@ -1011,15 +1061,16 @@ export function TvCorner({
     uploadCancelRef.current = false;
   }, []);
 
-  // Soft progress heartbeat so friends stay roughly aligned without seeking ourselves.
   useEffect(() => {
     if (!toast || toast.kind === "error") return;
     const timer = window.setTimeout(() => setToast(null), 6000);
     return () => window.clearTimeout(timer);
   }, [toast]);
 
+  // Soft progress heartbeat so friends stay roughly aligned without seeking ourselves.
   useEffect(() => {
     if (!room.id || !room.currentVideo || !powerOn) return;
+    if (isVillageBroadcast(room)) return;
     const timer = window.setInterval(() => {
       const el = videoRef.current;
       if (!el || el.paused || applyingRemote.current) return;
@@ -1037,7 +1088,7 @@ export function TvCorner({
     return () => window.clearInterval(timer);
   // Avoid re-binding the heartbeat every render.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.id, room.currentVideo, powerOn]);
+  }, [room.id, room.currentVideo, room.scope, room.broadcastMode, powerOn]);
 
   const decor = DECOR[villageId];
   const watchers = room.watchers || [];
@@ -1069,9 +1120,9 @@ export function TvCorner({
           <p className="tv-eyebrow">{villageName} evenings</p>
           <h1>TV Corner</h1>
           <p>
-            Gather round the vintage set. Switch channels from the village
-            lineup, and chat with neighbors — or keep it private on a friends
-            couch.
+            Gather round the vintage set. The village lounge runs like a real
+            channel — shuffled schedule, wall-clock air times. Friends couches
+            stay pause-and-scrub watch parties.
           </p>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1197,6 +1248,7 @@ export function TvCorner({
                     playsInline
                     preload="auto"
                     onPlay={() => {
+                      if (isVillageBroadcast(room)) return;
                       if (applyingRemote.current) return;
                       void patchRoom({
                         isPlaying: true,
@@ -1206,6 +1258,7 @@ export function TvCorner({
                       });
                     }}
                     onPause={() => {
+                      if (isVillageBroadcast(room)) return;
                       if (applyingRemote.current) return;
                       void patchRoom({
                         isPlaying: false,
@@ -1215,6 +1268,7 @@ export function TvCorner({
                       });
                     }}
                     onSeeked={() => {
+                      if (isVillageBroadcast(room)) return;
                       // Ignore programmatic seeks and tiny scrub noise from sync.
                       if (applyingRemote.current || localControlRef.current) return;
                       if (Date.now() < suppressUntil.current) return;
@@ -1226,9 +1280,10 @@ export function TvCorner({
                       });
                     }}
                     onEnded={() => {
+                      if (isVillageBroadcast(room)) return;
                       playNextInChannel();
                     }}
-                    controls
+                    controls={!isVillageBroadcast(room)}
                   />
                 ) : (
                   <div className="tv-idle">
@@ -1313,6 +1368,46 @@ export function TvCorner({
                   );
                 })}
               </ul>
+            </div>
+          ) : null}
+
+          {isVillageBroadcast(room) && (room.schedule?.length || 0) > 0 ? (
+            <div className="tv-guide" aria-label="Channel schedule">
+              <div className="tv-guide-header">
+                <p className="tv-guide-eyebrow">Tonight&apos;s guide</p>
+                <h2>
+                  {channels.find((c) => c.id === room.currentChannelId)?.title ||
+                    "Channel"}{" "}
+                  schedule
+                </h2>
+                <p>
+                  Clips air on a shuffled wall-clock lineup. Join mid-show — the
+                  broadcast does not restart for you.
+                </p>
+              </div>
+              <ol className="tv-guide-list">
+                {(room.schedule as TvScheduleSlot[]).map((slot) => (
+                  <li
+                    key={`${slot.videoId}-${slot.startsAt}`}
+                    className={slot.isCurrent ? "now" : undefined}
+                  >
+                    <time dateTime={slot.startsAt}>
+                      {formatGuideClock(slot.startsAt)}
+                    </time>
+                    <div>
+                      <strong>
+                        {slot.isCurrent ? "Now · " : ""}
+                        {slot.title}
+                      </strong>
+                      <span>
+                        {formatDurationShort(slot.durationMs)}
+                        {" · until "}
+                        {formatGuideClock(slot.endsAt)}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
           ) : null}
 

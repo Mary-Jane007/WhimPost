@@ -55,7 +55,11 @@ export function WelcomeLetterEditor({
   }
 
   useEffect(() => {
-    if (open) load(initialVillageId);
+    if (!open) return;
+    const timer = window.setTimeout(() => {
+      void load(initialVillageId);
+    }, 0);
+    return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialVillageId]);
 

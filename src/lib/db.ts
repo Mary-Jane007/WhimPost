@@ -45,7 +45,25 @@ function migrate(db: Database.Database) {
     "font_style TEXT NOT NULL DEFAULT 'quill'"
   );
   ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
+  ensureColumn(
+    db,
+    "tv_videos",
+    "duration_ms",
+    "duration_ms INTEGER NOT NULL DEFAULT 0"
+  );
   ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
+  ensureColumn(
+    db,
+    "tv_channels",
+    "schedule_epoch_ms",
+    "schedule_epoch_ms INTEGER"
+  );
+  ensureColumn(
+    db,
+    "tv_channels",
+    "schedule_order_json",
+    "schedule_order_json TEXT"
+  );
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS village_notes (

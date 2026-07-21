@@ -5,8 +5,16 @@ import { areFriends, listFriends } from "@/lib/letters";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import { getVillage } from "@/lib/villages";
+import {
+  ensureChannelSchedule,
+  probeAndStoreDuration,
+  removeVideoFromChannelSchedule,
+  resolveChannelBroadcast,
+  type TvScheduleSlot,
+} from "@/lib/tvSchedule";
 
 export type TvRoomScope = "village" | "friends";
+export type { TvScheduleSlot };
 
 export type TvVideo = {
   id: string;
@@ -14,6 +22,7 @@ export type TvVideo = {
   url: string;
   mime: string;
   sizeBytes: number;
+  durationMs: number;
   uploaderId: string;
   uploaderName: string;
   villageId: string | null;
@@ -60,6 +69,9 @@ export type TvRoomState = {
   createdAt: string;
   watchers: TvWatcher[];
   messages: TvChatMessage[];
+  /** Village lounge only — wall-clock channel guide. */
+  schedule: TvScheduleSlot[];
+  broadcastMode: "schedule" | "interactive";
 };
 
 type VideoRow = {
@@ -68,6 +80,7 @@ type VideoRow = {
   filename: string;
   mime: string;
   size_bytes: number;
+  duration_ms?: number | null;
   uploader_id: string;
   village_id: string | null;
   channel_id: string | null;
@@ -112,6 +125,7 @@ function mapVideo(row: VideoRow): TvVideo {
     url: videoUrl(row.filename),
     mime: row.mime,
     sizeBytes: Number(row.size_bytes) || 0,
+    durationMs: Number(row.duration_ms) || 0,
     uploaderId: row.uploader_id,
     uploaderName: row.uploader_name || "Villager",
     villageId: row.village_id,
@@ -357,23 +371,31 @@ export function createVideo(input: {
   uploaderId: string;
   villageId: string | null;
   channelId: string;
+  durationMs?: number;
 }): TvVideo {
   const db = getDb();
   const id = randomUUID();
   db.prepare(
     `INSERT INTO tv_videos
-      (id, title, filename, mime, size_bytes, uploader_id, village_id, channel_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      (id, title, filename, mime, size_bytes, duration_ms, uploader_id, village_id, channel_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     id,
     input.title,
     input.filename,
     input.mime,
     input.sizeBytes,
+    Math.max(0, Math.floor(input.durationMs || 0)),
     input.uploaderId,
     input.villageId,
     input.channelId
   );
+
+  if (!(input.durationMs && input.durationMs > 0)) {
+    probeAndStoreDuration(id, input.filename);
+  }
+
+  ensureChannelSchedule(input.channelId);
   return getVideoById(id)!;
 }
 
@@ -384,6 +406,9 @@ export function deleteVideo(videoId: string, user: UserPublic) {
     return { ok: false as const, error: "Only the site owner can remove clips" };
   }
   const db = getDb();
+  if (video.channelId) {
+    removeVideoFromChannelSchedule(video.channelId, videoId);
+  }
   db.prepare(`UPDATE tv_rooms SET current_video_id = NULL WHERE current_video_id = ?`).run(
     videoId
   );
@@ -536,19 +561,18 @@ function mapRoom(
   row: RoomRow,
   opts: { includeMessages?: boolean } = {}
 ): TvRoomState {
-  const currentVideo = row.current_video_id
-    ? getVideoById(row.current_video_id)
-    : null;
   const includeMessages = opts.includeMessages !== false;
-  return {
+  const base: TvRoomState = {
     id: row.id,
     scope: row.scope,
     villageId: row.village_id,
     hostId: row.host_id,
     title: row.title,
-    currentChannelId: row.current_channel_id || currentVideo?.channelId || null,
+    currentChannelId: row.current_channel_id,
     currentVideoId: row.current_video_id,
-    currentVideo,
+    currentVideo: row.current_video_id
+      ? getVideoById(row.current_video_id)
+      : null,
     isPlaying: Boolean(row.is_playing),
     positionMs: Number(row.position_ms) || 0,
     positionUpdatedAt: row.position_updated_at,
@@ -556,7 +580,47 @@ function mapRoom(
     createdAt: row.created_at,
     watchers: listWatchers(row.id),
     messages: includeMessages ? listChatMessages(row.id) : [],
+    schedule: [],
+    broadcastMode: row.scope === "village" ? "schedule" : "interactive",
   };
+
+  if (row.scope !== "village") {
+    if (!base.currentChannelId && base.currentVideo?.channelId) {
+      base.currentChannelId = base.currentVideo.channelId;
+    }
+    return base;
+  }
+
+  // Village lounge: wall-clock schedule is the source of truth.
+  const channelId = row.current_channel_id;
+  if (!channelId) {
+    base.currentVideoId = null;
+    base.currentVideo = null;
+    base.isPlaying = false;
+    base.positionMs = 0;
+    base.schedule = [];
+    return base;
+  }
+
+  const broadcast = resolveChannelBroadcast(channelId);
+  if (!broadcast) {
+    base.currentChannelId = channelId;
+    base.currentVideoId = null;
+    base.currentVideo = null;
+    base.isPlaying = false;
+    base.positionMs = 0;
+    base.schedule = [];
+    return base;
+  }
+
+  base.currentChannelId = channelId;
+  base.currentVideoId = broadcast.videoId;
+  base.currentVideo = getVideoById(broadcast.videoId);
+  base.isPlaying = broadcast.isPlaying;
+  base.positionMs = broadcast.positionMs;
+  base.positionUpdatedAt = broadcast.positionUpdatedAt;
+  base.schedule = broadcast.schedule;
+  return base;
 }
 
 export function estimatedPositionMs(room: Pick<
@@ -613,7 +677,8 @@ export function getOrCreateVillageRoom(
 
   if (existing) {
     touchPresence(existing.id, user.id);
-    return mapRoom(existing);
+    ensureVillageBroadcastChannel(existing.id, villageId);
+    return getRoomById(existing.id)!;
   }
 
   const village = getVillage(villageId);
@@ -627,7 +692,29 @@ export function getOrCreateVillageRoom(
      VALUES (?, 'village', ?, ?, ?)`
   ).run(id, villageId, user.id, title);
   touchPresence(id, user.id);
+  ensureVillageBroadcastChannel(id, villageId);
   return getRoomById(id)!;
+}
+
+/** If the village set has no channel tuned, start the first scheduled lineup. */
+function ensureVillageBroadcastChannel(roomId: string, villageId: string) {
+  const db = getDb();
+  const row = db
+    .prepare(`SELECT current_channel_id FROM tv_rooms WHERE id = ?`)
+    .get(roomId) as { current_channel_id: string | null } | undefined;
+  if (!row || row.current_channel_id) return;
+
+  const channels = listChannelsForVillage(villageId);
+  const first = channels.find((c) => c.videos.length > 0);
+  if (!first) return;
+  ensureChannelSchedule(first.id);
+  db.prepare(
+    `UPDATE tv_rooms
+     SET current_channel_id = ?,
+         is_playing = 1,
+         updated_at = datetime('now')
+     WHERE id = ?`
+  ).run(first.id, roomId);
 }
 
 export function createFriendsRoom(user: UserPublic, title?: string): TvRoomState {
@@ -686,6 +773,60 @@ export function updateRoomPlayback(
   }
 
   const libraryVillage = channelLibraryVillageId(user, room);
+
+  // Village lounge is a real TV broadcast — only channel changes are interactive.
+  if (room.scope === "village") {
+    let nextChannelId = room.currentChannelId;
+
+    if (patch.channelId !== undefined) {
+      if (patch.channelId === null) {
+        nextChannelId = null;
+      } else {
+        const channel = getChannelById(patch.channelId);
+        if (!channel || !channelUsableInVillage(channel, libraryVillage)) {
+          return {
+            ok: false as const,
+            error: "That channel is not on this village dial",
+            status: 400,
+          };
+        }
+        nextChannelId = channel.id;
+        ensureChannelSchedule(channel.id);
+      }
+    } else if (patch.videoId) {
+      // Picking a clip on the shelf tunes that clip's channel (schedule keeps air time).
+      const video = getVideoById(patch.videoId);
+      if (
+        !video ||
+        !canAccessVideo(user, video) ||
+        !videoUsableInVillage(video, libraryVillage) ||
+        !video.channelId
+      ) {
+        return {
+          ok: false as const,
+          error: "That clip is not on this village dial",
+          status: 400,
+        };
+      }
+      nextChannelId = video.channelId;
+      ensureChannelSchedule(video.channelId);
+    }
+
+    const db = getDb();
+    db.prepare(
+      `UPDATE tv_rooms
+       SET current_channel_id = ?,
+           current_video_id = NULL,
+           is_playing = 1,
+           position_ms = 0,
+           position_updated_at = datetime('now'),
+           updated_at = datetime('now')
+       WHERE id = ?`
+    ).run(nextChannelId, roomId);
+
+    touchPresence(roomId, user.id);
+    return { ok: true as const, room: getRoomById(roomId)! };
+  }
 
   let nextChannelId = room.currentChannelId;
   let nextVideoId = room.currentVideoId;
