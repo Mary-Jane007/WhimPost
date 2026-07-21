@@ -25,7 +25,7 @@ const MIME: Record<string, string> = {
   mkv: "video/x-matroska",
 };
 
-const RANGE_CHUNK = 2 * 1024 * 1024; // 2MB preferred range slices
+const RANGE_CHUNK = 5 * 1024 * 1024; // 5MB preferred range slices for smooth movie start
 
 function fileStreamResponse(
   filePath: string,
@@ -39,14 +39,19 @@ function fileStreamResponse(
   const stream = fs.createReadStream(filePath, { start: from, end: to });
   const webStream = Readable.toWeb(stream) as unknown as ReadableStream;
 
+  const common = {
+    "Content-Type": contentType,
+    "Accept-Ranges": "bytes",
+    "Cache-Control": "private, max-age=86400",
+    "X-Content-Type-Options": "nosniff",
+  } as Record<string, string>;
+
   if (start === undefined && end === undefined) {
     return new NextResponse(webStream, {
       status: 200,
       headers: {
-        "Content-Type": contentType,
+        ...common,
         "Content-Length": String(stat.size),
-        "Accept-Ranges": "bytes",
-        "Cache-Control": "private, max-age=86400",
       },
     });
   }
@@ -55,11 +60,9 @@ function fileStreamResponse(
   return new NextResponse(webStream, {
     status: 206,
     headers: {
-      "Content-Type": contentType,
+      ...common,
       "Content-Length": String(chunkSize),
       "Content-Range": `bytes ${from}-${to}/${stat.size}`,
-      "Accept-Ranges": "bytes",
-      "Cache-Control": "private, max-age=86400",
     },
   });
 }
@@ -130,15 +133,16 @@ export async function GET(
     if (!match) return jsonError("Invalid range", 416);
 
     const start = Number(match[1]);
-    const end = match[2]
-      ? Number(match[2])
+    const requestedEnd = match[2] ? Number(match[2]) : NaN;
+    const end = Number.isFinite(requestedEnd)
+      ? Math.min(requestedEnd, stat.size - 1)
       : Math.min(start + RANGE_CHUNK - 1, stat.size - 1);
     if (
       Number.isNaN(start) ||
       Number.isNaN(end) ||
+      start < 0 ||
       start >= stat.size ||
-      end >= stat.size ||
-      start > end
+      end < start
     ) {
       return new NextResponse(null, {
         status: 416,
