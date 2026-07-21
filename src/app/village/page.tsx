@@ -118,7 +118,7 @@ export default async function VillagePage() {
 
   const unlockLabels = [
     "Lantern path lit",
-    "Seasonal bunting",
+    "Village bunting",
     "Visiting wildlife",
     "Special building glow",
   ];
