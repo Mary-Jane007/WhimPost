@@ -391,6 +391,31 @@ export function deleteVideo(videoId: string, user: UserPublic) {
   return { ok: true as const, filename: video.url.replace("/api/uploads/", "") };
 }
 
+export function renameVideo(
+  videoId: string,
+  titleRaw: string,
+  user: UserPublic
+) {
+  const video = getVideoById(videoId);
+  if (!video) return { ok: false as const, error: "Clip not found" };
+  if (!user.isOwner) {
+    return { ok: false as const, error: "Only the site owner can rename clips" };
+  }
+  const title = titleRaw.trim().slice(0, 80);
+  if (!title) {
+    return { ok: false as const, error: "Give the clip a name" };
+  }
+  const db = getDb();
+  db.prepare(`UPDATE tv_videos SET title = ? WHERE id = ?`).run(title, videoId);
+  const updated = getVideoById(videoId);
+  if (!updated) return { ok: false as const, error: "Clip not found" };
+  return {
+    ok: true as const,
+    video: updated,
+    channel: video.channelId ? getChannelById(video.channelId) : null,
+  };
+}
+
 function listWatchers(roomId: string): TvWatcher[] {
   const db = getDb();
   const rows = db

@@ -10,6 +10,7 @@ import {
   deleteVideo,
   getChannelById,
   listVideosForChannel,
+  renameVideo,
   resolveTvUpload,
 } from "@/lib/tvCorner";
 
@@ -264,6 +265,29 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json(result);
+}
+
+export async function PATCH(req: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) return jsonError("Not signed in", 401);
+  if (!user.isOwner) {
+    return jsonError("Only the site owner can rename clips", 403);
+  }
+
+  const body = (await req.json().catch(() => null)) as {
+    id?: string;
+    title?: string;
+  } | null;
+  if (!body?.id) return jsonError("Missing clip id");
+  if (typeof body.title !== "string") return jsonError("Missing new title");
+
+  const result = renameVideo(body.id, body.title, user);
+  if (!result.ok) return jsonError(result.error, 400);
+
+  return NextResponse.json({
+    video: result.video,
+    channel: result.channel,
+  });
 }
 
 export async function DELETE(req: NextRequest) {
