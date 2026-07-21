@@ -13,6 +13,9 @@ export function SiteNav({ user }: { user: UserPublic | null }) {
     ...(user?.villageId === "bramblewood"
       ? [{ href: "/workshop", label: "Workshop" }]
       : []),
+    ...(user?.villageId === "mosshollow"
+      ? [{ href: "/library", label: "Library" }]
+      : []),
     { href: "/tv-corner", label: "TV Corner" },
     { href: "/inbox", label: "Inbox" },
     { href: "/sent", label: "Sent" },
