@@ -15,10 +15,10 @@ async function requireWorkshopUser(): Promise<
 > {
   const user = await getCurrentUser();
   if (!user) return { error: jsonError("Not signed in", 401) };
-  if (user.villageId !== "bramblewood" && !user.isOwner) {
+  if (user.villageId !== "bramblewood") {
     return {
       error: jsonError(
-        "The Bramblewood Workshop is for Bramblewood villagers",
+        "The Bramblewood Workshop is only for Bramblewood villagers",
         403
       ),
     };
