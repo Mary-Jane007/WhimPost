@@ -108,6 +108,7 @@ export function TvCorner({
   const [chatDraft, setChatDraft] = useState("");
   const [showChannels, setShowChannels] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [chatBusy, setChatBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [powerOn, setPowerOn] = useState(true);
@@ -276,40 +277,80 @@ export function TvCorner({
     }
   }
 
-  async function onUploadClip(file: File | null) {
-    if (!file || !user.isOwner) return;
-    if (!effectiveChannelId) {
+  function mergeChannel(next: TvChannel) {
+    setChannels((prev) => {
+      const exists = prev.some((c) => c.id === next.id);
+      if (!exists) return [...prev, next];
+      return prev.map((c) => (c.id === next.id ? next : c));
+    });
+    setSelectedChannelId(next.id);
+  }
+
+  async function uploadOneToChannel(
+    file: File,
+    channelId: string,
+    title?: string
+  ) {
+    if (file.size > 5 * 1024 * 1024 * 1024) {
+      throw new Error(`${file.name} is over 5GB`);
+    }
+    const form = new FormData();
+    form.append("video", file);
+    form.append("channelId", channelId);
+    const clipName =
+      (title || "").trim() ||
+      file.name.replace(/\.[^.]+$/, "").slice(0, 80) ||
+      "Untitled clip";
+    form.append("title", clipName);
+    const res = await fetch("/api/tv/videos", { method: "POST", body: form });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Could not upload ${file.name}`);
+    if (data.channel) mergeChannel(data.channel);
+    return data.video as TvVideo;
+  }
+
+  async function onUploadClips(
+    files: FileList | File[] | null,
+    channelId?: string
+  ) {
+    if (!user.isOwner || !files || files.length === 0) return;
+    const targetChannelId = channelId || effectiveChannelId;
+    if (!targetChannelId) {
       setError("Create a channel first, then upload videos to it");
       return;
     }
-    if (file.size > 5 * 1024 * 1024 * 1024) {
-      setError("Videos must be under 5GB");
-      return;
-    }
-    const targetChannelId = effectiveChannelId;
+    const list = Array.from(files);
     setBusy(true);
     setError(null);
+    let uploaded = 0;
     try {
-      const form = new FormData();
-      form.append("video", file);
-      form.append("channelId", targetChannelId);
-      if (clipTitle.trim()) form.append("title", clipTitle.trim());
-      const res = await fetch("/api/tv/videos", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
+      for (let i = 0; i < list.length; i++) {
+        const file = list[i];
+        setUploadProgress(
+          `Uploading ${i + 1} of ${list.length}: ${file.name}`
+        );
+        // Only apply the typed title to the first file in a batch.
+        await uploadOneToChannel(
+          file,
+          targetChannelId,
+          i === 0 ? clipTitle : undefined
+        );
+        uploaded += 1;
+      }
       setClipTitle("");
-      if (data.channel) {
-        setChannels((prev) => {
-          const exists = prev.some((c) => c.id === data.channel.id);
-          if (!exists) return prev;
-          return prev.map((c) =>
-            c.id === data.channel.id ? data.channel : c
-          );
-        });
+      if (uploaded > 1) {
+        setError(null);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      setError(
+        err instanceof Error
+          ? uploaded
+            ? `${uploaded} uploaded, then: ${err.message}`
+            : err.message
+          : "Upload failed"
+      );
     } finally {
+      setUploadProgress(null);
       setBusy(false);
     }
   }
@@ -587,8 +628,6 @@ export function TvCorner({
   const activeChannelIndex = channels.findIndex(
     (c) => c.id === room.currentChannelId
   );
-  const selectedChannel =
-    channels.find((c) => c.id === effectiveChannelId) || null;
   const tunableChannels = channels.filter((c) => c.videos.length > 0);
   const chatLabel =
     room.scope === "friends"
@@ -1003,10 +1042,9 @@ export function TvCorner({
               </button>
 
               <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
-                <strong>2.</strong> Upload videos to a channel — shorts or full
-                movies (MP4, WebM, MOV, M4V, AVI, MPEG, or MKV · up to 5GB).
-                Large files may take a while; keep this tab open until it
-                finishes.
+                <strong>2.</strong> Add as many videos as you like to a channel
+                — shorts or full movies (MP4, WebM, MOV, M4V, AVI, MPEG, or MKV
+                · up to 5GB each). You can select multiple files at once.
               </p>
               <label className="tv-upload">
                 <span>Channel</span>
@@ -1020,23 +1058,26 @@ export function TvCorner({
                   ) : (
                     channels.map((c) => (
                       <option key={c.id} value={c.id}>
-                        {c.title}
+                        {c.title} ({c.videos.length})
                       </option>
                     ))
                   )}
                 </select>
               </label>
               <label className="tv-upload">
-                <span>Clip title</span>
+                <span>Title for first file (optional)</span>
                 <input
                   type="text"
                   value={clipTitle}
                   onChange={(e) => setClipTitle(e.target.value)}
-                  placeholder="Moon garden loop"
+                  placeholder="Leaves the filename if blank"
                   maxLength={80}
                   disabled={!effectiveChannelId}
                 />
               </label>
+              {uploadProgress ? (
+                <p className="tv-shelf-copy tv-upload-status">{uploadProgress}</p>
+              ) : null}
               <label
                 className={`tv-upload-file btn-primary${
                   !effectiveChannelId ? " is-disabled" : ""
@@ -1046,14 +1087,17 @@ export function TvCorner({
                   type="file"
                   accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-msvideo,video/avi,video/mpeg,video/x-matroska,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
                   hidden
+                  multiple
                   disabled={busy || !effectiveChannelId}
                   onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
+                    const files = e.target.files;
                     e.target.value = "";
-                    void onUploadClip(file);
+                    void onUploadClips(files);
                   }}
                 />
-                {busy ? "Uploading… (large files take time)" : "Upload video to channel"}
+                {busy
+                  ? uploadProgress || "Uploading…"
+                  : "Add videos to channel"}
               </label>
             </div>
           ) : (
@@ -1139,10 +1183,28 @@ export function TvCorner({
                           );
                         })}
                       </ul>
-                    ) : user.isOwner && selectedChannel?.id === channel.id ? (
-                      <p className="muted tv-channel-empty">
-                        Upload a video to this channel above.
-                      </p>
+                    ) : (
+                      <p className="muted tv-channel-empty">No videos yet.</p>
+                    )}
+                    {user.isOwner ? (
+                      <label className="tv-channel-add btn-primary">
+                        <input
+                          type="file"
+                          accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-msvideo,video/avi,video/mpeg,video/x-matroska,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
+                          hidden
+                          multiple
+                          disabled={busy}
+                          onChange={(e) => {
+                            const files = e.target.files;
+                            e.target.value = "";
+                            setSelectedChannelId(channel.id);
+                            void onUploadClips(files, channel.id);
+                          }}
+                        />
+                        {busy && effectiveChannelId === channel.id
+                          ? uploadProgress || "Uploading…"
+                          : "Add more videos"}
+                      </label>
                     ) : null}
                   </li>
                 );
