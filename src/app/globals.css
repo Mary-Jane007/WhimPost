@@ -3987,3 +3987,183 @@ body.theme-moonmere .cottage-plaque {
 .tv-nook-hearthwick .tv-screen.on {
   animation-duration: 3.2s;
 }
+
+/* TV channel dial + chat */
+
+.tv-channel-dial {
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 35%, transparent);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--village-color, #2a3548) 42%, rgba(0, 0, 0, 0.3)),
+      rgba(0, 0, 0, 0.22)
+    );
+}
+
+.tv-channel-dial-label {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-display, Georgia, serif);
+  color: var(--cream, #f3e6d0);
+  font-size: 0.95rem;
+}
+
+.tv-channel-dial ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+  max-height: 14rem;
+  overflow: auto;
+}
+
+.tv-channel-dial button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  text-align: left;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 25%, transparent);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--cream, #f3e6d0);
+  cursor: pointer;
+}
+
+.tv-channel-dial button em {
+  font-style: normal;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
+.tv-channel-dial button.active {
+  border-color: color-mix(in srgb, var(--gold, #c9a227) 55%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 28%, rgba(0, 0, 0, 0.28));
+}
+
+.tv-ch-num {
+  display: inline-block;
+  margin-right: 0.25rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+
+.tv-owner-upload {
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px dashed color-mix(in srgb, var(--village-soft, #c4a574) 30%, transparent);
+}
+
+.tv-upload select {
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 35%, transparent);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--cream, #f3e6d0);
+  padding: 0.55rem 0.7rem;
+}
+
+.tv-shelf-hint {
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.tv-chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 16rem;
+  max-height: 22rem;
+  border-radius: 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 32%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--cream, #f3e6d0) 10%, transparent),
+      color-mix(in srgb, var(--village-color, #2a3548) 40%, rgba(0, 0, 0, 0.28))
+    );
+  overflow: hidden;
+}
+
+.tv-chat-header {
+  padding: 0.75rem 1rem 0.55rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 22%, transparent);
+}
+
+.tv-chat-header h2 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.15rem;
+  color: var(--cream, #f3e6d0);
+}
+
+.tv-chat-header p {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 70%, transparent);
+}
+
+.tv-chat-log {
+  flex: 1;
+  overflow: auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.tv-chat-bubble {
+  align-self: flex-start;
+  max-width: 92%;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.85rem 0.85rem 0.85rem 0.25rem;
+  background: rgba(0, 0, 0, 0.28);
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 92%, transparent);
+}
+
+.tv-chat-bubble.mine {
+  align-self: flex-end;
+  border-radius: 0.85rem 0.85rem 0.25rem 0.85rem;
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 32%, rgba(0, 0, 0, 0.35));
+}
+
+.tv-chat-author {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  opacity: 0.75;
+  margin-bottom: 0.15rem;
+}
+
+.tv-chat-bubble p {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tv-chat-compose {
+  display: flex;
+  gap: 0.45rem;
+  padding: 0.65rem 0.75rem 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 22%, transparent);
+}
+
+.tv-chat-compose input {
+  flex: 1;
+  min-width: 0;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 35%, transparent);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--cream, #f3e6d0);
+  padding: 0.55rem 0.7rem;
+}
+
+.tv-chat-compose .btn-primary {
+  flex-shrink: 0;
+}
