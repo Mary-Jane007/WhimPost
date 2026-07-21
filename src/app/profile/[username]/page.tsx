@@ -7,6 +7,7 @@ import {
 } from "@/lib/letters";
 import { getUserVillageStats } from "@/lib/villageProgress";
 import { getVillage } from "@/lib/villages";
+import { markUnlocksSeen } from "@/lib/notifications";
 import { CottageProfile } from "@/components/CottageProfile";
 import { PageCrest } from "@/components/PageCrest";
 
@@ -23,8 +24,10 @@ export default async function ProfilePage({
   if (!profile) notFound();
 
   const isSelf = viewer.id === profile.id;
+  const db = getDb();
+  if (isSelf) markUnlocksSeen(db, viewer.id);
   const village = getVillage(profile.villageId);
-  const stats = getUserVillageStats(getDb(), profile.id);
+  const stats = getUserVillageStats(db, profile.id);
   const relation = isSelf
     ? ({ status: "none" } as const)
     : getFriendshipRelation(viewer.id, profile.id);

@@ -29,12 +29,14 @@ import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
+import { markUnlocksSeen } from "@/lib/notifications";
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const db = getDb();
+  markUnlocksSeen(db, user.id);
   const stats = getUserVillageStats(db, user.id);
 
   if (!stats.villageId) {

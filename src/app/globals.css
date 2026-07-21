@@ -165,6 +165,9 @@ select {
 .nav-ghost {
   opacity: 0.78;
   transition: opacity 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .nav-links a:hover,
@@ -172,6 +175,24 @@ select {
 .nav-ghost:hover {
   opacity: 1;
   color: var(--gold);
+}
+
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #d4af37, #b8860b);
+  color: #1a2219;
+  font-family: var(--font-stamp);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  box-shadow: 0 0 0 2px rgba(26, 34, 25, 0.35);
 }
 
 .nav-ghost {
