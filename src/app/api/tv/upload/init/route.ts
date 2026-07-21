@@ -33,7 +33,10 @@ export async function POST(req: NextRequest) {
     villageId: user.villageId,
   });
 
-  if (!result.ok) return jsonError(result.error);
+  if (!result.ok) {
+    console.error("[tv upload] init rejected", result.error, body);
+    return jsonError(result.error);
+  }
 
   return NextResponse.json({
     uploadId: result.meta.id,
