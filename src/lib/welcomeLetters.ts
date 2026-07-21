@@ -20,7 +20,7 @@ type SystemVillageSender = {
   bio: string;
 };
 
-type WelcomeTemplate = {
+export type WelcomeTemplate = {
   subject: string;
   body: string;
   paperStyle: string;
@@ -43,6 +43,14 @@ type WelcomeTemplate = {
     scale: number;
     rotation: number;
   }>;
+};
+
+export type WelcomeTemplateEdit = {
+  villageId: VillageId;
+  subject: string;
+  body: string;
+  isCustom: boolean;
+  updatedAt: string | null;
 };
 
 const SYSTEM_SENDERS: Partial<Record<VillageId, SystemVillageSender>> = {
@@ -544,22 +552,121 @@ export function ensureVillageSystemUser(
   return sender.id;
 }
 
-/** Keep welcome-letter body & decorations aligned with the current template. */
-export function syncWelcomeLetterDecorations(db: Database.Database) {
-  for (const [villageId, template] of Object.entries(WELCOME_TEMPLATES)) {
+/** Default hardcoded welcome template (before owner edits). */
+export function getDefaultWelcomeTemplate(
+  villageId: VillageId
+): WelcomeTemplate | null {
+  return WELCOME_TEMPLATES[villageId] || null;
+}
+
+/** Effective welcome template: owner edit if present, else default. */
+export function getEffectiveWelcomeTemplate(
+  db: Database.Database,
+  villageId: VillageId
+): WelcomeTemplate | null {
+  const defaults = getDefaultWelcomeTemplate(villageId);
+  if (!defaults) return null;
+
+  const row = db
+    .prepare(
+      `SELECT subject, body FROM welcome_letter_templates WHERE village_id = ?`
+    )
+    .get(villageId) as { subject: string; body: string } | undefined;
+
+  if (!row) return defaults;
+  return {
+    ...defaults,
+    subject: row.subject,
+    body: row.body,
+  };
+}
+
+export function getWelcomeTemplateEdit(
+  db: Database.Database,
+  villageId: VillageId
+): WelcomeTemplateEdit | null {
+  const defaults = getDefaultWelcomeTemplate(villageId);
+  if (!defaults) return null;
+
+  const row = db
+    .prepare(
+      `SELECT subject, body, updated_at
+       FROM welcome_letter_templates WHERE village_id = ?`
+    )
+    .get(villageId) as
+    | { subject: string; body: string; updated_at: string }
+    | undefined;
+
+  return {
+    villageId,
+    subject: row?.subject ?? defaults.subject,
+    body: row?.body ?? defaults.body,
+    isCustom: Boolean(row),
+    updatedAt: row?.updated_at ?? null,
+  };
+}
+
+export function upsertWelcomeTemplate(
+  db: Database.Database,
+  villageId: VillageId,
+  subject: string,
+  body: string,
+  updatedBy: string | null
+): WelcomeTemplateEdit | null {
+  db.prepare(
+    `INSERT INTO welcome_letter_templates (village_id, subject, body, updated_at, updated_by)
+     VALUES (?, ?, ?, datetime('now'), ?)
+     ON CONFLICT(village_id) DO UPDATE SET
+       subject = excluded.subject,
+       body = excluded.body,
+       updated_at = datetime('now'),
+       updated_by = excluded.updated_by`
+  ).run(villageId, subject, body, updatedBy);
+
+  syncWelcomeLetterDecorations(db, villageId);
+  return getWelcomeTemplateEdit(db, villageId);
+}
+
+export function resetWelcomeTemplate(
+  db: Database.Database,
+  villageId: VillageId
+): WelcomeTemplateEdit | null {
+  db.prepare(`DELETE FROM welcome_letter_templates WHERE village_id = ?`).run(
+    villageId
+  );
+  syncWelcomeLetterDecorations(db, villageId);
+  return getWelcomeTemplateEdit(db, villageId);
+}
+
+/** Keep welcome letters aligned with the effective (possibly owner-edited) template. */
+export function syncWelcomeLetterDecorations(
+  db: Database.Database,
+  onlyVillageId?: VillageId
+) {
+  const villageIds = onlyVillageId
+    ? [onlyVillageId]
+    : (Object.keys(WELCOME_TEMPLATES) as VillageId[]);
+
+  for (const villageId of villageIds) {
+    const template = getEffectiveWelcomeTemplate(db, villageId);
     if (!template) continue;
-    const senderId = ensureVillageSystemUser(db, villageId as VillageId);
+    const senderId = ensureVillageSystemUser(db, villageId);
     if (!senderId) continue;
     db.prepare(
       `UPDATE letters
-       SET body = ?, stickers_json = ?, scrap_json = ?
-       WHERE sender_id = ? AND subject = ?`
+       SET subject = ?, body = ?, stickers_json = ?, scrap_json = ?,
+           paper_style = ?, envelope_style = ?, wax_seal = ?, stamp_style = ?
+       WHERE sender_id = ?`
     ).run(
+      template.subject,
       template.body,
       JSON.stringify(template.stickers),
       JSON.stringify(template.scraps),
-      senderId,
-      template.subject
+      template.paperStyle,
+      template.envelopeStyle,
+      template.waxSeal,
+      template.stampStyle,
+      senderId
     );
   }
 }
@@ -619,19 +726,19 @@ export function deliverWelcomeLetter(
   villageId: string
 ): LetterView | null {
   if (!isVillageId(villageId)) return null;
-  const template = WELCOME_TEMPLATES[villageId];
+  const template = getEffectiveWelcomeTemplate(db, villageId);
   const senderId = ensureVillageSystemUser(db, villageId);
   if (!template || !senderId) return null;
 
-  syncWelcomeLetterDecorations(db);
+  syncWelcomeLetterDecorations(db, villageId);
 
   const existing = db
     .prepare(
       `SELECT * FROM letters
-       WHERE recipient_id = ? AND sender_id = ? AND subject = ?
+       WHERE recipient_id = ? AND sender_id = ?
        LIMIT 1`
     )
-    .get(recipientId, senderId, template.subject) as LetterRecord | undefined;
+    .get(recipientId, senderId) as LetterRecord | undefined;
 
   if (existing) {
     // Backfill starter gifts for villagers who got the letter before gifts existed.
@@ -675,22 +782,21 @@ export function getUnreadWelcomeLetter(
 ): LetterView | null {
   if (!villageId || !isVillageId(villageId)) return null;
   const sender = SYSTEM_SENDERS[villageId];
-  const template = WELCOME_TEMPLATES[villageId];
+  const template = getEffectiveWelcomeTemplate(db, villageId);
   if (!sender || !template) return null;
 
-  syncWelcomeLetterDecorations(db);
+  syncWelcomeLetterDecorations(db, villageId);
 
   const row = db
     .prepare(
       `SELECT * FROM letters
        WHERE recipient_id = ?
          AND sender_id = ?
-         AND subject = ?
          AND is_read = 0
          AND status = 'sent'
        LIMIT 1`
     )
-    .get(recipientId, sender.id, template.subject) as LetterRecord | undefined;
+    .get(recipientId, sender.id) as LetterRecord | undefined;
 
   return row ? toLetterView(row) : null;
 }

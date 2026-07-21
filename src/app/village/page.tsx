@@ -22,6 +22,7 @@ import { VillageChangePanel } from "@/components/VillageChangePanel";
 import { NoticeBoard } from "@/components/NoticeBoard";
 import { CollectibleIcon } from "@/components/CollectibleIcon";
 import { PageCrest } from "@/components/PageCrest";
+import { WelcomeLetterEditor } from "@/components/WelcomeLetterEditor";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
 import { VillageMascot } from "@/components/VillageMascot";
 import {
@@ -334,6 +335,12 @@ export default async function VillagePage() {
           ))}
         </div>
       </section>
+
+      {user.isOwner ? (
+        <WelcomeLetterEditor
+          initialVillageId={stats.villageId as VillageId}
+        />
+      ) : null}
 
       <VillageChangePanel
         currentVillageId={stats.villageId as VillageId}
