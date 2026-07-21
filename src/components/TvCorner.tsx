@@ -109,6 +109,7 @@ export function TvCorner({
   const [showChannels, setShowChannels] = useState(false);
   const [busy, setBusy] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const [chatBusy, setChatBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [powerOn, setPowerOn] = useState(true);
@@ -296,11 +297,19 @@ export function TvCorner({
     return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   }
 
+  function reportUploadProgress(
+    msg: string,
+    percent: number | null
+  ) {
+    setUploadProgress(msg);
+    setUploadPercent(percent);
+  }
+
   function uploadOneToChannel(
     file: File,
     channelId: string,
     title: string | undefined,
-    onProgress: (msg: string) => void
+    onProgress: (msg: string, percent: number | null) => void
   ) {
     if (file.size <= 0) {
       return Promise.reject(
@@ -318,28 +327,33 @@ export function TvCorner({
       file.name.replace(/\.[^.]+$/, "").slice(0, 80) ||
       "Untitled clip";
 
+    // FormData + XHR: progress events work, and no custom headers (proxy-safe).
     return new Promise<TvVideo>((resolve, reject) => {
+      const form = new FormData();
+      form.append("video", file, file.name);
+      form.append("channelId", channelId);
+      form.append("title", clipName);
+
       const xhr = new XMLHttpRequest();
       xhr.open("POST", "/api/tv/videos");
-      xhr.setRequestHeader("x-tv-channel-id", channelId);
-      xhr.setRequestHeader("x-tv-filename", encodeURIComponent(file.name));
-      xhr.setRequestHeader("x-tv-title", encodeURIComponent(clipName));
-      xhr.setRequestHeader(
-        "Content-Type",
-        file.type && file.type !== "application/octet-stream"
-          ? file.type
-          : "application/octet-stream"
-      );
       xhr.timeout = 0;
+      xhr.responseType = "text";
 
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable && event.total > 0) {
-          const pct = Math.min(99, Math.round((event.loaded / event.total) * 100));
+          const pct = Math.min(
+            99,
+            Math.round((event.loaded / event.total) * 100)
+          );
           onProgress(
-            `${pct}% · ${file.name} (${formatBytesShort(event.loaded)} / ${formatBytesShort(event.total)})`
+            `Uploading ${file.name} — ${pct}% (${formatBytesShort(event.loaded)} of ${formatBytesShort(event.total)})`,
+            pct
           );
         } else {
-          onProgress(`Uploading ${file.name}…`);
+          onProgress(
+            `Uploading ${file.name} (${formatBytesShort(file.size)})…`,
+            null
+          );
         }
       };
 
@@ -361,17 +375,19 @@ export function TvCorner({
           return;
         }
         if (xhr.status < 200 || xhr.status >= 300) {
-          reject(
-            new Error(data?.error || `Could not upload ${file.name}`)
-          );
+          reject(new Error(data?.error || `Could not upload ${file.name}`));
           return;
         }
         if (data?.channel) mergeChannel(data.channel);
         if (!data?.video) {
-          reject(new Error(`Upload finished but no clip was saved for ${file.name}`));
+          reject(
+            new Error(
+              `Upload finished but no clip was saved for ${file.name}`
+            )
+          );
           return;
         }
-        onProgress(`Saved ${file.name}`);
+        onProgress(`Saved ${file.name}`, 100);
         resolve(data.video);
       };
 
@@ -385,8 +401,11 @@ export function TvCorner({
         reject(new Error("Upload timed out — try again"));
       xhr.onabort = () => reject(new Error("Upload was cancelled"));
 
-      onProgress(`Starting ${file.name} (${formatBytesShort(file.size)})…`);
-      xhr.send(file);
+      onProgress(
+        `Starting upload: ${file.name} (${formatBytesShort(file.size)})…`,
+        0
+      );
+      xhr.send(form);
     });
   }
 
@@ -403,29 +422,38 @@ export function TvCorner({
     const list = Array.from(files);
     setBusy(true);
     setError(null);
+    reportUploadProgress(
+      `Preparing ${list.length} video${list.length === 1 ? "" : "s"}…`,
+      0
+    );
     let uploaded = 0;
     try {
       for (let i = 0; i < list.length; i++) {
         const file = list[i];
         const prefix =
-          list.length > 1 ? `${i + 1}/${list.length} · ` : "";
+          list.length > 1 ? `Video ${i + 1} of ${list.length}: ` : "";
         await uploadOneToChannel(
           file,
           targetChannelId,
           i === 0 ? clipTitle : undefined,
-          (msg) => setUploadProgress(`${prefix}${msg}`)
+          (msg, percent) => reportUploadProgress(`${prefix}${msg}`, percent)
         );
         uploaded += 1;
       }
       setClipTitle("");
-      setUploadProgress(
+      reportUploadProgress(
         uploaded === 1
-          ? "Upload complete"
-          : `${uploaded} videos uploaded`
+          ? "Upload complete — your video is on the channel"
+          : `${uploaded} videos uploaded to the channel`,
+        100
       );
-      window.setTimeout(() => setUploadProgress(null), 2500);
+      window.setTimeout(() => {
+        setUploadProgress(null);
+        setUploadPercent(null);
+      }, 4000);
     } catch (err) {
       setUploadProgress(null);
+      setUploadPercent(null);
       setError(
         err instanceof Error
           ? uploaded
@@ -773,6 +801,35 @@ export function TvCorner({
       </div>
 
       {error ? <p className="tv-error">{error}</p> : null}
+
+      {uploadProgress || uploadPercent !== null ? (
+        <div className="tv-upload-banner" role="status" aria-live="polite">
+          <div className="tv-upload-banner-top">
+            <strong>
+              {uploadPercent !== null && uploadPercent >= 100
+                ? "Upload finished"
+                : "Uploading your video"}
+            </strong>
+            {uploadPercent !== null ? (
+              <span className="tv-upload-pct">{uploadPercent}%</span>
+            ) : null}
+          </div>
+          <div
+            className="tv-upload-bar"
+            aria-hidden={uploadPercent === null}
+          >
+            <span
+              style={{
+                width: `${Math.max(uploadPercent ?? 0, uploadPercent === 0 ? 2 : 0)}%`,
+              }}
+            />
+          </div>
+          <p>{uploadProgress || "Working…"}</p>
+          <p className="tv-upload-banner-hint">
+            Keep this tab open until it reaches 100%.
+          </p>
+        </div>
+      ) : null}
 
       <div className="tv-nook-layout">
         <section className="tv-stage" aria-label="Vintage television">
@@ -1160,7 +1217,16 @@ export function TvCorner({
                 />
               </label>
               {uploadProgress ? (
-                <p className="tv-shelf-copy tv-upload-status">{uploadProgress}</p>
+                <div className="tv-upload-inline" role="status">
+                  <div className="tv-upload-bar">
+                    <span
+                      style={{
+                        width: `${Math.max(uploadPercent ?? 0, 2)}%`,
+                      }}
+                    />
+                  </div>
+                  <p className="tv-shelf-copy tv-upload-status">{uploadProgress}</p>
+                </div>
               ) : null}
               <label
                 className={`tv-upload-file btn-primary${

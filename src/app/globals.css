@@ -4277,6 +4277,84 @@ body.theme-moonmere .cottage-plaque {
   font-size: 0.86rem;
 }
 
+.tv-upload-banner {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 40;
+  margin: 0 0 1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 45%, transparent);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--village-color, #2a3548) 70%, #1a120c),
+      color-mix(in srgb, #1a120c 80%, var(--village-color, #2a3548))
+    );
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+.tv-upload-banner-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.tv-upload-banner-top strong {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.05rem;
+  color: var(--cream, #f3e6d0);
+}
+
+.tv-upload-pct {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--village-soft, #c4a574) 70%, white);
+}
+
+.tv-upload-bar {
+  height: 0.7rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 28%, transparent);
+}
+
+.tv-upload-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--village-soft, #c4a574) 75%, #8b5a2b),
+    color-mix(in srgb, var(--cream, #f3e6d0) 55%, var(--village-soft, #c4a574))
+  );
+  transition: width 0.2s ease-out;
+}
+
+.tv-upload-banner p {
+  margin: 0.55rem 0 0;
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 88%, white);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.tv-upload-banner-hint {
+  opacity: 0.75;
+  font-size: 0.8rem !important;
+}
+
+.tv-upload-inline {
+  margin: 0.35rem 0 0.65rem;
+}
+
+.tv-upload-inline .tv-upload-bar {
+  margin-bottom: 0.35rem;
+}
+
 .tv-channel-add {
   display: flex;
   justify-content: center;
