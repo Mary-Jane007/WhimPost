@@ -483,14 +483,62 @@ export const GROW_BADGES = [
 ];
 
 export const BIRDS = [
-  { id: "robin", name: "Robin", emoji: "🧡", hint: "Cheerful chest, early song" },
-  { id: "sparrow", name: "Sparrow", emoji: "🪶", hint: "Busy around seed and hedge" },
-  { id: "blue-jay", name: "Blue Jay", emoji: "💙", hint: "Bright flash through pines" },
-  { id: "owl", name: "Owl", emoji: "🦉", hint: "Soft dusk watcher" },
-  { id: "cardinal", name: "Cardinal", emoji: "❤️", hint: "Scarlet against snow or leaf" },
-  { id: "hummingbird", name: "Hummingbird", emoji: "✨", hint: "Hover near nectar blooms" },
-  { id: "finch", name: "Finch", emoji: "🎵", hint: "Small song on high twigs" },
-  { id: "woodpecker", name: "Woodpecker", emoji: "🪵", hint: "Tap-tap on old bark" },
+  {
+    id: "robin",
+    name: "Robin",
+    emoji: "🧡",
+    hint: "Cheerful chest, early song",
+    image: "/workshop/birds/robin.jpg",
+  },
+  {
+    id: "sparrow",
+    name: "Sparrow",
+    emoji: "🪶",
+    hint: "Busy around seed and hedge",
+    image: "/workshop/birds/sparrow.jpg",
+  },
+  {
+    id: "blue-jay",
+    name: "Blue Jay",
+    emoji: "💙",
+    hint: "Bright flash through pines",
+    image: "/workshop/birds/blue-jay.jpg",
+  },
+  {
+    id: "owl",
+    name: "Owl",
+    emoji: "🦉",
+    hint: "Soft dusk watcher",
+    image: "/workshop/birds/owl.jpg",
+  },
+  {
+    id: "cardinal",
+    name: "Cardinal",
+    emoji: "❤️",
+    hint: "Scarlet against snow or leaf",
+    image: "/workshop/birds/cardinal.jpg",
+  },
+  {
+    id: "hummingbird",
+    name: "Hummingbird",
+    emoji: "✨",
+    hint: "Hover near nectar blooms",
+    image: "/workshop/birds/hummingbird.jpg",
+  },
+  {
+    id: "finch",
+    name: "Finch",
+    emoji: "🎵",
+    hint: "Small song on high twigs",
+    image: "/workshop/birds/finch.jpg",
+  },
+  {
+    id: "woodpecker",
+    name: "Woodpecker",
+    emoji: "🪵",
+    hint: "Tap-tap on old bark",
+    image: "/workshop/birds/woodpecker.jpg",
+  },
 ];
 
 export const SEASONAL_PANELS = [

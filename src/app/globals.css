@@ -6125,7 +6125,31 @@ button.linkish:hover {
 }
 
 .bird-card .bw-bird-emoji {
-  font-size: 1.8rem;
+  font-size: 1.05rem;
+}
+
+.bw-bird-figure {
+  margin: 0 0 0.65rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: color-mix(in srgb, #d9e5c8 55%, #fff8ea);
+  border: 1px solid color-mix(in srgb, #8fa978 28%, transparent);
+}
+
+.bw-bird-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.bw-bird-figure figcaption {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem 0.45rem;
+  font-size: 0.78rem;
+  color: #5f7a45;
 }
 
 .bw-check {
