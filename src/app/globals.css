@@ -2798,12 +2798,16 @@ body.theme-clovermeadow .village-sticker-pack {
   gap: 1rem;
   justify-items: center;
   text-align: left;
+  width: min(100%, 34rem);
 }
 
 .welcome-letter-stage .letter-paper {
   width: min(100%, 34rem);
-  max-height: min(62vh, 36rem);
-  overflow: auto;
+}
+
+.welcome-letter-stage .letter-paper.welcome-fit {
+  max-height: none;
+  overflow: visible;
 }
 
 /* Village welcome letters always read in vintage typewriter */
@@ -2826,8 +2830,64 @@ body.theme-clovermeadow .village-sticker-pack {
 .letter-paper.welcome-typewriter .letter-body-display,
 .letter-paper.welcome-typewriter .letter-body-input,
 .welcome-editor-preview.welcome-typewriter .letter-body-display {
-  font-size: 1.08rem;
-  line-height: 1.75;
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+/* Welcome letters grow with their text so nothing is clipped by the frame */
+.letter-paper.welcome-fit {
+  aspect-ratio: auto !important;
+  height: auto !important;
+  min-height: 28rem;
+  max-height: none !important;
+  overflow: visible !important;
+  width: min(100%, 30rem);
+  padding: 2.6rem 2.45rem 7.25rem;
+  background-size: cover !important;
+  background-position: top center !important;
+  background-repeat: no-repeat !important;
+}
+
+.letter-paper.welcome-fit .letter-subject-display,
+.letter-paper.welcome-fit .letter-subject-input {
+  font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+  line-height: 1.35;
+  margin: 0 0 0.85rem;
+  text-wrap: balance;
+}
+
+.letter-paper.welcome-fit .letter-body-display,
+.letter-paper.welcome-fit .letter-body-input {
+  min-height: 0;
+  font-size: 0.98rem;
+  line-height: 1.68;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.letter-paper.welcome-fit .letter-body-para {
+  margin: 0 0 0.8rem;
+}
+
+.letter-paper.welcome-fit .letter-body-list {
+  margin: 0 0 0.8rem;
+  padding-left: 1.1rem;
+}
+
+.letter-paper.welcome-fit .letter-body-list li {
+  margin: 0.28rem 0;
+}
+
+.letter-paper.welcome-fit .letter-inline-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  vertical-align: -0.15rem;
+}
+
+/* Stationery already shows the village mascot — hide the floating badge on welcomes */
+.letter-paper.welcome-fit .letter-mascot {
+  display: none;
 }
 
 .welcome-editor-form .welcome-typewriter-field {
