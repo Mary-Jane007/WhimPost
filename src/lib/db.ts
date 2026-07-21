@@ -49,6 +49,46 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_users_village ON users(village_id);
     CREATE INDEX IF NOT EXISTS idx_village_notes ON village_notes(village_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS tv_videos (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      filename TEXT NOT NULL UNIQUE,
+      mime TEXT NOT NULL,
+      size_bytes INTEGER NOT NULL DEFAULT 0,
+      uploader_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      village_id TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_tv_videos_village
+      ON tv_videos(village_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_tv_videos_uploader
+      ON tv_videos(uploader_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS tv_rooms (
+      id TEXT PRIMARY KEY,
+      scope TEXT NOT NULL CHECK(scope IN ('village', 'friends')),
+      village_id TEXT,
+      host_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      title TEXT NOT NULL DEFAULT 'Watch party',
+      current_video_id TEXT REFERENCES tv_videos(id) ON DELETE SET NULL,
+      is_playing INTEGER NOT NULL DEFAULT 0,
+      position_ms INTEGER NOT NULL DEFAULT 0,
+      position_updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_tv_rooms_scope
+      ON tv_rooms(scope, village_id, updated_at);
+
+    CREATE TABLE IF NOT EXISTS tv_presence (
+      room_id TEXT NOT NULL REFERENCES tv_rooms(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      last_seen_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (room_id, user_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_tv_presence_seen
+      ON tv_presence(room_id, last_seen_at);
   `);
 }
 

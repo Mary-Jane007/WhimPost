@@ -6,6 +6,7 @@ import type { UserPublic } from "@/lib/types";
 
 const links = [
   { href: "/village", label: "Village" },
+  { href: "/tv-corner", label: "TV Corner" },
   { href: "/inbox", label: "Inbox" },
   { href: "/sent", label: "Sent" },
   { href: "/compose", label: "Write" },
