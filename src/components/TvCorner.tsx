@@ -108,10 +108,15 @@ export function TvCorner({
   const [chatDraft, setChatDraft] = useState("");
   const [showChannels, setShowChannels] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const [chatBusy, setChatBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{
+    kind: "error" | "success" | "info";
+    message: string;
+  } | null>(null);
   const [powerOn, setPowerOn] = useState(true);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -297,29 +302,114 @@ export function TvCorner({
     return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   }
 
-  function reportUploadProgress(
-    msg: string,
-    percent: number | null
-  ) {
+  function notifyIssue(message: string) {
+    setError(message);
+    setToast({ kind: "error", message });
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "granted") {
+        try {
+          new Notification("WhimPost TV Corner", {
+            body: message,
+            silent: false,
+          });
+        } catch {
+          // ignore notification failures
+        }
+      } else if (Notification.permission === "default") {
+        void Notification.requestPermission().then((perm) => {
+          if (perm === "granted") {
+            try {
+              new Notification("WhimPost TV Corner", { body: message });
+            } catch {
+              // ignore
+            }
+          }
+        });
+      }
+    }
+  }
+
+  function notifySuccess(message: string) {
+    setToast({ kind: "success", message });
+    if (
+      typeof window !== "undefined" &&
+      "Notification" in window &&
+      Notification.permission === "granted"
+    ) {
+      try {
+        new Notification("WhimPost TV Corner", { body: message });
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  function reportUploadProgress(msg: string, percent: number | null) {
     setUploadProgress(msg);
     setUploadPercent(percent);
   }
 
-  function uploadOneToChannel(
+  function putChunk(
+    uploadId: string,
+    index: number,
+    blob: Blob
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open(
+        "PUT",
+        `/api/tv/upload/${encodeURIComponent(uploadId)}/chunk?index=${index}`
+      );
+      xhr.timeout = 0;
+      xhr.responseType = "text";
+      xhr.setRequestHeader(
+        "Content-Type",
+        "application/octet-stream"
+      );
+      xhr.onload = () => {
+        let data: { error?: string } | null = null;
+        try {
+          data = JSON.parse(xhr.responseText || "{}");
+        } catch {
+          reject(
+            new Error(
+              xhr.responseText?.slice(0, 140) ||
+                `Chunk ${index + 1} failed (${xhr.status || "network"})`
+            )
+          );
+          return;
+        }
+        if (xhr.status < 200 || xhr.status >= 300) {
+          reject(new Error(data?.error || `Chunk ${index + 1} failed`));
+          return;
+        }
+        resolve();
+      };
+      xhr.onerror = () =>
+        reject(
+          new Error(
+            `Network error on chunk ${index + 1} — keep this tab open and retry`
+          )
+        );
+      xhr.ontimeout = () =>
+        reject(new Error(`Chunk ${index + 1} timed out — try again`));
+      xhr.send(blob);
+    });
+  }
+
+  async function uploadOneToChannel(
     file: File,
     channelId: string,
     title: string | undefined,
     onProgress: (msg: string, percent: number | null) => void
   ) {
     if (file.size <= 0) {
-      return Promise.reject(
-        new Error(
-          `${file.name} looks empty — wait for the download to finish, then try again`
-        )
+      throw new Error(
+        `${file.name} looks empty — wait for the download to finish, then try again`
       );
     }
     if (file.size > 5 * 1024 * 1024 * 1024) {
-      return Promise.reject(new Error(`${file.name} is over 5GB`));
+      throw new Error(`${file.name} is over 5GB`);
     }
 
     const clipName =
@@ -327,99 +417,87 @@ export function TvCorner({
       file.name.replace(/\.[^.]+$/, "").slice(0, 80) ||
       "Untitled clip";
 
-    // FormData + XHR: progress events work, and no custom headers (proxy-safe).
-    return new Promise<TvVideo>((resolve, reject) => {
-      const form = new FormData();
-      form.append("video", file, file.name);
-      form.append("channelId", channelId);
-      form.append("title", clipName);
+    onProgress(
+      `Preparing ${file.name} (${formatBytesShort(file.size)})…`,
+      0
+    );
 
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", "/api/tv/videos");
-      xhr.timeout = 0;
-      xhr.responseType = "text";
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable && event.total > 0) {
-          const pct = Math.min(
-            99,
-            Math.round((event.loaded / event.total) * 100)
-          );
-          onProgress(
-            `Uploading ${file.name} — ${pct}% (${formatBytesShort(event.loaded)} of ${formatBytesShort(event.total)})`,
-            pct
-          );
-        } else {
-          onProgress(
-            `Uploading ${file.name} (${formatBytesShort(file.size)})…`,
-            null
-          );
-        }
-      };
-
-      xhr.onload = () => {
-        let data: {
-          error?: string;
-          video?: TvVideo;
-          channel?: TvChannel;
-        } | null = null;
-        try {
-          data = JSON.parse(xhr.responseText || "{}");
-        } catch {
-          reject(
-            new Error(
-              xhr.responseText?.slice(0, 140) ||
-                `Upload failed (${xhr.status || "network"})`
-            )
-          );
-          return;
-        }
-        if (xhr.status < 200 || xhr.status >= 300) {
-          reject(new Error(data?.error || `Could not upload ${file.name}`));
-          return;
-        }
-        if (data?.channel) mergeChannel(data.channel);
-        if (!data?.video) {
-          reject(
-            new Error(
-              `Upload finished but no clip was saved for ${file.name}`
-            )
-          );
-          return;
-        }
-        onProgress(`Saved ${file.name}`, 100);
-        resolve(data.video);
-      };
-
-      xhr.onerror = () =>
-        reject(
-          new Error(
-            "Network error while uploading — keep this tab open and try again"
-          )
-        );
-      xhr.ontimeout = () =>
-        reject(new Error("Upload timed out — try again"));
-      xhr.onabort = () => reject(new Error("Upload was cancelled"));
-
-      onProgress(
-        `Starting upload: ${file.name} (${formatBytesShort(file.size)})…`,
-        0
-      );
-      xhr.send(form);
+    const initRes = await fetch("/api/tv/upload/init", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channelId,
+        title: clipName,
+        filename: file.name,
+        mime: file.type || "application/octet-stream",
+        size: file.size,
+      }),
     });
+    const initData = await initRes.json().catch(() => ({}));
+    if (!initRes.ok) {
+      throw new Error(initData.error || `Could not start upload for ${file.name}`);
+    }
+
+    const uploadId = String(initData.uploadId || "");
+    const chunkSize = Number(initData.chunkSize) || 2 * 1024 * 1024;
+    const chunkCount =
+      Number(initData.chunkCount) ||
+      Math.max(1, Math.ceil(file.size / chunkSize));
+    if (!uploadId) throw new Error("Upload session missing id");
+
+    let uploadedBytes = 0;
+    for (let i = 0; i < chunkCount; i++) {
+      const start = i * chunkSize;
+      const end = Math.min(file.size, start + chunkSize);
+      const blob = file.slice(start, end);
+      await putChunk(uploadId, i, blob);
+      uploadedBytes = end;
+      const pct = Math.min(
+        99,
+        Math.round((uploadedBytes / file.size) * 100)
+      );
+      onProgress(
+        `Uploading ${file.name} — ${pct}% (${formatBytesShort(uploadedBytes)} of ${formatBytesShort(file.size)}) · piece ${i + 1}/${chunkCount}`,
+        pct
+      );
+    }
+
+    onProgress(`Finishing ${file.name}…`, 99);
+    const doneRes = await fetch(
+      `/api/tv/upload/${encodeURIComponent(uploadId)}/complete`,
+      { method: "POST" }
+    );
+    const doneData = await doneRes.json().catch(() => ({}));
+    if (!doneRes.ok) {
+      throw new Error(doneData.error || `Could not finish ${file.name}`);
+    }
+    if (doneData.channel) mergeChannel(doneData.channel);
+    if (!doneData.video) {
+      throw new Error(`Upload finished but no clip was saved for ${file.name}`);
+    }
+    onProgress(`Saved ${file.name}`, 100);
+    return doneData.video as TvVideo;
   }
 
   async function onUploadClips(
     files: FileList | File[] | null,
     channelId?: string
   ) {
-    if (!user.isOwner || !files || files.length === 0) return;
+    if (!user.isOwner) {
+      notifyIssue("Only the site owner can upload channel videos");
+      return;
+    }
+    if (!files || files.length === 0) {
+      notifyIssue("No video file was chosen");
+      return;
+    }
     const targetChannelId = channelId || effectiveChannelId;
     if (!targetChannelId) {
-      setError("Create a channel first, then upload videos to it");
+      notifyIssue("Create a channel first, then upload videos to it");
       return;
     }
     const list = Array.from(files);
+    setUploading(true);
     setBusy(true);
     setError(null);
     reportUploadProgress(
@@ -441,27 +519,28 @@ export function TvCorner({
         uploaded += 1;
       }
       setClipTitle("");
-      reportUploadProgress(
+      const successMsg =
         uploaded === 1
           ? "Upload complete — your video is on the channel"
-          : `${uploaded} videos uploaded to the channel`,
-        100
-      );
+          : `${uploaded} videos uploaded to the channel`;
+      reportUploadProgress(successMsg, 100);
+      notifySuccess(successMsg);
       window.setTimeout(() => {
         setUploadProgress(null);
         setUploadPercent(null);
-      }, 4000);
+      }, 5000);
     } catch (err) {
       setUploadProgress(null);
       setUploadPercent(null);
-      setError(
+      const message =
         err instanceof Error
           ? uploaded
             ? `${uploaded} uploaded, then: ${err.message}`
             : err.message
-          : "Upload failed"
-      );
+          : "Upload failed";
+      notifyIssue(message);
     } finally {
+      setUploading(false);
       setBusy(false);
     }
   }
@@ -713,6 +792,12 @@ export function TvCorner({
 
   // Soft progress heartbeat so friends stay roughly aligned without seeking ourselves.
   useEffect(() => {
+    if (!toast || toast.kind === "error") return;
+    const timer = window.setTimeout(() => setToast(null), 6000);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  useEffect(() => {
     if (!room.id || !room.currentVideo || !powerOn) return;
     const timer = window.setInterval(() => {
       const el = videoRef.current;
@@ -802,6 +887,33 @@ export function TvCorner({
 
       {error ? <p className="tv-error">{error}</p> : null}
 
+      {toast ? (
+        <div
+          className={`tv-toast tv-toast-${toast.kind}`}
+          role="alert"
+          aria-live="assertive"
+        >
+          <div className="tv-toast-body">
+            <strong>
+              {toast.kind === "error"
+                ? "Upload issue"
+                : toast.kind === "success"
+                  ? "All set"
+                  : "Note"}
+            </strong>
+            <p>{toast.message}</p>
+          </div>
+          <button
+            type="button"
+            className="tv-toast-dismiss"
+            aria-label="Dismiss notification"
+            onClick={() => setToast(null)}
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
+
       {uploadProgress || uploadPercent !== null ? (
         <div className="tv-upload-banner" role="status" aria-live="polite">
           <div className="tv-upload-banner-top">
@@ -826,7 +938,8 @@ export function TvCorner({
           </div>
           <p>{uploadProgress || "Working…"}</p>
           <p className="tv-upload-banner-hint">
-            Keep this tab open until it reaches 100%.
+            Keep this tab open until it reaches 100%. Large movies upload in
+            small pieces so they don’t get cut off.
           </p>
         </div>
       ) : null}
@@ -1245,7 +1358,7 @@ export function TvCorner({
                     void onUploadClips(files);
                   }}
                 />
-                {busy
+                {busy || uploading
                   ? uploadProgress || "Uploading…"
                   : "Add videos to channel"}
               </label>
@@ -1351,7 +1464,7 @@ export function TvCorner({
                             void onUploadClips(files, channel.id);
                           }}
                         />
-                        {busy && effectiveChannelId === channel.id
+                        {busy && uploading && effectiveChannelId === channel.id
                           ? uploadProgress || "Uploading…"
                           : "Add more videos"}
                       </label>

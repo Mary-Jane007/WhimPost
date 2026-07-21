@@ -207,17 +207,32 @@ export async function POST(req: NextRequest) {
   }
 
   const file = form.get("video");
-  if (!(file instanceof File)) {
+  // Next/undici may give a Blob that isn't `instanceof File`.
+  const isBlob =
+    file !== null &&
+    typeof file === "object" &&
+    typeof (file as Blob).arrayBuffer === "function" &&
+    typeof (file as Blob).size === "number";
+  if (!isBlob || typeof file === "string") {
     return jsonError("Choose a cozy clip or movie for this channel");
   }
+  const blob = file as Blob & { name?: string; type: string };
+  const originalName =
+    typeof blob.name === "string" && blob.name
+      ? blob.name
+      : "clip.mp4";
 
-  const resolved = resolveTvUpload(file);
+  const resolved = resolveTvUpload({
+    name: originalName,
+    type: blob.type || "",
+    size: blob.size,
+  });
   if (!resolved.ok) return jsonError(resolved.error);
 
   const titleRaw = String(form.get("title") || "").trim();
   const title =
     titleRaw.slice(0, 80) ||
-    file.name.replace(/\.[^.]+$/, "").slice(0, 80) ||
+    originalName.replace(/\.[^.]+$/, "").slice(0, 80) ||
     "Untitled clip";
 
   const ext = resolved.ext;
@@ -226,7 +241,7 @@ export async function POST(req: NextRequest) {
   const destPath = path.join(UPLOAD_DIR, filename);
 
   try {
-    await saveUploadStream(file.stream(), destPath);
+    await saveUploadStream(blob.stream(), destPath);
   } catch (err) {
     if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
     console.error("[tv upload] save failed", err);
@@ -238,7 +253,7 @@ export async function POST(req: NextRequest) {
     filename,
     mime: resolved.mime,
     destPath,
-    expectedSize: file.size > 0 ? file.size : undefined,
+    expectedSize: blob.size > 0 ? blob.size : undefined,
     uploaderId: user.id,
     villageId: channel.villageId,
     channelId: channel.id,
