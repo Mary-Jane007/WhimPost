@@ -16,8 +16,13 @@ const MIME: Record<string, string> = {
   webp: "image/webp",
   gif: "image/gif",
   mp4: "video/mp4",
+  m4v: "video/x-m4v",
   webm: "video/webm",
   mov: "video/quicktime",
+  avi: "video/x-msvideo",
+  mpg: "video/mpeg",
+  mpeg: "video/mpeg",
+  mkv: "video/x-matroska",
 };
 
 const RANGE_CHUNK = 2 * 1024 * 1024; // 2MB preferred range slices
@@ -67,12 +72,21 @@ export async function GET(
   if (!user) return jsonError("Not signed in", 401);
 
   const { filename } = await context.params;
-  if (!/^[a-f0-9-]+\.(jpg|jpeg|png|webp|gif|mp4|webm|mov)$/i.test(filename)) {
+  if (!/^[a-f0-9-]+\.(jpg|jpeg|png|webp|gif|mp4|webm|mov|m4v|avi|mpg|mpeg|mkv)$/i.test(filename)) {
     return jsonError("Invalid file", 400);
   }
 
   const ext = filename.split(".").pop()?.toLowerCase() || "jpg";
-  const isVideo = ext === "mp4" || ext === "webm" || ext === "mov";
+  const isVideo = [
+    "mp4",
+    "webm",
+    "mov",
+    "m4v",
+    "avi",
+    "mpg",
+    "mpeg",
+    "mkv",
+  ].includes(ext);
 
   if (isVideo) {
     const video = getVideoByFilename(filename);

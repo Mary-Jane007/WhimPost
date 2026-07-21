@@ -6,14 +6,11 @@ import { pipeline } from "stream/promises";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import {
-  TV_ALLOWED_MIME,
-  TV_MAX_BYTES,
-  TV_MAX_LABEL,
-  TV_MIME_EXT,
   createVideo,
   deleteVideo,
   getChannelById,
   listVideosForChannel,
+  resolveTvUpload,
 } from "@/lib/tvCorner";
 
 export const runtime = "nodejs";
@@ -71,12 +68,9 @@ export async function POST(req: NextRequest) {
   if (!(file instanceof File)) {
     return jsonError("Choose a cozy clip or movie for this channel");
   }
-  if (!TV_ALLOWED_MIME.has(file.type)) {
-    return jsonError("Use an MP4, WebM, or MOV video");
-  }
-  if (file.size > TV_MAX_BYTES) {
-    return jsonError(`Videos must be under ${TV_MAX_LABEL}`);
-  }
+
+  const resolved = resolveTvUpload(file);
+  if (!resolved.ok) return jsonError(resolved.error);
 
   const titleRaw = String(form.get("title") || "").trim();
   const title =
@@ -84,7 +78,7 @@ export async function POST(req: NextRequest) {
     file.name.replace(/\.[^.]+$/, "").slice(0, 80) ||
     "Untitled clip";
 
-  const ext = TV_MIME_EXT[file.type] || "mp4";
+  const ext = resolved.ext;
   ensureUploadDir();
   const filename = `${randomUUID()}.${ext}`;
   const destPath = path.join(UPLOAD_DIR, filename);
@@ -108,7 +102,7 @@ export async function POST(req: NextRequest) {
   const video = createVideo({
     title,
     filename,
-    mime: file.type,
+    mime: resolved.mime,
     sizeBytes,
     uploaderId: user.id,
     villageId: channel.villageId,
