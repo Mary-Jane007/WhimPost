@@ -42,6 +42,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
   const [journalNote, setJournalNote] = useState("");
   const [journalPhoto, setJournalPhoto] = useState<string | null>(null);
   const [journalMarkComplete, setJournalMarkComplete] = useState(true);
+  const [journalShareVillage, setJournalShareVillage] = useState(false);
   const [journalUploading, setJournalUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const journalFileRef = useRef<HTMLInputElement>(null);
@@ -197,12 +198,14 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
       note,
       photoUrl: journalPhoto || undefined,
       markCraftComplete: Boolean(journalCraftId) && journalMarkComplete,
+      shareWithVillage: journalShareVillage,
     });
     setJournalCraftId("");
     setJournalTitle("");
     setJournalNote("");
     setJournalPhoto(null);
     setJournalMarkComplete(true);
+    setJournalShareVillage(false);
   }
 
   return (
@@ -750,6 +753,17 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                   Also mark this craft complete (+XP &amp; Craftsman Badge)
                 </label>
               ) : null}
+              <label className="bw-check">
+                <input
+                  type="checkbox"
+                  checked={journalShareVillage}
+                  onChange={(e) => setJournalShareVillage(e.target.checked)}
+                />
+                Share with the village square
+                {journalPhoto
+                  ? " (includes your photo)"
+                  : " — add a photo to show your finished craft"}
+              </label>
               <button
                 type="submit"
                 className="btn-primary"
@@ -797,6 +811,25 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                       />
                     )}
                     <p className="bw-handnote">{entry.note}</p>
+                    <div className="bw-journal-share-row">
+                      {entry.shared ? (
+                        <em className="bw-shared-tag">Shared on the village square</em>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          disabled={busy}
+                          onClick={() =>
+                            void postAction({
+                              type: "shareJournal",
+                              entryId: entry.id,
+                            })
+                          }
+                        >
+                          Share with village square
+                        </button>
+                      )}
+                    </div>
                   </article>
                 ))}
               </div>

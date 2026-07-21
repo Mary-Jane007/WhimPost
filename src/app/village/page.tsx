@@ -78,19 +78,20 @@ export default async function VillagePage() {
 
   const noteRows = db
     .prepare(
-      `SELECT n.id, n.body, n.anonymous, n.created_at,
+      `SELECT n.id, n.body, n.anonymous, n.image_url, n.created_at,
               u.id as uid, u.username, u.display_name, u.bio, u.forest_name,
               u.created_at as ucreated, u.is_owner, u.village_id, u.reputation
        FROM village_notes n
        JOIN users u ON u.id = n.author_id
        WHERE n.village_id = ?
        ORDER BY n.created_at DESC
-       LIMIT 30`
+       LIMIT 40`
     )
     .all(stats.villageId) as Array<{
     id: string;
     body: string;
     anonymous: number;
+    image_url: string | null;
     created_at: string;
     uid: string;
     username: string;
@@ -107,6 +108,7 @@ export default async function VillagePage() {
     id: r.id,
     body: r.body,
     anonymous: Boolean(r.anonymous),
+    imageUrl: r.image_url || null,
     createdAt: r.created_at,
     author: r.anonymous
       ? null

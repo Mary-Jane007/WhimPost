@@ -2367,6 +2367,33 @@ body.theme-clovermeadow .village-sticker-pack {
   border: 1px solid rgba(243, 230, 208, 0.1);
   border-radius: var(--frame-chip);
   background: rgba(18, 24, 18, 0.22);
+  display: grid;
+  gap: 0.45rem;
+}
+
+.notice-list li.notice-with-image {
+  grid-template-columns: 6.5rem 1fr;
+  align-items: start;
+}
+
+.notice-share-image {
+  width: 6.5rem;
+  height: 5rem;
+  object-fit: cover;
+  border-radius: 0.55rem 0.75rem 0.5rem 0.7rem;
+  border: 2px solid rgba(243, 230, 208, 0.35);
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 560px) {
+  .notice-list li.notice-with-image {
+    grid-template-columns: 1fr;
+  }
+
+  .notice-share-image {
+    width: 100%;
+    height: 10rem;
+  }
 }
 
 .notice-list p {
@@ -2376,6 +2403,16 @@ body.theme-clovermeadow .village-sticker-pack {
 .notice-list span {
   font-size: 0.85rem;
   opacity: 0.65;
+}
+
+.bw-journal-share-row {
+  margin-top: 0.55rem;
+}
+
+.bw-shared-tag {
+  font-size: 0.82rem;
+  color: #5f7a45;
+  font-style: normal;
 }
 
 .village-join {
