@@ -7,8 +7,11 @@ export type PaperStyle =
   | "lined"
   | "floral"
   | "night"
-  | "hearthwick"
-  | "bramblewood";
+  | "mosshollow"
+  | "clovermeadow"
+  | "moonmere"
+  | "bramblewood"
+  | "hearthwick";
 
 /** Handwriting / typeface for letter subject + body. */
 export type LetterFont =
@@ -312,14 +315,29 @@ export const PAPER_OPTIONS: {
   hint: string;
 }[] = [
   {
-    id: "hearthwick",
-    name: "Hearthwick Stationery",
-    hint: "Lined parchment & hedgehog meadow",
+    id: "mosshollow",
+    name: "Mosshollow Stationery",
+    hint: "Sage paper & library owl",
+  },
+  {
+    id: "clovermeadow",
+    name: "Clovermeadow Stationery",
+    hint: "Blush paper & honeybee",
+  },
+  {
+    id: "moonmere",
+    name: "Moonmere Stationery",
+    hint: "Mist paper & luna moth",
   },
   {
     id: "bramblewood",
     name: "Bramblewood Stationery",
     hint: "Fox on the stones & a quiet frame",
+  },
+  {
+    id: "hearthwick",
+    name: "Hearthwick Stationery",
+    hint: "Warm parchment & hedgehog",
   },
   { id: "parchment", name: "Parchment", hint: "Tea-stained & soft" },
   { id: "cream", name: "Cream Linen", hint: "Quiet & classic" },
@@ -328,6 +346,15 @@ export const PAPER_OPTIONS: {
   { id: "floral", name: "Pressed Petals", hint: "Soft botanical wash" },
   { id: "night", name: "Night Ink", hint: "Moonlit charcoal" },
 ];
+
+/** Village write desks use themed stationery paper styles. */
+export const VILLAGE_STATIONERY: Record<string, PaperStyle> = {
+  mosshollow: "mosshollow",
+  clovermeadow: "clovermeadow",
+  moonmere: "moonmere",
+  bramblewood: "bramblewood",
+  hearthwick: "hearthwick",
+};
 
 export const FONT_OPTIONS: {
   id: LetterFont;

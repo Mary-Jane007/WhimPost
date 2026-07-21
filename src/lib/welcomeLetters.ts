@@ -129,7 +129,7 @@ May your mailbox always be full, your thoughts never hurried, and your stories f
 Welcome to **Mosshollow**.
 
 *May your words take root.*`,
-    paperStyle: "moss",
+    paperStyle: "mosshollow",
     envelopeStyle: "sage",
     waxSeal: "fern",
     stampStyle: "leafy-branch",
@@ -206,7 +206,7 @@ There's no rush in a meadow.
 Welcome home.
 
 *May your letters bloom wherever they are read.*`,
-    paperStyle: "floral",
+    paperStyle: "clovermeadow",
     envelopeStyle: "blush",
     waxSeal: "heart",
     stampStyle: "dragonfly",
@@ -295,7 +295,7 @@ Until then, the lake will keep your secrets, and the stars will keep you company
 Welcome to **Moonmere**.
 
 *May your words drift softly into waiting hearts.*`,
-    paperStyle: "night",
+    paperStyle: "moonmere",
     envelopeStyle: "ink",
     waxSeal: "moon",
     stampStyle: "moon-full",

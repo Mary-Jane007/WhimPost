@@ -13,6 +13,7 @@ import {
   PAPER_OPTIONS,
   SCRAP_OPTIONS,
   STAMP_OPTIONS,
+  VILLAGE_STATIONERY,
   WAX_OPTIONS,
   sharedStickers,
   villagePackStickers,
@@ -28,11 +29,6 @@ import {
   type WaxSeal,
 } from "@/lib/types";
 import { getVillage } from "@/lib/villages";
-
-const VILLAGE_STATIONERY: Record<string, PaperStyle> = {
-  hearthwick: "hearthwick",
-  bramblewood: "bramblewood",
-};
 
 function defaultPaperForVillage(villageId: string | null | undefined): PaperStyle {
   return (villageId && VILLAGE_STATIONERY[villageId]) || "parchment";
@@ -102,12 +98,25 @@ export function ComposeStudio({
     }
     return PAPER_OPTIONS.filter((p) => !VILLAGE_STATIONERY[p.id]);
   }, [villageStationery]);
-  const composeThemeClass =
-    villageId === "hearthwick"
-      ? "compose-hearthwick"
-      : villageId === "bramblewood"
-        ? "compose-bramblewood"
-        : "";
+  const composeThemeClass = villageStationery
+    ? `compose-village compose-${villageStationery}`
+    : "";
+  const stationeryHint =
+    villageStationery === "mosshollow"
+      ? "You're writing on Mosshollow stationery — sage paper, a quiet frame, and the library owl keeping watch."
+      : villageStationery === "clovermeadow"
+        ? "You're writing on Clovermeadow stationery — blush paper, a quiet frame, and a honeybee on clover."
+        : villageStationery === "moonmere"
+          ? "You're writing on Moonmere stationery — misty paper, a quiet frame, and a luna moth by the shore."
+          : villageStationery === "bramblewood"
+            ? "You're writing on Bramblewood's trail stationery — a quiet frame and a fox on mossy stones, with room to decorate."
+            : villageStationery === "hearthwick"
+              ? "You're writing on Hearthwick stationery — warm parchment, a quiet frame, and a hedgehog by the hearth."
+              : null;
+  const stageHint =
+    villageStationery
+      ? "Write inside the frame — leave room for stickers and scraps if you like, then seal when ready."
+      : "Drag stickers, scraps, and photos across the page. Use the gold corner on a photo to resize. Seal when your letter feels complete.";
 
   function addSticker(kind: StickerKind) {
     const place = scatter(stickers.length + 3, stickers.length);
@@ -354,16 +363,8 @@ export function ComposeStudio({
 
           {tab === "paper" && (
             <div className="palette-stack">
-              {villageStationery === "hearthwick" ? (
-                <p className="compose-hint">
-                  You&apos;re writing on Hearthwick&apos;s cottage stationery —
-                  lined parchment with a meadow hedgehog in the corner.
-                </p>
-              ) : villageStationery === "bramblewood" ? (
-                <p className="compose-hint">
-                  You&apos;re writing on Bramblewood&apos;s trail stationery —
-                  a quiet frame and a fox on mossy stones, with room to decorate.
-                </p>
+              {stationeryHint ? (
+                <p className="compose-hint">{stationeryHint}</p>
               ) : null}
               <div className="option-grid">
                 {paperChoices.map((opt) => (
@@ -598,13 +599,7 @@ export function ComposeStudio({
               waxSeal={waxSeal}
             />
           )}
-          <p className="compose-hint">
-            {villageStationery === "hearthwick"
-              ? "Type on the lined parchment — the hedgehog keeps the corner warm. Drag stickers and photos if you like, then seal when ready."
-              : villageStationery === "bramblewood"
-                ? "Write inside the floral frame — the fox keeps watch from the stones. Drag stickers and photos if you like, then seal when ready."
-                : "Drag stickers, scraps, and photos across the page. Use the gold corner on a photo to resize. Seal when your letter feels complete."}
-          </p>
+          <p className="compose-hint">{stageHint}</p>
         </section>
       </div>
     </div>

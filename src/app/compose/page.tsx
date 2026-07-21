@@ -3,6 +3,38 @@ import { getCurrentUser } from "@/lib/auth";
 import { listFriends } from "@/lib/letters";
 import { ComposeStudio } from "@/components/ComposeStudio";
 import { PageCrest } from "@/components/PageCrest";
+import type { StickerKind } from "@/lib/types";
+
+const COMPOSE_COPY: Record<
+  string,
+  { title: string; lead: string; crest: StickerKind[] }
+> = {
+  mosshollow: {
+    title: "Write among the shelves",
+    lead: "Sage Mosshollow paper, a quiet border, and the library owl — with room to decorate the page yourself.",
+    crest: ["mushroom-amanita", "leafy-branch", "moon-full"],
+  },
+  clovermeadow: {
+    title: "Write in the meadow",
+    lead: "Blush Clovermeadow paper, a quiet border, and a honeybee — with room to decorate the page yourself.",
+    crest: ["sunflower", "butterfly-green", "gingham-bow"],
+  },
+  moonmere: {
+    title: "Write by moonlight",
+    lead: "Misty Moonmere paper, a quiet border, and a luna moth — with room to decorate the page yourself.",
+    crest: ["moon-crescent", "moon-full", "dragonfly"],
+  },
+  bramblewood: {
+    title: "Write on the trail",
+    lead: "Cream trail paper with a quiet border, a fox on mossy stones, and plenty of room to decorate.",
+    crest: ["fox-seated", "mushroom-amanita", "leafy-branch"],
+  },
+  hearthwick: {
+    title: "Write by the hearth",
+    lead: "Warm Hearthwick parchment, a quiet border, and a hedgehog — with room to decorate the page yourself.",
+    crest: ["pie", "candle-jar", "jam-jar"],
+  },
+};
 
 export default async function ComposePage({
   searchParams,
@@ -22,42 +54,24 @@ export default async function ComposePage({
       ]
     : friends;
 
-  const isHearthwick = user.villageId === "hearthwick";
-  const isBramblewood = user.villageId === "bramblewood";
+  const copy = (user.villageId && COMPOSE_COPY[user.villageId]) || null;
 
   return (
     <main
       className={`app-main forest-panel ${
-        isHearthwick
-          ? "compose-page-hearthwick"
-          : isBramblewood
-            ? "compose-page-bramblewood"
-            : ""
+        copy && user.villageId ? `compose-page-${user.villageId}` : ""
       }`}
     >
       <PageCrest
         kinds={
-          isHearthwick
-            ? ["pie", "candle-jar", "jam-jar"]
-            : isBramblewood
-              ? ["fox-seated", "mushroom-amanita", "leafy-branch"]
-              : ["frogs-tandem", "butterfly-green", "narcissus"]
+          copy?.crest || ["frogs-tandem", "butterfly-green", "narcissus"]
         }
       />
       <header className="page-header">
-        <h1>
-          {isHearthwick
-            ? "Write by the hearth"
-            : isBramblewood
-              ? "Write on the trail"
-              : "Write a letter"}
-        </h1>
+        <h1>{copy?.title || "Write a letter"}</h1>
         <p>
-          {isHearthwick
-            ? "Lined cottage parchment, a meadow hedgehog in the corner, and room for whatever you need to say."
-            : isBramblewood
-              ? "Cream trail paper with a quiet border, a fox on mossy stones, and plenty of room to decorate."
-              : "Pick paper and an envelope, scatter stickers and scraps, then seal it shut."}
+          {copy?.lead ||
+            "Pick paper and an envelope, scatter stickers and scraps, then seal it shut."}
         </p>
       </header>
       <ComposeStudio friends={ordered} villageId={user.villageId} />
