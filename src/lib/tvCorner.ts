@@ -170,7 +170,7 @@ export function listVideosForChannel(channelId: string): TvVideo[] {
        JOIN users u ON u.id = v.uploader_id
        WHERE v.channel_id = ?
        ORDER BY v.created_at ASC
-       LIMIT 80`
+       LIMIT 200`
     )
     .all(channelId) as VideoRow[];
   return rows.map(mapVideo);

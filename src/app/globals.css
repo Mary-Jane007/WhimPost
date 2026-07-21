@@ -4271,3 +4271,17 @@ body.theme-moonmere .cottage-plaque {
   opacity: 0.75;
   font-weight: 500;
 }
+
+.tv-upload-status {
+  color: color-mix(in srgb, var(--village-soft, #c4a574) 85%, white);
+  font-size: 0.86rem;
+}
+
+.tv-channel-add {
+  display: flex;
+  justify-content: center;
+  margin: 0.35rem 0.35rem 0.45rem;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
