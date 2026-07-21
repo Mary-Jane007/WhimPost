@@ -22,8 +22,10 @@ type Props = {
 
 type ScopeTab = "village" | "friends";
 
-const POLL_MS = 1600;
-const DRIFT_MS = 900;
+const POLL_MS = 2000;
+const DRIFT_MS = 2500;
+const LOCAL_SUPPRESS_MS = 4000;
+const PROGRESS_HEARTBEAT_MS = 5000;
 
 function estimatedPositionMs(room: {
   positionMs: number;
@@ -114,6 +116,9 @@ export function TvCorner({
   const suppressUntil = useRef(0);
   const roomIdRef = useRef(room.id);
   const applyingRemote = useRef(false);
+  const lastAppliedSyncKey = useRef("");
+  const lastProgressPush = useRef(0);
+  const localControlRef = useRef(false);
 
   const effectiveChannelId = channels.some((c) => c.id === selectedChannelId)
     ? selectedChannelId
@@ -126,6 +131,48 @@ export function TvCorner({
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [room.messages?.length, room.id]);
+
+  function markLocalControl(ms = LOCAL_SUPPRESS_MS) {
+    localControlRef.current = true;
+    // eslint-disable-next-line react-hooks/purity -- event-driven sync guard
+    suppressUntil.current = Date.now() + ms;
+  }
+
+  async function patchRoom(
+    patch: {
+      channelId?: string | null;
+      videoId?: string | null;
+      isPlaying?: boolean;
+      positionMs?: number;
+      title?: string;
+    },
+    opts?: { silent?: boolean }
+  ) {
+    if (!room.id) return;
+    if (!opts?.silent) markLocalControl();
+    const res = await fetch(`/api/tv/room/${room.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error || "Could not change the channel");
+      return;
+    }
+    if (opts?.silent) {
+      // Keep playing locally; only refresh server snapshot fields we need.
+      setRoom((prev) => ({
+        ...prev,
+        ...data.room,
+        messages: prev.messages,
+        watchers: data.room.watchers || prev.watchers,
+      }));
+    } else {
+      setRoom(data.room);
+    }
+    if (data.channels) setChannels(data.channels);
+  }
 
   async function fetchScope(nextScope: ScopeTab, roomId?: string) {
     setBusy(true);
@@ -186,31 +233,6 @@ export function TvCorner({
     } finally {
       setBusy(false);
     }
-  }
-
-  async function patchRoom(patch: {
-    channelId?: string | null;
-    videoId?: string | null;
-    isPlaying?: boolean;
-    positionMs?: number;
-    title?: string;
-  }) {
-    if (!room.id) return;
-    // Sync guard for local control; only runs from user events / handlers.
-    // eslint-disable-next-line react-hooks/purity -- not called during render
-    suppressUntil.current = Date.now() + 2200;
-    const res = await fetch(`/api/tv/room/${room.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Could not change the channel");
-      return;
-    }
-    setRoom(data.room);
-    if (data.channels) setChannels(data.channels);
   }
 
   async function createChannel() {
@@ -407,22 +429,60 @@ export function TvCorner({
     }
   }
 
-  // Poll room state for watch-together + chat sync
+  // Poll chat / presence / remote channel changes without yanking local playback.
   useEffect(() => {
     if (!room.id) return;
     let cancelled = false;
 
     async function poll() {
       if (cancelled) return;
-      if (Date.now() < suppressUntil.current) return;
       try {
         const res = await fetch(`/api/tv/room/${roomIdRef.current}`);
         if (!res.ok) return;
         const data = await res.json();
         if (cancelled || !data.room) return;
         if (data.room.id !== roomIdRef.current) return;
-        setRoom(data.room);
+
+        const remote = data.room as TvRoomState;
+        const now = Date.now();
+        const suppressing = now < suppressUntil.current;
+
+        setRoom((prev) => {
+          // Always refresh chat + watchers.
+          if (suppressing || localControlRef.current) {
+            return {
+              ...prev,
+              messages: remote.messages,
+              watchers: remote.watchers,
+              title: remote.title,
+              // Allow remote channel/video switches even while chatting.
+              currentChannelId:
+                remote.currentChannelId !== prev.currentChannelId
+                  ? remote.currentChannelId
+                  : prev.currentChannelId,
+              currentVideoId:
+                remote.currentVideoId !== prev.currentVideoId
+                  ? remote.currentVideoId
+                  : prev.currentVideoId,
+              currentVideo:
+                remote.currentVideoId !== prev.currentVideoId
+                  ? remote.currentVideo
+                  : prev.currentVideo,
+            };
+          }
+          return remote;
+        });
         if (data.channels) setChannels(data.channels);
+
+        if (suppressing) return;
+
+        // Followers only: if someone else changed playback, clear local-control flag.
+        if (localControlRef.current) {
+          // Keep local control until suppress window ends.
+          if (now >= suppressUntil.current) {
+            localControlRef.current = false;
+          }
+        }
       } catch {
         // ignore transient poll errors
       }
@@ -435,28 +495,82 @@ export function TvCorner({
     };
   }, [room.id]);
 
-  // Apply remote playback to the local video element
+  // Apply remote playback only when the sync key changes (channel/video/play/seek).
   useEffect(() => {
     const el = videoRef.current;
     if (!el || !room.currentVideo) return;
-    if (Date.now() < suppressUntil.current) return;
 
-    const targetSec = estimatedPositionMs(room) / 1000;
+    const syncKey = [
+      room.currentVideoId,
+      room.isPlaying ? "1" : "0",
+      room.positionUpdatedAt,
+    ].join("|");
+
+    const now = Date.now();
+    if (now < suppressUntil.current && localControlRef.current) {
+      // Still own the dial — don't yank the playhead.
+      lastAppliedSyncKey.current = syncKey;
+      return;
+    }
+
+    const isNewSync = syncKey !== lastAppliedSyncKey.current;
+    const targetSec =
+      estimatedPositionMs({
+        positionMs: room.positionMs,
+        isPlaying: room.isPlaying,
+        positionUpdatedAt: room.positionUpdatedAt,
+      }) / 1000;
     const drift = Math.abs(el.currentTime - targetSec) * 1000;
 
     applyingRemote.current = true;
-    if (drift > DRIFT_MS) {
-      el.currentTime = Math.max(0, targetSec);
+    if (isNewSync && drift > DRIFT_MS) {
+      try {
+        el.currentTime = Math.max(0, targetSec);
+      } catch {
+        // ignore seek errors while buffering
+      }
     }
+
     if (room.isPlaying && el.paused && powerOn) {
       void el.play().catch(() => undefined);
     } else if (!room.isPlaying && !el.paused) {
       el.pause();
     }
-    queueMicrotask(() => {
+
+    lastAppliedSyncKey.current = syncKey;
+    window.setTimeout(() => {
       applyingRemote.current = false;
-    });
-  }, [room, powerOn]);
+    }, 120);
+  }, [
+    room.currentVideo,
+    room.currentVideoId,
+    room.isPlaying,
+    room.positionMs,
+    room.positionUpdatedAt,
+    powerOn,
+  ]);
+
+  // Soft progress heartbeat so friends stay roughly aligned without seeking ourselves.
+  useEffect(() => {
+    if (!room.id || !room.currentVideo || !powerOn) return;
+    const timer = window.setInterval(() => {
+      const el = videoRef.current;
+      if (!el || el.paused || applyingRemote.current) return;
+      const now = Date.now();
+      if (now - lastProgressPush.current < PROGRESS_HEARTBEAT_MS) return;
+      lastProgressPush.current = now;
+      void patchRoom(
+        {
+          isPlaying: true,
+          positionMs: Math.floor(el.currentTime * 1000),
+        },
+        { silent: true }
+      );
+    }, PROGRESS_HEARTBEAT_MS);
+    return () => window.clearInterval(timer);
+  // Avoid re-binding the heartbeat every render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room.id, room.currentVideo, powerOn]);
 
   const decor = DECOR[villageId];
   const watchers = room.watchers || [];
@@ -545,6 +659,7 @@ export function TvCorner({
                     className="tv-video"
                     src={room.currentVideo.url}
                     playsInline
+                    preload="auto"
                     onPlay={() => {
                       if (applyingRemote.current) return;
                       void patchRoom({
@@ -564,7 +679,9 @@ export function TvCorner({
                       });
                     }}
                     onSeeked={() => {
-                      if (applyingRemote.current) return;
+                      // Ignore programmatic seeks and tiny scrub noise from sync.
+                      if (applyingRemote.current || localControlRef.current) return;
+                      if (Date.now() < suppressUntil.current) return;
                       void patchRoom({
                         positionMs: Math.floor(
                           (videoRef.current?.currentTime || 0) * 1000
