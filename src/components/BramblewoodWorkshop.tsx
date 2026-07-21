@@ -630,11 +630,23 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
             <div className="bw-grid birds">
               {BIRDS.map((b) => {
                 const spotted = progress.birds[b.id]?.spotted;
+                const photo = progress.birds[b.id]?.photoUrl;
                 return (
                   <article key={b.id} className="bw-card bird-card">
-                    <span className="bw-bird-emoji" aria-hidden>
-                      {b.emoji}
-                    </span>
+                    <figure className="bw-bird-figure">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photo || b.image}
+                        alt={photo ? `Your photo of a ${b.name}` : b.name}
+                        className="bw-bird-image"
+                      />
+                      <figcaption>
+                        <span className="bw-bird-emoji" aria-hidden>
+                          {b.emoji}
+                        </span>
+                        {spotted ? "Spotted in your guide" : "Field guide plate"}
+                      </figcaption>
+                    </figure>
                     <h3>{b.name}</h3>
                     <p>{b.hint}</p>
                     <div className="bw-actions">
