@@ -56,7 +56,7 @@ export default async function ComposePage({
           {isHearthwick
             ? "Lined cottage parchment, a meadow hedgehog in the corner, and room for whatever you need to say."
             : isBramblewood
-              ? "Cream trail paper framed with peach blossoms, a fox on mossy stones, and space for your next note."
+              ? "Cream trail paper with a quiet border, a fox on mossy stones, and plenty of room to decorate."
               : "Pick paper and an envelope, scatter stickers and scraps, then seal it shut."}
         </p>
       </header>

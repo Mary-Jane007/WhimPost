@@ -319,7 +319,7 @@ export const PAPER_OPTIONS: {
   {
     id: "bramblewood",
     name: "Bramblewood Stationery",
-    hint: "Fox trail & peach wildflowers",
+    hint: "Fox on the stones & a quiet frame",
   },
   { id: "parchment", name: "Parchment", hint: "Tea-stained & soft" },
   { id: "cream", name: "Cream Linen", hint: "Quiet & classic" },

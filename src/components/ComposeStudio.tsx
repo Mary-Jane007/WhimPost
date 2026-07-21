@@ -362,7 +362,7 @@ export function ComposeStudio({
               ) : villageStationery === "bramblewood" ? (
                 <p className="compose-hint">
                   You&apos;re writing on Bramblewood&apos;s trail stationery —
-                  cream paper framed with peach blossoms and a fox on mossy stones.
+                  a quiet frame and a fox on mossy stones, with room to decorate.
                 </p>
               ) : null}
               <div className="option-grid">
