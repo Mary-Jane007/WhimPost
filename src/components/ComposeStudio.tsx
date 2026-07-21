@@ -9,6 +9,7 @@ import { StickerArt, ScrapArt } from "@/components/stickers/StickerArt";
 import type { UserPublic } from "@/lib/types";
 import {
   ENVELOPE_OPTIONS,
+  FONT_OPTIONS,
   PAPER_OPTIONS,
   SCRAP_OPTIONS,
   STAMP_OPTIONS,
@@ -16,6 +17,7 @@ import {
   sharedStickers,
   villagePackStickers,
   type EnvelopeStyle,
+  type LetterFont,
   type PaperStyle,
   type PlacedImage,
   type PlacedScrap,
@@ -49,15 +51,16 @@ export function ComposeStudio({
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [paperStyle, setPaperStyle] = useState<PaperStyle>("parchment");
+  const [fontStyle, setFontStyle] = useState<LetterFont>("quill");
   const [envelopeStyle, setEnvelopeStyle] = useState<EnvelopeStyle>("kraft");
   const [waxSeal, setWaxSeal] = useState<WaxSeal>("fern");
   const [stampStyle, setStampStyle] = useState<StampStyle>("mushroom-amanita");
   const [stickers, setStickers] = useState<PlacedSticker[]>([]);
   const [scraps, setScraps] = useState<PlacedScrap[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [tab, setTab] = useState<"paper" | "envelope" | "stickers" | "scraps">(
-    "paper"
-  );
+  const [tab, setTab] = useState<
+    "paper" | "font" | "envelope" | "stickers" | "scraps"
+  >("paper");
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [image, setImage] = useState<PlacedImage | null>(null);
@@ -218,6 +221,7 @@ export function ComposeStudio({
         subject,
         body,
         paperStyle,
+        fontStyle,
         envelopeStyle,
         waxSeal,
         stampStyle,
@@ -301,6 +305,7 @@ export function ComposeStudio({
             {(
               [
                 ["paper", "Paper"],
+                ["font", "Font"],
                 ["envelope", "Envelope"],
                 ["stickers", "Stickers"],
                 ["scraps", "Scraps"],
@@ -359,6 +364,32 @@ export function ComposeStudio({
               ) : (
                 <p className="compose-hint">JPG, PNG, WebP, or GIF · under 4MB</p>
               )}
+            </div>
+          )}
+
+          {tab === "font" && (
+            <div className="palette-stack">
+              <p className="compose-hint">
+                Choose how your words look on the page — typewriter, handwriting,
+                or a whimsical print.
+              </p>
+              <div className="option-grid font-option-grid">
+                {FONT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={`option-chip font-swatch font-${opt.id} ${fontStyle === opt.id ? "active" : ""}`}
+                    onClick={() => {
+                      setFontStyle(opt.id);
+                      setPreview("letter");
+                    }}
+                  >
+                    <strong>{opt.name}</strong>
+                    <span>{opt.hint}</span>
+                    <em className="font-sample">{opt.sample}</em>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -499,6 +530,7 @@ export function ComposeStudio({
           {preview === "letter" ? (
             <LetterPaper
               paperStyle={paperStyle}
+              fontStyle={fontStyle}
               body={body}
               subject={subject}
               stickers={stickers}

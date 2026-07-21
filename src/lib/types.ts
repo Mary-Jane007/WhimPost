@@ -8,6 +8,16 @@ export type PaperStyle =
   | "floral"
   | "night";
 
+/** Handwriting / typeface for letter subject + body. */
+export type LetterFont =
+  | "quill"
+  | "typewriter"
+  | "ink-hand"
+  | "soft-hand"
+  | "letterpress"
+  | "storybook"
+  | "flourish";
+
 export type EnvelopeStyle =
   | "kraft"
   | "sage"
@@ -207,6 +217,7 @@ export interface LetterRecord {
   envelope_style: EnvelopeStyle;
   wax_seal: WaxSeal;
   stamp_style: StampStyle;
+  font_style: LetterFont;
   stickers_json: string;
   scrap_json: string;
   status: "draft" | "sent";
@@ -225,6 +236,7 @@ export interface LetterView {
   envelopeStyle: EnvelopeStyle;
   waxSeal: WaxSeal;
   stampStyle: StampStyle;
+  fontStyle: LetterFont;
   stickers: PlacedSticker[];
   scraps: PlacedScrap[];
   image: PlacedImage | null;
@@ -253,6 +265,56 @@ export const PAPER_OPTIONS: {
   { id: "lined", name: "Garden Lines", hint: "For thoughtful words" },
   { id: "floral", name: "Pressed Petals", hint: "Soft botanical wash" },
   { id: "night", name: "Night Ink", hint: "Moonlit charcoal" },
+];
+
+export const FONT_OPTIONS: {
+  id: LetterFont;
+  name: string;
+  hint: string;
+  sample: string;
+}[] = [
+  {
+    id: "quill",
+    name: "Quill Serif",
+    hint: "Classic library ink",
+    sample: "The moss remembers your name.",
+  },
+  {
+    id: "typewriter",
+    name: "Vintage Typewriter",
+    hint: "Clacked keys & ribbons",
+    sample: "Dear friend — a note from the desk.",
+  },
+  {
+    id: "ink-hand",
+    name: "Ink Hand",
+    hint: "Pen-and-journal loops",
+    sample: "Written by lantern light.",
+  },
+  {
+    id: "soft-hand",
+    name: "Soft Script",
+    hint: "Casual cottage scribble",
+    sample: "Thinking of you today.",
+  },
+  {
+    id: "letterpress",
+    name: "Letterpress",
+    hint: "Old printed pages",
+    sample: "Once upon a woodland lane…",
+  },
+  {
+    id: "storybook",
+    name: "Storybook",
+    hint: "Fairytale chapter titles",
+    sample: "A letter tucked in a tree hollow.",
+  },
+  {
+    id: "flourish",
+    name: "Flourish",
+    hint: "Whimsical swirling script",
+    sample: "With warmth & wildflowers,",
+  },
 ];
 
 export const ENVELOPE_OPTIONS: {
