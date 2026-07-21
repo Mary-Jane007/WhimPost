@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import type { UserPublic } from "@/lib/types";
 
@@ -19,6 +20,7 @@ export function FriendsPanel({
   initialIncoming: FriendRequest[];
   initialOutgoing: FriendRequest[];
 }) {
+  const router = useRouter();
   const [friends, setFriends] = useState(initialFriends);
   const [incoming, setIncoming] = useState(initialIncoming);
   const [outgoing, setOutgoing] = useState(initialOutgoing);
@@ -41,6 +43,7 @@ export function FriendsPanel({
       setIncoming(data.incoming);
       setOutgoing(data.outgoing);
     }
+    router.refresh();
   }
 
   function searchUsers(value: string) {

@@ -1,9 +1,13 @@
 import { StickerArt } from "@/components/stickers/StickerArt";
 import type { StickerKind } from "@/lib/types";
 import {
+  bramblewoodStickerSrc,
   cloverStickerSrc,
+  hearthwickStickerSrc,
   moonmereStickerSrc,
+  type BramblewoodStickerId,
   type CloverStickerId,
+  type HearthwickStickerId,
   type MoonmereStickerId,
 } from "@/lib/villageThemes";
 
@@ -15,6 +19,8 @@ export function PageCrest({
   villageStickers?: Array<
     | { village: "clovermeadow"; id: CloverStickerId }
     | { village: "moonmere"; id: MoonmereStickerId }
+    | { village: "bramblewood"; id: BramblewoodStickerId }
+    | { village: "hearthwick"; id: HearthwickStickerId }
     | CloverStickerId
   >;
 }) {
@@ -27,7 +33,11 @@ export function PageCrest({
                 ? cloverStickerSrc(entry)
                 : entry.village === "moonmere"
                   ? moonmereStickerSrc(entry.id)
-                  : cloverStickerSrc(entry.id);
+                  : entry.village === "bramblewood"
+                    ? bramblewoodStickerSrc(entry.id)
+                    : entry.village === "hearthwick"
+                      ? hearthwickStickerSrc(entry.id)
+                      : cloverStickerSrc(entry.id);
             const key = typeof entry === "string" ? entry : entry.id;
             return (
               // eslint-disable-next-line @next/next/no-img-element

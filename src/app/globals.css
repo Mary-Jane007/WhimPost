@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Special+Elite&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Fondamento:ital@0;1&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Great+Vibes&family=Homemade+Apple&family=IM+Fell+English:ital@0;1&family=Special+Elite&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -22,10 +22,35 @@
   --font-display: "Fraunces", Georgia, serif;
   --font-letter: "Cormorant Garamond", "Times New Roman", serif;
   --font-stamp: "Special Elite", "Courier New", monospace;
+  --font-quill: "Cormorant Garamond", "Times New Roman", serif;
+  --font-typewriter: "Special Elite", "Courier New", monospace;
+  --font-ink-hand: "Homemade Apple", "Segoe Script", cursive;
+  --font-soft-hand: "Caveat", "Segoe Script", cursive;
+  --font-letterpress: "IM Fell English", Georgia, serif;
+  --font-storybook: "Fondamento", Georgia, serif;
+  --font-flourish: "Great Vibes", "Segoe Script", cursive;
   --bg-glow: radial-gradient(ellipse at 18% 8%, rgba(95, 127, 101, 0.4), transparent 45%),
     radial-gradient(ellipse at 85% 5%, rgba(212, 175, 55, 0.14), transparent 35%),
     radial-gradient(ellipse at 50% 100%, rgba(36, 51, 40, 0.9), transparent 55%),
     linear-gradient(165deg, #121812 0%, #1a2219 28%, #243024 62%, #1a2219 100%);
+
+  /* Whimsical organic frames — petal / cloud / leaf silhouettes */
+  --frame-panel: 1.85rem 2.6rem 2.1rem 2.35rem / 2.4rem 1.7rem 2.55rem 1.9rem;
+  --frame-panel-sm: 1.35rem 1.9rem 1.5rem 1.75rem / 1.8rem 1.25rem 1.95rem 1.4rem;
+  --frame-cloud: 2.2rem 1.4rem 2.5rem 1.6rem / 1.5rem 2.4rem 1.35rem 2.2rem;
+  --frame-petal: 42% 58% 48% 52% / 55% 42% 58% 45%;
+  --frame-bloom: 1.4rem 2rem 1.55rem 1.85rem;
+  --frame-chip: 1.15rem 1.55rem 1.3rem 1.45rem / 1.5rem 1.1rem 1.6rem 1.2rem;
+  --frame-pill: 1.1rem 1.75rem 1.25rem 1.55rem;
+  --frame-paper: 1.7rem 2.35rem 1.9rem 2.55rem / 2.15rem 1.65rem 2.4rem 1.8rem;
+  --frame-button: 1.35rem 1.85rem 1.5rem 1.65rem / 1.7rem 1.25rem 1.8rem 1.4rem;
+  --frame-input: 0.95rem 1.35rem 1.05rem 1.2rem / 1.25rem 0.9rem 1.35rem 1rem;
+  --frame-stamp-mask:
+    radial-gradient(circle at 0 50%, transparent 0.28rem, #000 0.3rem) 0 / 100% 0.85rem repeat-y,
+    radial-gradient(circle at 100% 50%, transparent 0.28rem, #000 0.3rem) 100% / 100% 0.85rem repeat-y,
+    radial-gradient(circle at 50% 0, transparent 0.28rem, #000 0.3rem) 0 0 / 0.85rem 100% repeat-x,
+    radial-gradient(circle at 50% 100%, transparent 0.28rem, #000 0.3rem) 0 100% / 0.85rem 100% repeat-x,
+    linear-gradient(#000, #000);
 }
 
 * {
@@ -98,6 +123,8 @@ select {
   position: sticky;
   top: 0;
   z-index: 20;
+  border-bottom-left-radius: 1.75rem 1.1rem;
+  border-bottom-right-radius: 2.1rem 1.35rem;
   backdrop-filter: blur(10px);
   background: linear-gradient(180deg, rgba(31, 42, 30, 0.92), rgba(31, 42, 30, 0.55));
   border-bottom: 1px solid rgba(243, 230, 208, 0.08);
@@ -138,6 +165,9 @@ select {
 .nav-ghost {
   opacity: 0.78;
   transition: opacity 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .nav-links a:hover,
@@ -145,6 +175,24 @@ select {
 .nav-ghost:hover {
   opacity: 1;
   color: var(--gold);
+}
+
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #d4af37, #b8860b);
+  color: #1a2219;
+  font-family: var(--font-stamp);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  box-shadow: 0 0 0 2px rgba(26, 34, 25, 0.35);
 }
 
 .nav-ghost {
@@ -160,7 +208,8 @@ select {
 
 .nav-cta {
   border: 1px solid rgba(212, 175, 55, 0.55);
-  padding: 0.4rem 0.75rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--frame-pill);
   opacity: 1 !important;
   color: var(--gold) !important;
 }
@@ -205,6 +254,7 @@ select {
   font-size: 0.85rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  border-radius: var(--frame-button);
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
@@ -414,6 +464,7 @@ select {
     linear-gradient(160deg, rgba(243, 230, 208, 0.1), rgba(31, 42, 30, 0.35)),
     rgba(36, 48, 36, 0.75);
   border: 1px solid rgba(243, 230, 208, 0.14);
+  border-radius: var(--frame-cloud);
 }
 
 .auth-panel h1 {
@@ -456,6 +507,7 @@ select {
   color: var(--ink);
   padding: 0.65rem 0.75rem;
   outline: none;
+  border-radius: var(--frame-input);
 }
 
 .auth-form input:focus,
@@ -521,9 +573,14 @@ select {
 
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 3rem 1.25rem;
   max-width: 28rem;
   margin: 2rem auto;
+  border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-cloud);
+  background:
+    radial-gradient(circle at 20% 15%, rgba(212, 175, 55, 0.1), transparent 45%),
+    rgba(31, 42, 30, 0.35);
 }
 
 .empty-state h1,
@@ -557,9 +614,10 @@ select {
 .mail-item {
   display: grid;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1rem 1.15rem;
   border: 1px solid rgba(243, 230, 208, 0.1);
   background: rgba(31, 42, 30, 0.45);
+  border-radius: var(--frame-cloud);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -612,6 +670,7 @@ select {
   width: 100%;
   aspect-ratio: 1.55 / 1;
   border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 1.35rem 1.85rem 1.5rem 1.7rem / 1.6rem 1.25rem 1.75rem 1.4rem;
   overflow: hidden;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
 }
@@ -748,7 +807,10 @@ select {
   margin: 0 auto;
   padding: 2rem 1.75rem 3rem;
   color: var(--ink);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  border-radius: var(--frame-paper);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(92, 58, 30, 0.08);
   overflow: hidden;
 }
 
@@ -786,6 +848,113 @@ select {
   color: #f3e6d0;
 }
 
+/* Village stationery — themed paper, quiet border, mascot corner */
+.paper-mosshollow,
+.paper-clovermeadow,
+.paper-moonmere,
+.paper-bramblewood,
+.paper-hearthwick {
+  background-size: 100% 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border-radius: 0.55rem 0.75rem 0.9rem 0.7rem / 0.7rem 0.55rem 0.8rem 0.65rem;
+  aspect-ratio: 3 / 4;
+  width: min(100%, 32rem);
+  min-height: 0;
+  height: auto;
+  padding: 3rem 2.35rem 8.25rem 2.35rem;
+  overflow: hidden;
+}
+
+.paper-mosshollow {
+  color: #1f2a1e;
+  background-color: #d8e2d4;
+  background-image: url("/villages/mosshollow/letter-paper.jpg");
+  box-shadow:
+    0 22px 48px rgba(20, 40, 28, 0.4),
+    inset 0 0 0 1px rgba(40, 70, 50, 0.12);
+}
+
+.paper-clovermeadow {
+  color: #4a2f3a;
+  background-color: #f3d8df;
+  background-image: url("/villages/clovermeadow/letter-paper.jpg");
+  box-shadow:
+    0 22px 48px rgba(90, 40, 60, 0.35),
+    inset 0 0 0 1px rgba(160, 90, 110, 0.14);
+}
+
+.paper-moonmere {
+  color: #243040;
+  background-color: #d9d8e6;
+  background-image: url("/villages/moonmere/letter-paper.jpg");
+  box-shadow:
+    0 22px 48px rgba(30, 35, 60, 0.4),
+    inset 0 0 0 1px rgba(70, 80, 120, 0.14);
+}
+
+.paper-bramblewood {
+  color: #2f2418;
+  background-color: #f4ebdc;
+  background-image: url("/villages/bramblewood/letter-paper.jpg");
+  box-shadow:
+    0 22px 48px rgba(40, 28, 12, 0.4),
+    inset 0 0 0 1px rgba(60, 70, 40, 0.12);
+}
+
+.paper-hearthwick {
+  color: #3a2a1a;
+  background-color: #e8d7bc;
+  background-image: url("/villages/hearthwick/letter-paper.jpg");
+  box-shadow:
+    0 22px 48px rgba(40, 22, 10, 0.42),
+    inset 0 0 0 1px rgba(92, 58, 30, 0.12);
+}
+
+.paper-mosshollow .letter-subject-input,
+.paper-mosshollow .letter-subject-display,
+.paper-clovermeadow .letter-subject-input,
+.paper-clovermeadow .letter-subject-display,
+.paper-moonmere .letter-subject-input,
+.paper-moonmere .letter-subject-display,
+.paper-bramblewood .letter-subject-input,
+.paper-bramblewood .letter-subject-display,
+.paper-hearthwick .letter-subject-input,
+.paper-hearthwick .letter-subject-display {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.paper-mosshollow .letter-body-input,
+.paper-mosshollow .letter-body-display,
+.paper-clovermeadow .letter-body-input,
+.paper-clovermeadow .letter-body-display,
+.paper-moonmere .letter-body-input,
+.paper-moonmere .letter-body-display,
+.paper-bramblewood .letter-body-input,
+.paper-bramblewood .letter-body-display,
+.paper-hearthwick .letter-body-input,
+.paper-hearthwick .letter-body-display {
+  min-height: 24rem;
+  line-height: 1.7rem;
+  background: transparent;
+}
+
+.paper-mosshollow.font-typewriter .letter-body-input,
+.paper-mosshollow.font-typewriter .letter-body-display,
+.paper-clovermeadow.font-typewriter .letter-body-input,
+.paper-clovermeadow.font-typewriter .letter-body-display,
+.paper-moonmere.font-typewriter .letter-body-input,
+.paper-moonmere.font-typewriter .letter-body-display,
+.paper-bramblewood.font-typewriter .letter-body-input,
+.paper-bramblewood.font-typewriter .letter-body-display,
+.paper-hearthwick.font-typewriter .letter-body-input,
+.paper-hearthwick.font-typewriter .letter-body-display {
+  font-size: 1.05rem;
+  line-height: 1.7rem;
+  letter-spacing: 0.015em;
+}
+
 .paper-swatch.paper-parchment {
   background: #e8dcc8;
   color: #2f2418;
@@ -809,6 +978,26 @@ select {
 .paper-swatch.paper-night {
   background: #2a322a;
   color: #f3e6d0;
+}
+.paper-swatch.paper-mosshollow {
+  background: #d8e2d4;
+  color: #1f2a1e;
+}
+.paper-swatch.paper-clovermeadow {
+  background: #f3d8df;
+  color: #4a2f3a;
+}
+.paper-swatch.paper-moonmere {
+  background: #d9d8e6;
+  color: #243040;
+}
+.paper-swatch.paper-bramblewood {
+  background: #f0e4d0;
+  color: #2f2418;
+}
+.paper-swatch.paper-hearthwick {
+  background: #e8d7bc;
+  color: #3a2a1a;
 }
 
 .letter-subject-input,
@@ -843,6 +1032,148 @@ select {
   position: relative;
   z-index: 2;
   white-space: pre-wrap;
+}
+
+/* Letter font choices (compose + reader) */
+.letter-paper.font-quill .letter-subject-display,
+.letter-paper.font-quill .letter-subject-input {
+  font-family: var(--font-display);
+}
+.letter-paper.font-quill .letter-body-display,
+.letter-paper.font-quill .letter-body-input {
+  font-family: var(--font-quill);
+}
+
+.letter-paper.font-typewriter .letter-subject-display,
+.letter-paper.font-typewriter .letter-subject-input,
+.letter-paper.font-typewriter .letter-body-display,
+.letter-paper.font-typewriter .letter-body-input {
+  font-family: var(--font-typewriter);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.letter-paper.font-typewriter .letter-body-display,
+.letter-paper.font-typewriter .letter-body-input {
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.letter-paper.font-ink-hand .letter-subject-display,
+.letter-paper.font-ink-hand .letter-subject-input,
+.letter-paper.font-ink-hand .letter-body-display,
+.letter-paper.font-ink-hand .letter-body-input {
+  font-family: var(--font-ink-hand);
+  font-weight: 400;
+}
+.letter-paper.font-ink-hand .letter-subject-display,
+.letter-paper.font-ink-hand .letter-subject-input {
+  font-size: 1.55rem;
+}
+.letter-paper.font-ink-hand .letter-body-display,
+.letter-paper.font-ink-hand .letter-body-input {
+  font-size: 1.25rem;
+  line-height: 1.9;
+}
+
+.letter-paper.font-soft-hand .letter-subject-display,
+.letter-paper.font-soft-hand .letter-subject-input,
+.letter-paper.font-soft-hand .letter-body-display,
+.letter-paper.font-soft-hand .letter-body-input {
+  font-family: var(--font-soft-hand);
+  font-weight: 600;
+}
+.letter-paper.font-soft-hand .letter-subject-display,
+.letter-paper.font-soft-hand .letter-subject-input {
+  font-size: 1.85rem;
+}
+.letter-paper.font-soft-hand .letter-body-display,
+.letter-paper.font-soft-hand .letter-body-input {
+  font-size: 1.45rem;
+  line-height: 1.55;
+}
+
+.letter-paper.font-letterpress .letter-subject-display,
+.letter-paper.font-letterpress .letter-subject-input,
+.letter-paper.font-letterpress .letter-body-display,
+.letter-paper.font-letterpress .letter-body-input {
+  font-family: var(--font-letterpress);
+  font-weight: 400;
+}
+.letter-paper.font-letterpress .letter-body-display,
+.letter-paper.font-letterpress .letter-body-input {
+  font-size: 1.18rem;
+  line-height: 1.7;
+}
+
+.letter-paper.font-storybook .letter-subject-display,
+.letter-paper.font-storybook .letter-subject-input,
+.letter-paper.font-storybook .letter-body-display,
+.letter-paper.font-storybook .letter-body-input {
+  font-family: var(--font-storybook);
+  font-weight: 400;
+}
+.letter-paper.font-storybook .letter-body-display,
+.letter-paper.font-storybook .letter-body-input {
+  font-size: 1.2rem;
+  line-height: 1.75;
+}
+
+.letter-paper.font-flourish .letter-subject-display,
+.letter-paper.font-flourish .letter-subject-input,
+.letter-paper.font-flourish .letter-body-display,
+.letter-paper.font-flourish .letter-body-input {
+  font-family: var(--font-flourish);
+  font-weight: 400;
+}
+.letter-paper.font-flourish .letter-subject-display,
+.letter-paper.font-flourish .letter-subject-input {
+  font-size: 2.1rem;
+}
+.letter-paper.font-flourish .letter-body-display,
+.letter-paper.font-flourish .letter-body-input {
+  font-size: 1.65rem;
+  line-height: 1.55;
+}
+
+.font-option-grid .font-swatch {
+  text-align: left;
+  gap: 0.2rem;
+}
+
+.font-option-grid .font-sample {
+  display: block;
+  margin-top: 0.35rem;
+  font-style: normal;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: rgba(47, 36, 24, 0.82);
+}
+
+.font-swatch.font-quill .font-sample {
+  font-family: var(--font-quill);
+}
+.font-swatch.font-typewriter .font-sample {
+  font-family: var(--font-typewriter);
+  font-size: 0.92rem;
+}
+.font-swatch.font-ink-hand .font-sample {
+  font-family: var(--font-ink-hand);
+  font-size: 1rem;
+}
+.font-swatch.font-soft-hand .font-sample {
+  font-family: var(--font-soft-hand);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.font-swatch.font-letterpress .font-sample {
+  font-family: var(--font-letterpress);
+}
+.font-swatch.font-storybook .font-sample {
+  font-family: var(--font-storybook);
+}
+.font-swatch.font-flourish .font-sample {
+  font-family: var(--font-flourish);
+  font-size: 1.35rem;
 }
 
 .letter-body-display {
@@ -901,6 +1232,60 @@ select {
   gap: 1rem;
 }
 
+.compose-page-mosshollow .page-header h1,
+.compose-page-clovermeadow .page-header h1,
+.compose-page-moonmere .page-header h1,
+.compose-page-bramblewood .page-header h1,
+.compose-page-hearthwick .page-header h1 {
+  color: #f3e0c8;
+}
+
+.compose-village .compose-stage {
+  border-radius: var(--frame-panel);
+  padding: 1.1rem 0.85rem 1.4rem;
+}
+
+.compose-mosshollow .compose-stage {
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(107, 143, 113, 0.2), transparent 45%),
+    rgba(26, 40, 30, 0.3);
+}
+
+.compose-clovermeadow .compose-stage {
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(232, 160, 181, 0.22), transparent 45%),
+    rgba(74, 47, 58, 0.28);
+}
+
+.compose-moonmere .compose-stage {
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(138, 155, 200, 0.2), transparent 45%),
+    rgba(30, 36, 55, 0.32);
+}
+
+.compose-bramblewood .compose-stage {
+  background:
+    radial-gradient(ellipse at 75% 15%, rgba(210, 140, 70, 0.16), transparent 42%),
+    radial-gradient(ellipse at 15% 85%, rgba(70, 90, 40, 0.22), transparent 48%),
+    rgba(36, 40, 24, 0.3);
+}
+
+.compose-hearthwick .compose-stage {
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(212, 140, 70, 0.18), transparent 45%),
+    radial-gradient(ellipse at 20% 90%, rgba(90, 50, 28, 0.28), transparent 50%),
+    rgba(48, 30, 20, 0.28);
+}
+
+.compose-village .letter-paper.paper-mosshollow,
+.compose-village .letter-paper.paper-clovermeadow,
+.compose-village .letter-paper.paper-moonmere,
+.compose-village .letter-paper.paper-bramblewood,
+.compose-village .letter-paper.paper-hearthwick {
+  width: min(100%, 32rem);
+  max-height: none;
+}
+
 .compose-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -917,6 +1302,8 @@ select {
 .preview-toggle {
   display: inline-flex;
   border: 1px solid rgba(243, 230, 208, 0.2);
+  border-radius: var(--frame-pill);
+  overflow: hidden;
 }
 
 .preview-toggle button {
@@ -957,6 +1344,7 @@ select {
 .compose-palette {
   background: rgba(31, 42, 30, 0.55);
   border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-panel-sm);
   padding: 0.85rem;
 }
 
@@ -978,6 +1366,7 @@ select {
   border: 1px solid rgba(243, 230, 208, 0.15);
   background: rgba(243, 230, 208, 0.05);
   color: var(--cream);
+  border-radius: var(--frame-chip);
 }
 
 .palette-tabs button {
@@ -1065,8 +1454,9 @@ select {
 .village-sticker-pack {
   display: grid;
   gap: 0.55rem;
-  padding: 0.7rem;
+  padding: 0.7rem 0.85rem;
   border: 1px solid rgba(242, 196, 208, 0.35);
+  border-radius: var(--frame-bloom);
   background: rgba(212, 132, 154, 0.1);
 }
 
@@ -1178,6 +1568,7 @@ body.theme-clovermeadow .village-sticker-pack {
   padding: 1.25rem;
   border: 1px solid rgba(243, 230, 208, 0.1);
   background: rgba(31, 42, 30, 0.4);
+  border-radius: var(--frame-panel-sm);
 }
 
 .friends-section h2 {
@@ -1400,6 +1791,19 @@ body.theme-clovermeadow .village-sticker-pack {
   z-index: 2;
 }
 
+.forest-sticker,
+.forest-stickers .sparkle,
+.forest-sticker * {
+  pointer-events: none;
+}
+
+.page-shell > .site-nav,
+.page-shell > main,
+.page-shell > .app-main {
+  position: relative;
+  z-index: 3;
+}
+
 .forest-sticker {
   position: absolute;
   display: block;
@@ -1563,9 +1967,50 @@ body.theme-clovermeadow .village-sticker-pack {
   background:
     linear-gradient(160deg, rgba(36, 48, 36, 0.55), rgba(26, 34, 25, 0.35));
   border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-panel);
   padding: 1.5rem 1.25rem 2.5rem;
   margin-top: 1rem;
   margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-main.forest-panel::before,
+.app-main.forest-panel::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+.app-main.forest-panel::before {
+  width: 7.5rem;
+  height: 7.5rem;
+  top: -2.4rem;
+  left: -2.1rem;
+  background:
+    radial-gradient(circle at 35% 40%, rgba(212, 175, 55, 0.28), transparent 58%),
+    radial-gradient(circle at 70% 65%, rgba(143, 168, 138, 0.35), transparent 55%);
+  border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+  transform: rotate(-12deg);
+}
+
+.app-main.forest-panel::after {
+  width: 8.5rem;
+  height: 8.5rem;
+  right: -2.6rem;
+  bottom: -2.8rem;
+  background:
+    radial-gradient(circle at 40% 35%, rgba(196, 164, 132, 0.28), transparent 56%),
+    radial-gradient(circle at 65% 70%, rgba(95, 127, 101, 0.32), transparent 58%);
+  border-radius: 45% 55% 40% 60% / 55% 40% 60% 45%;
+  transform: rotate(18deg);
+}
+
+.app-main.forest-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .page-crest {
@@ -1629,6 +2074,7 @@ body.theme-clovermeadow .village-sticker-pack {
     linear-gradient(160deg, rgba(243, 230, 208, 0.12), rgba(31, 42, 30, 0.55)),
     rgba(36, 48, 36, 0.82);
   border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: var(--frame-cloud);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
 
@@ -1645,6 +2091,7 @@ body.theme-clovermeadow .village-sticker-pack {
 .feature-visual {
   min-height: 18rem;
   border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-panel-sm);
   background:
     linear-gradient(145deg, rgba(95, 127, 101, 0.25), rgba(31, 42, 30, 0.5)),
     radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.18), transparent 50%);
@@ -1783,8 +2230,9 @@ body.theme-clovermeadow .village-sticker-pack {
   text-align: left;
   display: grid;
   gap: 0.2rem;
-  padding: 0.85rem;
+  padding: 0.85rem 1rem;
   border: 1px solid rgba(243, 230, 208, 0.18);
+  border-radius: var(--frame-bloom);
   background: linear-gradient(
     145deg,
     color-mix(in srgb, var(--village-soft, #6b8f71) 22%, transparent),
@@ -1902,6 +2350,7 @@ body.theme-clovermeadow .village-sticker-pack {
 .village-stats > div {
   padding: 0.9rem 1rem;
   border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-bloom);
   background: rgba(18, 24, 18, 0.35);
   display: grid;
   gap: 0.25rem;
@@ -1921,14 +2370,16 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .village-panel {
   margin-bottom: 1.15rem;
-  padding: 1.15rem;
+  padding: 1.15rem 1.25rem;
   border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-panel-sm);
   background:
     linear-gradient(
       160deg,
       color-mix(in srgb, var(--village-soft, #6b8f71) 12%, transparent),
       rgba(31, 42, 30, 0.4)
     );
+  overflow: hidden;
 }
 
 .village-panel h2 {
@@ -1955,10 +2406,11 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .feature-chip,
 .unlock-pill {
-  padding: 0.35rem 0.65rem;
+  padding: 0.35rem 0.75rem;
   border: 1px solid rgba(243, 230, 208, 0.15);
   background: rgba(243, 230, 208, 0.06);
   font-size: 0.9rem;
+  border-radius: var(--frame-pill);
 }
 
 .unlock-row {
@@ -1992,11 +2444,28 @@ body.theme-clovermeadow .village-sticker-pack {
 }
 
 .collectible-chip {
-  padding: 0.65rem;
+  padding: 0.75rem 0.7rem;
   border: 1px solid rgba(243, 230, 208, 0.12);
   background: rgba(18, 24, 18, 0.3);
   display: grid;
   gap: 0.15rem;
+  border-radius: var(--frame-petal);
+  justify-items: center;
+  text-align: center;
+  transition: transform 0.35s ease, border-color 0.25s ease;
+}
+
+.collectible-chip:nth-child(3n + 1) {
+  border-radius: 48% 52% 45% 55% / 52% 42% 58% 48%;
+}
+
+.collectible-chip:nth-child(3n + 2) {
+  border-radius: 55% 45% 52% 48% / 42% 58% 45% 55%;
+}
+
+.collectible-chip:hover {
+  transform: translateY(-3px) rotate(-1deg);
+  border-color: rgba(212, 175, 55, 0.4);
 }
 
 .collectible-icon {
@@ -2007,10 +2476,31 @@ body.theme-clovermeadow .village-sticker-pack {
   margin-bottom: 0.15rem;
 }
 
+.collectible-icon-sm {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-bottom: 0;
+}
+
+.collectible-icon-lg {
+  width: 3rem;
+  height: 3rem;
+}
+
 .collectible-emoji {
   font-size: 1.55rem;
   line-height: 1;
   margin-bottom: 0.1rem;
+}
+
+.letter-inline-icon {
+  display: inline-block;
+  width: 1.45rem;
+  height: 1.45rem;
+  object-fit: contain;
+  vertical-align: -0.35em;
+  margin-right: 0.2em;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.22));
 }
 
 .collectible-chip strong {
@@ -2049,6 +2539,7 @@ body.theme-clovermeadow .village-sticker-pack {
 .notice-form textarea {
   width: 100%;
   border: 1px solid rgba(92, 58, 30, 0.25);
+  border-radius: var(--frame-input);
   background: rgba(243, 230, 208, 0.92);
   color: var(--ink);
   padding: 0.65rem 0.75rem;
@@ -2075,8 +2566,10 @@ body.theme-clovermeadow .village-sticker-pack {
 }
 
 .notice-list li {
-  padding: 0.7rem 0.8rem;
-  border-top: 1px solid rgba(243, 230, 208, 0.1);
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(243, 230, 208, 0.1);
+  border-radius: var(--frame-chip);
+  background: rgba(18, 24, 18, 0.22);
 }
 
 .notice-list p {
@@ -2095,8 +2588,9 @@ body.theme-clovermeadow .village-sticker-pack {
 }
 
 .season-list span {
-  padding: 0.35rem 0.6rem;
+  padding: 0.35rem 0.7rem;
   border: 1px dashed rgba(243, 230, 208, 0.2);
+  border-radius: var(--frame-pill);
   font-size: 0.9rem;
 }
 
@@ -2166,6 +2660,7 @@ body.theme-clovermeadow .village-sticker-pack {
   gap: 0.35rem;
   padding: 0.85rem;
   border: 1px dashed rgba(243, 230, 208, 0.35);
+  border-radius: var(--frame-bloom);
   background: rgba(243, 230, 208, 0.06);
   cursor: pointer;
   font-family: var(--font-stamp) !important;
@@ -2188,6 +2683,7 @@ body.theme-clovermeadow .village-sticker-pack {
   position: relative;
   margin: 0;
   padding: 0.35rem;
+  border-radius: 1.1rem 1.45rem 1.2rem 1.35rem / 1.35rem 1.05rem 1.45rem 1.15rem;
   background: rgba(243, 230, 208, 0.7);
   border: 1px solid rgba(92, 58, 30, 0.22);
   box-shadow: 2px 3px 0 rgba(60, 40, 20, 0.12);
@@ -2259,6 +2755,7 @@ body.theme-clovermeadow .village-sticker-pack {
   overflow: auto;
   padding: 1.5rem 1.35rem 1.75rem;
   border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--frame-cloud);
   background:
     linear-gradient(165deg, rgba(243, 230, 208, 0.96), rgba(225, 208, 175, 0.94));
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
@@ -2301,12 +2798,101 @@ body.theme-clovermeadow .village-sticker-pack {
   gap: 1rem;
   justify-items: center;
   text-align: left;
+  width: min(100%, 34rem);
 }
 
 .welcome-letter-stage .letter-paper {
   width: min(100%, 34rem);
-  max-height: min(62vh, 36rem);
-  overflow: auto;
+}
+
+.welcome-letter-stage .letter-paper.welcome-fit {
+  max-height: none;
+  overflow: visible;
+}
+
+/* Village welcome letters always read in vintage typewriter */
+.letter-paper.welcome-typewriter .letter-subject-display,
+.letter-paper.welcome-typewriter .letter-subject-input,
+.letter-paper.welcome-typewriter .letter-body-display,
+.letter-paper.welcome-typewriter .letter-body-input,
+.welcome-editor-preview.welcome-typewriter h3,
+.welcome-editor-preview.welcome-typewriter .letter-body-display {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.02em;
+}
+
+.letter-paper.welcome-typewriter .letter-subject-display,
+.letter-paper.welcome-typewriter .letter-subject-input,
+.welcome-editor-preview.welcome-typewriter h3 {
+  font-weight: 400;
+}
+
+.letter-paper.welcome-typewriter .letter-body-display,
+.letter-paper.welcome-typewriter .letter-body-input,
+.welcome-editor-preview.welcome-typewriter .letter-body-display {
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+/* Welcome letters grow with their text so nothing is clipped by the frame */
+.letter-paper.welcome-fit {
+  aspect-ratio: auto !important;
+  height: auto !important;
+  min-height: 28rem;
+  max-height: none !important;
+  overflow: visible !important;
+  width: min(100%, 30rem);
+  padding: 2.6rem 2.45rem 7.25rem;
+  background-size: cover !important;
+  background-position: top center !important;
+  background-repeat: no-repeat !important;
+}
+
+.letter-paper.welcome-fit .letter-subject-display,
+.letter-paper.welcome-fit .letter-subject-input {
+  font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+  line-height: 1.35;
+  margin: 0 0 0.85rem;
+  text-wrap: balance;
+}
+
+.letter-paper.welcome-fit .letter-body-display,
+.letter-paper.welcome-fit .letter-body-input {
+  min-height: 0;
+  font-size: 0.98rem;
+  line-height: 1.68;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.letter-paper.welcome-fit .letter-body-para {
+  margin: 0 0 0.8rem;
+}
+
+.letter-paper.welcome-fit .letter-body-list {
+  margin: 0 0 0.8rem;
+  padding-left: 1.1rem;
+}
+
+.letter-paper.welcome-fit .letter-body-list li {
+  margin: 0.28rem 0;
+}
+
+.letter-paper.welcome-fit .letter-inline-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  vertical-align: -0.15rem;
+}
+
+/* Stationery already shows the village mascot — hide the floating badge on welcomes */
+.letter-paper.welcome-fit .letter-mascot {
+  display: none;
+}
+
+.welcome-editor-form .welcome-typewriter-field {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.02em;
 }
 
 .welcome-dismiss {
@@ -2646,7 +3232,7 @@ body.theme-mosshollow .paper-moss {
   height: clamp(360px, 58vh, 560px);
   overflow: hidden;
   border: 1px solid rgba(243, 230, 208, 0.14);
-  border-radius: 2px;
+  border-radius: var(--frame-panel-sm);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.25),
     0 24px 50px rgba(0, 0, 0, 0.35);
@@ -2776,6 +3362,7 @@ body.theme-mosshollow .paper-moss {
   width: 2.4em;
   height: 2.4em;
   border: 1.5px dashed rgba(243, 230, 208, 0.28);
+  border-radius: var(--frame-petal);
   background: rgba(20, 24, 18, 0.35);
   filter: grayscale(1) brightness(0.55);
   opacity: 0.55;
@@ -2806,9 +3393,10 @@ body.theme-mosshollow .paper-moss {
   transform: translateX(-50%);
   z-index: 6;
   width: min(78%, 280px);
-  padding: 0.55rem 0.75rem;
+  padding: 0.55rem 0.85rem;
   text-align: left;
   border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 1.2rem 1.7rem 1.35rem 1.55rem / 1.5rem 1.15rem 1.65rem 1.25rem;
   background:
     linear-gradient(165deg, #d9c7a0, #c4ae82 55%, #b39a6c);
   color: #2a2218;
@@ -2854,8 +3442,9 @@ body.theme-mosshollow .paper-moss {
 
 .cottage-inspect {
   height: 100%;
-  padding: 1.1rem;
+  padding: 1.1rem 1.2rem;
   border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-panel-sm);
   background:
     linear-gradient(
       160deg,
@@ -3270,4 +3859,542 @@ body.theme-moonmere .cottage-window-glow {
 body.theme-moonmere .cottage-plaque {
   background: linear-gradient(165deg, #ebe4d4, #d8cdb8 55%, #c9bda6);
   border-color: rgba(122, 143, 168, 0.55);
+}
+
+/* —— Hearthwick firelit cottage theme —— */
+body.theme-hearthwick {
+  --forest-deep: #2c1e14;
+  --forest: #4a3224;
+  --blush: #c4846c;
+  --sage: #8a7a5c;
+  --gold: #e8b86d;
+}
+
+body.theme-hearthwick .site-nav {
+  background: linear-gradient(
+    180deg,
+    rgba(44, 30, 20, 0.96),
+    rgba(139, 90, 43, 0.4)
+  );
+  border-bottom-color: rgba(226, 195, 154, 0.38);
+}
+
+body.theme-hearthwick .brand-icon,
+body.theme-hearthwick .nav-links a:hover,
+body.theme-hearthwick .open-cue {
+  color: #e8b86d;
+}
+
+body.theme-hearthwick .btn-primary {
+  background: linear-gradient(145deg, #d4783a, #8b5a2b);
+  color: #f3e6d4;
+  border-color: rgba(243, 230, 212, 0.4);
+}
+
+body.theme-hearthwick .btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+body.theme-hearthwick .btn-secondary {
+  border-color: rgba(226, 195, 154, 0.5);
+  color: var(--cream);
+}
+
+body.theme-hearthwick .forest-backdrop {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(44, 30, 20, 0.38) 0%,
+      rgba(74, 50, 36, 0.58) 45%,
+      rgba(36, 24, 16, 0.9) 100%
+    ),
+    radial-gradient(ellipse at 20% 12%, rgba(232, 184, 109, 0.36), transparent 44%),
+    radial-gradient(ellipse at 78% 20%, rgba(212, 120, 58, 0.28), transparent 40%),
+    radial-gradient(ellipse at 55% 8%, rgba(196, 132, 108, 0.14), transparent 30%),
+    linear-gradient(165deg, #2c1e14, #6b4226 55%, #2c1e14);
+  opacity: 0.9;
+}
+
+body.theme-hearthwick .app-main.forest-panel,
+body.theme-hearthwick .village-panel {
+  border-color: rgba(226, 195, 154, 0.35);
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--village-soft, #e2c39a) 14%, transparent),
+      rgba(44, 30, 20, 0.52)
+    );
+}
+
+body.theme-hearthwick .village-page {
+  border-color: color-mix(in srgb, var(--village-color, #8b5a2b) 55%, transparent);
+}
+
+body.theme-hearthwick .village-motto {
+  color: color-mix(in srgb, var(--village-soft, #e2c39a) 75%, white);
+}
+
+body.theme-hearthwick .village-hero h1 {
+  color: #e2c39a;
+  text-shadow: 0 2px 18px rgba(212, 120, 58, 0.35);
+}
+
+body.theme-hearthwick .hero-postmark {
+  color: rgba(232, 184, 109, 0.92);
+}
+
+body.theme-hearthwick .forest-stickers-hearthwick .forest-sticker {
+  filter: drop-shadow(0 6px 14px rgba(24, 14, 8, 0.45)) saturate(1.05);
+}
+
+body.theme-hearthwick .welcome-modal {
+  background: linear-gradient(165deg, #f3e6d4, #e2c39a);
+  border-color: rgba(139, 90, 43, 0.5);
+  color: #2c1e14;
+}
+
+body.theme-hearthwick .welcome-modal-title {
+  color: #8b5a2b;
+}
+
+body.theme-hearthwick .welcome-modal-kicker,
+body.theme-hearthwick .welcome-modal-lead {
+  color: rgba(44, 30, 20, 0.72);
+}
+
+body.theme-hearthwick .form-error {
+  color: #e8b86d;
+}
+
+body.theme-hearthwick .collectible-chip {
+  border-color: rgba(226, 195, 154, 0.35);
+  background: rgba(44, 30, 20, 0.42);
+}
+
+body.theme-hearthwick .feature-chip,
+body.theme-hearthwick .unlock-pill.unlocked {
+  border-color: rgba(226, 195, 154, 0.4);
+  background: rgba(212, 120, 58, 0.16);
+}
+
+body.theme-hearthwick .village-sticker-pack {
+  border-color: rgba(226, 195, 154, 0.45);
+  background: rgba(139, 90, 43, 0.14);
+}
+
+body.theme-hearthwick .village-sticker-pack h3 {
+  color: #e2c39a;
+}
+
+body.theme-hearthwick .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(232, 184, 109, 0.16), transparent 40%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(107, 66, 38, 0.45) 0 14px,
+      rgba(74, 50, 36, 0.55) 14px 28px
+    ),
+    linear-gradient(165deg, #8b5a2b, #4a3224 70%, #2c1e14);
+}
+
+body.theme-hearthwick .cottage-window-glow {
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(232, 184, 109, 0.55),
+      rgba(212, 120, 58, 0.2) 55%,
+      transparent 72%
+    );
+}
+
+body.theme-hearthwick .cottage-plaque {
+  background: linear-gradient(165deg, #f3e6d4, #e2c39a 55%, #d4a574);
+  border-color: rgba(139, 90, 43, 0.55);
+}
+
+/* —— Discover your belonging quiz —— */
+.belonging-quiz {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.belonging-kicker {
+  margin: 0;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.9);
+}
+
+.belonging-intro h2,
+.belonging-question h2,
+.belonging-result h2,
+.belonging-confirm h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3.5vw, 2.1rem);
+  margin: 0.35rem 0 0.75rem;
+  font-weight: 600;
+}
+
+.belonging-lead,
+.belonging-result-blurb {
+  margin: 0 0 1.1rem;
+  color: rgba(243, 230, 208, 0.82);
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.belonging-traits {
+  list-style: none;
+  margin: 0 0 1.35rem;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.belonging-traits li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.55rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-chip);
+  background: rgba(18, 24, 18, 0.28);
+}
+
+.belonging-traits li span {
+  grid-row: 1 / span 2;
+  font-size: 1.35rem;
+  align-self: center;
+}
+
+.belonging-traits strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.belonging-traits em {
+  font-style: italic;
+  font-size: 0.92rem;
+  color: rgba(243, 230, 208, 0.7);
+}
+
+.belonging-account-cue {
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: var(--frame-bloom);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.12), transparent 55%),
+    rgba(31, 42, 30, 0.45);
+}
+
+.belonging-account-cue p {
+  margin: 0.25rem 0 0;
+  color: rgba(243, 230, 208, 0.8);
+}
+
+.belonging-progress {
+  height: 0.4rem;
+  border-radius: 999px;
+  background: rgba(243, 230, 208, 0.12);
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+}
+
+.belonging-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--moss-light), var(--gold));
+  border-radius: inherit;
+  transition: width 0.35s ease;
+}
+
+.belonging-options {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.belonging-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: start;
+  text-align: left;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(243, 230, 208, 0.16);
+  border-radius: var(--frame-bloom);
+  background:
+    linear-gradient(145deg, rgba(243, 230, 208, 0.07), transparent 55%),
+    rgba(24, 32, 22, 0.55);
+  color: var(--cream);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.belonging-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.45);
+  background:
+    linear-gradient(145deg, rgba(212, 175, 55, 0.12), transparent 55%),
+    rgba(28, 38, 26, 0.7);
+}
+
+.belonging-option-key {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: var(--frame-petal);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  font-family: var(--font-stamp);
+  font-size: 0.75rem;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.belonging-cinematic {
+  min-height: 18rem;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+  border-radius: var(--frame-cloud);
+  border: 1px solid rgba(243, 230, 208, 0.14);
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(212, 175, 55, 0.16), transparent 50%),
+    linear-gradient(165deg, rgba(18, 28, 20, 0.92), rgba(10, 16, 12, 0.96));
+  overflow: hidden;
+  position: relative;
+}
+
+.belonging-cinema-stage {
+  width: min(100%, 28rem);
+  text-align: center;
+  min-height: 8rem;
+  display: grid;
+  place-items: center;
+}
+
+.cinema-line {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  line-height: 1.35;
+}
+
+.cinema-line.muted-line {
+  opacity: 0.7;
+  font-size: 1.15rem;
+}
+
+.cinema-lantern {
+  display: grid;
+  gap: 0.65rem;
+  justify-items: center;
+}
+
+.cinema-lantern span {
+  font-size: 3rem;
+  filter: drop-shadow(0 0 18px rgba(255, 200, 100, 0.45));
+  animation: softPulse 2.4s ease-in-out infinite;
+}
+
+.cinema-lantern p,
+.cinema-path-sign p {
+  margin: 0;
+  font-family: var(--font-letter);
+  font-size: 1.15rem;
+  color: rgba(243, 230, 208, 0.88);
+}
+
+.cinema-path-sign {
+  position: relative;
+  display: grid;
+  gap: 0.55rem;
+  justify-items: center;
+  padding: 1rem;
+}
+
+.cinema-path-emoji {
+  font-size: 3.2rem;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+  animation: softPulse 2s ease-in-out infinite;
+}
+
+.cinema-path-glow {
+  position: absolute;
+  inset: 20% 15%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.28), transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.cinema-welcome {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  color: var(--gold);
+}
+
+.path-mosshollow .cinema-path-glow {
+  background: radial-gradient(circle, rgba(95, 127, 101, 0.4), transparent 70%);
+}
+.path-clovermeadow .cinema-path-glow {
+  background: radial-gradient(circle, rgba(232, 160, 181, 0.35), transparent 70%);
+}
+.path-moonmere .cinema-path-glow {
+  background: radial-gradient(circle, rgba(122, 143, 168, 0.4), transparent 70%);
+}
+.path-bramblewood .cinema-path-glow {
+  background: radial-gradient(circle, rgba(224, 112, 32, 0.38), transparent 70%);
+}
+.path-hearthwick .cinema-path-glow {
+  background: radial-gradient(circle, rgba(232, 184, 109, 0.42), transparent 70%);
+}
+
+.belonging-result-hero {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.belonging-result-hero h2 {
+  margin: 0;
+}
+
+.belonging-result-meta {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0 0 1rem;
+}
+
+.belonging-result-meta > div {
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-chip);
+  background: rgba(18, 24, 18, 0.3);
+}
+
+.belonging-result-meta dt {
+  font-family: var(--font-stamp);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin: 0 0 0.2rem;
+}
+
+.belonging-result-meta dd {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.belonging-result-note {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: rgba(243, 230, 208, 0.68);
+}
+
+.belonging-confirm,
+.belonging-step {
+  gap: 0.85rem;
+}
+
+.belonging-confirm .btn-secondary {
+  width: 100%;
+}
+
+button.linkish {
+  background: none;
+  border: none;
+  color: rgba(243, 230, 208, 0.75);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
+}
+
+button.linkish:hover {
+  color: var(--gold);
+}
+
+
+/* —— Owner welcome letter editor —— */
+.welcome-editor-form {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.welcome-editor-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-family: var(--font-stamp);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(243, 230, 208, 0.8);
+}
+
+.welcome-editor-form input,
+.welcome-editor-form select,
+.welcome-editor-form textarea {
+  width: 100%;
+  border: 1px solid rgba(92, 58, 30, 0.25);
+  border-radius: var(--frame-input);
+  background: rgba(243, 230, 208, 0.92);
+  color: var(--ink);
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.welcome-editor-form textarea {
+  min-height: 16rem;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.welcome-editor-meta,
+.welcome-editor-hint,
+.welcome-editor-status {
+  margin: 0;
+  font-size: 0.92rem;
+  color: rgba(243, 230, 208, 0.72);
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-letter);
+}
+
+.welcome-editor-hint code {
+  font-family: var(--font-stamp);
+  font-size: 0.8rem;
+  color: var(--gold);
+}
+
+.welcome-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.welcome-editor-preview {
+  margin-top: 0.35rem;
+  text-align: left;
+  max-height: 28rem;
+  overflow: auto;
+}
+
+.welcome-editor-preview h3 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  color: var(--ink);
 }
