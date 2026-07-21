@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import type { TvChannel, TvRoomState, TvVideo } from "@/lib/tvCorner";
@@ -887,32 +888,35 @@ export function TvCorner({
 
       {error ? <p className="tv-error">{error}</p> : null}
 
-      {toast ? (
-        <div
-          className={`tv-toast tv-toast-${toast.kind}`}
-          role="alert"
-          aria-live="assertive"
-        >
-          <div className="tv-toast-body">
-            <strong>
-              {toast.kind === "error"
-                ? "Upload issue"
-                : toast.kind === "success"
-                  ? "All set"
-                  : "Note"}
-            </strong>
-            <p>{toast.message}</p>
-          </div>
-          <button
-            type="button"
-            className="tv-toast-dismiss"
-            aria-label="Dismiss notification"
-            onClick={() => setToast(null)}
-          >
-            ×
-          </button>
-        </div>
-      ) : null}
+      {toast && typeof document !== "undefined"
+        ? createPortal(
+            <div
+              className={`tv-toast tv-toast-${toast.kind}`}
+              role="alert"
+              aria-live="assertive"
+            >
+              <div className="tv-toast-body">
+                <strong>
+                  {toast.kind === "error"
+                    ? "Upload issue"
+                    : toast.kind === "success"
+                      ? "All set"
+                      : "Note"}
+                </strong>
+                <p>{toast.message}</p>
+              </div>
+              <button
+                type="button"
+                className="tv-toast-dismiss"
+                aria-label="Dismiss notification"
+                onClick={() => setToast(null)}
+              >
+                ×
+              </button>
+            </div>,
+            document.body
+          )
+        : null}
 
       {uploadProgress || uploadPercent !== null ? (
         <div className="tv-upload-banner" role="status" aria-live="polite">
