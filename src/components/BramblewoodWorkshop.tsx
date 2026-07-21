@@ -253,16 +253,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
               Craftsman Badge.
             </p>
             <article className="bw-card craft-card">
-              <figure className="bw-craft-example">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={craft.image}
-                  alt={`Example of finished craft: ${craft.title}`}
-                  className="bw-card-art"
-                />
-                <figcaption>Inspiration · finished example</figcaption>
-              </figure>
-              <div>
+              <div className="bw-craft-copy">
                 <p className="bw-meta">
                   {craft.difficulty} · {craft.time}
                 </p>
@@ -314,6 +305,15 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                   />
                 ) : null}
               </div>
+              <figure className="bw-craft-example">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={craft.image}
+                  alt={`Example of finished craft: ${craft.title}`}
+                  className="bw-card-art"
+                />
+                <figcaption>Inspiration · finished example</figcaption>
+              </figure>
             </article>
             <details className="bw-more">
               <summary>More craft ideas</summary>
