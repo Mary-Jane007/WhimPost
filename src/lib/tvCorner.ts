@@ -10,16 +10,29 @@ import {
   probeAndStoreDuration,
   removeVideoFromChannelSchedule,
   resolveChannelBroadcast,
+  setVideoDurationMs,
   type TvScheduleSlot,
 } from "@/lib/tvSchedule";
+import {
+  DEFAULT_LINK_DURATION_MS,
+  parseTvLink,
+  type TvSourceKind,
+} from "@/lib/tvLinks";
+import { probeRemoteDurationMs } from "@/lib/tvDuration";
 
 export type TvRoomScope = "village" | "friends";
 export type { TvScheduleSlot };
+export type { TvSourceKind };
 
 export type TvVideo = {
   id: string;
   title: string;
   url: string;
+  /** Internal disk key, or `link-{uuid}` for URL clips. */
+  filename: string;
+  sourceUrl: string | null;
+  sourceKind: TvSourceKind;
+  youtubeId: string | null;
   mime: string;
   sizeBytes: number;
   durationMs: number;
@@ -81,12 +94,45 @@ type VideoRow = {
   mime: string;
   size_bytes: number;
   duration_ms?: number | null;
+  source_url?: string | null;
   uploader_id: string;
   village_id: string | null;
   channel_id: string | null;
   created_at: string;
   uploader_name?: string;
 };
+
+function classifyStoredVideo(row: VideoRow): {
+  sourceKind: TvSourceKind;
+  youtubeId: string | null;
+  url: string;
+  sourceUrl: string | null;
+} {
+  const sourceUrl = row.source_url?.trim() || null;
+  if (!sourceUrl) {
+    return {
+      sourceKind: "file",
+      youtubeId: null,
+      url: videoUrl(row.filename),
+      sourceUrl: null,
+    };
+  }
+  const parsed = parseTvLink(sourceUrl);
+  if (parsed.ok && parsed.kind === "youtube") {
+    return {
+      sourceKind: "youtube",
+      youtubeId: parsed.youtubeId,
+      url: sourceUrl,
+      sourceUrl,
+    };
+  }
+  return {
+    sourceKind: "direct",
+    youtubeId: null,
+    url: sourceUrl,
+    sourceUrl,
+  };
+}
 
 type ChannelRow = {
   id: string;
@@ -119,10 +165,15 @@ export function videoUrl(filename: string) {
 }
 
 function mapVideo(row: VideoRow): TvVideo {
+  const classified = classifyStoredVideo(row);
   return {
     id: row.id,
     title: row.title,
-    url: videoUrl(row.filename),
+    url: classified.url,
+    filename: row.filename,
+    sourceUrl: classified.sourceUrl,
+    sourceKind: classified.sourceKind,
+    youtubeId: classified.youtubeId,
     mime: row.mime,
     sizeBytes: Number(row.size_bytes) || 0,
     durationMs: Number(row.duration_ms) || 0,
@@ -350,9 +401,9 @@ export function deleteChannel(channelId: string, user: UserPublic) {
   if (!channel) return { ok: false as const, error: "Channel not found" };
 
   const db = getDb();
-  const filenames = channel.videos.map((v) =>
-    v.url.replace("/api/uploads/", "")
-  );
+  const filenames = channel.videos
+    .filter((v) => v.sourceKind === "file")
+    .map((v) => v.filename);
   db.prepare(
     `UPDATE tv_rooms
      SET current_channel_id = NULL, current_video_id = NULL
@@ -372,13 +423,14 @@ export function createVideo(input: {
   villageId: string | null;
   channelId: string;
   durationMs?: number;
+  sourceUrl?: string | null;
 }): TvVideo {
   const db = getDb();
   const id = randomUUID();
   db.prepare(
     `INSERT INTO tv_videos
-      (id, title, filename, mime, size_bytes, duration_ms, uploader_id, village_id, channel_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      (id, title, filename, mime, size_bytes, duration_ms, uploader_id, village_id, channel_id, source_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     id,
     input.title,
@@ -388,15 +440,63 @@ export function createVideo(input: {
     Math.max(0, Math.floor(input.durationMs || 0)),
     input.uploaderId,
     input.villageId,
-    input.channelId
+    input.channelId,
+    input.sourceUrl?.trim() || null
   );
 
-  if (!(input.durationMs && input.durationMs > 0)) {
+  if (!(input.durationMs && input.durationMs > 0) && !input.sourceUrl) {
     probeAndStoreDuration(id, input.filename);
   }
 
   ensureChannelSchedule(input.channelId);
   return getVideoById(id)!;
+}
+
+/** Add a channel clip from a YouTube or direct video URL (no file upload). */
+export function createVideoFromLink(input: {
+  sourceUrl: string;
+  title?: string;
+  durationMs?: number | null;
+  uploaderId: string;
+  villageId: string | null;
+  channelId: string;
+}): { ok: true; video: TvVideo } | { ok: false; error: string } {
+  const parsed = parseTvLink(input.sourceUrl);
+  if (!parsed.ok) return parsed;
+
+  let durationMs =
+    input.durationMs && input.durationMs > 0
+      ? Math.floor(input.durationMs)
+      : 0;
+
+  if (!durationMs && parsed.kind === "direct") {
+    durationMs = probeRemoteDurationMs(parsed.sourceUrl) || 0;
+  }
+  if (!durationMs) {
+    durationMs = DEFAULT_LINK_DURATION_MS;
+  }
+
+  const title =
+    (input.title || "").trim().slice(0, 80) ||
+    parsed.titleHint.slice(0, 80) ||
+    "Linked clip";
+
+  const video = createVideo({
+    title,
+    filename: `link-${randomUUID()}`,
+    mime: parsed.mime,
+    sizeBytes: 0,
+    uploaderId: input.uploaderId,
+    villageId: input.villageId,
+    channelId: input.channelId,
+    durationMs,
+    sourceUrl: parsed.sourceUrl,
+  });
+
+  // Persist duration explicitly for schedule (createVideo skipped file probe).
+  setVideoDurationMs(video.id, durationMs);
+  ensureChannelSchedule(input.channelId);
+  return { ok: true, video: getVideoById(video.id)! };
 }
 
 export function deleteVideo(videoId: string, user: UserPublic) {
@@ -413,7 +513,11 @@ export function deleteVideo(videoId: string, user: UserPublic) {
     videoId
   );
   db.prepare(`DELETE FROM tv_videos WHERE id = ?`).run(videoId);
-  return { ok: true as const, filename: video.url.replace("/api/uploads/", "") };
+  return {
+    ok: true as const,
+    filename: video.filename,
+    isFile: video.sourceKind === "file",
+  };
 }
 
 export function renameVideo(

@@ -12,8 +12,10 @@ export function uploadFilePath(filename: string) {
 }
 
 /** Probe media duration in milliseconds. Returns null if unknown. */
-export function probeDurationMs(filePath: string): number | null {
-  if (!filePath || !fs.existsSync(filePath)) return null;
+export function probeDurationMs(filePathOrUrl: string): number | null {
+  if (!filePathOrUrl) return null;
+  const isRemote = /^https?:\/\//i.test(filePathOrUrl);
+  if (!isRemote && !fs.existsSync(filePathOrUrl)) return null;
   try {
     const out = execFileSync(
       "ffprobe",
@@ -24,9 +26,10 @@ export function probeDurationMs(filePath: string): number | null {
         "format=duration",
         "-of",
         "default=noprint_wrappers=1:nokey=1",
-        filePath,
+        ...(isRemote ? ["-user_agent", "WhimPostTV/1.0"] : []),
+        filePathOrUrl,
       ],
-      { encoding: "utf8", timeout: 30_000 }
+      { encoding: "utf8", timeout: isRemote ? 45_000 : 30_000 }
     ).trim();
     const seconds = Number.parseFloat(out);
     if (!Number.isFinite(seconds) || seconds <= 0) return null;
@@ -37,7 +40,13 @@ export function probeDurationMs(filePath: string): number | null {
 }
 
 export function probeUploadDurationMs(filename: string): number {
+  if (filename.startsWith("link-")) return DEFAULT_TV_DURATION_MS;
   return (
     probeDurationMs(uploadFilePath(filename)) ?? DEFAULT_TV_DURATION_MS
   );
+}
+
+/** Best-effort duration for a remote direct video URL. */
+export function probeRemoteDurationMs(url: string): number | null {
+  return probeDurationMs(url);
 }

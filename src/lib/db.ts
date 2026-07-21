@@ -51,6 +51,7 @@ function migrate(db: Database.Database) {
     "duration_ms",
     "duration_ms INTEGER NOT NULL DEFAULT 0"
   );
+  ensureColumn(db, "tv_videos", "source_url", "source_url TEXT");
   ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
   ensureColumn(
     db,
