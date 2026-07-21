@@ -4424,6 +4424,22 @@ button.linkish:hover {
   display: block;
 }
 
+.tv-video-embed {
+  border: 0;
+  object-fit: unset;
+}
+
+.tv-clip-kind {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.7em;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--village-color, #5a4632) 70%, #888);
+  opacity: 0.85;
+}
+
 .tv-idle {
   position: absolute;
   inset: 0;
