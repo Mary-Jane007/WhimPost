@@ -657,4 +657,16 @@ export const TV_MIME_EXT: Record<string, string> = {
 };
 
 export const TV_ALLOWED_MIME = new Set(Object.keys(TV_MIME_EXT));
-export const TV_MAX_BYTES = 80 * 1024 * 1024; // 80MB
+/** Full movies welcome — up to 5GB per file. */
+export const TV_MAX_BYTES = 5 * 1024 * 1024 * 1024;
+export const TV_MAX_LABEL = "5GB";
+
+export function formatTvBytes(bytes: number) {
+  if (bytes >= 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  }
+  if (bytes >= 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
