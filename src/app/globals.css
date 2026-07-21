@@ -3571,3 +3571,316 @@ body.theme-hearthwick .cottage-plaque {
   background: linear-gradient(165deg, #f3e6d4, #e2c39a 55%, #d4a574);
   border-color: rgba(139, 90, 43, 0.55);
 }
+
+/* —— Discover your belonging quiz —— */
+.belonging-quiz {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.belonging-kicker {
+  margin: 0;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.9);
+}
+
+.belonging-intro h2,
+.belonging-question h2,
+.belonging-result h2,
+.belonging-confirm h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3.5vw, 2.1rem);
+  margin: 0.35rem 0 0.75rem;
+  font-weight: 600;
+}
+
+.belonging-lead,
+.belonging-result-blurb {
+  margin: 0 0 1.1rem;
+  color: rgba(243, 230, 208, 0.82);
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.belonging-traits {
+  list-style: none;
+  margin: 0 0 1.35rem;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.belonging-traits li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.55rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-chip);
+  background: rgba(18, 24, 18, 0.28);
+}
+
+.belonging-traits li span {
+  grid-row: 1 / span 2;
+  font-size: 1.35rem;
+  align-self: center;
+}
+
+.belonging-traits strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.belonging-traits em {
+  font-style: italic;
+  font-size: 0.92rem;
+  color: rgba(243, 230, 208, 0.7);
+}
+
+.belonging-account-cue {
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: var(--frame-bloom);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(212, 175, 55, 0.12), transparent 55%),
+    rgba(31, 42, 30, 0.45);
+}
+
+.belonging-account-cue p {
+  margin: 0.25rem 0 0;
+  color: rgba(243, 230, 208, 0.8);
+}
+
+.belonging-progress {
+  height: 0.4rem;
+  border-radius: 999px;
+  background: rgba(243, 230, 208, 0.12);
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+}
+
+.belonging-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--moss-light), var(--gold));
+  border-radius: inherit;
+  transition: width 0.35s ease;
+}
+
+.belonging-options {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.belonging-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: start;
+  text-align: left;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(243, 230, 208, 0.16);
+  border-radius: var(--frame-bloom);
+  background:
+    linear-gradient(145deg, rgba(243, 230, 208, 0.07), transparent 55%),
+    rgba(24, 32, 22, 0.55);
+  color: var(--cream);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.belonging-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.45);
+  background:
+    linear-gradient(145deg, rgba(212, 175, 55, 0.12), transparent 55%),
+    rgba(28, 38, 26, 0.7);
+}
+
+.belonging-option-key {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: var(--frame-petal);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  font-family: var(--font-stamp);
+  font-size: 0.75rem;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.belonging-cinematic {
+  min-height: 18rem;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+  border-radius: var(--frame-cloud);
+  border: 1px solid rgba(243, 230, 208, 0.14);
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(212, 175, 55, 0.16), transparent 50%),
+    linear-gradient(165deg, rgba(18, 28, 20, 0.92), rgba(10, 16, 12, 0.96));
+  overflow: hidden;
+  position: relative;
+}
+
+.belonging-cinema-stage {
+  width: min(100%, 28rem);
+  text-align: center;
+  min-height: 8rem;
+  display: grid;
+  place-items: center;
+}
+
+.cinema-line {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  line-height: 1.35;
+}
+
+.cinema-line.muted-line {
+  opacity: 0.7;
+  font-size: 1.15rem;
+}
+
+.cinema-lantern {
+  display: grid;
+  gap: 0.65rem;
+  justify-items: center;
+}
+
+.cinema-lantern span {
+  font-size: 3rem;
+  filter: drop-shadow(0 0 18px rgba(255, 200, 100, 0.45));
+  animation: softPulse 2.4s ease-in-out infinite;
+}
+
+.cinema-lantern p,
+.cinema-path-sign p {
+  margin: 0;
+  font-family: var(--font-letter);
+  font-size: 1.15rem;
+  color: rgba(243, 230, 208, 0.88);
+}
+
+.cinema-path-sign {
+  position: relative;
+  display: grid;
+  gap: 0.55rem;
+  justify-items: center;
+  padding: 1rem;
+}
+
+.cinema-path-emoji {
+  font-size: 3.2rem;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+  animation: softPulse 2s ease-in-out infinite;
+}
+
+.cinema-path-glow {
+  position: absolute;
+  inset: 20% 15%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.28), transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.cinema-welcome {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  color: var(--gold);
+}
+
+.path-mosshollow .cinema-path-glow {
+  background: radial-gradient(circle, rgba(95, 127, 101, 0.4), transparent 70%);
+}
+.path-clovermeadow .cinema-path-glow {
+  background: radial-gradient(circle, rgba(232, 160, 181, 0.35), transparent 70%);
+}
+.path-moonmere .cinema-path-glow {
+  background: radial-gradient(circle, rgba(122, 143, 168, 0.4), transparent 70%);
+}
+.path-bramblewood .cinema-path-glow {
+  background: radial-gradient(circle, rgba(224, 112, 32, 0.38), transparent 70%);
+}
+.path-hearthwick .cinema-path-glow {
+  background: radial-gradient(circle, rgba(232, 184, 109, 0.42), transparent 70%);
+}
+
+.belonging-result-hero {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.belonging-result-hero h2 {
+  margin: 0;
+}
+
+.belonging-result-meta {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0 0 1rem;
+}
+
+.belonging-result-meta > div {
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: var(--frame-chip);
+  background: rgba(18, 24, 18, 0.3);
+}
+
+.belonging-result-meta dt {
+  font-family: var(--font-stamp);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin: 0 0 0.2rem;
+}
+
+.belonging-result-meta dd {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.belonging-result-note {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: rgba(243, 230, 208, 0.68);
+}
+
+.belonging-confirm,
+.belonging-step {
+  gap: 0.85rem;
+}
+
+.belonging-confirm .btn-secondary {
+  width: 100%;
+}
+
+button.linkish {
+  background: none;
+  border: none;
+  color: rgba(243, 230, 208, 0.75);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
+}
+
+button.linkish:hover {
+  color: var(--gold);
+}
+
