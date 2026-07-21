@@ -40,12 +40,6 @@ function migrate(db: Database.Database) {
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
   ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
   ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
-  ensureColumn(
-    db,
-    "tv_channels",
-    "is_global",
-    "is_global INTEGER NOT NULL DEFAULT 0"
-  );
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS village_notes (
@@ -126,6 +120,13 @@ function migrate(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_tv_chat_room
       ON tv_chat_messages(room_id, created_at);
   `);
+
+  ensureColumn(
+    db,
+    "tv_channels",
+    "is_global",
+    "is_global INTEGER NOT NULL DEFAULT 0"
+  );
 
   // Fold any pre-channel clips into a village channel so the dial stays usable.
   const orphans = db
