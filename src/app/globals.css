@@ -5768,6 +5768,31 @@ button.linkish:hover {
   filter: drop-shadow(0 3px 5px rgba(40, 20, 8, 0.2));
 }
 
+.bw-craft-example {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+}
+
+.bw-craft-example .bw-card-art {
+  max-width: 100%;
+  width: 100%;
+  border-radius: 0.85rem 1.1rem 0.75rem 1rem;
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+  filter: none;
+  border: 1px solid rgba(120, 82, 42, 0.22);
+  box-shadow: 0 6px 14px rgba(60, 35, 15, 0.12);
+}
+
+.bw-craft-example figcaption {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5f7a45;
+}
+
 .bw-actions {
   display: flex;
   flex-wrap: wrap;
@@ -5826,6 +5851,31 @@ button.linkish:hover {
   padding: 0.4rem 0.55rem;
   border-radius: 0.7rem;
   background: rgba(255, 255, 255, 0.45);
+}
+
+.bw-idea-craft {
+  align-items: center;
+  justify-content: flex-start !important;
+}
+
+.bw-idea-craft img {
+  width: 4.25rem;
+  height: 3.2rem;
+  object-fit: cover;
+  border-radius: 0.55rem 0.75rem 0.5rem 0.7rem;
+  border: 1px solid rgba(120, 82, 42, 0.2);
+  flex-shrink: 0;
+}
+
+.bw-idea-craft div {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.bw-idea-craft span {
+  font-size: 0.82rem;
+  color: #6b4a2e;
 }
 
 .bw-prompt-text {
