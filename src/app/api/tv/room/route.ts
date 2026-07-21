@@ -5,7 +5,7 @@ import {
   getOrCreateVillageRoom,
   getRoomById,
   listFriendRooms,
-  listVideosForUser,
+  listChannelsForUser,
   touchPresence,
   canAccessRoom,
 } from "@/lib/tvCorner";
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     const fresh = getRoomById(room.id)!;
     return NextResponse.json({
       room: fresh,
-      videos: listVideosForUser(user, fresh),
+      channels: listChannelsForUser(user, fresh),
       friendRooms: room.scope === "friends" ? listFriendRooms(user) : [],
     });
   }
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     const room = active ? getRoomById(active.id) : null;
     return NextResponse.json({
       room,
-      videos: listVideosForUser(user, room),
+      channels: listChannelsForUser(user, room),
       friendRooms,
     });
   }
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
   const room = getOrCreateVillageRoom(user, user.villageId as VillageId);
   return NextResponse.json({
     room,
-    videos: listVideosForUser(user, room),
+    channels: listChannelsForUser(user, room),
     friendRooms: [],
   });
 }
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   const room = createFriendsRoom(user, body.title);
   return NextResponse.json({
     room,
-    videos: listVideosForUser(user, room),
+    channels: listChannelsForUser(user, room),
     friendRooms: listFriendRooms(user),
   });
 }

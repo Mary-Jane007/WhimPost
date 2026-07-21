@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
-import type { TvRoomState, TvVideo } from "@/lib/tvCorner";
+import type { TvChannel, TvRoomState, TvVideo } from "@/lib/tvCorner";
 
 type VillageOption = { id: VillageId; name: string };
 
@@ -15,7 +15,7 @@ type Props = {
   mascotImage: string | null;
   villageOptions: VillageOption[];
   initialRoom: TvRoomState;
-  initialVideos: TvVideo[];
+  initialChannels: TvChannel[];
   initialFriendRooms: TvRoomState[];
   friendCount: number;
 };
@@ -84,19 +84,24 @@ export function TvCorner({
   mascotImage,
   villageOptions,
   initialRoom,
-  initialVideos,
+  initialChannels,
   initialFriendRooms,
   friendCount,
 }: Props) {
   const [scope, setScope] = useState<ScopeTab>("village");
   const [room, setRoom] = useState<TvRoomState>(initialRoom);
-  const [videos, setVideos] = useState<TvVideo[]>(initialVideos);
+  const [channels, setChannels] = useState<TvChannel[]>(initialChannels);
   const [friendRooms, setFriendRooms] = useState<TvRoomState[]>(
     initialFriendRooms
   );
   const [titleDraft, setTitleDraft] = useState("");
-  const [uploadTitle, setUploadTitle] = useState("");
-  const [uploadVillageId, setUploadVillageId] = useState<VillageId>(villageId);
+  const [channelTitle, setChannelTitle] = useState("");
+  const [channelVillageId, setChannelVillageId] =
+    useState<VillageId>(villageId);
+  const [selectedChannelId, setSelectedChannelId] = useState<string>(
+    initialChannels[0]?.id || ""
+  );
+  const [clipTitle, setClipTitle] = useState("");
   const [chatDraft, setChatDraft] = useState("");
   const [showChannels, setShowChannels] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -109,6 +114,10 @@ export function TvCorner({
   const suppressUntil = useRef(0);
   const roomIdRef = useRef(room.id);
   const applyingRemote = useRef(false);
+
+  const effectiveChannelId = channels.some((c) => c.id === selectedChannelId)
+    ? selectedChannelId
+    : channels[0]?.id || "";
 
   useEffect(() => {
     roomIdRef.current = room.id;
@@ -129,7 +138,7 @@ export function TvCorner({
       if (!res.ok) throw new Error(data.error || "Could not open the lounge");
       setScope(nextScope);
       setFriendRooms(data.friendRooms || []);
-      setVideos(data.videos || []);
+      setChannels(data.channels || []);
       if (data.room) {
         setRoom(data.room);
       } else {
@@ -139,6 +148,7 @@ export function TvCorner({
           scope: "friends",
           currentVideo: null,
           currentVideoId: null,
+          currentChannelId: null,
           isPlaying: false,
           watchers: [],
           messages: [],
@@ -169,7 +179,7 @@ export function TvCorner({
       setScope("friends");
       setRoom(data.room);
       setFriendRooms(data.friendRooms || []);
-      setVideos(data.videos || []);
+      setChannels(data.channels || []);
       setTitleDraft("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not start a couch");
@@ -179,6 +189,7 @@ export function TvCorner({
   }
 
   async function patchRoom(patch: {
+    channelId?: string | null;
     videoId?: string | null;
     isPlaying?: boolean;
     positionMs?: number;
@@ -199,30 +210,98 @@ export function TvCorner({
       return;
     }
     setRoom(data.room);
-    if (data.videos) setVideos(data.videos);
+    if (data.channels) setChannels(data.channels);
   }
 
-  async function onUpload(file: File | null) {
+  async function createChannel() {
+    if (!user.isOwner) return;
+    const title = channelTitle.trim();
+    if (!title) {
+      setError("Give your channel a name first");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/tv/channels", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          villageId: channelVillageId,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not create channel");
+      setChannelTitle("");
+      if (channelVillageId === (room.villageId || villageId)) {
+        setChannels((prev) => [...prev, data.channel]);
+      }
+      setSelectedChannelId(data.channel.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not create channel");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onUploadClip(file: File | null) {
     if (!file || !user.isOwner) return;
+    if (!effectiveChannelId) {
+      setError("Create a channel first, then upload videos to it");
+      return;
+    }
+    const targetChannelId = effectiveChannelId;
     setBusy(true);
     setError(null);
     try {
       const form = new FormData();
       form.append("video", file);
-      form.append("villageId", uploadVillageId);
-      if (uploadTitle.trim()) form.append("title", uploadTitle.trim());
+      form.append("channelId", targetChannelId);
+      if (clipTitle.trim()) form.append("title", clipTitle.trim());
       const res = await fetch("/api/tv/videos", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
-      setUploadTitle("");
-      if (uploadVillageId === (room.villageId || villageId)) {
-        setVideos((prev) => {
-          const next = prev.filter((v) => v.id !== data.video.id);
-          return [...next, data.video];
+      setClipTitle("");
+      if (data.channel) {
+        setChannels((prev) => {
+          const exists = prev.some((c) => c.id === data.channel.id);
+          if (!exists) return prev;
+          return prev.map((c) =>
+            c.id === data.channel.id ? data.channel : c
+          );
         });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeChannel(id: string) {
+    if (!user.isOwner) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/tv/channels", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not remove channel");
+      setChannels((prev) => prev.filter((c) => c.id !== id));
+      if (room.currentChannelId === id) {
+        await patchRoom({
+          channelId: null,
+          videoId: null,
+          isPlaying: false,
+          positionMs: 0,
+        });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not remove channel");
     } finally {
       setBusy(false);
     }
@@ -239,13 +318,18 @@ export function TvCorner({
         body: JSON.stringify({ id }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not remove channel");
-      setVideos((prev) => prev.filter((v) => v.id !== id));
+      if (!res.ok) throw new Error(data.error || "Could not remove clip");
+      setChannels((prev) =>
+        prev.map((channel) => ({
+          ...channel,
+          videos: channel.videos.filter((v) => v.id !== id),
+        }))
+      );
       if (room.currentVideoId === id) {
         await patchRoom({ videoId: null, isPlaying: false, positionMs: 0 });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not remove channel");
+      setError(err instanceof Error ? err.message : "Could not remove clip");
     } finally {
       setBusy(false);
     }
@@ -275,13 +359,48 @@ export function TvCorner({
     }
   }
 
-  function tuneTo(videoId: string) {
+  function tuneToChannel(channel: TvChannel) {
+    if (!channel.videos.length) {
+      setError("This channel has no videos yet");
+      setSelectedChannelId(channel.id);
+      return;
+    }
     void patchRoom({
-      videoId,
+      channelId: channel.id,
+      videoId: channel.videos[0].id,
       isPlaying: true,
       positionMs: 0,
     });
+    setSelectedChannelId(channel.id);
     setShowChannels(false);
+  }
+
+  function tuneToVideo(video: TvVideo) {
+    void patchRoom({
+      channelId: video.channelId,
+      videoId: video.id,
+      isPlaying: true,
+      positionMs: 0,
+    });
+    if (video.channelId) setSelectedChannelId(video.channelId);
+    setShowChannels(false);
+  }
+
+  function playNextInChannel() {
+    const channel = channels.find((c) => c.id === room.currentChannelId);
+    if (!channel || !room.currentVideoId) return;
+    const idx = channel.videos.findIndex((v) => v.id === room.currentVideoId);
+    const next = channel.videos[idx + 1];
+    if (next) {
+      void patchRoom({
+        channelId: channel.id,
+        videoId: next.id,
+        isPlaying: true,
+        positionMs: 0,
+      });
+    } else {
+      void patchRoom({ isPlaying: false, positionMs: 0 });
+    }
   }
 
   // Poll room state for watch-together + chat sync
@@ -299,7 +418,7 @@ export function TvCorner({
         if (cancelled || !data.room) return;
         if (data.room.id !== roomIdRef.current) return;
         setRoom(data.room);
-        if (data.videos) setVideos(data.videos);
+        if (data.channels) setChannels(data.channels);
       } catch {
         // ignore transient poll errors
       }
@@ -338,7 +457,12 @@ export function TvCorner({
   const decor = DECOR[villageId];
   const watchers = room.watchers || [];
   const messages = room.messages || [];
-  const activeIndex = videos.findIndex((v) => v.id === room.currentVideoId);
+  const activeChannelIndex = channels.findIndex(
+    (c) => c.id === room.currentChannelId
+  );
+  const selectedChannel =
+    channels.find((c) => c.id === effectiveChannelId) || null;
+  const tunableChannels = channels.filter((c) => c.videos.length > 0);
   const chatLabel =
     room.scope === "friends"
       ? "Friends-only chat — just this couch"
@@ -445,7 +569,7 @@ export function TvCorner({
                       });
                     }}
                     onEnded={() => {
-                      void patchRoom({ isPlaying: false, positionMs: 0 });
+                      playNextInChannel();
                     }}
                     controls
                   />
@@ -453,7 +577,10 @@ export function TvCorner({
                   <div className="tv-idle">
                     <div className="tv-idle-glow" />
                     <p className="tv-idle-channel">
-                      CH · {activeIndex >= 0 ? channelLabel(activeIndex) : "—"}
+                      CH ·{" "}
+                      {activeChannelIndex >= 0
+                        ? channelLabel(activeChannelIndex)
+                        : "—"}
                     </p>
                     <p>{powerOn ? decor.idle : "The set is sleeping."}</p>
                   </div>
@@ -482,7 +609,7 @@ export function TvCorner({
                 type="button"
                 className="tv-knob"
                 onClick={() => setShowChannels((v) => !v)}
-                disabled={!room.id || !powerOn || videos.length === 0}
+                disabled={!room.id || !powerOn || tunableChannels.length === 0}
                 aria-expanded={showChannels}
                 aria-controls="tv-channel-dial"
               >
@@ -503,19 +630,26 @@ export function TvCorner({
                 Choose a channel from the {villageName} lineup
               </p>
               <ul>
-                {videos.map((video, index) => {
-                  const active = room.currentVideoId === video.id;
+                {tunableChannels.map((channel, index) => {
+                  const active = room.currentChannelId === channel.id;
                   return (
-                    <li key={video.id}>
+                    <li key={channel.id}>
                       <button
                         type="button"
                         role="option"
                         aria-selected={active}
                         className={active ? "active" : ""}
-                        onClick={() => tuneTo(video.id)}
+                        onClick={() => tuneToChannel(channel)}
                       >
                         <em>CH {channelLabel(index)}</em>
-                        <strong>{video.title}</strong>
+                        <strong>
+                          {channel.title}
+                          <span className="tv-channel-meta">
+                            {" "}
+                            · {channel.videos.length} clip
+                            {channel.videos.length === 1 ? "" : "s"}
+                          </span>
+                        </strong>
                       </button>
                     </li>
                   );
@@ -532,7 +666,10 @@ export function TvCorner({
                   : room.title
                 : "No friends couch yet"}
               {room.currentVideo
-                ? ` · ${room.currentVideo.title}`
+                ? ` · ${
+                    channels.find((c) => c.id === room.currentChannelId)
+                      ?.title || "Channel"
+                  } — ${room.currentVideo.title}`
                 : ""}
             </p>
             <ul>
@@ -671,21 +808,21 @@ export function TvCorner({
 
           <h2>Channels</h2>
           <p className="tv-shelf-copy">
-            Owner-curated reels for this village. Turn the Channel knob or pick
-            one below to change the program for everyone.
+            Create a channel first, then upload videos into it. Turning the
+            Channel knob tunes the whole lounge to that lineup.
           </p>
 
           {user.isOwner ? (
             <div className="tv-owner-upload">
               <p className="tv-shelf-copy">
-                Upload a channel (MP4, WebM, or MOV · up to 80MB).
+                <strong>1.</strong> Make a channel
               </p>
               <label className="tv-upload">
                 <span>Village</span>
                 <select
-                  value={uploadVillageId}
+                  value={channelVillageId}
                   onChange={(e) =>
-                    setUploadVillageId(e.target.value as VillageId)
+                    setChannelVillageId(e.target.value as VillageId)
                   }
                 >
                   {villageOptions.map((v) => (
@@ -696,72 +833,158 @@ export function TvCorner({
                 </select>
               </label>
               <label className="tv-upload">
-                <span>Title</span>
+                <span>Channel name</span>
                 <input
                   type="text"
-                  value={uploadTitle}
-                  onChange={(e) => setUploadTitle(e.target.value)}
-                  placeholder="Moon garden loop"
+                  value={channelTitle}
+                  onChange={(e) => setChannelTitle(e.target.value)}
+                  placeholder="Cottage cartoons"
                   maxLength={80}
                 />
               </label>
-              <label className="tv-upload-file btn-primary">
+              <button
+                type="button"
+                className="btn-primary tv-upload-file"
+                onClick={createChannel}
+                disabled={busy || !channelTitle.trim()}
+              >
+                {busy ? "Saving…" : "Create channel"}
+              </button>
+
+              <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
+                <strong>2.</strong> Upload videos to a channel
+              </p>
+              <label className="tv-upload">
+                <span>Channel</span>
+                <select
+                  value={effectiveChannelId}
+                  onChange={(e) => setSelectedChannelId(e.target.value)}
+                  disabled={channels.length === 0}
+                >
+                  {channels.length === 0 ? (
+                    <option value="">Create a channel first</option>
+                  ) : (
+                    channels.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </label>
+              <label className="tv-upload">
+                <span>Clip title</span>
+                <input
+                  type="text"
+                  value={clipTitle}
+                  onChange={(e) => setClipTitle(e.target.value)}
+                  placeholder="Moon garden loop"
+                  maxLength={80}
+                  disabled={!effectiveChannelId}
+                />
+              </label>
+              <label
+                className={`tv-upload-file btn-primary${
+                  !effectiveChannelId ? " is-disabled" : ""
+                }`}
+              >
                 <input
                   type="file"
                   accept="video/mp4,video/webm,video/quicktime"
                   hidden
-                  disabled={busy}
+                  disabled={busy || !effectiveChannelId}
                   onChange={(e) => {
                     const file = e.target.files?.[0] || null;
                     e.target.value = "";
-                    void onUpload(file);
+                    void onUploadClip(file);
                   }}
                 />
-                {busy ? "Tucking away…" : "Upload channel"}
+                {busy ? "Tucking away…" : "Upload video to channel"}
               </label>
             </div>
           ) : (
             <p className="tv-shelf-copy tv-shelf-hint">
-              Only the site owner can add new channels to the dial.
+              Only the site owner can create channels and upload videos.
             </p>
           )}
 
-          <ul className="tv-video-list">
-            {videos.length === 0 ? (
+          <ul className="tv-channel-list">
+            {channels.length === 0 ? (
               <li className="muted">
                 No channels yet
-                {user.isOwner
-                  ? " — upload the first reel for this village."
-                  : "."}
+                {user.isOwner ? " — create the first one above." : "."}
               </li>
             ) : (
-              videos.map((video, index) => {
-                const active = room.currentVideoId === video.id;
+              channels.map((channel, index) => {
+                const active = room.currentChannelId === channel.id;
                 return (
-                  <li key={video.id} className={active ? "active" : ""}>
-                    <button
-                      type="button"
-                      className="tv-video-pick"
-                      disabled={!room.id || busy}
-                      onClick={() => tuneTo(video.id)}
-                    >
-                      <strong>
-                        <span className="tv-ch-num">
-                          CH {channelLabel(index)}
-                        </span>{" "}
-                        {video.title}
-                      </strong>
-                      <span>Village channel</span>
-                    </button>
-                    {user.isOwner ? (
+                  <li
+                    key={channel.id}
+                    className={active ? "tv-channel-card active" : "tv-channel-card"}
+                  >
+                    <div className="tv-channel-card-head">
                       <button
                         type="button"
-                        className="tv-video-remove"
-                        onClick={() => removeVideo(video.id)}
-                        aria-label={`Remove ${video.title}`}
+                        className="tv-video-pick"
+                        disabled={!room.id || busy || channel.videos.length === 0}
+                        onClick={() => tuneToChannel(channel)}
                       >
-                        ×
+                        <strong>
+                          <span className="tv-ch-num">
+                            CH {channelLabel(index)}
+                          </span>{" "}
+                          {channel.title}
+                        </strong>
+                        <span>
+                          {channel.videos.length} clip
+                          {channel.videos.length === 1 ? "" : "s"}
+                          {channel.videos.length === 0
+                            ? " · empty"
+                            : ""}
+                        </span>
                       </button>
+                      {user.isOwner ? (
+                        <button
+                          type="button"
+                          className="tv-video-remove"
+                          onClick={() => removeChannel(channel.id)}
+                          aria-label={`Remove ${channel.title}`}
+                        >
+                          ×
+                        </button>
+                      ) : null}
+                    </div>
+                    {channel.videos.length > 0 ? (
+                      <ul className="tv-channel-clips">
+                        {channel.videos.map((video) => {
+                          const clipActive = room.currentVideoId === video.id;
+                          return (
+                            <li key={video.id} className={clipActive ? "active" : ""}>
+                              <button
+                                type="button"
+                                disabled={!room.id || busy}
+                                onClick={() => tuneToVideo(video)}
+                              >
+                                {video.title}
+                              </button>
+                              {user.isOwner ? (
+                                <button
+                                  type="button"
+                                  className="tv-video-remove"
+                                  onClick={() => removeVideo(video.id)}
+                                  aria-label={`Remove ${video.title}`}
+                                >
+                                  ×
+                                </button>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : user.isOwner && selectedChannel?.id === channel.id ? (
+                      <p className="muted tv-channel-empty">
+                        Upload a video to this channel above.
+                      </p>
                     ) : null}
                   </li>
                 );

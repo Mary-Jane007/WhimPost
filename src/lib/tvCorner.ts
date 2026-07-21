@@ -17,7 +17,17 @@ export type TvVideo = {
   uploaderId: string;
   uploaderName: string;
   villageId: string | null;
+  channelId: string | null;
   createdAt: string;
+};
+
+export type TvChannel = {
+  id: string;
+  title: string;
+  villageId: string;
+  createdBy: string;
+  createdAt: string;
+  videos: TvVideo[];
 };
 
 export type TvWatcher = {
@@ -39,6 +49,7 @@ export type TvRoomState = {
   villageId: string | null;
   hostId: string;
   title: string;
+  currentChannelId: string | null;
   currentVideoId: string | null;
   currentVideo: TvVideo | null;
   isPlaying: boolean;
@@ -58,8 +69,17 @@ type VideoRow = {
   size_bytes: number;
   uploader_id: string;
   village_id: string | null;
+  channel_id: string | null;
   created_at: string;
   uploader_name?: string;
+};
+
+type ChannelRow = {
+  id: string;
+  title: string;
+  village_id: string;
+  created_by: string;
+  created_at: string;
 };
 
 type RoomRow = {
@@ -68,6 +88,7 @@ type RoomRow = {
   village_id: string | null;
   host_id: string;
   title: string;
+  current_channel_id: string | null;
   current_video_id: string | null;
   is_playing: number;
   position_ms: number;
@@ -92,6 +113,7 @@ function mapVideo(row: VideoRow): TvVideo {
     uploaderId: row.uploader_id,
     uploaderName: row.uploader_name || "Villager",
     villageId: row.village_id,
+    channelId: row.channel_id,
     createdAt: row.created_at,
   };
 }
@@ -125,7 +147,6 @@ export function getVideoByFilename(filename: string): TvVideo | null {
 export function canAccessVideo(user: UserPublic, video: TvVideo) {
   if (user.isOwner) return true;
   if (video.villageId && user.villageId === video.villageId) return true;
-  // Friends couch: tune into a penpal's village channel library
   if (areFriends(user.id, video.uploaderId)) return true;
   const friends = listFriends(user.id);
   if (friends.some((f) => f.villageId && f.villageId === video.villageId)) {
@@ -134,21 +155,55 @@ export function canAccessVideo(user: UserPublic, video: TvVideo) {
   return false;
 }
 
-/** Owner-curated clips for one village — the channel lineup. */
-export function listVideosForVillage(villageId: string | null | undefined): TvVideo[] {
-  if (!villageId) return [];
+export function listVideosForChannel(channelId: string): TvVideo[] {
   const db = getDb();
   const rows = db
     .prepare(
       `SELECT v.*, u.display_name as uploader_name
        FROM tv_videos v
        JOIN users u ON u.id = v.uploader_id
-       WHERE v.village_id = ?
+       WHERE v.channel_id = ?
        ORDER BY v.created_at ASC
        LIMIT 80`
     )
-    .all(villageId) as VideoRow[];
+    .all(channelId) as VideoRow[];
   return rows.map(mapVideo);
+}
+
+function mapChannel(row: ChannelRow): TvChannel {
+  return {
+    id: row.id,
+    title: row.title,
+    villageId: row.village_id,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    videos: listVideosForChannel(row.id),
+  };
+}
+
+export function getChannelById(id: string): TvChannel | null {
+  const db = getDb();
+  const row = db
+    .prepare(`SELECT * FROM tv_channels WHERE id = ?`)
+    .get(id) as ChannelRow | undefined;
+  return row ? mapChannel(row) : null;
+}
+
+/** Owner-curated channels for one village. */
+export function listChannelsForVillage(
+  villageId: string | null | undefined
+): TvChannel[] {
+  if (!villageId) return [];
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT * FROM tv_channels
+       WHERE village_id = ?
+       ORDER BY created_at ASC
+       LIMIT 40`
+    )
+    .all(villageId) as ChannelRow[];
+  return rows.map(mapChannel);
 }
 
 export function channelLibraryVillageId(
@@ -159,11 +214,55 @@ export function channelLibraryVillageId(
   return user.villageId;
 }
 
+export function listChannelsForUser(
+  user: UserPublic,
+  room?: Pick<TvRoomState, "villageId" | "scope"> | null
+): TvChannel[] {
+  return listChannelsForVillage(channelLibraryVillageId(user, room));
+}
+
+/** @deprecated Prefer listChannelsForUser — flat video list for legacy callers. */
 export function listVideosForUser(
   user: UserPublic,
   room?: Pick<TvRoomState, "villageId" | "scope"> | null
 ): TvVideo[] {
-  return listVideosForVillage(channelLibraryVillageId(user, room));
+  return listChannelsForUser(user, room).flatMap((channel) => channel.videos);
+}
+
+export function createChannel(input: {
+  title: string;
+  villageId: string;
+  createdBy: string;
+}): TvChannel {
+  const db = getDb();
+  const id = randomUUID();
+  const title = input.title.trim().slice(0, 80) || "Untitled channel";
+  db.prepare(
+    `INSERT INTO tv_channels (id, title, village_id, created_by)
+     VALUES (?, ?, ?, ?)`
+  ).run(id, title, input.villageId, input.createdBy);
+  return getChannelById(id)!;
+}
+
+export function deleteChannel(channelId: string, user: UserPublic) {
+  if (!user.isOwner) {
+    return { ok: false as const, error: "Only the site owner can remove channels" };
+  }
+  const channel = getChannelById(channelId);
+  if (!channel) return { ok: false as const, error: "Channel not found" };
+
+  const db = getDb();
+  const filenames = channel.videos.map((v) =>
+    v.url.replace("/api/uploads/", "")
+  );
+  db.prepare(
+    `UPDATE tv_rooms
+     SET current_channel_id = NULL, current_video_id = NULL
+     WHERE current_channel_id = ?`
+  ).run(channelId);
+  db.prepare(`DELETE FROM tv_videos WHERE channel_id = ?`).run(channelId);
+  db.prepare(`DELETE FROM tv_channels WHERE id = ?`).run(channelId);
+  return { ok: true as const, filenames };
 }
 
 export function createVideo(input: {
@@ -173,13 +272,14 @@ export function createVideo(input: {
   sizeBytes: number;
   uploaderId: string;
   villageId: string | null;
+  channelId: string;
 }): TvVideo {
   const db = getDb();
   const id = randomUUID();
   db.prepare(
     `INSERT INTO tv_videos
-      (id, title, filename, mime, size_bytes, uploader_id, village_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
+      (id, title, filename, mime, size_bytes, uploader_id, village_id, channel_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     id,
     input.title,
@@ -187,7 +287,8 @@ export function createVideo(input: {
     input.mime,
     input.sizeBytes,
     input.uploaderId,
-    input.villageId
+    input.villageId,
+    input.channelId
   );
   return getVideoById(id)!;
 }
@@ -196,7 +297,7 @@ export function deleteVideo(videoId: string, user: UserPublic) {
   const video = getVideoById(videoId);
   if (!video) return { ok: false as const, error: "Clip not found" };
   if (!user.isOwner) {
-    return { ok: false as const, error: "Only the site owner can remove channels" };
+    return { ok: false as const, error: "Only the site owner can remove clips" };
   }
   const db = getDb();
   db.prepare(`UPDATE tv_rooms SET current_video_id = NULL WHERE current_video_id = ?`).run(
@@ -336,6 +437,7 @@ function mapRoom(
     villageId: row.village_id,
     hostId: row.host_id,
     title: row.title,
+    currentChannelId: row.current_channel_id || currentVideo?.channelId || null,
     currentVideoId: row.current_video_id,
     currentVideo,
     isPlaying: Boolean(row.is_playing),
@@ -425,7 +527,6 @@ export function createFriendsRoom(user: UserPublic, title?: string): TvRoomState
   const roomTitle =
     (title || "").trim().slice(0, 60) ||
     `${user.displayName}'s couch`;
-  // Friends couch uses the host's village channel library.
   db.prepare(
     `INSERT INTO tv_rooms
       (id, scope, village_id, host_id, title)
@@ -462,6 +563,7 @@ export function updateRoomPlayback(
   roomId: string,
   user: UserPublic,
   patch: {
+    channelId?: string | null;
     videoId?: string | null;
     isPlaying?: boolean;
     positionMs?: number;
@@ -476,7 +578,29 @@ export function updateRoomPlayback(
 
   const libraryVillage = channelLibraryVillageId(user, room);
 
+  let nextChannelId = room.currentChannelId;
   let nextVideoId = room.currentVideoId;
+
+  if (patch.channelId !== undefined) {
+    if (patch.channelId === null) {
+      nextChannelId = null;
+      nextVideoId = null;
+    } else {
+      const channel = getChannelById(patch.channelId);
+      if (!channel || channel.villageId !== libraryVillage) {
+        return {
+          ok: false as const,
+          error: "That channel is not on this village dial",
+          status: 400,
+        };
+      }
+      nextChannelId = channel.id;
+      if (patch.videoId === undefined) {
+        nextVideoId = channel.videos[0]?.id || null;
+      }
+    }
+  }
+
   if (patch.videoId !== undefined) {
     if (patch.videoId === null) {
       nextVideoId = null;
@@ -489,11 +613,12 @@ export function updateRoomPlayback(
       ) {
         return {
           ok: false as const,
-          error: "That channel is not on this village dial",
+          error: "That clip is not on this village dial",
           status: 400,
         };
       }
       nextVideoId = video.id;
+      nextChannelId = video.channelId || nextChannelId;
     }
   }
 
@@ -511,14 +636,15 @@ export function updateRoomPlayback(
   const db = getDb();
   db.prepare(
     `UPDATE tv_rooms
-     SET current_video_id = ?,
+     SET current_channel_id = ?,
+         current_video_id = ?,
          is_playing = ?,
          position_ms = ?,
          position_updated_at = datetime('now'),
          title = ?,
          updated_at = datetime('now')
      WHERE id = ?`
-  ).run(nextVideoId, isPlaying, positionMs, title, roomId);
+  ).run(nextChannelId, nextVideoId, isPlaying, positionMs, title, roomId);
 
   touchPresence(roomId, user.id);
   return { ok: true as const, room: getRoomById(roomId)! };
