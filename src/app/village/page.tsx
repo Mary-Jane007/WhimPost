@@ -13,7 +13,6 @@ import {
   collectiblesForVillage,
   getVillage,
   RANK_LADDER,
-  SEASONAL_EVENTS,
   SHARED_FEATURES,
   type VillageId,
 } from "@/lib/villages";
@@ -79,19 +78,20 @@ export default async function VillagePage() {
 
   const noteRows = db
     .prepare(
-      `SELECT n.id, n.body, n.anonymous, n.created_at,
+      `SELECT n.id, n.body, n.anonymous, n.image_url, n.created_at,
               u.id as uid, u.username, u.display_name, u.bio, u.forest_name,
               u.created_at as ucreated, u.is_owner, u.village_id, u.reputation
        FROM village_notes n
        JOIN users u ON u.id = n.author_id
        WHERE n.village_id = ?
        ORDER BY n.created_at DESC
-       LIMIT 30`
+       LIMIT 40`
     )
     .all(stats.villageId) as Array<{
     id: string;
     body: string;
     anonymous: number;
+    image_url: string | null;
     created_at: string;
     uid: string;
     username: string;
@@ -108,6 +108,7 @@ export default async function VillagePage() {
     id: r.id,
     body: r.body,
     anonymous: Boolean(r.anonymous),
+    imageUrl: r.image_url || null,
     createdAt: r.created_at,
     author: r.anonymous
       ? null
@@ -119,7 +120,7 @@ export default async function VillagePage() {
 
   const unlockLabels = [
     "Lantern path lit",
-    "Seasonal bunting",
+    "Village bunting",
     "Visiting wildlife",
     "Special building glow",
   ];
@@ -230,6 +231,13 @@ export default async function VillagePage() {
             </span>
           ))}
         </div>
+        {village.id === "bramblewood" && user.villageId === "bramblewood" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/workshop" className="btn-primary">
+              Enter The Bramblewood Workshop
+            </Link>
+          </p>
+        ) : null}
       </section>
 
       <section className="village-panel">
@@ -237,12 +245,6 @@ export default async function VillagePage() {
         <ul className="belong-list">
           {village.belongs.map((b) => (
             <li key={b}>{b}</li>
-          ))}
-        </ul>
-        <h3>Village tasks</h3>
-        <ul className="task-list">
-          {village.tasks.map((t) => (
-            <li key={t}>{t}</li>
           ))}
         </ul>
         <p className="muted">
@@ -325,15 +327,6 @@ export default async function VillagePage() {
             })}
           </ul>
         )}
-      </section>
-
-      <section className="village-panel">
-        <h2>Seasonal spirit</h2>
-        <div className="season-list">
-          {SEASONAL_EVENTS.map((e) => (
-            <span key={e}>{e}</span>
-          ))}
-        </div>
       </section>
 
       {user.isOwner ? (

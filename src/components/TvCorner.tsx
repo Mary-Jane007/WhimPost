@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import type { TvChannel, TvRoomState, TvScheduleSlot, TvVideo } from "@/lib/tvCorner";
+import { youtubeEmbedSrc } from "@/lib/tvLinks";
 
 type VillageOption = { id: VillageId; name: string };
 
@@ -128,6 +129,10 @@ export function TvCorner({
     initialChannels[0]?.id || ""
   );
   const [clipTitle, setClipTitle] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkTitle, setLinkTitle] = useState("");
+  const [linkDurationMinutes, setLinkDurationMinutes] = useState("");
+  const [addingLink, setAddingLink] = useState(false);
   const [renamingVideoId, setRenamingVideoId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
   const [chatDraft, setChatDraft] = useState("");
@@ -633,6 +638,61 @@ export function TvCorner({
     return doneData.video as TvVideo;
   }
 
+  async function onAddLink(channelId?: string) {
+    if (!user.isOwner) {
+      notifyIssue("Only the site owner can add channel videos");
+      return;
+    }
+    const targetChannelId = channelId || effectiveChannelId;
+    if (!targetChannelId) {
+      notifyIssue("Create a channel first, then add a link to it");
+      return;
+    }
+    const url = linkUrl.trim();
+    if (!url) {
+      notifyIssue("Paste a YouTube or direct video link first");
+      return;
+    }
+    setAddingLink(true);
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/tv/videos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          channelId: targetChannelId,
+          sourceUrl: url,
+          title: linkTitle.trim() || undefined,
+          durationMinutes: linkDurationMinutes.trim() || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Could not add that link");
+      }
+      if (data.channel) mergeChannel(data.channel);
+      setLinkUrl("");
+      setLinkTitle("");
+      setLinkDurationMinutes("");
+      setSelectedChannelId(targetChannelId);
+      setToast({
+        kind: "success",
+        message:
+          data.video?.sourceKind === "youtube"
+            ? "YouTube link added to the channel"
+            : "Video link added to the channel",
+      });
+    } catch (err) {
+      notifyIssue(
+        err instanceof Error ? err.message : "Could not add that link"
+      );
+    } finally {
+      setAddingLink(false);
+      setBusy(false);
+    }
+  }
+
   async function onUploadClips(
     files: FileList | File[] | null,
     channelId?: string
@@ -995,6 +1055,7 @@ export function TvCorner({
   useEffect(() => {
     const el = videoRef.current;
     if (!el || !room.currentVideo) return;
+    if (room.currentVideo.sourceKind === "youtube") return;
 
     const syncKey = [
       room.currentVideoId,
@@ -1071,6 +1132,7 @@ export function TvCorner({
   useEffect(() => {
     if (!room.id || !room.currentVideo || !powerOn) return;
     if (isVillageBroadcast(room)) return;
+    if (room.currentVideo.sourceKind === "youtube") return;
     const timer = window.setInterval(() => {
       const el = videoRef.current;
       if (!el || el.paused || applyingRemote.current) return;
@@ -1240,6 +1302,27 @@ export function TvCorner({
             <div className="tv-bezel">
               <div className={`tv-screen ${powerOn ? "on" : "off"}`}>
                 {powerOn && room.currentVideo ? (
+                  room.currentVideo.sourceKind === "youtube" &&
+                  room.currentVideo.youtubeId ? (
+                    <iframe
+                      key={room.currentVideo.id}
+                      className="tv-video tv-video-embed"
+                      title={room.currentVideo.title}
+                      src={youtubeEmbedSrc(room.currentVideo.youtubeId, {
+                        startSec: Math.floor(
+                          estimatedPositionMs({
+                            positionMs: room.positionMs,
+                            isPlaying: room.isPlaying,
+                            positionUpdatedAt: room.positionUpdatedAt,
+                          }) / 1000
+                        ),
+                        autoplay: room.isPlaying,
+                      })}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      referrerPolicy="strict-origin-when-cross-origin"
+                    />
+                  ) : (
                   <video
                     ref={videoRef}
                     key={room.currentVideo.id}
@@ -1285,6 +1368,7 @@ export function TvCorner({
                     }}
                     controls={!isVillageBroadcast(room)}
                   />
+                  )
                 ) : (
                   <div className="tv-idle">
                     <div className="tv-idle-glow" />
@@ -1561,8 +1645,8 @@ export function TvCorner({
 
           <h2>Channels</h2>
           <p className="tv-shelf-copy">
-            Create a channel first, then upload videos into it. Turning the
-            Channel knob tunes the whole lounge to that lineup.
+            Create a channel first, then upload files or paste video links.
+            Turning the Channel knob tunes the whole lounge to that lineup.
           </p>
 
           {user.isOwner ? (
@@ -1625,10 +1709,8 @@ export function TvCorner({
               </button>
 
               <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
-                <strong>2.</strong> Add as many videos as you like to a channel
-                — shorts or full movies (MP4, WebM, MOV, M4V, AVI, MPEG, or MKV
-                · up to 5GB each). You can select multiple files at once. Keep
-                this tab open; you will see upload progress percent.
+                <strong>2.</strong> Add videos — upload a file, or paste a
+                YouTube / direct video link (no download needed).
               </p>
               <label className="tv-upload">
                 <span>Channel</span>
@@ -1648,6 +1730,60 @@ export function TvCorner({
                   )}
                 </select>
               </label>
+
+              <p className="tv-shelf-copy tv-shelf-hint">
+                <strong>Add by link</strong> — YouTube, or a direct .mp4 / .webm
+                URL. Optional length helps the village schedule stay accurate
+                (defaults to 10 minutes).
+              </p>
+              <label className="tv-upload">
+                <span>Video link</span>
+                <input
+                  type="url"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="https://youtu.be/… or https://…/clip.mp4"
+                  disabled={!effectiveChannelId || addingLink}
+                />
+              </label>
+              <label className="tv-upload">
+                <span>Title (optional)</span>
+                <input
+                  type="text"
+                  value={linkTitle}
+                  onChange={(e) => setLinkTitle(e.target.value)}
+                  placeholder="What should this clip be called?"
+                  maxLength={80}
+                  disabled={!effectiveChannelId || addingLink}
+                />
+              </label>
+              <label className="tv-upload">
+                <span>Length in minutes (optional)</span>
+                <input
+                  type="number"
+                  min={0.5}
+                  max={720}
+                  step={0.5}
+                  value={linkDurationMinutes}
+                  onChange={(e) => setLinkDurationMinutes(e.target.value)}
+                  placeholder="e.g. 22"
+                  disabled={!effectiveChannelId || addingLink}
+                />
+              </label>
+              <button
+                type="button"
+                className="btn-primary tv-upload-file"
+                onClick={() => void onAddLink()}
+                disabled={addingLink || uploading || !effectiveChannelId}
+              >
+                {addingLink ? "Adding link…" : "Add link to channel"}
+              </button>
+
+              <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
+                <strong>Or upload a file</strong> — shorts or full movies (MP4,
+                WebM, MOV, M4V, AVI, MPEG, or MKV · up to 5GB each). You can
+                select multiple files at once.
+              </p>
               <label className="tv-upload">
                 <span>Title for first file (optional)</span>
                 <input
@@ -1681,7 +1817,7 @@ export function TvCorner({
                   accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
                   hidden
                   multiple
-                  disabled={uploading || !effectiveChannelId}
+                  disabled={uploading || addingLink || !effectiveChannelId}
                   onChange={(e) => {
                     // Copy first — clearing the input empties the live FileList.
                     const files = Array.from(e.target.files || []);
@@ -1691,7 +1827,7 @@ export function TvCorner({
                 />
                 {uploading
                   ? uploadProgress || "Uploading…"
-                  : "Add videos to channel"}
+                  : "Upload videos to channel"}
               </label>
             </div>
           ) : (
@@ -1800,6 +1936,11 @@ export function TvCorner({
                                     onClick={() => tuneToVideo(video)}
                                   >
                                     {video.title}
+                                    {video.sourceKind === "youtube" ? (
+                                      <span className="tv-clip-kind">· YouTube</span>
+                                    ) : video.sourceKind === "direct" ? (
+                                      <span className="tv-clip-kind">· link</span>
+                                    ) : null}
                                   </button>
                                   {user.isOwner ? (
                                     <>
@@ -1833,25 +1974,54 @@ export function TvCorner({
                       <p className="muted tv-channel-empty">No videos yet.</p>
                     )}
                     {user.isOwner ? (
-                      <label className="tv-channel-add btn-primary">
-                        <input
-                          type="file"
-                          accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
-                          hidden
-                          multiple
-                          disabled={uploading}
-                          onChange={(e) => {
-                            // Copy first — clearing the input empties the live FileList.
-                            const files = Array.from(e.target.files || []);
-                            e.target.value = "";
-                            setSelectedChannelId(channel.id);
-                            void onUploadClips(files, channel.id);
-                          }}
-                        />
-                        {uploading && effectiveChannelId === channel.id
-                          ? uploadProgress || "Uploading…"
-                          : "Add more videos"}
-                      </label>
+                      <div className="tv-channel-add-row">
+                        <div className="tv-channel-link-box">
+                          <input
+                            type="url"
+                            value={linkUrl}
+                            onChange={(e) => {
+                              setSelectedChannelId(channel.id);
+                              setLinkUrl(e.target.value);
+                            }}
+                            onFocus={() => setSelectedChannelId(channel.id)}
+                            placeholder="Paste YouTube or video link…"
+                            disabled={addingLink || uploading}
+                            aria-label={`Video link for ${channel.title}`}
+                          />
+                          <button
+                            type="button"
+                            className="btn-primary"
+                            disabled={addingLink || uploading}
+                            onClick={() => {
+                              setSelectedChannelId(channel.id);
+                              void onAddLink(channel.id);
+                            }}
+                          >
+                            {addingLink && selectedChannelId === channel.id
+                              ? "Adding…"
+                              : "Add link"}
+                          </button>
+                        </div>
+                        <label className="tv-channel-add btn-secondary">
+                          <input
+                            type="file"
+                            accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
+                            hidden
+                            multiple
+                            disabled={uploading || addingLink}
+                            onChange={(e) => {
+                              // Copy first — clearing the input empties the live FileList.
+                              const files = Array.from(e.target.files || []);
+                              e.target.value = "";
+                              setSelectedChannelId(channel.id);
+                              void onUploadClips(files, channel.id);
+                            }}
+                          />
+                          {uploading && effectiveChannelId === channel.id
+                            ? uploadProgress || "Uploading…"
+                            : "Upload file"}
+                        </label>
+                      </div>
                     ) : null}
                   </li>
                 );

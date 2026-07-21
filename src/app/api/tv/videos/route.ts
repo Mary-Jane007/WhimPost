@@ -7,12 +7,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import {
   createVideo,
+  createVideoFromLink,
   deleteVideo,
   getChannelById,
   listVideosForChannel,
   renameVideo,
   resolveTvUpload,
 } from "@/lib/tvCorner";
+import { parseDurationMinutesInput } from "@/lib/tvLinks";
 
 export const runtime = "nodejs";
 export const maxDuration = 1800; // long movie uploads
@@ -123,6 +125,36 @@ export async function POST(req: NextRequest) {
   }
 
   const contentType = (req.headers.get("content-type") || "").toLowerCase();
+
+  // Add-by-link: JSON body with a YouTube or direct video URL.
+  if (contentType.includes("application/json")) {
+    const body = (await req.json().catch(() => null)) as {
+      channelId?: string;
+      sourceUrl?: string;
+      title?: string;
+      durationMinutes?: number | string;
+    } | null;
+    if (!body?.channelId) {
+      return jsonError("Create a channel first, then add a link to it");
+    }
+    const channel = getChannelById(String(body.channelId).trim());
+    if (!channel) {
+      return jsonError("Create a channel first, then add a link to it");
+    }
+    const result = createVideoFromLink({
+      sourceUrl: String(body.sourceUrl || ""),
+      title: typeof body.title === "string" ? body.title : "",
+      durationMs: parseDurationMinutesInput(body.durationMinutes),
+      uploaderId: user.id,
+      villageId: channel.villageId,
+      channelId: channel.id,
+    });
+    if (!result.ok) return jsonError(result.error);
+    return NextResponse.json({
+      video: result.video,
+      channel: getChannelById(channel.id),
+    });
+  }
 
   // Preferred path: raw binary body (streams to disk, works better for large movies).
   if (!contentType.includes("multipart/form-data")) {
@@ -303,9 +335,11 @@ export async function DELETE(req: NextRequest) {
   const result = deleteVideo(body.id, user);
   if (!result.ok) return jsonError(result.error, 403);
 
-  const filePath = path.join(UPLOAD_DIR, result.filename);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
+  if (result.isFile) {
+    const filePath = path.join(UPLOAD_DIR, result.filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
   }
 
   return NextResponse.json({ ok: true });
