@@ -5767,7 +5767,6 @@ button.linkish:hover {
 }
 
 .bw-card-art,
-.recipe-card > img,
 .broadcast-card > img {
   width: 100%;
   max-width: 10rem;
@@ -5813,6 +5812,49 @@ button.linkish:hover {
   text-transform: uppercase;
   color: #5f7a45;
   text-align: right;
+}
+
+.recipe-card {
+  display: grid;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+@media (min-width: 720px) {
+  .recipe-card {
+    grid-template-columns: minmax(0, 1fr) minmax(11rem, 44%);
+  }
+}
+
+.bw-recipe-example {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.bw-recipe-example img {
+  width: 100%;
+  min-height: 10rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.95rem 1.15rem 0.85rem 1.05rem;
+  border: 1px solid rgba(120, 82, 42, 0.22);
+  box-shadow: 0 7px 16px rgba(60, 35, 15, 0.13);
+  filter: none;
+}
+
+.bw-recipe-example figcaption {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5f7a45;
+  text-align: right;
+}
+
+@media (min-width: 720px) {
+  .bw-grid:has(.recipe-card) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .bw-actions {

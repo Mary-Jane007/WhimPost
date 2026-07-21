@@ -349,49 +349,57 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                 const done = progress.completed[`recipe:${r.id}`];
                 return (
                   <article key={r.id} className="bw-card recipe-card">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={r.image} alt="" />
-                    <h3>{r.title}</h3>
-                    <p className="bw-meta">
-                      {r.difficulty} · {r.time}
-                    </p>
-                    <details>
-                      <summary>Ingredients &amp; steps</summary>
-                      <ul>
-                        {r.ingredients.map((i) => (
-                          <li key={i}>{i}</li>
-                        ))}
-                      </ul>
-                      <ol>
-                        {r.instructions.map((s) => (
-                          <li key={s}>{s}</li>
-                        ))}
-                      </ol>
-                    </details>
-                    <div className="bw-actions">
-                      <button
-                        type="button"
-                        className="btn-primary"
-                        disabled={busy || done}
-                        onClick={() =>
-                          void postAction({
-                            type: "complete",
-                            completeKind: "recipe",
-                            id: r.id,
-                          })
-                        }
-                      >
-                        {done ? "Cooked" : "Mark Complete"}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-secondary"
-                        disabled={busy}
-                        onClick={() => requestPhoto("recipe", r.id)}
-                      >
-                        Upload Finished Dish
-                      </button>
+                    <div className="bw-recipe-copy">
+                      <h3>{r.title}</h3>
+                      <p className="bw-meta">
+                        {r.difficulty} · {r.time}
+                      </p>
+                      <details>
+                        <summary>Ingredients &amp; steps</summary>
+                        <ul>
+                          {r.ingredients.map((i) => (
+                            <li key={i}>{i}</li>
+                          ))}
+                        </ul>
+                        <ol>
+                          {r.instructions.map((s) => (
+                            <li key={s}>{s}</li>
+                          ))}
+                        </ol>
+                      </details>
+                      <div className="bw-actions">
+                        <button
+                          type="button"
+                          className="btn-primary"
+                          disabled={busy || done}
+                          onClick={() =>
+                            void postAction({
+                              type: "complete",
+                              completeKind: "recipe",
+                              id: r.id,
+                            })
+                          }
+                        >
+                          {done ? "Cooked" : "Mark Complete"}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          disabled={busy}
+                          onClick={() => requestPhoto("recipe", r.id)}
+                        >
+                          Upload Finished Dish
+                        </button>
+                      </div>
                     </div>
+                    <figure className="bw-recipe-example">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={r.image}
+                        alt={`Example of finished dish: ${r.title}`}
+                      />
+                      <figcaption>Inspiration · finished dish</figcaption>
+                    </figure>
                   </article>
                 );
               })}
