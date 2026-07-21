@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "5gb",
     },
+    // Large TV movie uploads — avoid silent truncation of request bodies.
     proxyClientMaxBodySize: "5gb",
   },
 };
