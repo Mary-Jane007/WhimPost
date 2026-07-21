@@ -5396,3 +5396,90 @@ button.linkish:hover {
   font-size: 0.82rem;
   cursor: pointer;
 }
+
+/* ─── Village lounge program guide ─────────────────────────── */
+
+.tv-guide {
+  margin: 1rem 0 0.35rem;
+  padding: 0.95rem 1rem 1.05rem;
+  border-radius: 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 32%, transparent);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--village-color, #2a3548) 35%, rgba(0, 0, 0, 0.35)),
+      rgba(0, 0, 0, 0.28)
+    );
+}
+
+.tv-guide-header {
+  margin-bottom: 0.75rem;
+}
+
+.tv-guide-eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold, #c9a227) 75%, white);
+}
+
+.tv-guide-header h2 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  color: var(--cream, #f3e6d0);
+}
+
+.tv-guide-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(243, 230, 208, 0.78);
+}
+
+.tv-guide-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+  max-height: 16rem;
+  overflow: auto;
+}
+
+.tv-guide-list li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.7rem;
+  border: 1px solid transparent;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.tv-guide-list li.now {
+  border-color: color-mix(in srgb, var(--gold, #c9a227) 55%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 22%, rgba(0, 0, 0, 0.25));
+}
+
+.tv-guide-list time {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--gold, #c9a227) 80%, white);
+  padding-top: 0.1rem;
+}
+
+.tv-guide-list strong {
+  display: block;
+  color: var(--cream, #f3e6d0);
+  font-size: 0.95rem;
+}
+
+.tv-guide-list span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: rgba(243, 230, 208, 0.65);
+}
