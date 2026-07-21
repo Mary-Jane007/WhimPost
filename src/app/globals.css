@@ -6080,6 +6080,64 @@ button.linkish:hover {
 .bw-journal {
   display: grid;
   gap: 1rem;
+  margin-top: 1rem;
+}
+
+.bw-journal-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.bw-journal-form h3 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  color: #3a1f12;
+}
+
+.bw-field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.bw-field span {
+  font-size: 0.85rem;
+  color: #5f7a45;
+}
+
+.bw-field input,
+.bw-field select,
+.bw-field textarea {
+  width: 100%;
+  border: 1px solid rgba(120, 82, 42, 0.28);
+  border-radius: 0.75rem 1rem 0.7rem 0.9rem;
+  background: rgba(255, 252, 245, 0.95);
+  color: #3a1f12;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+}
+
+.bw-field textarea {
+  resize: vertical;
+  min-height: 6rem;
+  line-height: 1.45;
+}
+
+.bw-journal-photo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.bw-journal-form-preview {
+  width: 5.5rem;
+  height: 4.2rem;
+  object-fit: cover;
+  border-radius: 0.45rem 0.7rem 0.4rem 0.65rem;
+  border: 2px solid #f3e6d0;
+  box-shadow: 2px 3px 0 rgba(90, 60, 30, 0.1);
+  transform: rotate(-2deg);
 }
 
 .bw-journal-entry {

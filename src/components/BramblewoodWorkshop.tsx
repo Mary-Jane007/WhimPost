@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import type { UserPublic } from "@/lib/types";
 import type { WorkshopProgress } from "@/lib/workshop";
 import {
@@ -37,7 +37,14 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [journalCraftId, setJournalCraftId] = useState("");
+  const [journalTitle, setJournalTitle] = useState("");
+  const [journalNote, setJournalNote] = useState("");
+  const [journalPhoto, setJournalPhoto] = useState<string | null>(null);
+  const [journalMarkComplete, setJournalMarkComplete] = useState(true);
+  const [journalUploading, setJournalUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const journalFileRef = useRef<HTMLInputElement>(null);
   const pendingPhotoKey = useRef<string | null>(null);
   const pendingPhotoKind = useRef<
     | "generic"
@@ -153,6 +160,49 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
       pendingPhotoKey.current = null;
       if (fileRef.current) fileRef.current.value = "";
     }
+  }
+
+  async function onJournalPhoto(file: File | null) {
+    if (!file) return;
+    setJournalUploading(true);
+    setError(null);
+    try {
+      const url = await uploadPhoto(file);
+      setJournalPhoto(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setJournalUploading(false);
+      if (journalFileRef.current) journalFileRef.current.value = "";
+    }
+  }
+
+  async function submitJournalEntry(e: FormEvent) {
+    e.preventDefault();
+    const craft = CRAFTS.find((c) => c.id === journalCraftId);
+    const title = (journalTitle.trim() || craft?.title || "").trim();
+    const note = journalNote.trim();
+    if (!title) {
+      setError("Give your journal entry a craft name");
+      return;
+    }
+    if (!note) {
+      setError("Write a little about how it went");
+      return;
+    }
+    await postAction({
+      type: "journalEntry",
+      activityId: journalCraftId || undefined,
+      activityName: title,
+      note,
+      photoUrl: journalPhoto || undefined,
+      markCraftComplete: Boolean(journalCraftId) && journalMarkComplete,
+    });
+    setJournalCraftId("");
+    setJournalTitle("");
+    setJournalNote("");
+    setJournalPhoto(null);
+    setJournalMarkComplete(true);
   }
 
   return (
@@ -612,12 +662,107 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
           <section className="bw-section">
             <h2>Craft Journal</h2>
             <p className="bw-section-lead">
-              An old scrapbook of everything you&apos;ve made in the workshop.
+              Record finished crafts, write about the making, and tape in a
+              photo of what you created.
             </p>
+
+            <form className="bw-card bw-journal-form" onSubmit={submitJournalEntry}>
+              <h3>New journal page</h3>
+              <label className="bw-field">
+                <span>Which craft?</span>
+                <select
+                  value={journalCraftId}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setJournalCraftId(id);
+                    const craft = CRAFTS.find((c) => c.id === id);
+                    if (craft) setJournalTitle(craft.title);
+                  }}
+                >
+                  <option value="">Something else / custom</option>
+                  {CRAFTS.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="bw-field">
+                <span>Title</span>
+                <input
+                  type="text"
+                  value={journalTitle}
+                  onChange={(e) => setJournalTitle(e.target.value)}
+                  placeholder="e.g. Pressed flower bookmarks"
+                  maxLength={120}
+                  required
+                />
+              </label>
+              <label className="bw-field">
+                <span>Your experience</span>
+                <textarea
+                  value={journalNote}
+                  onChange={(e) => setJournalNote(e.target.value)}
+                  placeholder="How did it feel? What surprised you? Did the moss stick? Write it like a scrapbook note…"
+                  rows={5}
+                  maxLength={2000}
+                  required
+                />
+              </label>
+              <div className="bw-journal-photo-row">
+                <input
+                  ref={journalFileRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  hidden
+                  onChange={(e) =>
+                    void onJournalPhoto(e.target.files?.[0] || null)
+                  }
+                />
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  disabled={busy || journalUploading}
+                  onClick={() => journalFileRef.current?.click()}
+                >
+                  {journalUploading
+                    ? "Uploading…"
+                    : journalPhoto
+                      ? "Change photo"
+                      : "Add finished craft photo"}
+                </button>
+                {journalPhoto ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={journalPhoto}
+                    alt="Finished craft preview"
+                    className="bw-journal-form-preview"
+                  />
+                ) : null}
+              </div>
+              {journalCraftId ? (
+                <label className="bw-check">
+                  <input
+                    type="checkbox"
+                    checked={journalMarkComplete}
+                    onChange={(e) => setJournalMarkComplete(e.target.checked)}
+                  />
+                  Also mark this craft complete (+XP &amp; Craftsman Badge)
+                </label>
+              ) : null}
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={busy || journalUploading}
+              >
+                Save to Craft Journal
+              </button>
+            </form>
+
             {progress.journal.length === 0 ? (
               <p className="muted">
-                Complete a craft, recipe, or quest — entries appear here with
-                dates, XP, and handwritten notes.
+                Your scrapbook is waiting for its first page — add a finished
+                craft above.
               </p>
             ) : (
               <div className="bw-journal">
@@ -640,7 +785,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={entry.photoUrl}
-                        alt=""
+                        alt={`Finished: ${entry.activityName}`}
                         className="bw-journal-photo"
                       />
                     ) : (

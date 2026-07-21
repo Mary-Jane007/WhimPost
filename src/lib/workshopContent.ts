@@ -32,6 +32,7 @@ export const WORKSHOP_XP = {
   growWeek: 30,
   growComplete: 80,
   seasonal: 60,
+  journal: 25,
 } as const;
 
 export const WORKSHOP_TITLES = [
