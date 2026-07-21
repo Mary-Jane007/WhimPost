@@ -619,7 +619,12 @@ export function TvCorner({
       notifyIssue("Only the site owner can upload channel videos");
       return;
     }
-    if (!files || files.length === 0) {
+    const list = !files
+      ? []
+      : Array.isArray(files)
+        ? files
+        : Array.from(files);
+    if (list.length === 0) {
       notifyIssue("No video file was chosen");
       return;
     }
@@ -628,7 +633,6 @@ export function TvCorner({
       notifyIssue("Create a channel first, then upload videos to it");
       return;
     }
-    const list = Array.from(files);
     uploadCancelRef.current = false;
     setUploading(true);
     setBusy(true);
@@ -1582,14 +1586,15 @@ export function TvCorner({
                   accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
                   hidden
                   multiple
-                  disabled={busy || !effectiveChannelId}
+                  disabled={uploading || !effectiveChannelId}
                   onChange={(e) => {
-                    const files = e.target.files;
+                    // Copy first — clearing the input empties the live FileList.
+                    const files = Array.from(e.target.files || []);
                     e.target.value = "";
                     void onUploadClips(files);
                   }}
                 />
-                {busy || uploading
+                {uploading
                   ? uploadProgress || "Uploading…"
                   : "Add videos to channel"}
               </label>
@@ -1739,15 +1744,16 @@ export function TvCorner({
                           accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
                           hidden
                           multiple
-                          disabled={busy}
+                          disabled={uploading}
                           onChange={(e) => {
-                            const files = e.target.files;
+                            // Copy first — clearing the input empties the live FileList.
+                            const files = Array.from(e.target.files || []);
                             e.target.value = "";
                             setSelectedChannelId(channel.id);
                             void onUploadClips(files, channel.id);
                           }}
                         />
-                        {busy && uploading && effectiveChannelId === channel.id
+                        {uploading && effectiveChannelId === channel.id
                           ? uploadProgress || "Uploading…"
                           : "Add more videos"}
                       </label>
