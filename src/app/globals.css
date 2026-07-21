@@ -4369,6 +4369,26 @@ body.theme-moonmere .cottage-plaque {
   margin-bottom: 0.55rem;
 }
 
+.tv-upload-banner-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.tv-upload-cancel {
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 40%, transparent);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--cream, #f3e6d0);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.tv-upload-cancel:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
 .tv-upload-banner-top strong {
   font-family: var(--font-display, Georgia, serif);
   font-size: 1.05rem;
