@@ -71,7 +71,7 @@ export const CRAFTS: CraftItem[] = [
       "Press under books for several days.",
       "Glue onto cardstock strips and bind with twine.",
     ],
-    image: "/stickers/villages/bramblewood/bouquet.png",
+    image: "/workshop/crafts/flower-bookmarks.jpg",
     note: "Today I pressed wildflowers while it rained outside. The pages still smell faintly of lavender.",
   },
   {
@@ -85,7 +85,7 @@ export const CRAFTS: CraftItem[] = [
       "Paint with soft woodland colors.",
       "Glue moss and a bead knob, then lean it at a tree base.",
     ],
-    image: "/stickers/villages/bramblewood/fox-sitting.png",
+    image: "/workshop/crafts/fairy-door.jpg",
     note: "I left a fairy door by the oak. It feels like the woods are listening.",
   },
   {
@@ -99,7 +99,7 @@ export const CRAFTS: CraftItem[] = [
       "Paint tiny patterns or faces.",
       "Seal lightly and display in a dish.",
     ],
-    image: "/stickers/villages/bramblewood/maple-branch.png",
+    image: "/workshop/crafts/paint-acorns.jpg",
     note: "A handful of painted acorns now live on my windowsill like little lanterns.",
   },
   {
@@ -113,7 +113,7 @@ export const CRAFTS: CraftItem[] = [
       "Roll in seed and tie with string.",
       "Hang from a branch and wait quietly.",
     ],
-    image: "/stickers/villages/bramblewood/monarch.png",
+    image: "/workshop/crafts/bird-feeder.jpg",
     note: "The feeder swayed in the wind and a sparrow found it before dusk.",
   },
   {
@@ -127,7 +127,7 @@ export const CRAFTS: CraftItem[] = [
       "Add leaf prints or tiny mushrooms.",
       "Seal and pot a small herb.",
     ],
-    image: "/stickers/villages/bramblewood/eucalyptus.png",
+    image: "/workshop/crafts/flower-pot.jpg",
     note: "My flower pot now wears a painted fern — very Bramblewood.",
   },
   {
@@ -141,7 +141,7 @@ export const CRAFTS: CraftItem[] = [
       "Secure wicks in molds and pour.",
       "Cool fully, then trim and light with care.",
     ],
-    image: "/stickers/villages/bramblewood/candle-jar.png",
+    image: "/workshop/crafts/beeswax-candles.jpg",
     note: "The beeswax smelled like honey and summer fields.",
   },
   {
@@ -155,7 +155,7 @@ export const CRAFTS: CraftItem[] = [
       "Sew three sides, fill with lavender, close the last edge.",
       "Tuck into a drawer or letter satchel.",
     ],
-    image: "/stickers/villages/bramblewood/blankets.png",
+    image: "/workshop/crafts/lavender-sachet.jpg",
     note: "Every time I open the drawer, lavender rises like a quiet greeting.",
   },
   {
@@ -169,7 +169,7 @@ export const CRAFTS: CraftItem[] = [
       "Mist lightly and add a tiny companion.",
       "Keep in soft light and watch it settle.",
     ],
-    image: "/stickers/villages/bramblewood/mushroom.png",
+    image: "/workshop/crafts/moss-terrarium.jpg",
     note: "A miniature forest now lives on my desk.",
   },
   {
@@ -183,7 +183,7 @@ export const CRAFTS: CraftItem[] = [
       "Pour over a screen and press out water.",
       "Scatter petals and dry flat overnight.",
     ],
-    image: "/stickers/villages/bramblewood/book-leaf.png",
+    image: "/workshop/crafts/homemade-paper.jpg",
     note: "The paper dried uneven and perfect — like bark and sky.",
   },
   {
@@ -197,7 +197,7 @@ export const CRAFTS: CraftItem[] = [
       "Build a twig arch and pebble benches.",
       "Place where morning light can find it.",
     ],
-    image: "/stickers/villages/bramblewood/autumn-tree.png",
+    image: "/workshop/crafts/fairy-garden.jpg",
     note: "I built a path of pebbles and imagined fox footprints.",
   },
   {
@@ -211,7 +211,7 @@ export const CRAFTS: CraftItem[] = [
       "Dry-brush tips with soft color.",
       "Let dry, then arrange in a bowl.",
     ],
-    image: "/stickers/villages/bramblewood/maple-branch.png",
+    image: "/workshop/crafts/paint-pinecones.jpg",
     note: "Painted pinecones look like tiny autumn fireworks.",
   },
   {
@@ -225,7 +225,7 @@ export const CRAFTS: CraftItem[] = [
       "Press between paper under books.",
       "Wait patiently, then frame or journal them.",
     ],
-    image: "/stickers/villages/bramblewood/autumn-leaves.png",
+    image: "/workshop/crafts/press-wildflowers.jpg",
     note: "Pressed petals became quiet bookmarks for rainy days.",
   },
   {
@@ -239,7 +239,7 @@ export const CRAFTS: CraftItem[] = [
       "Bind corners with twine.",
       "Mount a photo or watercolor behind.",
     ],
-    image: "/stickers/villages/bramblewood/maple-branch.png",
+    image: "/workshop/crafts/twig-frame.jpg",
     note: "The twig frame made my sketch feel like it grew outdoors.",
   },
   {
@@ -253,7 +253,7 @@ export const CRAFTS: CraftItem[] = [
       "Add dots with a toothpick tip.",
       "Dry, paint, and seal gently.",
     ],
-    image: "/stickers/villages/bramblewood/mushroom.png",
+    image: "/workshop/crafts/clay-mushrooms.jpg",
     note: "A family of clay mushrooms lined up by the window.",
   },
 ];
