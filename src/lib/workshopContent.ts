@@ -51,7 +51,6 @@ export type CraftItem = {
   materials: string[];
   instructions: string[];
   image: string;
-  note: string;
 };
 
 export const CRAFTS: CraftItem[] = [
@@ -67,7 +66,6 @@ export const CRAFTS: CraftItem[] = [
       "Glue onto cardstock strips and bind with twine.",
     ],
     image: "/workshop/crafts/flower-bookmarks.jpg",
-    note: "Today I pressed wildflowers while it rained outside. The pages still smell faintly of lavender.",
   },
   {
     id: "fairy-door",
@@ -81,7 +79,6 @@ export const CRAFTS: CraftItem[] = [
       "Glue moss and a bead knob, then lean it at a tree base.",
     ],
     image: "/workshop/crafts/fairy-door.jpg",
-    note: "I left a fairy door by the oak. It feels like the woods are listening.",
   },
   {
     id: "paint-acorns",
@@ -95,7 +92,6 @@ export const CRAFTS: CraftItem[] = [
       "Seal lightly and display in a dish.",
     ],
     image: "/workshop/crafts/paint-acorns.jpg",
-    note: "A handful of painted acorns now live on my windowsill like little lanterns.",
   },
   {
     id: "bird-feeder",
@@ -109,7 +105,6 @@ export const CRAFTS: CraftItem[] = [
       "Hang from a branch and wait quietly.",
     ],
     image: "/workshop/crafts/bird-feeder.jpg",
-    note: "The feeder swayed in the wind and a sparrow found it before dusk.",
   },
   {
     id: "flower-pot",
@@ -123,7 +118,6 @@ export const CRAFTS: CraftItem[] = [
       "Seal and pot a small herb.",
     ],
     image: "/workshop/crafts/flower-pot.jpg",
-    note: "My flower pot now wears a painted fern — very Bramblewood.",
   },
   {
     id: "beeswax-candles",
@@ -137,7 +131,6 @@ export const CRAFTS: CraftItem[] = [
       "Cool fully, then trim and light with care.",
     ],
     image: "/workshop/crafts/beeswax-candles.jpg",
-    note: "The beeswax smelled like honey and summer fields.",
   },
   {
     id: "lavender-sachet",
@@ -151,7 +144,6 @@ export const CRAFTS: CraftItem[] = [
       "Tuck into a drawer or letter satchel.",
     ],
     image: "/workshop/crafts/lavender-sachet.jpg",
-    note: "Every time I open the drawer, lavender rises like a quiet greeting.",
   },
   {
     id: "moss-terrarium",
@@ -165,7 +157,6 @@ export const CRAFTS: CraftItem[] = [
       "Keep in soft light and watch it settle.",
     ],
     image: "/workshop/crafts/moss-terrarium.jpg",
-    note: "A miniature forest now lives on my desk.",
   },
   {
     id: "homemade-paper",
@@ -179,7 +170,6 @@ export const CRAFTS: CraftItem[] = [
       "Scatter petals and dry flat overnight.",
     ],
     image: "/workshop/crafts/homemade-paper.jpg",
-    note: "The paper dried uneven and perfect — like bark and sky.",
   },
   {
     id: "fairy-garden",
@@ -193,7 +183,6 @@ export const CRAFTS: CraftItem[] = [
       "Place where morning light can find it.",
     ],
     image: "/workshop/crafts/fairy-garden.jpg",
-    note: "I built a path of pebbles and imagined fox footprints.",
   },
   {
     id: "paint-pinecones",
@@ -207,7 +196,6 @@ export const CRAFTS: CraftItem[] = [
       "Let dry, then arrange in a bowl.",
     ],
     image: "/workshop/crafts/paint-pinecones.jpg",
-    note: "Painted pinecones look like tiny autumn fireworks.",
   },
   {
     id: "press-wildflowers",
@@ -221,7 +209,6 @@ export const CRAFTS: CraftItem[] = [
       "Wait patiently, then frame or journal them.",
     ],
     image: "/workshop/crafts/press-wildflowers.jpg",
-    note: "Pressed petals became quiet bookmarks for rainy days.",
   },
   {
     id: "twig-frame",
@@ -235,7 +222,6 @@ export const CRAFTS: CraftItem[] = [
       "Mount a photo or watercolor behind.",
     ],
     image: "/workshop/crafts/twig-frame.jpg",
-    note: "The twig frame made my sketch feel like it grew outdoors.",
   },
   {
     id: "clay-mushrooms",
@@ -249,7 +235,6 @@ export const CRAFTS: CraftItem[] = [
       "Dry, paint, and seal gently.",
     ],
     image: "/workshop/crafts/clay-mushrooms.jpg",
-    note: "A family of clay mushrooms lined up by the window.",
   },
 ];
 
@@ -261,7 +246,6 @@ export type RecipeItem = {
   ingredients: string[];
   instructions: string[];
   image: string;
-  note: string;
   badge: string;
 };
 
@@ -278,7 +262,6 @@ export const RECIPES: RecipeItem[] = [
       "Bake until bubbling and golden.",
     ],
     image: "/workshop/recipes/apple-crumble.jpg",
-    note: "The kitchen smelled like orchard dusk.",
     badge: "Orchard Baker",
   },
   {
@@ -293,7 +276,6 @@ export const RECIPES: RecipeItem[] = [
       "Bake and glaze while warm.",
     ],
     image: "/workshop/recipes/cinnamon-rolls.jpg",
-    note: "Sticky fingers, happy fox heart.",
     badge: "Hearth Roll Baker",
   },
   {
@@ -308,7 +290,6 @@ export const RECIPES: RecipeItem[] = [
       "Bake until just golden at the edges.",
     ],
     image: "/workshop/recipes/lavender-cookies.jpg",
-    note: "Cookies tasted like a quiet meadow.",
     badge: "Lavender Baker",
   },
   {
@@ -323,7 +304,6 @@ export const RECIPES: RecipeItem[] = [
       "Scoop and bake until firm.",
     ],
     image: "/workshop/recipes/honey-oat-biscuits.jpg",
-    note: "Crisp edges, soft middle — perfect with tea.",
     badge: "Honey Keeper",
   },
   {
@@ -338,7 +318,6 @@ export const RECIPES: RecipeItem[] = [
       "Serve in your favorite mug.",
     ],
     image: "/workshop/recipes/hot-chocolate.jpg",
-    note: "Steam curled up like a tiny cloud.",
     badge: "Mug Warmth",
   },
   {
@@ -353,7 +332,6 @@ export const RECIPES: RecipeItem[] = [
       "Taste for salt and serve warm.",
     ],
     image: "/workshop/recipes/pumpkin-soup.jpg",
-    note: "Soup the color of late October.",
     badge: "Harvest Cook",
   },
   {
@@ -368,7 +346,6 @@ export const RECIPES: RecipeItem[] = [
       "Cool and label with the date.",
     ],
     image: "/workshop/recipes/homemade-jam.jpg",
-    note: "The jam set slowly, like patience itself.",
     badge: "Jar Keeper",
   },
   {
@@ -383,7 +360,6 @@ export const RECIPES: RecipeItem[] = [
       "Bake and glaze with lemon juice sugar.",
     ],
     image: "/workshop/recipes/lemon-loaf.jpg",
-    note: "Bright citrus cut through the rainy afternoon.",
     badge: "Citrus Baker",
   },
   {
@@ -398,7 +374,6 @@ export const RECIPES: RecipeItem[] = [
       "Roll in parchment and chill.",
     ],
     image: "/workshop/recipes/herb-butter.jpg",
-    note: "Herb butter melted on warm bread like a blessing.",
     badge: "Herb Whisperer",
   },
   {
@@ -413,7 +388,6 @@ export const RECIPES: RecipeItem[] = [
       "Shape, bake, and serve with jam.",
     ],
     image: "/workshop/recipes/scones.jpg",
-    note: "Crumbly scones for a slow morning.",
     badge: "Tea Table Host",
   },
   {
@@ -428,7 +402,6 @@ export const RECIPES: RecipeItem[] = [
       "Vent the top and bake until juices bubble.",
     ],
     image: "/workshop/recipes/berry-pie.jpg",
-    note: "Purple stains on my apron — proof of joy.",
     badge: "Pie Maker",
   },
   {
@@ -443,7 +416,6 @@ export const RECIPES: RecipeItem[] = [
       "Bake until the crust sings when tapped.",
     ],
     image: "/workshop/recipes/fresh-bread.jpg",
-    note: "The loaf cracked open like a warm hillside.",
     badge: "Village Baker",
   },
 ];
@@ -452,42 +424,34 @@ export const CREATIVE_PROMPTS = [
   {
     id: "dream-cottage",
     text: "Draw your dream cottage.",
-    note: "I sketched a cottage with crooked shutters and too many flowerpots.",
   },
   {
     id: "first-flower",
     text: "Paint the first flower you see this week.",
-    note: "The first flower was small and stubborn between two stones.",
   },
   {
     id: "woodland-creature",
     text: "Design a woodland creature.",
-    note: "My creature had leaf ears and pockets full of seeds.",
   },
   {
     id: "forest-map",
     text: "Invent a magical forest map.",
-    note: "I named a creek after the sound of rain on tin.",
   },
   {
     id: "rainy-afternoon",
     text: "Write about your favorite rainy afternoon.",
-    note: "Rain made the workshop windows soft and silver.",
   },
   {
     id: "reading-nook",
     text: "Design your perfect reading nook.",
-    note: "Blankets, a low lamp, and a fox-shaped bookmark.",
   },
   {
     id: "mushroom-village",
     text: "Sketch a mushroom village.",
-    note: "Tiny doors in toadstool stems — of course.",
   },
   {
     id: "village-mascot",
     text: "Illustrate your village mascot.",
-    note: "Our fox looked proud beside a stack of craft paper.",
   },
 ];
 
