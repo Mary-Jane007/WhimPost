@@ -5413,6 +5413,40 @@ button.linkish:hover {
   cursor: pointer;
 }
 
+.tv-channel-add-row {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.45rem 0.35rem 0.55rem;
+}
+
+.tv-channel-link-box {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.tv-channel-link-box input {
+  width: 100%;
+  min-width: 0;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 40%, transparent);
+  background: color-mix(in srgb, #1a2218 88%, transparent);
+  color: var(--cream, #f3e6d0);
+  padding: 0.45rem 0.65rem;
+  font-size: 0.82rem;
+}
+
+.tv-channel-link-box .btn-primary {
+  white-space: nowrap;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.tv-channel-add-row .tv-channel-add {
+  margin: 0;
+}
+
 /* ─── Village lounge program guide ─────────────────────────── */
 
 .tv-guide {
