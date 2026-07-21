@@ -767,14 +767,24 @@ export function resolveTvUpload(file: {
   type: string;
   size: number;
 }): { ok: true; mime: string; ext: string } | { ok: false; error: string } {
+  if (file.size <= 0) {
+    return {
+      ok: false,
+      error: "That file looks empty — is it still downloading?",
+    };
+  }
   if (file.size > TV_MAX_BYTES) {
     return { ok: false, error: `Videos must be under ${TV_MAX_LABEL}` };
   }
   const extFromName = file.name.split(".").pop()?.toLowerCase() || "";
-  const mime =
-    (file.type && TV_ALLOWED_MIME.has(file.type) ? file.type : "") ||
-    EXT_MIME[extFromName] ||
-    "";
+  const rawType = (file.type || "").toLowerCase().trim();
+  const mimeFromType =
+    (TV_ALLOWED_MIME.has(rawType) ? rawType : "") ||
+    (rawType === "application/mp4" ? "video/mp4" : "") ||
+    (rawType === "video/x-quicktime" ? "video/quicktime" : "");
+  // Browsers often send octet-stream / blank type for downloaded movies —
+  // fall back to the file extension.
+  const mime = mimeFromType || EXT_MIME[extFromName] || "";
   if (!mime || !TV_ALLOWED_MIME.has(mime)) {
     return {
       ok: false,

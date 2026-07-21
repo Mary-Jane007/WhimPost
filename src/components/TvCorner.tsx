@@ -286,27 +286,108 @@ export function TvCorner({
     setSelectedChannelId(next.id);
   }
 
-  async function uploadOneToChannel(
+  function formatBytesShort(bytes: number) {
+    if (bytes >= 1024 * 1024 * 1024) {
+      return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+    }
+    if (bytes >= 1024 * 1024) {
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+    return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  }
+
+  function uploadOneToChannel(
     file: File,
     channelId: string,
-    title?: string
+    title: string | undefined,
+    onProgress: (msg: string) => void
   ) {
-    if (file.size > 5 * 1024 * 1024 * 1024) {
-      throw new Error(`${file.name} is over 5GB`);
+    if (file.size <= 0) {
+      return Promise.reject(
+        new Error(
+          `${file.name} looks empty — wait for the download to finish, then try again`
+        )
+      );
     }
-    const form = new FormData();
-    form.append("video", file);
-    form.append("channelId", channelId);
+    if (file.size > 5 * 1024 * 1024 * 1024) {
+      return Promise.reject(new Error(`${file.name} is over 5GB`));
+    }
+
     const clipName =
       (title || "").trim() ||
       file.name.replace(/\.[^.]+$/, "").slice(0, 80) ||
       "Untitled clip";
-    form.append("title", clipName);
-    const res = await fetch("/api/tv/videos", { method: "POST", body: form });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || `Could not upload ${file.name}`);
-    if (data.channel) mergeChannel(data.channel);
-    return data.video as TvVideo;
+
+    return new Promise<TvVideo>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/tv/videos");
+      xhr.setRequestHeader("x-tv-channel-id", channelId);
+      xhr.setRequestHeader("x-tv-filename", encodeURIComponent(file.name));
+      xhr.setRequestHeader("x-tv-title", encodeURIComponent(clipName));
+      xhr.setRequestHeader(
+        "Content-Type",
+        file.type && file.type !== "application/octet-stream"
+          ? file.type
+          : "application/octet-stream"
+      );
+      xhr.timeout = 0;
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && event.total > 0) {
+          const pct = Math.min(99, Math.round((event.loaded / event.total) * 100));
+          onProgress(
+            `${pct}% · ${file.name} (${formatBytesShort(event.loaded)} / ${formatBytesShort(event.total)})`
+          );
+        } else {
+          onProgress(`Uploading ${file.name}…`);
+        }
+      };
+
+      xhr.onload = () => {
+        let data: {
+          error?: string;
+          video?: TvVideo;
+          channel?: TvChannel;
+        } | null = null;
+        try {
+          data = JSON.parse(xhr.responseText || "{}");
+        } catch {
+          reject(
+            new Error(
+              xhr.responseText?.slice(0, 140) ||
+                `Upload failed (${xhr.status || "network"})`
+            )
+          );
+          return;
+        }
+        if (xhr.status < 200 || xhr.status >= 300) {
+          reject(
+            new Error(data?.error || `Could not upload ${file.name}`)
+          );
+          return;
+        }
+        if (data?.channel) mergeChannel(data.channel);
+        if (!data?.video) {
+          reject(new Error(`Upload finished but no clip was saved for ${file.name}`));
+          return;
+        }
+        onProgress(`Saved ${file.name}`);
+        resolve(data.video);
+      };
+
+      xhr.onerror = () =>
+        reject(
+          new Error(
+            "Network error while uploading — keep this tab open and try again"
+          )
+        );
+      xhr.ontimeout = () =>
+        reject(new Error("Upload timed out — try again"));
+      xhr.onabort = () => reject(new Error("Upload was cancelled"));
+
+      onProgress(`Starting ${file.name} (${formatBytesShort(file.size)})…`);
+      xhr.send(file);
+    });
   }
 
   async function onUploadClips(
@@ -326,22 +407,25 @@ export function TvCorner({
     try {
       for (let i = 0; i < list.length; i++) {
         const file = list[i];
-        setUploadProgress(
-          `Uploading ${i + 1} of ${list.length}: ${file.name}`
-        );
-        // Only apply the typed title to the first file in a batch.
+        const prefix =
+          list.length > 1 ? `${i + 1}/${list.length} · ` : "";
         await uploadOneToChannel(
           file,
           targetChannelId,
-          i === 0 ? clipTitle : undefined
+          i === 0 ? clipTitle : undefined,
+          (msg) => setUploadProgress(`${prefix}${msg}`)
         );
         uploaded += 1;
       }
       setClipTitle("");
-      if (uploaded > 1) {
-        setError(null);
-      }
+      setUploadProgress(
+        uploaded === 1
+          ? "Upload complete"
+          : `${uploaded} videos uploaded`
+      );
+      window.setTimeout(() => setUploadProgress(null), 2500);
     } catch (err) {
+      setUploadProgress(null);
       setError(
         err instanceof Error
           ? uploaded
@@ -350,7 +434,6 @@ export function TvCorner({
           : "Upload failed"
       );
     } finally {
-      setUploadProgress(null);
       setBusy(false);
     }
   }
@@ -1044,7 +1127,8 @@ export function TvCorner({
               <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
                 <strong>2.</strong> Add as many videos as you like to a channel
                 — shorts or full movies (MP4, WebM, MOV, M4V, AVI, MPEG, or MKV
-                · up to 5GB each). You can select multiple files at once.
+                · up to 5GB each). You can select multiple files at once. Keep
+                this tab open; you will see upload progress percent.
               </p>
               <label className="tv-upload">
                 <span>Channel</span>
@@ -1085,7 +1169,7 @@ export function TvCorner({
               >
                 <input
                   type="file"
-                  accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-msvideo,video/avi,video/mpeg,video/x-matroska,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
+                  accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
                   hidden
                   multiple
                   disabled={busy || !effectiveChannelId}
@@ -1190,7 +1274,7 @@ export function TvCorner({
                       <label className="tv-channel-add btn-primary">
                         <input
                           type="file"
-                          accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-msvideo,video/avi,video/mpeg,video/x-matroska,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
+                          accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
                           hidden
                           multiple
                           disabled={busy}
