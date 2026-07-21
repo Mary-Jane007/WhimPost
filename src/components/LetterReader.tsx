@@ -76,6 +76,7 @@ export function LetterReader({
           >
             <LetterPaper
               paperStyle={letter.paperStyle}
+              fontStyle={letter.fontStyle}
               body={letter.body}
               subject={letter.subject}
               stickers={letter.stickers}
