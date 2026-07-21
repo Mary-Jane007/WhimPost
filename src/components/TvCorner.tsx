@@ -638,12 +638,13 @@ export function TvCorner({
     return doneData.video as TvVideo;
   }
 
-  async function onAddLink() {
+  async function onAddLink(channelId?: string) {
     if (!user.isOwner) {
       notifyIssue("Only the site owner can add channel videos");
       return;
     }
-    if (!effectiveChannelId) {
+    const targetChannelId = channelId || effectiveChannelId;
+    if (!targetChannelId) {
       notifyIssue("Create a channel first, then add a link to it");
       return;
     }
@@ -660,7 +661,7 @@ export function TvCorner({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          channelId: effectiveChannelId,
+          channelId: targetChannelId,
           sourceUrl: url,
           title: linkTitle.trim() || undefined,
           durationMinutes: linkDurationMinutes.trim() || undefined,
@@ -674,6 +675,7 @@ export function TvCorner({
       setLinkUrl("");
       setLinkTitle("");
       setLinkDurationMinutes("");
+      setSelectedChannelId(targetChannelId);
       setToast({
         kind: "success",
         message:
@@ -1772,12 +1774,7 @@ export function TvCorner({
                 type="button"
                 className="btn-primary tv-upload-file"
                 onClick={() => void onAddLink()}
-                disabled={
-                  addingLink ||
-                  uploading ||
-                  !effectiveChannelId ||
-                  !linkUrl.trim()
-                }
+                disabled={addingLink || uploading || !effectiveChannelId}
               >
                 {addingLink ? "Adding link…" : "Add link to channel"}
               </button>
@@ -1977,25 +1974,54 @@ export function TvCorner({
                       <p className="muted tv-channel-empty">No videos yet.</p>
                     )}
                     {user.isOwner ? (
-                      <label className="tv-channel-add btn-primary">
-                        <input
-                          type="file"
-                          accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
-                          hidden
-                          multiple
-                          disabled={uploading}
-                          onChange={(e) => {
-                            // Copy first — clearing the input empties the live FileList.
-                            const files = Array.from(e.target.files || []);
-                            e.target.value = "";
-                            setSelectedChannelId(channel.id);
-                            void onUploadClips(files, channel.id);
-                          }}
-                        />
-                        {uploading && effectiveChannelId === channel.id
-                          ? uploadProgress || "Uploading…"
-                          : "Add more videos"}
-                      </label>
+                      <div className="tv-channel-add-row">
+                        <div className="tv-channel-link-box">
+                          <input
+                            type="url"
+                            value={linkUrl}
+                            onChange={(e) => {
+                              setSelectedChannelId(channel.id);
+                              setLinkUrl(e.target.value);
+                            }}
+                            onFocus={() => setSelectedChannelId(channel.id)}
+                            placeholder="Paste YouTube or video link…"
+                            disabled={addingLink || uploading}
+                            aria-label={`Video link for ${channel.title}`}
+                          />
+                          <button
+                            type="button"
+                            className="btn-primary"
+                            disabled={addingLink || uploading}
+                            onClick={() => {
+                              setSelectedChannelId(channel.id);
+                              void onAddLink(channel.id);
+                            }}
+                          >
+                            {addingLink && selectedChannelId === channel.id
+                              ? "Adding…"
+                              : "Add link"}
+                          </button>
+                        </div>
+                        <label className="tv-channel-add btn-secondary">
+                          <input
+                            type="file"
+                            accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
+                            hidden
+                            multiple
+                            disabled={uploading || addingLink}
+                            onChange={(e) => {
+                              // Copy first — clearing the input empties the live FileList.
+                              const files = Array.from(e.target.files || []);
+                              e.target.value = "";
+                              setSelectedChannelId(channel.id);
+                              void onUploadClips(files, channel.id);
+                            }}
+                          />
+                          {uploading && effectiveChannelId === channel.id
+                            ? uploadProgress || "Uploading…"
+                            : "Upload file"}
+                        </label>
+                      </div>
                     ) : null}
                   </li>
                 );
