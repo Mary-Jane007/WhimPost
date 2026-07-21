@@ -6167,6 +6167,65 @@ button.linkish:hover {
   align-items: center;
 }
 
+.bw-photo-drop {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.85rem 0.9rem;
+  border: 2px dashed rgba(95, 122, 69, 0.55);
+  border-radius: 1rem 1.2rem 0.9rem 1.1rem;
+  background: rgba(95, 122, 69, 0.1);
+}
+
+.bw-photo-drop-title {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.1rem;
+  color: #3a1f12;
+}
+
+.bw-photo-drop-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(58, 31, 18, 0.75);
+}
+
+.bw-photo-input {
+  width: 100%;
+  font: inherit;
+  color: #3a1f12;
+  background: rgba(255, 252, 245, 0.95);
+  border: 1px solid rgba(120, 82, 42, 0.28);
+  border-radius: 0.7rem;
+  padding: 0.45rem;
+}
+
+.bw-photo-pick-btn {
+  justify-self: start;
+  border: 1px solid rgba(95, 122, 69, 0.45);
+  background: linear-gradient(165deg, #6f8f52, #557240);
+  color: #fff8ea;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.bw-photo-pick-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.bw-photo-chosen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.bw-photo-drop-compact {
+  margin-top: 0.75rem;
+}
+
 .bw-journal-form-preview {
   width: 5.5rem;
   height: 4.2rem;
