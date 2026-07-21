@@ -79,7 +79,6 @@ export interface VillageInfo {
   mascotImage?: string;
   color: string;
   colorSoft: string;
-  tasks: string[];
   building: string;
   buildingEmoji: string;
 }
@@ -97,12 +96,6 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/mosshollow/mascot.png",
     color: "#1a3d2e",
     colorSoft: "#6b8f71",
-    tasks: [
-      "Write one thoughtful letter each week",
-      "Recommend a book to another villager",
-      'Collect "Pressed Leaves" by writing long letters',
-      "Discover hidden quotes around the village",
-    ],
     building: "The Great Library",
     buildingEmoji: "📚",
   },
@@ -117,12 +110,6 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/clovermeadow/mascot.png",
     color: "#d4849a",
     colorSoft: "#f2c4d0",
-    tasks: [
-      "Send compliments",
-      "Welcome new villagers",
-      "Leave anonymous encouraging notes",
-      "Plant flowers by completing acts of kindness",
-    ],
     building: "Community Garden",
     buildingEmoji: "🌻",
   },
@@ -138,12 +125,6 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/moonmere/mascot.png",
     color: "#2a3548",
     colorSoft: "#8a9b88",
-    tasks: [
-      "Answer a Question of the Day",
-      "Write about dreams",
-      "Tell stories",
-      "Reflect on life's mysteries",
-    ],
     building: "The Moon Dock",
     buildingEmoji: "🌙",
   },
@@ -159,12 +140,6 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/bramblewood/mascot.png",
     color: "#e07020",
     colorSoft: "#f0a868",
-    tasks: [
-      "Solve weekly riddles",
-      "Find hidden collectibles around WhimPost",
-      "Write fictional letters",
-      "Go on seasonal quests",
-    ],
     building: "Explorer's Guild",
     buildingEmoji: "🗺️",
   },
@@ -180,12 +155,6 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/hearthwick/mascot.png",
     color: "#8b5a2b",
     colorSoft: "#e2c39a",
-    tasks: [
-      "Host tea conversations",
-      "Share recipes",
-      "Write comforting letters",
-      "Keep the village fire burning by staying active",
-    ],
     building: "The Hearth Hall",
     buildingEmoji: "🫖",
   },
@@ -234,17 +203,7 @@ export const SHARED_FEATURES = [
   { emoji: "📮", name: "Post Office" },
   { emoji: "🌳", name: "Notice Board" },
   { emoji: "🪑", name: "Meeting Bench" },
-  { emoji: "🌼", name: "Seasonal Decorations" },
   { emoji: "📬", name: "Daily Mail" },
-];
-
-export const SEASONAL_EVENTS = [
-  "🍂 Autumn Harvest Festival",
-  "❄ Winter Lantern Festival",
-  "🌸 Spring Blossom Fair",
-  "☀ Firefly Nights",
-  "🎃 Pumpkin Letter Exchange",
-  "🎄 Secret Winter Pen Pal",
 ];
 
 export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {

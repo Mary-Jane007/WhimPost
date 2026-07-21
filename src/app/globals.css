@@ -2222,8 +2222,7 @@ body.theme-clovermeadow .village-sticker-pack {
   color: var(--gold);
 }
 
-.belong-list,
-.task-list {
+.belong-list {
   margin: 0.35rem 0 0.75rem;
   padding-left: 1.1rem;
   color: rgba(243, 230, 208, 0.85);
@@ -2377,19 +2376,6 @@ body.theme-clovermeadow .village-sticker-pack {
 .notice-list span {
   font-size: 0.85rem;
   opacity: 0.65;
-}
-
-.season-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-}
-
-.season-list span {
-  padding: 0.35rem 0.7rem;
-  border: 1px dashed rgba(243, 230, 208, 0.2);
-  border-radius: var(--frame-pill);
-  font-size: 0.9rem;
 }
 
 .village-join {

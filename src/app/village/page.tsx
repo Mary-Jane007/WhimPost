@@ -13,7 +13,6 @@ import {
   collectiblesForVillage,
   getVillage,
   RANK_LADDER,
-  SEASONAL_EVENTS,
   SHARED_FEATURES,
   type VillageId,
 } from "@/lib/villages";
@@ -239,12 +238,6 @@ export default async function VillagePage() {
             <li key={b}>{b}</li>
           ))}
         </ul>
-        <h3>Village tasks</h3>
-        <ul className="task-list">
-          {village.tasks.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
         <p className="muted">
           Send letters (+3), welcome friends (+5), write long letters (+2 &amp;
           collectibles).
@@ -325,15 +318,6 @@ export default async function VillagePage() {
             })}
           </ul>
         )}
-      </section>
-
-      <section className="village-panel">
-        <h2>Seasonal spirit</h2>
-        <div className="season-list">
-          {SEASONAL_EVENTS.map((e) => (
-            <span key={e}>{e}</span>
-          ))}
-        </div>
       </section>
 
       {user.isOwner ? (
