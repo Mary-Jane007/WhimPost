@@ -106,6 +106,8 @@ export function TvCorner({
     initialChannels[0]?.id || ""
   );
   const [clipTitle, setClipTitle] = useState("");
+  const [renamingVideoId, setRenamingVideoId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState("");
   const [chatDraft, setChatDraft] = useState("");
   const [showChannels, setShowChannels] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -592,11 +594,74 @@ export function TvCorner({
           videos: channel.videos.filter((v) => v.id !== id),
         }))
       );
+      if (renamingVideoId === id) {
+        setRenamingVideoId(null);
+        setRenameDraft("");
+      }
       if (room.currentVideoId === id) {
         await patchRoom({ videoId: null, isPlaying: false, positionMs: 0 });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not remove clip");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function startRenameVideo(video: TvVideo) {
+    if (!user.isOwner) return;
+    setRenamingVideoId(video.id);
+    setRenameDraft(video.title);
+    setError(null);
+  }
+
+  function cancelRenameVideo() {
+    setRenamingVideoId(null);
+    setRenameDraft("");
+  }
+
+  async function saveRenameVideo(videoId: string) {
+    if (!user.isOwner) return;
+    const title = renameDraft.trim();
+    if (!title) {
+      notifyIssue("Give the clip a name");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/tv/videos", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: videoId, title }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not rename clip");
+      if (data.channel) {
+        mergeChannel(data.channel);
+      } else if (data.video) {
+        setChannels((prev) =>
+          prev.map((channel) => ({
+            ...channel,
+            videos: channel.videos.map((v) =>
+              v.id === data.video.id ? data.video : v
+            ),
+          }))
+        );
+      }
+      if (room.currentVideoId === videoId && data.video) {
+        setRoom((prev) => ({
+          ...prev,
+          currentVideo: data.video,
+        }));
+      }
+      setRenamingVideoId(null);
+      setRenameDraft("");
+      notifySuccess(`Renamed to “${data.video.title}”`);
+    } catch (err) {
+      notifyIssue(
+        err instanceof Error ? err.message : "Could not rename clip"
+      );
     } finally {
       setBusy(false);
     }
@@ -1427,25 +1492,77 @@ export function TvCorner({
                       <ul className="tv-channel-clips">
                         {channel.videos.map((video) => {
                           const clipActive = room.currentVideoId === video.id;
+                          const isRenaming = renamingVideoId === video.id;
                           return (
                             <li key={video.id} className={clipActive ? "active" : ""}>
-                              <button
-                                type="button"
-                                disabled={!room.id || busy}
-                                onClick={() => tuneToVideo(video)}
-                              >
-                                {video.title}
-                              </button>
-                              {user.isOwner ? (
-                                <button
-                                  type="button"
-                                  className="tv-video-remove"
-                                  onClick={() => removeVideo(video.id)}
-                                  aria-label={`Remove ${video.title}`}
+                              {isRenaming ? (
+                                <form
+                                  className="tv-rename-form"
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    void saveRenameVideo(video.id);
+                                  }}
                                 >
-                                  ×
-                                </button>
-                              ) : null}
+                                  <input
+                                    type="text"
+                                    value={renameDraft}
+                                    onChange={(e) =>
+                                      setRenameDraft(e.target.value)
+                                    }
+                                    maxLength={80}
+                                    autoFocus
+                                    disabled={busy}
+                                    aria-label="Clip title"
+                                  />
+                                  <button
+                                    type="submit"
+                                    className="tv-rename-save"
+                                    disabled={busy || !renameDraft.trim()}
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="tv-rename-cancel"
+                                    onClick={cancelRenameVideo}
+                                    disabled={busy}
+                                  >
+                                    Cancel
+                                  </button>
+                                </form>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    disabled={!room.id || busy}
+                                    onClick={() => tuneToVideo(video)}
+                                  >
+                                    {video.title}
+                                  </button>
+                                  {user.isOwner ? (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className="tv-video-rename"
+                                        onClick={() => startRenameVideo(video)}
+                                        disabled={busy}
+                                        aria-label={`Rename ${video.title}`}
+                                        title="Rename"
+                                      >
+                                        ✎
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="tv-video-remove"
+                                        onClick={() => removeVideo(video.id)}
+                                        aria-label={`Remove ${video.title}`}
+                                      >
+                                        ×
+                                      </button>
+                                    </>
+                                  ) : null}
+                                </>
+                              )}
                             </li>
                           );
                         })}

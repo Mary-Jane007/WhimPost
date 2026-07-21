@@ -4218,9 +4218,13 @@ body.theme-moonmere .cottage-plaque {
 
 .tv-channel-clips li {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 0.3rem;
   align-items: stretch;
+}
+
+.tv-channel-clips li:has(.tv-rename-form) {
+  grid-template-columns: 1fr;
 }
 
 .tv-channel-clips button:first-child {
@@ -4232,6 +4236,63 @@ body.theme-moonmere .cottage-plaque {
   padding: 0.4rem 0.55rem;
   font-size: 0.85rem;
   cursor: pointer;
+}
+
+.tv-video-rename {
+  border: 0;
+  border-radius: 0.55rem;
+  background: rgba(0, 0, 0, 0.22);
+  color: color-mix(in srgb, var(--village-soft, #c4a574) 80%, white);
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.tv-video-rename:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 22%, rgba(0, 0, 0, 0.22));
+}
+
+.tv-video-rename:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.tv-rename-form {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.3rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+.tv-rename-form input {
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 40%, transparent);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--cream, #f3e6d0);
+  padding: 0.4rem 0.55rem;
+  font-size: 0.85rem;
+  min-width: 0;
+}
+
+.tv-rename-save,
+.tv-rename-cancel {
+  border: 0;
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.tv-rename-save {
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 35%, rgba(0, 0, 0, 0.25));
+  color: var(--cream, #f3e6d0);
+}
+
+.tv-rename-cancel {
+  background: rgba(0, 0, 0, 0.28);
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 80%, transparent);
 }
 
 .tv-channel-clips li.active button:first-child {
