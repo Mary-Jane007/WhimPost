@@ -857,8 +857,9 @@ export function TvCorner({
 
               <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
                 <strong>2.</strong> Upload videos to a channel — shorts or full
-                movies (MP4, WebM, or MOV · up to 5GB). Large files may take a
-                while.
+                movies (MP4, WebM, MOV, M4V, AVI, MPEG, or MKV · up to 5GB).
+                Large files may take a while; keep this tab open until it
+                finishes.
               </p>
               <label className="tv-upload">
                 <span>Channel</span>
@@ -896,7 +897,7 @@ export function TvCorner({
               >
                 <input
                   type="file"
-                  accept="video/mp4,video/webm,video/quicktime"
+                  accept="video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-msvideo,video/avi,video/mpeg,video/x-matroska,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
                   hidden
                   disabled={busy || !effectiveChannelId}
                   onChange={(e) => {

@@ -654,12 +654,52 @@ export const TV_MIME_EXT: Record<string, string> = {
   "video/mp4": "mp4",
   "video/webm": "webm",
   "video/quicktime": "mov",
+  "video/x-m4v": "mp4",
+  "video/x-msvideo": "avi",
+  "video/avi": "avi",
+  "video/mpeg": "mpg",
+  "video/x-matroska": "mkv",
 };
 
 export const TV_ALLOWED_MIME = new Set(Object.keys(TV_MIME_EXT));
 /** Full movies welcome — up to 5GB per file. */
 export const TV_MAX_BYTES = 5 * 1024 * 1024 * 1024;
 export const TV_MAX_LABEL = "5GB";
+
+const EXT_MIME: Record<string, string> = {
+  mp4: "video/mp4",
+  m4v: "video/x-m4v",
+  webm: "video/webm",
+  mov: "video/quicktime",
+  qt: "video/quicktime",
+  avi: "video/x-msvideo",
+  mpg: "video/mpeg",
+  mpeg: "video/mpeg",
+  mkv: "video/x-matroska",
+};
+
+export function resolveTvUpload(file: {
+  name: string;
+  type: string;
+  size: number;
+}): { ok: true; mime: string; ext: string } | { ok: false; error: string } {
+  if (file.size > TV_MAX_BYTES) {
+    return { ok: false, error: `Videos must be under ${TV_MAX_LABEL}` };
+  }
+  const extFromName = file.name.split(".").pop()?.toLowerCase() || "";
+  const mime =
+    (file.type && TV_ALLOWED_MIME.has(file.type) ? file.type : "") ||
+    EXT_MIME[extFromName] ||
+    "";
+  if (!mime || !TV_ALLOWED_MIME.has(mime)) {
+    return {
+      ok: false,
+      error: "Use MP4, WebM, MOV, M4V, AVI, MPEG, or MKV",
+    };
+  }
+  const ext = TV_MIME_EXT[mime] || extFromName || "mp4";
+  return { ok: true, mime, ext };
+}
 
 export function formatTvBytes(bytes: number) {
   if (bytes >= 1024 * 1024 * 1024) {
