@@ -161,6 +161,7 @@ export function WelcomeLetterEditor({
           <label>
             Subject
             <input
+              className="welcome-typewriter-field"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               maxLength={120}
@@ -172,6 +173,7 @@ export function WelcomeLetterEditor({
           <label>
             Letter body
             <textarea
+              className="welcome-typewriter-field"
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={16}
@@ -221,7 +223,7 @@ export function WelcomeLetterEditor({
           {status && <p className="welcome-editor-status">{status}</p>}
 
           {showPreview ? (
-            <div className="welcome-editor-preview letter-paper paper-cream">
+            <div className="welcome-editor-preview letter-paper paper-cream welcome-typewriter">
               <h3>{subject || "Untitled welcome"}</h3>
               <LetterBodyText body={body || " "} />
             </div>
