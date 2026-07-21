@@ -32,16 +32,15 @@ export default async function WorkshopPage() {
     );
   }
 
-  if (user.villageId !== "bramblewood" && !user.isOwner) {
+  if (user.villageId !== "bramblewood") {
     return (
       <main className="app-main forest-panel">
         <PageCrest kinds={["fox-seated", "leafy-branch", "candle-jar"]} />
         <header className="page-header">
           <h1>The Bramblewood Workshop</h1>
           <p>
-            This cozy atelier belongs to Bramblewood villagers. You&apos;re
-            welcome to visit their square, or settle there if your heart leans
-            autumn-orange.
+            This atelier is exclusive to Bramblewood. Join that village if you
+            want a seat among the autumn crafts.
           </p>
         </header>
         <p className="muted">
