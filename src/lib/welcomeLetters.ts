@@ -655,7 +655,8 @@ export function syncWelcomeLetterDecorations(
     db.prepare(
       `UPDATE letters
        SET subject = ?, body = ?, stickers_json = ?, scrap_json = ?,
-           paper_style = ?, envelope_style = ?, wax_seal = ?, stamp_style = ?
+           paper_style = ?, envelope_style = ?, wax_seal = ?, stamp_style = ?,
+           font_style = 'typewriter'
        WHERE sender_id = ?`
     ).run(
       template.subject,
@@ -750,9 +751,9 @@ export function deliverWelcomeLetter(
   db.prepare(
     `INSERT INTO letters (
       id, sender_id, recipient_id, subject, body,
-      paper_style, envelope_style, wax_seal, stamp_style,
+      paper_style, envelope_style, wax_seal, stamp_style, font_style,
       stickers_json, scrap_json, status, is_read, sent_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sent', 0, datetime('now'))`
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'typewriter', ?, ?, 'sent', 0, datetime('now'))`
   ).run(
     id,
     senderId,

@@ -37,6 +37,12 @@ function migrate(db: Database.Database) {
   );
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
+  ensureColumn(
+    db,
+    "letters",
+    "font_style",
+    "font_style TEXT NOT NULL DEFAULT 'quill'"
+  );
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS village_notes (
@@ -100,6 +106,7 @@ function createDb() {
       envelope_style TEXT NOT NULL DEFAULT 'kraft',
       wax_seal TEXT NOT NULL DEFAULT 'fern',
       stamp_style TEXT NOT NULL DEFAULT 'mushroom-amanita',
+      font_style TEXT NOT NULL DEFAULT 'quill',
       stickers_json TEXT NOT NULL DEFAULT '[]',
       scrap_json TEXT NOT NULL DEFAULT '[]',
       status TEXT NOT NULL CHECK(status IN ('draft', 'sent')) DEFAULT 'sent',
