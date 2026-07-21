@@ -7,8 +7,6 @@ export type WorkshopTabId =
   | "quest"
   | "grow"
   | "birds"
-  | "puzzle"
-  | "broadcast"
   | "journal";
 
 export const WORKSHOP_TABS: Array<{
@@ -22,8 +20,6 @@ export const WORKSHOP_TABS: Array<{
   { id: "quest", label: "Woodland Quest", emoji: "📷" },
   { id: "grow", label: "Grow Something", emoji: "🌱" },
   { id: "birds", label: "Bird Watch", emoji: "🐦" },
-  { id: "puzzle", label: "Puzzle Table", emoji: "🧩" },
-  { id: "broadcast", label: "Bramblewood Broadcast", emoji: "📺" },
   { id: "journal", label: "Craft Journal", emoji: "📖" },
 ];
 
@@ -35,8 +31,6 @@ export const WORKSHOP_XP = {
   bird: 20,
   growWeek: 30,
   growComplete: 80,
-  puzzle: 35,
-  broadcast: 25,
   seasonal: 60,
 } as const;
 
@@ -534,193 +528,6 @@ export const BIRDS = [
   { id: "woodpecker", name: "Woodpecker", emoji: "🪵", hint: "Tap-tap on old bark" },
 ];
 
-export const PUZZLES = [
-  {
-    id: "crossword",
-    title: "Crossword",
-    blurb: "Cozy forest words across and down.",
-    prompt: "Fill eight woodland words — leaf, moss, fox, twig, nest, oak, fern, rain.",
-  },
-  {
-    id: "word-search",
-    title: "Word Search",
-    blurb: "Find herbs hiding in the letter thicket.",
-    prompt: "Circle: mint, thyme, sage, basil, dill, rosemary.",
-  },
-  {
-    id: "jigsaw",
-    title: "Jigsaw Puzzle",
-    blurb: "Assemble a cottage by candlelight (in your mind or on paper).",
-    prompt: "Sketch the scene in 9 squares, then rearrange and redraw once.",
-  },
-  {
-    id: "spot-difference",
-    title: "Spot the Difference",
-    blurb: "Two almost-identical workshop tables.",
-    prompt: "Find five changes: missing scissors, extra mushroom, moved candle, new leaf, open book.",
-  },
-  {
-    id: "hidden-objects",
-    title: "Hidden Objects",
-    blurb: "Seek craft tools in a cluttered sketch.",
-    prompt: "Hide and find: spool, paintbrush, acorn, stamp, ribbon.",
-  },
-  {
-    id: "logic",
-    title: "Logic Puzzle",
-    blurb: "Three foxes, three crafts, one afternoon.",
-    prompt: "Who painted, who baked, who pressed flowers? Invent fair clues and solve.",
-  },
-];
-
-export type BroadcastVideo = {
-  id: string;
-  title: string;
-  category: string;
-  categoryEmoji: string;
-  duration: string;
-  blurb: string;
-  image: string;
-};
-
-export const BROADCAST_VIDEOS: BroadcastVideo[] = [
-  {
-    id: "nature-journaling",
-    title: "Nature Journaling by the Creek",
-    category: "Nature Journaling",
-    categoryEmoji: "🌿",
-    duration: "18 min",
-    blurb: "Soft pages, field notes, and the hush of water.",
-    image: "/stickers/villages/bramblewood/book-leaf.png",
-  },
-  {
-    id: "watercolor",
-    title: "Watercolor Leaves",
-    category: "Watercolor Painting",
-    categoryEmoji: "🎨",
-    duration: "22 min",
-    blurb: "Wet-on-wet greens and gentle edges.",
-    image: "/stickers/villages/bramblewood/autumn-leaves.png",
-  },
-  {
-    id: "candle-making",
-    title: "Candle Making at Dusk",
-    category: "Candle Making",
-    categoryEmoji: "🕯",
-    duration: "25 min",
-    blurb: "Wax, wick, and a quiet flame.",
-    image: "/stickers/villages/bramblewood/candle-jar.png",
-  },
-  {
-    id: "clay-mushrooms-vid",
-    title: "Clay Mushroom Sculpting",
-    category: "Clay Mushroom Sculpting",
-    categoryEmoji: "🍄",
-    duration: "20 min",
-    blurb: "Shape a little forest floor companion.",
-    image: "/stickers/villages/bramblewood/mushroom.png",
-  },
-  {
-    id: "bookbinding",
-    title: "Simple Bookbinding",
-    category: "Bookbinding",
-    categoryEmoji: "📚",
-    duration: "30 min",
-    blurb: "Stitch a soft pamphlet for notes.",
-    image: "/stickers/villages/bramblewood/pack/books.png",
-  },
-  {
-    id: "wood-carving",
-    title: "Whittle a Wooden Spoon",
-    category: "Wood Carving",
-    categoryEmoji: "🪵",
-    duration: "28 min",
-    blurb: "Slow cuts and grain that tells stories.",
-    image: "/stickers/villages/bramblewood/pack/books.png",
-  },
-  {
-    id: "crochet",
-    title: "Crochet a Leaf Coaster",
-    category: "Crochet",
-    categoryEmoji: "🧶",
-    duration: "24 min",
-    blurb: "Loops like ivy around a mug.",
-    image: "/stickers/villages/bramblewood/blankets.png",
-  },
-  {
-    id: "embroidery",
-    title: "Embroidery: Tiny Mushroom",
-    category: "Embroidery",
-    categoryEmoji: "🪡",
-    duration: "26 min",
-    blurb: "Needle and thread on soft linen.",
-    image: "/stickers/villages/bramblewood/pack/bracelet.png",
-  },
-  {
-    id: "pottery",
-    title: "Pinch Pot Pottery",
-    category: "Pottery",
-    categoryEmoji: "🏺",
-    duration: "21 min",
-    blurb: "Thumbprints become a small bowl.",
-    image: "/stickers/villages/bramblewood/eucalyptus.png",
-  },
-  {
-    id: "birdhouse",
-    title: "Birdhouse Building Basics",
-    category: "Birdhouse Building",
-    categoryEmoji: "🪺",
-    duration: "32 min",
-    blurb: "A safe perch for village birds.",
-    image: "/stickers/villages/bramblewood/pack/compass.png",
-  },
-  {
-    id: "pressed-flower-art",
-    title: "Pressed Flower Art",
-    category: "Pressed Flower Art",
-    categoryEmoji: "🌸",
-    duration: "19 min",
-    blurb: "Arrange petals into a quiet collage.",
-    image: "/stickers/villages/bramblewood/bouquet.png",
-  },
-  {
-    id: "basket-weaving",
-    title: "Beginner Basket Weaving",
-    category: "Basket Weaving",
-    categoryEmoji: "🧺",
-    duration: "35 min",
-    blurb: "Over, under, and a soft oval form.",
-    image: "/stickers/picnic-basket.png",
-  },
-  {
-    id: "bread-baking",
-    title: "Bread Baking Calm",
-    category: "Bread Baking",
-    categoryEmoji: "🍞",
-    duration: "27 min",
-    blurb: "Knead, rest, and listen to the crust.",
-    image: "/stickers/villages/bramblewood/pack/books.png",
-  },
-  {
-    id: "cottage-baking",
-    title: "Cottage Baking Hour",
-    category: "Cottage Baking",
-    categoryEmoji: "🍪",
-    duration: "23 min",
-    blurb: "Cookies, crumbs, and window light.",
-    image: "/stickers/pie.png",
-  },
-  {
-    id: "gardening",
-    title: "Garden Bed Tending",
-    category: "Gardening",
-    categoryEmoji: "🪴",
-    duration: "16 min",
-    blurb: "Soil under nails and hopeful sprouts.",
-    image: "/stickers/villages/bramblewood/eucalyptus.png",
-  },
-];
-
 export const SEASONAL_PANELS = [
   {
     id: "spring",
@@ -782,13 +589,6 @@ export function weekIndex(length: number, now = new Date()) {
   return week % length;
 }
 
-export function dayIndex(length: number, now = new Date()) {
-  if (length <= 0) return 0;
-  const start = Date.UTC(now.getUTCFullYear(), 0, 1);
-  const day = Math.floor((now.getTime() - start) / 86_400_000);
-  return day % length;
-}
-
 export function titleForXp(xp: number) {
   let current: (typeof WORKSHOP_TITLES)[number] = WORKSHOP_TITLES[0];
   for (const t of WORKSHOP_TITLES) {
@@ -803,8 +603,4 @@ export function featuredCraft(now = new Date()) {
 
 export function featuredPrompt(now = new Date()) {
   return CREATIVE_PROMPTS[weekIndex(CREATIVE_PROMPTS.length, now)];
-}
-
-export function featuredPuzzle(now = new Date()) {
-  return PUZZLES[dayIndex(PUZZLES.length, now)];
 }

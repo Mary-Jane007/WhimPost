@@ -6,11 +6,9 @@ import {
   craftCompletionPayload,
   getWorkshopProgress,
   promptCompletionPayload,
-  puzzleCompletionPayload,
   recipeCompletionPayload,
   type WorkshopAction,
 } from "@/lib/workshop";
-import { featuredPuzzle } from "@/lib/workshopContent";
 
 async function requireWorkshopUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
@@ -41,7 +39,7 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as
     | (Partial<WorkshopAction> & {
         type?: string;
-        completeKind?: "craft" | "recipe" | "prompt" | "puzzle";
+        completeKind?: "craft" | "recipe" | "prompt";
         id?: string;
         photoUrl?: string;
       })
@@ -60,8 +58,6 @@ export async function POST(req: NextRequest) {
       action = recipeCompletionPayload(body.id, body.photoUrl);
     } else if (body.completeKind === "prompt" && body.id) {
       action = promptCompletionPayload(body.id, body.photoUrl);
-    } else if (body.completeKind === "puzzle") {
-      action = puzzleCompletionPayload(body.id || featuredPuzzle().id);
     } else {
       return jsonError("Unknown completion kind");
     }
