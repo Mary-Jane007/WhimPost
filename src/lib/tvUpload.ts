@@ -5,6 +5,7 @@ import {
   createVideo,
   getChannelById,
   resolveTvUpload,
+  safeUploadFilename,
   type TvChannel,
   type TvVideo,
 } from "@/lib/tvCorner";
@@ -69,13 +70,10 @@ export function cleanupUploadSession(uploadId: string) {
       const part = chunkPath(uploadId, i);
       if (fs.existsSync(part)) fs.unlinkSync(part);
     }
-  } else {
-    // Best-effort wipe of any leftover parts.
-    if (fs.existsSync(INCOMING_DIR)) {
-      for (const name of fs.readdirSync(INCOMING_DIR)) {
-        if (name.startsWith(`${uploadId}.`)) {
-          fs.unlinkSync(path.join(INCOMING_DIR, name));
-        }
+  } else if (fs.existsSync(INCOMING_DIR)) {
+    for (const name of fs.readdirSync(INCOMING_DIR)) {
+      if (name.startsWith(`${uploadId}.`)) {
+        fs.unlinkSync(path.join(INCOMING_DIR, name));
       }
     }
   }
@@ -92,8 +90,9 @@ export function createUploadSession(input: {
   uploaderId: string;
   villageId: string | null;
 }): { ok: true; meta: UploadSessionMeta } | { ok: false; error: string } {
+  const filename = safeUploadFilename(input.filename);
   const resolved = resolveTvUpload({
-    name: input.filename,
+    name: filename,
     type: input.mime,
     size: input.size,
   });
@@ -108,14 +107,14 @@ export function createUploadSession(input: {
   const chunkCount = Math.max(1, Math.ceil(input.size / chunkSize));
   const title =
     input.title.trim().slice(0, 80) ||
-    input.filename.replace(/\.[^.]+$/, "").slice(0, 80) ||
+    filename.replace(/\.[^.]+$/, "").slice(0, 80) ||
     "Untitled clip";
 
   const meta: UploadSessionMeta = {
     id: randomUUID(),
     channelId: channel.id,
     title,
-    filename: input.filename,
+    filename,
     mime: resolved.mime,
     ext: resolved.ext,
     size: input.size,
@@ -145,12 +144,12 @@ export function saveChunk(
   if (data.length <= 0) {
     return { ok: false, error: "Empty chunk received", status: 400 };
   }
-  // Last chunk may be smaller; others should be full size (allow smaller for last).
-  if (index < meta.chunkCount - 1 && data.length > meta.chunkSize) {
+  if (data.length > meta.chunkSize) {
     return { ok: false, error: "Chunk too large", status: 400 };
   }
 
   ensureUploadDirs();
+  // Overwrite is intentional — client retries rewrite the same piece.
   fs.writeFileSync(chunkPath(uploadId, index), data);
   if (!meta.received.includes(index)) {
     meta.received.push(index);
@@ -174,36 +173,36 @@ export function completeUploadSession(
   if (meta.received.length !== meta.chunkCount) {
     return {
       ok: false,
-      error: `Upload incomplete (${meta.received.length}/${meta.chunkCount} chunks)`,
+      error: `Upload incomplete (${meta.received.length}/${meta.chunkCount} chunks) — try again`,
       status: 400,
     };
   }
 
   ensureUploadDirs();
+  for (let i = 0; i < meta.chunkCount; i++) {
+    if (!fs.existsSync(chunkPath(uploadId, i))) {
+      return { ok: false, error: `Missing chunk ${i} — try again`, status: 400 };
+    }
+  }
+
   const finalName = `${randomUUID()}.${meta.ext}`;
   const destPath = path.join(UPLOAD_DIR, finalName);
 
   try {
-    for (let i = 0; i < meta.chunkCount; i++) {
-      const part = chunkPath(uploadId, i);
-      if (!fs.existsSync(part)) {
-        if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
-        return { ok: false, error: `Missing chunk ${i}`, status: 400 };
-      }
-    }
-    const out = fs.openSync(destPath, "w");
+    const fd = fs.openSync(destPath, "w");
     try {
       for (let i = 0; i < meta.chunkCount; i++) {
-        fs.writeSync(out, fs.readFileSync(chunkPath(uploadId, i)));
+        fs.writeSync(fd, fs.readFileSync(chunkPath(uploadId, i)));
       }
     } finally {
-      fs.closeSync(out);
+      fs.closeSync(fd);
     }
   } catch (err) {
     if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
     console.error("[tv upload] assemble failed", err);
     return { ok: false, error: "Could not assemble upload — try again", status: 500 };
   }
+
   const sizeBytes = fs.statSync(destPath).size;
   if (sizeBytes <= 0) {
     fs.unlinkSync(destPath);

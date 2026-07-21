@@ -801,7 +801,10 @@ export function resolveTvUpload(file: {
   if (file.size > TV_MAX_BYTES) {
     return { ok: false, error: `Videos must be under ${TV_MAX_LABEL}` };
   }
-  const extFromName = file.name.split(".").pop()?.toLowerCase() || "";
+  // Browsers usually send basename only; still strip Windows/mac paths if present.
+  const baseName =
+    file.name.replace(/\\/g, "/").split("/").pop()?.trim() || "clip.mp4";
+  const extFromName = baseName.split(".").pop()?.toLowerCase() || "";
   const rawType = (file.type || "").toLowerCase().trim();
   const mimeFromType =
     (TV_ALLOWED_MIME.has(rawType) ? rawType : "") ||
@@ -818,6 +821,13 @@ export function resolveTvUpload(file: {
   }
   const ext = TV_MIME_EXT[mime] || extFromName || "mp4";
   return { ok: true, mime, ext };
+}
+
+/** Basename only — strips C:\\Users\\...\\ prefixes from downloaders. */
+export function safeUploadFilename(name: string) {
+  const base =
+    name.replace(/\\/g, "/").split("/").pop()?.trim() || "clip.mp4";
+  return base.replace(/[^\w.\- ()[\]]+/g, "_").slice(0, 180) || "clip.mp4";
 }
 
 export function formatTvBytes(bytes: number) {
