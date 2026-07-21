@@ -10,7 +10,7 @@ export function SiteNav({ user }: { user: UserPublic | null }) {
 
   const links = [
     { href: "/village", label: "Village" },
-    ...(user?.villageId === "bramblewood" || user?.isOwner
+    ...(user?.villageId === "bramblewood"
       ? [{ href: "/workshop", label: "Workshop" }]
       : []),
     { href: "/tv-corner", label: "TV Corner" },
