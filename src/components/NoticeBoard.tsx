@@ -1,18 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+
+export type VillageNote = {
+  id: string;
+  body: string;
+  anonymous: boolean;
+  imageUrl?: string | null;
+  createdAt: string;
+  author: { displayName: string; username: string } | null;
+};
 
 export function NoticeBoard({
   initialNotes,
 }: {
-  initialNotes: Array<{
-    id: string;
-    body: string;
-    anonymous: boolean;
-    createdAt: string;
-    author: { displayName: string; username: string } | null;
-  }>;
+  initialNotes: VillageNote[];
 }) {
   const [notes, setNotes] = useState(initialNotes);
   const [body, setBody] = useState("");
@@ -20,7 +23,7 @@ export function NoticeBoard({
   const [error, setError] = useState("");
   const [posting, setPosting] = useState(false);
 
-  async function postNote(e: React.FormEvent) {
+  async function postNote(e: FormEvent) {
     e.preventDefault();
     setPosting(true);
     setError("");
@@ -43,9 +46,10 @@ export function NoticeBoard({
 
   return (
     <section className="village-panel">
-      <h2>🌳 Notice Board</h2>
+      <h2>🏘️ Village Square</h2>
       <p className="section-lead">
-        Leave a note for your neighbors — encouragement, dreams, or a quiet hello.
+        Notes and workshop shares from neighbors — crafts, photos, and kind
+        words pinned for everyone.
       </p>
       <form className="notice-form" onSubmit={postNote}>
         <textarea
@@ -65,30 +69,40 @@ export function NoticeBoard({
         </label>
         {error && <p className="form-error">{error}</p>}
         <button type="submit" className="btn-primary" disabled={posting}>
-          {posting ? "Pinning…" : "Pin to the board"}
+          {posting ? "Pinning…" : "Pin to the square"}
         </button>
       </form>
       <ul className="notice-list">
         {notes.length === 0 && (
-          <li className="muted">The board is quiet. Be the first note.</li>
+          <li className="muted">The square is quiet. Be the first note.</li>
         )}
         {notes.map((n) => (
-          <li key={n.id}>
-            <p>{n.body}</p>
-            <span>
-              {n.anonymous ? (
-                "A kind stranger"
-              ) : n.author ? (
-                <>
-                  <Link href={`/profile/${n.author.username}`}>
-                    {n.author.displayName}
-                  </Link>{" "}
-                  (@{n.author.username})
-                </>
-              ) : (
-                "A villager"
-              )}
-            </span>
+          <li key={n.id} className={n.imageUrl ? "notice-with-image" : undefined}>
+            {n.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={n.imageUrl}
+                alt="Shared workshop craft"
+                className="notice-share-image"
+              />
+            ) : null}
+            <div>
+              <p>{n.body}</p>
+              <span>
+                {n.anonymous ? (
+                  "A kind stranger"
+                ) : n.author ? (
+                  <>
+                    <Link href={`/profile/${n.author.username}`}>
+                      {n.author.displayName}
+                    </Link>{" "}
+                    (@{n.author.username})
+                  </>
+                ) : (
+                  "A villager"
+                )}
+              </span>
+            </div>
           </li>
         ))}
       </ul>

@@ -189,6 +189,13 @@ function migrate(db: Database.Database) {
     "is_global",
     "is_global INTEGER NOT NULL DEFAULT 0"
   );
+  ensureColumn(db, "village_notes", "image_url", "image_url TEXT");
+  ensureColumn(
+    db,
+    "workshop_journal",
+    "shared",
+    "shared INTEGER NOT NULL DEFAULT 0"
+  );
 
   // Fold any pre-channel clips into a village channel so the dial stays usable.
   const orphans = db

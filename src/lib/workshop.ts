@@ -22,6 +22,7 @@ export type JournalEntry = {
   photoUrl: string | null;
   xpEarned: number;
   note: string;
+  shared: boolean;
   createdAt: string;
 };
 
@@ -93,7 +94,7 @@ function listJournal(userId: string): JournalEntry[] {
   const db = getDb();
   const rows = db
     .prepare(
-      `SELECT id, activity_type, activity_id, activity_name, photo_url, xp_earned, note, created_at
+      `SELECT id, activity_type, activity_id, activity_name, photo_url, xp_earned, note, shared, created_at
        FROM workshop_journal
        WHERE user_id = ?
        ORDER BY created_at DESC
@@ -107,6 +108,7 @@ function listJournal(userId: string): JournalEntry[] {
     photo_url: string | null;
     xp_earned: number;
     note: string;
+    shared: number | null;
     created_at: string;
   }>;
   return rows.map((r) => ({
@@ -117,6 +119,7 @@ function listJournal(userId: string): JournalEntry[] {
     photoUrl: r.photo_url,
     xpEarned: r.xp_earned,
     note: r.note,
+    shared: Boolean(r.shared),
     createdAt: r.created_at,
   }));
 }
@@ -157,22 +160,58 @@ function insertJournal(input: {
   photoUrl?: string | null;
   xpEarned: number;
   note: string;
+  shared?: boolean;
 }) {
   const db = getDb();
+  const id = randomUUID();
   db.prepare(
     `INSERT INTO workshop_journal
-      (id, user_id, activity_type, activity_id, activity_name, photo_url, xp_earned, note)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      (id, user_id, activity_type, activity_id, activity_name, photo_url, xp_earned, note, shared)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
-    randomUUID(),
+    id,
     input.userId,
     input.activityType,
     input.activityId,
     input.activityName,
     input.photoUrl || null,
     input.xpEarned,
-    input.note
+    input.note,
+    input.shared ? 1 : 0
   );
+  return id;
+}
+
+function shareJournalToVillageSquare(input: {
+  userId: string;
+  activityName: string;
+  note: string;
+  photoUrl?: string | null;
+}) {
+  const db = getDb();
+  const user = db
+    .prepare(`SELECT village_id FROM users WHERE id = ?`)
+    .get(input.userId) as { village_id: string | null } | undefined;
+  if (!user?.village_id) return false;
+
+  const body = [
+    `🧵 Workshop share · ${input.activityName}`,
+    input.note.trim().slice(0, 220),
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  db.prepare(
+    `INSERT INTO village_notes (id, village_id, author_id, body, anonymous, image_url)
+     VALUES (?, ?, ?, ?, 0, ?)`
+  ).run(
+    randomUUID(),
+    user.village_id,
+    input.userId,
+    body.slice(0, 280),
+    input.photoUrl || null
+  );
+  return true;
 }
 
 export type WorkshopAction =
@@ -200,7 +239,9 @@ export type WorkshopAction =
       note: string;
       photoUrl?: string;
       markCraftComplete?: boolean;
-    };
+      shareWithVillage?: boolean;
+    }
+  | { type: "shareJournal"; entryId: string };
 
 export function applyWorkshopAction(
   userId: string,
@@ -382,6 +423,7 @@ export function applyWorkshopAction(
     }
 
     xp += xpEarned;
+    const shareWithVillage = Boolean(action.shareWithVillage);
     insertJournal({
       userId,
       activityType,
@@ -390,7 +432,45 @@ export function applyWorkshopAction(
       photoUrl: action.photoUrl,
       xpEarned,
       note,
+      shared: shareWithVillage,
     });
+    if (shareWithVillage) {
+      shareJournalToVillageSquare({
+        userId,
+        activityName: name,
+        note,
+        photoUrl: action.photoUrl,
+      });
+    }
+  } else if (action.type === "shareJournal") {
+    const entry = db
+      .prepare(
+        `SELECT id, activity_name, note, photo_url, shared
+         FROM workshop_journal
+         WHERE id = ? AND user_id = ?`
+      )
+      .get(action.entryId, userId) as
+      | {
+          id: string;
+          activity_name: string;
+          note: string;
+          photo_url: string | null;
+          shared: number;
+        }
+      | undefined;
+    if (entry && !entry.shared) {
+      const ok = shareJournalToVillageSquare({
+        userId,
+        activityName: entry.activity_name,
+        note: entry.note,
+        photoUrl: entry.photo_url,
+      });
+      if (ok) {
+        db.prepare(`UPDATE workshop_journal SET shared = 1 WHERE id = ?`).run(
+          entry.id
+        );
+      }
+    }
   }
 
   db.prepare(
