@@ -238,6 +238,13 @@ export default async function VillagePage() {
             </Link>
           </p>
         ) : null}
+        {village.id === "mosshollow" && user.villageId === "mosshollow" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/library" className="btn-primary">
+              Enter The Grand Library
+            </Link>
+          </p>
+        ) : null}
       </section>
 
       <section className="village-panel">

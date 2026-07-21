@@ -6359,3 +6359,516 @@ button.linkish:hover {
   gap: 0.4rem;
   align-items: flex-start;
 }
+
+/* ─── Mosshollow Grand Library ─────────────────────────────── */
+
+.mh-library-page {
+  position: relative;
+}
+
+.mh-library {
+  position: relative;
+  isolation: isolate;
+  color: #e8dcc4;
+}
+
+.mh-atmosphere {
+  pointer-events: none;
+  position: absolute;
+  inset: -1rem -0.5rem auto;
+  height: 18rem;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.mh-dust {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 236, 190, 0.55);
+  animation: mh-float 14s linear infinite;
+}
+
+.mh-dust.d1 { left: 12%; top: 20%; animation-duration: 16s; }
+.mh-dust.d2 { left: 42%; top: 8%; animation-duration: 12s; animation-delay: -4s; }
+.mh-dust.d3 { left: 68%; top: 30%; animation-duration: 18s; animation-delay: -8s; }
+.mh-dust.d4 { left: 84%; top: 14%; animation-duration: 13s; animation-delay: -2s; }
+
+.mh-candle {
+  position: absolute;
+  width: 10px;
+  height: 18px;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(180deg, #ffe7a8, #c47a2c);
+  box-shadow: 0 0 18px rgba(255, 186, 90, 0.55);
+  animation: mh-flicker 2.4s ease-in-out infinite;
+}
+
+.mh-candle.c1 { left: 8%; top: 55%; }
+.mh-candle.c2 { right: 10%; top: 48%; animation-delay: -1.1s; }
+
+.mh-owl-fly {
+  position: absolute;
+  left: -8%;
+  top: 35%;
+  width: 28px;
+  height: 14px;
+  background: radial-gradient(circle at 30% 50%, #cbb896, transparent 70%);
+  opacity: 0.55;
+  animation: mh-owl 22s linear infinite;
+}
+
+.mh-deco {
+  position: absolute;
+  width: 3.2rem;
+  height: auto;
+  opacity: 0.72;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+}
+
+.mh-deco.books { left: 4%; top: 62%; }
+.mh-deco.ink { right: 6%; top: 70%; width: 2.6rem; }
+.mh-deco.lantern { left: 18%; top: 78%; width: 2.4rem; animation: mh-flicker 3s ease-in-out infinite; }
+.mh-deco.moth { right: 20%; top: 58%; width: 2.5rem; animation: mh-float 10s ease-in-out infinite; }
+
+@keyframes mh-float {
+  0% { transform: translateY(0) translateX(0); opacity: 0.2; }
+  40% { opacity: 0.75; }
+  100% { transform: translateY(-120px) translateX(24px); opacity: 0; }
+}
+
+@keyframes mh-flicker {
+  0%, 100% { filter: brightness(1); transform: scaleY(1); }
+  50% { filter: brightness(1.25); transform: scaleY(1.06); }
+}
+
+@keyframes mh-owl {
+  0% { transform: translateX(0) translateY(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  50% { transform: translateX(55vw) translateY(-18px); opacity: 0.45; }
+  100% { transform: translateX(110vw) translateY(8px); opacity: 0; }
+}
+
+.mh-hero {
+  position: relative;
+  z-index: 1;
+  margin: 0.5rem 0 1.25rem;
+  padding: 1.4rem 1.35rem 1.5rem;
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 196, 110, 0.16), transparent 50%),
+    linear-gradient(160deg, rgba(28, 36, 28, 0.92), rgba(18, 24, 20, 0.96));
+  border: 1px solid rgba(196, 170, 120, 0.28);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.25);
+}
+
+.mh-eyebrow {
+  margin: 0 0 0.35rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: #c4b089;
+}
+
+.mh-hero h1 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, "Palatino Linotype", serif;
+  font-size: clamp(2.1rem, 5vw, 3.1rem);
+  color: #f3e6d0;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+
+.mh-subtitle {
+  margin: 0.55rem 0 0.75rem;
+  font-size: 1.15rem;
+  color: #d7c49a;
+}
+
+.mh-lead {
+  margin: 0;
+  max-width: 46rem;
+  line-height: 1.55;
+  color: rgba(232, 220, 196, 0.88);
+}
+
+.mh-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #cbb896;
+}
+
+.mh-error {
+  color: #f0b4a0;
+  background: rgba(80, 28, 20, 0.45);
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.75rem;
+}
+
+.mh-toast {
+  color: #e8f0d8;
+  background: rgba(50, 72, 42, 0.55);
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.75rem;
+}
+
+.mh-tabs {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0 1.1rem;
+}
+
+.mh-tabs button {
+  border: 1px solid rgba(196, 170, 120, 0.3);
+  background: rgba(24, 30, 24, 0.75);
+  color: #e8dcc4;
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+
+.mh-tabs button.active {
+  background: linear-gradient(180deg, #8a6a3d, #5c4528);
+  border-color: transparent;
+  color: #fff6e4;
+}
+
+.mh-panel {
+  position: relative;
+  z-index: 1;
+}
+
+.mh-section h2 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display), Georgia, serif;
+  color: #f0e2c4;
+}
+
+.mh-section-lead {
+  margin: 0 0 1rem;
+  color: rgba(232, 220, 196, 0.78);
+}
+
+.mh-book-feature {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  padding: 1rem;
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(145deg, rgba(48, 36, 22, 0.7), rgba(22, 28, 22, 0.85));
+  border: 1px solid rgba(196, 170, 120, 0.25);
+}
+
+@media (min-width: 820px) {
+  .mh-book-feature {
+    grid-template-columns: 220px 1fr;
+  }
+}
+
+.mh-cover {
+  display: grid;
+  place-items: center;
+  gap: 0.45rem;
+  min-height: 16rem;
+  border-radius: 0.85rem;
+  background:
+    linear-gradient(160deg, #5c3b22, #2a1c12 70%);
+  border: 2px solid rgba(214, 178, 110, 0.45);
+  box-shadow: 8px 10px 0 rgba(0, 0, 0, 0.25);
+  text-align: center;
+  padding: 1rem;
+}
+
+.mh-cover span {
+  font-size: 3rem;
+}
+
+.mh-cover strong {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.05rem;
+  color: #f3e6d0;
+}
+
+.mh-meta,
+.mh-themes,
+.mh-rating {
+  font-size: 0.88rem;
+  color: #c4b089;
+}
+
+.mh-progress-label {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.85rem 0;
+}
+
+.mh-progress-label input[type="range"] {
+  width: 100%;
+}
+
+.mh-quotes h4,
+.mh-discussion h4 {
+  margin: 0.85rem 0 0.35rem;
+  color: #e4d2a8;
+}
+
+.mh-quotes ul,
+.mh-clues {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: rgba(232, 220, 196, 0.88);
+}
+
+.mh-club-shelf {
+  margin-top: 1.25rem;
+}
+
+.mh-club-shelf ul {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.mh-club-shelf li {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(30, 36, 30, 0.8);
+  border: 1px solid rgba(196, 170, 120, 0.22);
+  font-size: 0.84rem;
+}
+
+.mh-club-shelf li.active {
+  background: rgba(120, 86, 42, 0.55);
+}
+
+.mh-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+}
+
+.mh-chips button {
+  border-radius: 999px;
+  border: 1px solid rgba(196, 170, 120, 0.28);
+  background: rgba(24, 30, 24, 0.7);
+  color: #e8dcc4;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.mh-chips button.active {
+  background: #6f8f52;
+  border-color: transparent;
+}
+
+.mh-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .mh-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .mh-grid.archives {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.mh-card {
+  padding: 0.95rem 1rem;
+  border-radius: 1.1rem;
+  background: rgba(26, 32, 26, 0.82);
+  border: 1px solid rgba(196, 170, 120, 0.22);
+}
+
+.mh-card h3 {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-display), Georgia, serif;
+  color: #f0e2c4;
+}
+
+.mh-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.mh-quiz-options {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.65rem 0;
+}
+
+.mh-quiz-options button {
+  text-align: left;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(196, 170, 120, 0.28);
+  background: rgba(18, 22, 18, 0.75);
+  color: #e8dcc4;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+}
+
+.mh-quiz-options button.active {
+  border-color: #d2b174;
+  background: rgba(90, 68, 34, 0.55);
+}
+
+.mh-done {
+  color: #b7d39a;
+}
+
+.mh-mystery-form,
+.mh-journal-form,
+.mh-curiosity form,
+.mh-section form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.mh-mystery-form label,
+.mh-journal-form label,
+.mh-section form label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.mh-mystery-form input,
+.mh-journal-form input,
+.mh-journal-form textarea,
+.mh-section form textarea {
+  width: 100%;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(196, 170, 120, 0.3);
+  background: rgba(12, 16, 12, 0.7);
+  color: #f3e6d0;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+}
+
+.mh-thought-list ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.mh-thought-list li {
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.9rem;
+  background: rgba(20, 26, 20, 0.75);
+  border: 1px solid rgba(196, 170, 120, 0.18);
+}
+
+.mh-thumb {
+  display: grid;
+  place-items: center;
+  height: 5.5rem;
+  margin-bottom: 0.55rem;
+  border-radius: 0.8rem;
+  font-size: 2rem;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 200, 120, 0.25), transparent 55%),
+    linear-gradient(160deg, #3a2a18, #1a2218);
+}
+
+.mh-journal-pages {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.mh-journal-page {
+  position: relative;
+  padding: 1rem 1.05rem 1.1rem;
+  border-radius: 0.4rem 1rem 0.85rem 0.55rem;
+  background:
+    linear-gradient(135deg, rgba(214, 190, 150, 0.92), rgba(196, 168, 124, 0.88));
+  color: #3a2a18;
+  box-shadow:
+    inset 0 0 30px rgba(120, 80, 40, 0.12),
+    0 8px 18px rgba(0, 0, 0, 0.2);
+  transform: rotate(-0.4deg);
+}
+
+.mh-journal-page:nth-child(even) {
+  transform: rotate(0.5deg);
+}
+
+.mh-journal-page header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.mh-journal-page h3 {
+  margin: 0.35rem 0;
+  font-family: var(--font-display), Georgia, serif;
+  color: #2f2114;
+}
+
+.mh-journal-page blockquote {
+  margin: 0.55rem 0 0;
+  font-style: italic;
+  border-left: 2px solid rgba(90, 60, 30, 0.35);
+  padding-left: 0.65rem;
+}
+
+.mh-collections ul,
+.mh-badges ul {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.mh-collections li,
+.mh-badges li {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(30, 36, 30, 0.8);
+  border: 1px solid rgba(196, 170, 120, 0.22);
+  font-size: 0.84rem;
+}
+
+.mh-secret-book {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.5rem;
+  z-index: 40;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 220, 140, 0.65);
+  background: radial-gradient(circle at 40% 30%, #ffe7a8, #8a5a22);
+  color: #3a2a10;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 0 24px rgba(255, 200, 100, 0.55);
+  animation: mh-glow 2.2s ease-in-out infinite;
+}
+
+@keyframes mh-glow {
+  0%, 100% { box-shadow: 0 0 14px rgba(255, 200, 100, 0.35); transform: translateY(0); }
+  50% { box-shadow: 0 0 28px rgba(255, 220, 140, 0.75); transform: translateY(-3px); }
+}

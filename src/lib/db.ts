@@ -182,6 +182,49 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_workshop_journal_user
       ON workshop_journal(user_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS library_progress (
+      user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      xp INTEGER NOT NULL DEFAULT 0,
+      badges_json TEXT NOT NULL DEFAULT '[]',
+      stamps_json TEXT NOT NULL DEFAULT '[]',
+      book_progress_json TEXT NOT NULL DEFAULT '{}',
+      finished_json TEXT NOT NULL DEFAULT '{}',
+      wishlist_json TEXT NOT NULL DEFAULT '{}',
+      reading_status_json TEXT NOT NULL DEFAULT '{}',
+      curiosity_json TEXT NOT NULL DEFAULT '{}',
+      mystery_json TEXT NOT NULL DEFAULT '{}',
+      challenges_json TEXT NOT NULL DEFAULT '{}',
+      archives_json TEXT NOT NULL DEFAULT '{}',
+      collections_json TEXT NOT NULL DEFAULT '{}',
+      secrets_json TEXT NOT NULL DEFAULT '[]',
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS library_journal (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      activity_type TEXT NOT NULL,
+      activity_id TEXT NOT NULL,
+      activity_name TEXT NOT NULL,
+      note TEXT NOT NULL DEFAULT '',
+      quote TEXT NOT NULL DEFAULT '',
+      photo_url TEXT,
+      xp_earned INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_library_journal_user
+      ON library_journal(user_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS library_thoughts (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      prompt_id TEXT NOT NULL,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_library_thoughts_prompt
+      ON library_thoughts(prompt_id, created_at);
   `);
 
   ensureColumn(
