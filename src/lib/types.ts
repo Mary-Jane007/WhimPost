@@ -6,7 +6,8 @@ export type PaperStyle =
   | "moss"
   | "lined"
   | "floral"
-  | "night";
+  | "night"
+  | "hearthwick";
 
 /** Handwriting / typeface for letter subject + body. */
 export type LetterFont =
@@ -290,6 +291,11 @@ export const PAPER_OPTIONS: {
   name: string;
   hint: string;
 }[] = [
+  {
+    id: "hearthwick",
+    name: "Hearthwick Stationery",
+    hint: "Lined parchment & hedgehog meadow",
+  },
   { id: "parchment", name: "Parchment", hint: "Tea-stained & soft" },
   { id: "cream", name: "Cream Linen", hint: "Quiet & classic" },
   { id: "moss", name: "Moss Green", hint: "Forest floor hush" },

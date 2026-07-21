@@ -50,8 +50,12 @@ export function ComposeStudio({
   const [recipientId, setRecipientId] = useState(friends[0]?.id || "");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
-  const [paperStyle, setPaperStyle] = useState<PaperStyle>("parchment");
-  const [fontStyle, setFontStyle] = useState<LetterFont>("quill");
+  const [paperStyle, setPaperStyle] = useState<PaperStyle>(
+    villageId === "hearthwick" ? "hearthwick" : "parchment"
+  );
+  const [fontStyle, setFontStyle] = useState<LetterFont>(
+    villageId === "hearthwick" ? "typewriter" : "quill"
+  );
   const [envelopeStyle, setEnvelopeStyle] = useState<EnvelopeStyle>("kraft");
   const [waxSeal, setWaxSeal] = useState<WaxSeal>("fern");
   const [stampStyle, setStampStyle] = useState<StampStyle>("mushroom-amanita");
@@ -78,6 +82,14 @@ export function ComposeStudio({
   );
   const village = getVillage(villageId);
   const villagePackName = village ? `${village.name} pack` : null;
+  const isHearthwick = villageId === "hearthwick";
+  const paperChoices = useMemo(
+    () =>
+      isHearthwick
+        ? PAPER_OPTIONS.filter((p) => p.id === "hearthwick")
+        : PAPER_OPTIONS.filter((p) => p.id !== "hearthwick"),
+    [isHearthwick]
+  );
 
   function addSticker(kind: StickerKind) {
     const place = scatter(stickers.length + 3, stickers.length);
@@ -256,7 +268,7 @@ export function ComposeStudio({
   }
 
   return (
-    <div className="compose-studio">
+    <div className={`compose-studio ${isHearthwick ? "compose-hearthwick" : ""}`}>
       <div className="compose-toolbar">
         <label className="recipient-pick">
           To
@@ -324,8 +336,14 @@ export function ComposeStudio({
 
           {tab === "paper" && (
             <div className="palette-stack">
+              {isHearthwick ? (
+                <p className="compose-hint">
+                  You&apos;re writing on Hearthwick&apos;s cottage stationery —
+                  lined parchment with a meadow hedgehog in the corner.
+                </p>
+              ) : null}
               <div className="option-grid">
-                {PAPER_OPTIONS.map((opt) => (
+                {paperChoices.map((opt) => (
                   <button
                     key={opt.id}
                     type="button"
@@ -558,8 +576,9 @@ export function ComposeStudio({
             />
           )}
           <p className="compose-hint">
-            Drag stickers, scraps, and photos across the page. Use the gold corner
-            on a photo to resize. Seal when your letter feels complete.
+            {isHearthwick
+              ? "Type on the lined parchment — the hedgehog keeps the corner warm. Drag stickers and photos if you like, then seal when ready."
+              : "Drag stickers, scraps, and photos across the page. Use the gold corner on a photo to resize. Seal when your letter feels complete."}
           </p>
         </section>
       </div>
