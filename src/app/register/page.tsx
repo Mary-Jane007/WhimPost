@@ -19,8 +19,8 @@ export default async function RegisterPage() {
         </div>
         <h1>Claim your mailbox</h1>
         <p className="lede">
-          Choose a woodland name, pick your village, and begin writing letters
-          that feel found, not typed.
+          Choose a woodland name, then Discover your belonging — the forest will
+          guide you home before your first letter is written.
         </p>
         <RegisterForm />
       </div>

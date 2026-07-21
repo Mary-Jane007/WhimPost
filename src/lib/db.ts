@@ -38,6 +38,12 @@ function migrate(db: Database.Database) {
   );
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
+  ensureColumn(
+    db,
+    "letters",
+    "font_style",
+    "font_style TEXT NOT NULL DEFAULT 'quill'"
+  );
   ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
   ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
 
@@ -52,6 +58,14 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_users_village ON users(village_id);
     CREATE INDEX IF NOT EXISTS idx_village_notes ON village_notes(village_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS welcome_letter_templates (
+      village_id TEXT PRIMARY KEY,
+      subject TEXT NOT NULL,
+      body TEXT NOT NULL,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_by TEXT REFERENCES users(id) ON DELETE SET NULL
+    );
 
     CREATE TABLE IF NOT EXISTS tv_videos (
       id TEXT PRIMARY KEY,
@@ -200,6 +214,7 @@ function createDb() {
       envelope_style TEXT NOT NULL DEFAULT 'kraft',
       wax_seal TEXT NOT NULL DEFAULT 'fern',
       stamp_style TEXT NOT NULL DEFAULT 'mushroom-amanita',
+      font_style TEXT NOT NULL DEFAULT 'quill',
       stickers_json TEXT NOT NULL DEFAULT '[]',
       scrap_json TEXT NOT NULL DEFAULT '[]',
       status TEXT NOT NULL CHECK(status IN ('draft', 'sent')) DEFAULT 'sent',
