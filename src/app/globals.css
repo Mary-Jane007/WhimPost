@@ -4347,6 +4347,86 @@ body.theme-moonmere .cottage-plaque {
   font-size: 0.8rem !important;
 }
 
+.tv-toast {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: min(34rem, calc(100vw - 1.5rem));
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+  animation: tv-toast-in 0.28s ease-out;
+}
+
+@keyframes tv-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.tv-toast-error {
+  background: linear-gradient(165deg, #5c2218, #2a120e);
+  border-color: color-mix(in srgb, #e8a090 45%, transparent);
+  color: #ffe8e0;
+}
+
+.tv-toast-success {
+  background: linear-gradient(165deg, #243528, #152018);
+  border-color: color-mix(in srgb, #b7d4a8 40%, transparent);
+  color: #eef6e8;
+}
+
+.tv-toast-info {
+  background: linear-gradient(165deg, #2a3548, #161c28);
+  border-color: color-mix(in srgb, #c4a574 40%, transparent);
+  color: #f3e6d0;
+}
+
+.tv-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.tv-toast-body strong {
+  display: block;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+
+.tv-toast-body p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.tv-toast-dismiss {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.8;
+  padding: 0.1rem 0.25rem;
+}
+
+.tv-toast-dismiss:hover {
+  opacity: 1;
+}
+
 .tv-upload-inline {
   margin: 0.35rem 0 0.65rem;
 }
