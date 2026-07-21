@@ -151,6 +151,36 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_tv_chat_room
       ON tv_chat_messages(room_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS workshop_progress (
+      user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      xp INTEGER NOT NULL DEFAULT 0,
+      badges_json TEXT NOT NULL DEFAULT '[]',
+      completed_json TEXT NOT NULL DEFAULT '{}',
+      photos_json TEXT NOT NULL DEFAULT '{}',
+      quest_json TEXT NOT NULL DEFAULT '{}',
+      quest_photos_json TEXT NOT NULL DEFAULT '{}',
+      plant_id TEXT,
+      plant_weeks_json TEXT NOT NULL DEFAULT '{}',
+      birds_json TEXT NOT NULL DEFAULT '{}',
+      broadcast_json TEXT NOT NULL DEFAULT '{}',
+      seasonal_json TEXT NOT NULL DEFAULT '{}',
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS workshop_journal (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      activity_type TEXT NOT NULL,
+      activity_id TEXT NOT NULL,
+      activity_name TEXT NOT NULL,
+      photo_url TEXT,
+      xp_earned INTEGER NOT NULL DEFAULT 0,
+      note TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_workshop_journal_user
+      ON workshop_journal(user_id, created_at);
   `);
 
   ensureColumn(
