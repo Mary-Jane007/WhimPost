@@ -60,7 +60,18 @@ export function readUploadMeta(uploadId: string): UploadSessionMeta | null {
 
 export function writeUploadMeta(meta: UploadSessionMeta) {
   ensureUploadDirs();
-  fs.writeFileSync(metaPath(meta.id), JSON.stringify(meta));
+  const target = metaPath(meta.id);
+  const tmp = `${target}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(meta));
+  fs.renameSync(tmp, target);
+}
+
+function listReceivedChunks(uploadId: string, chunkCount: number) {
+  const received: number[] = [];
+  for (let i = 0; i < chunkCount; i++) {
+    if (fs.existsSync(chunkPath(uploadId, i))) received.push(i);
+  }
+  return received;
 }
 
 export function cleanupUploadSession(uploadId: string) {
@@ -151,11 +162,9 @@ export function saveChunk(
   ensureUploadDirs();
   // Overwrite is intentional — client retries rewrite the same piece.
   fs.writeFileSync(chunkPath(uploadId, index), data);
-  if (!meta.received.includes(index)) {
-    meta.received.push(index);
-    meta.received.sort((a, b) => a - b);
-    writeUploadMeta(meta);
-  }
+  // Rebuild from disk so parallel/retry writes never lose pieces.
+  meta.received = listReceivedChunks(uploadId, meta.chunkCount);
+  writeUploadMeta(meta);
   return { ok: true, meta };
 }
 
@@ -170,16 +179,21 @@ export function completeUploadSession(
   if (meta.uploaderId !== uploaderId) {
     return { ok: false, error: "Not your upload session", status: 403 };
   }
-  if (meta.received.length !== meta.chunkCount) {
+
+  const received = listReceivedChunks(uploadId, meta.chunkCount);
+  meta.received = received;
+  writeUploadMeta(meta);
+
+  if (received.length !== meta.chunkCount) {
     return {
       ok: false,
-      error: `Upload incomplete (${meta.received.length}/${meta.chunkCount} chunks) — try again`,
+      error: `Upload incomplete (${received.length}/${meta.chunkCount} chunks) — try again`,
       status: 400,
     };
   }
 
   ensureUploadDirs();
-  for (let i = 0; i < meta.chunkCount; i++) {
+  for (const i of received) {
     if (!fs.existsSync(chunkPath(uploadId, i))) {
       return { ok: false, error: `Missing chunk ${i} — try again`, status: 400 };
     }

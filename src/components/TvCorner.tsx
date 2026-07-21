@@ -458,7 +458,7 @@ export function TvCorner({
 
     if (file.size <= 0) {
       throw new Error(
-        `${shortName} looks empty — wait for the YTDown download to finish, then try again`
+        `${shortName} looks empty — wait for the download to finish, then try again`
       );
     }
     if (file.size > 5 * 1024 * 1024 * 1024) {
@@ -469,6 +469,84 @@ export function TvCorner({
       (title || "").trim() ||
       shortName.replace(/\.[^.]+$/, "").slice(0, 80) ||
       "Untitled clip";
+
+    // Smaller clips: one FormData request (simple + reliable).
+    if (file.size <= 32 * 1024 * 1024) {
+      onProgress(
+        `Uploading ${shortName} (${formatBytesShort(file.size)})…`,
+        0
+      );
+      const form = new FormData();
+      form.append("video", file, shortName);
+      form.append("channelId", channelId);
+      form.append("title", clipName);
+      const video = await new Promise<TvVideo>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        activeXhrRef.current = xhr;
+        xhr.open("POST", "/api/tv/videos");
+        xhr.timeout = 600_000;
+        xhr.responseType = "text";
+        xhr.upload.onprogress = (event) => {
+          if (!event.lengthComputable || event.total <= 0) return;
+          const pct = Math.min(
+            99,
+            Math.round((event.loaded / event.total) * 100)
+          );
+          onProgress(
+            `Uploading ${shortName} — ${pct}% (${formatBytesShort(event.loaded)} of ${formatBytesShort(event.total)})`,
+            pct
+          );
+        };
+        xhr.onload = () => {
+          if (activeXhrRef.current === xhr) activeXhrRef.current = null;
+          let data: {
+            error?: string;
+            video?: TvVideo;
+            channel?: TvChannel;
+          } | null = null;
+          try {
+            data = JSON.parse(xhr.responseText || "{}");
+          } catch {
+            reject(
+              new Error(
+                xhr.responseText?.slice(0, 140) ||
+                  `Upload failed (${xhr.status || "network"})`
+              )
+            );
+            return;
+          }
+          if (xhr.status < 200 || xhr.status >= 300) {
+            reject(new Error(data?.error || `Could not upload ${shortName}`));
+            return;
+          }
+          if (data?.channel) mergeChannel(data.channel);
+          if (!data?.video) {
+            reject(new Error(`Upload finished but no clip was saved for ${shortName}`));
+            return;
+          }
+          onProgress(`Saved ${shortName}`, 100);
+          resolve(data.video);
+        };
+        xhr.onerror = () => {
+          if (activeXhrRef.current === xhr) activeXhrRef.current = null;
+          reject(new Error(`Network error while uploading ${shortName}`));
+        };
+        xhr.ontimeout = () => {
+          if (activeXhrRef.current === xhr) activeXhrRef.current = null;
+          reject(new Error(`Upload timed out for ${shortName}`));
+        };
+        xhr.onabort = () => {
+          if (activeXhrRef.current === xhr) activeXhrRef.current = null;
+          reject(new Error("Upload cancelled"));
+        };
+        if (uploadCancelRef.current) {
+          reject(new Error("Upload cancelled"));
+          return;
+        }
+        xhr.send(form);
+      });
+      return video;
+    }
 
     onProgress(
       `Preparing ${shortName} (${formatBytesShort(file.size)})…`,
@@ -500,39 +578,19 @@ export function TvCorner({
       Math.max(1, Math.ceil(file.size / chunkSize));
     if (!uploadId) throw new Error("Upload session missing id");
 
-    // Upload a few pieces at a time so big 1080p files finish faster.
-    const concurrency = 3;
-    let completed = 0;
-    let nextIndex = 0;
-
-    const worker = async () => {
-      while (true) {
-        if (uploadCancelRef.current) throw new Error("Upload cancelled");
-        const i = nextIndex;
-        nextIndex += 1;
-        if (i >= chunkCount) return;
-        const start = i * chunkSize;
-        const end = Math.min(file.size, start + chunkSize);
-        const blob = file.slice(start, end);
-        await putChunk(uploadId, i, blob);
-        completed += 1;
-        const uploadedBytes = Math.min(file.size, completed * chunkSize);
-        const pct = Math.min(
-          99,
-          Math.round((completed / chunkCount) * 100)
-        );
-        onProgress(
-          `Uploading ${shortName} — ${pct}% (${formatBytesShort(Math.min(uploadedBytes, file.size))} of ${formatBytesShort(file.size)}) · piece ${completed}/${chunkCount}`,
-          pct
-        );
-      }
-    };
-
-    await Promise.all(
-      Array.from({ length: Math.min(concurrency, chunkCount) }, () =>
-        worker()
-      )
-    );
+    // One piece at a time — parallel uploads break on many preview proxies.
+    for (let i = 0; i < chunkCount; i++) {
+      if (uploadCancelRef.current) throw new Error("Upload cancelled");
+      const start = i * chunkSize;
+      const end = Math.min(file.size, start + chunkSize);
+      const blob = file.slice(start, end);
+      await putChunk(uploadId, i, blob);
+      const pct = Math.min(99, Math.round(((i + 1) / chunkCount) * 100));
+      onProgress(
+        `Uploading ${shortName} — ${pct}% (${formatBytesShort(end)} of ${formatBytesShort(file.size)}) · piece ${i + 1}/${chunkCount}`,
+        pct
+      );
+    }
 
     if (uploadCancelRef.current) throw new Error("Upload cancelled");
 
@@ -943,6 +1001,11 @@ export function TvCorner({
     room.positionUpdatedAt,
     powerOn,
   ]);
+
+  useEffect(() => {
+    // Clear leftover cancel flags if the page remounts mid-upload.
+    uploadCancelRef.current = false;
+  }, []);
 
   // Soft progress heartbeat so friends stay roughly aligned without seeking ourselves.
   useEffect(() => {
