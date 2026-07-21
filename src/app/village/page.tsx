@@ -231,7 +231,7 @@ export default async function VillagePage() {
             </span>
           ))}
         </div>
-        {village.id === "bramblewood" ? (
+        {village.id === "bramblewood" && user.villageId === "bramblewood" ? (
           <p className="muted" style={{ marginTop: "0.85rem" }}>
             <Link href="/workshop" className="btn-primary">
               Enter The Bramblewood Workshop
