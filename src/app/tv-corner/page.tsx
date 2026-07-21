@@ -5,7 +5,7 @@ import { listFriends } from "@/lib/letters";
 import {
   getOrCreateVillageRoom,
   listFriendRooms,
-  listVideosForUser,
+  listChannelsForUser,
 } from "@/lib/tvCorner";
 import { getVillage, VILLAGES, type VillageId } from "@/lib/villages";
 import { TvCorner } from "@/components/TvCorner";
@@ -33,7 +33,7 @@ export default async function TvCornerPage() {
 
   const village = getVillage(user.villageId as VillageId)!;
   const room = getOrCreateVillageRoom(user, user.villageId as VillageId);
-  const videos = listVideosForUser(user, room);
+  const channels = listChannelsForUser(user, room);
   const friendRooms = listFriendRooms(user);
   const friends = listFriends(user.id);
   const villageOptions = VILLAGES.map((v) => ({ id: v.id, name: v.name }));
@@ -48,7 +48,7 @@ export default async function TvCornerPage() {
         mascotImage={village.mascotImage || null}
         villageOptions={villageOptions}
         initialRoom={room}
-        initialVideos={videos}
+        initialChannels={channels}
         initialFriendRooms={friendRooms}
         friendCount={friends.length}
       />

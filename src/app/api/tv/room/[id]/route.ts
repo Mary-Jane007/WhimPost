@@ -3,7 +3,7 @@ import { getCurrentUser, jsonError } from "@/lib/auth";
 import {
   canAccessRoom,
   getRoomById,
-  listVideosForUser,
+  listChannelsForUser,
   touchPresence,
   updateRoomPlayback,
 } from "@/lib/tvCorner";
@@ -26,7 +26,7 @@ export async function GET(
   const fresh = getRoomById(id)!;
   return NextResponse.json({
     room: fresh,
-    videos: listVideosForUser(user, fresh),
+    channels: listChannelsForUser(user, fresh),
   });
 }
 
@@ -39,6 +39,7 @@ export async function PATCH(
 
   const { id } = await context.params;
   const body = (await req.json().catch(() => null)) as {
+    channelId?: string | null;
     videoId?: string | null;
     isPlaying?: boolean;
     positionMs?: number;
@@ -53,6 +54,6 @@ export async function PATCH(
   }
   return NextResponse.json({
     room: result.room,
-    videos: listVideosForUser(user, result.room),
+    channels: listChannelsForUser(user, result.room),
   });
 }

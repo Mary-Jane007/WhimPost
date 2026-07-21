@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
 
@@ -37,6 +38,8 @@ function migrate(db: Database.Database) {
   );
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
+  ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
+  ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS village_notes (
@@ -58,12 +61,25 @@ function migrate(db: Database.Database) {
       size_bytes INTEGER NOT NULL DEFAULT 0,
       uploader_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       village_id TEXT,
+      channel_id TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
     CREATE INDEX IF NOT EXISTS idx_tv_videos_village
       ON tv_videos(village_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_tv_videos_uploader
       ON tv_videos(uploader_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_tv_videos_channel
+      ON tv_videos(channel_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS tv_channels (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      village_id TEXT NOT NULL,
+      created_by TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_tv_channels_village
+      ON tv_channels(village_id, created_at);
 
     CREATE TABLE IF NOT EXISTS tv_rooms (
       id TEXT PRIMARY KEY,
@@ -71,6 +87,7 @@ function migrate(db: Database.Database) {
       village_id TEXT,
       host_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       title TEXT NOT NULL DEFAULT 'Watch party',
+      current_channel_id TEXT,
       current_video_id TEXT REFERENCES tv_videos(id) ON DELETE SET NULL,
       is_playing INTEGER NOT NULL DEFAULT 0,
       position_ms INTEGER NOT NULL DEFAULT 0,
@@ -100,6 +117,37 @@ function migrate(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_tv_chat_room
       ON tv_chat_messages(room_id, created_at);
   `);
+
+  // Fold any pre-channel clips into a village channel so the dial stays usable.
+  const orphans = db
+    .prepare(
+      `SELECT id, title, village_id, uploader_id
+       FROM tv_videos
+       WHERE channel_id IS NULL AND village_id IS NOT NULL`
+    )
+    .all() as Array<{
+    id: string;
+    title: string;
+    village_id: string;
+    uploader_id: string;
+  }>;
+
+  for (const video of orphans) {
+    const channelId = randomUUID();
+    db.prepare(
+      `INSERT INTO tv_channels (id, title, village_id, created_by)
+       VALUES (?, ?, ?, ?)`
+    ).run(
+      channelId,
+      video.title.slice(0, 80) || "Village channel",
+      video.village_id,
+      video.uploader_id
+    );
+    db.prepare(`UPDATE tv_videos SET channel_id = ? WHERE id = ?`).run(
+      channelId,
+      video.id
+    );
+  }
 }
 
 function createDb() {

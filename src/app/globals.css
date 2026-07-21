@@ -4167,3 +4167,84 @@ body.theme-moonmere .cottage-plaque {
 .tv-chat-compose .btn-primary {
   flex-shrink: 0;
 }
+
+.tv-channel-meta {
+  font-weight: 400;
+  opacity: 0.75;
+  font-size: 0.82em;
+}
+
+.tv-channel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+  max-height: 28rem;
+  overflow: auto;
+}
+
+.tv-channel-card {
+  border-radius: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 28%, transparent);
+  background: rgba(0, 0, 0, 0.18);
+  padding: 0.35rem;
+}
+
+.tv-channel-card.active {
+  border-color: color-mix(in srgb, var(--gold, #c9a227) 55%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 18%, rgba(0, 0, 0, 0.22));
+}
+
+.tv-channel-card-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.tv-channel-card-head .tv-video-pick {
+  border: 0;
+  background: transparent;
+}
+
+.tv-channel-clips {
+  list-style: none;
+  margin: 0.2rem 0 0.35rem;
+  padding: 0 0.35rem 0.35rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.tv-channel-clips li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.3rem;
+  align-items: stretch;
+}
+
+.tv-channel-clips button:first-child {
+  text-align: left;
+  border-radius: 0.55rem;
+  border: 1px solid transparent;
+  background: rgba(0, 0, 0, 0.18);
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 88%, transparent);
+  padding: 0.4rem 0.55rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tv-channel-clips li.active button:first-child {
+  border-color: color-mix(in srgb, var(--gold, #c9a227) 45%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 22%, rgba(0, 0, 0, 0.25));
+}
+
+.tv-channel-empty {
+  padding: 0 0.55rem 0.45rem;
+  font-size: 0.82rem;
+}
+
+.tv-upload-file.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
