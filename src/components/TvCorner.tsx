@@ -100,6 +100,7 @@ export function TvCorner({
   const [channelTitle, setChannelTitle] = useState("");
   const [channelVillageId, setChannelVillageId] =
     useState<VillageId>(villageId);
+  const [channelGlobal, setChannelGlobal] = useState(false);
   const [selectedChannelId, setSelectedChannelId] = useState<string>(
     initialChannels[0]?.id || ""
   );
@@ -251,13 +252,21 @@ export function TvCorner({
         body: JSON.stringify({
           title,
           villageId: channelVillageId,
+          isGlobal: channelGlobal,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not create channel");
       setChannelTitle("");
-      if (channelVillageId === (room.villageId || villageId)) {
-        setChannels((prev) => [...prev, data.channel]);
+      setChannelGlobal(false);
+      if (
+        data.channel.isGlobal ||
+        channelVillageId === (room.villageId || villageId)
+      ) {
+        setChannels((prev) => {
+          if (prev.some((c) => c.id === data.channel.id)) return prev;
+          return [...prev, data.channel];
+        });
       }
       setSelectedChannelId(data.channel.id);
     } catch (err) {
@@ -769,6 +778,7 @@ export function TvCorner({
                             {" "}
                             · {channel.videos.length} clip
                             {channel.videos.length === 1 ? "" : "s"}
+                            {channel.isGlobal ? " · every village" : ""}
                           </span>
                         </strong>
                       </button>
@@ -958,11 +968,31 @@ export function TvCorner({
                 <input
                   type="text"
                   value={channelTitle}
-                  onChange={(e) => setChannelTitle(e.target.value)}
-                  placeholder="Cottage cartoons"
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setChannelTitle(next);
+                    if (
+                      next.trim().toLowerCase() === "cottage cartoons"
+                    ) {
+                      setChannelGlobal(true);
+                    }
+                  }}
+                  placeholder="Cottage Cartoons"
                   maxLength={80}
                 />
               </label>
+              <label className="tv-upload tv-upload-check">
+                <input
+                  type="checkbox"
+                  checked={channelGlobal}
+                  onChange={(e) => setChannelGlobal(e.target.checked)}
+                />
+                <span>Show in every village (shared lineup)</span>
+              </label>
+              <p className="tv-shelf-copy tv-shelf-hint">
+                Cottage Cartoons is always shared across every village with the
+                same videos.
+              </p>
               <button
                 type="button"
                 className="btn-primary tv-upload-file"
@@ -1058,6 +1088,9 @@ export function TvCorner({
                             CH {channelLabel(index)}
                           </span>{" "}
                           {channel.title}
+                          {channel.isGlobal ? (
+                            <span className="tv-global-tag"> every village</span>
+                          ) : null}
                         </strong>
                         <span>
                           {channel.videos.length} clip
@@ -1065,6 +1098,7 @@ export function TvCorner({
                           {channel.videos.length === 0
                             ? " · empty"
                             : ""}
+                          {channel.isGlobal ? " · shared" : ""}
                         </span>
                       </button>
                       {user.isOwner ? (

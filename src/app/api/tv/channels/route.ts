@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import {
+  SHARED_CHANNEL_TITLE,
   createChannel,
   deleteChannel,
   listChannelsForVillage,
@@ -31,11 +32,12 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as {
     title?: string;
     villageId?: string;
+    isGlobal?: boolean;
   } | null;
 
   if (!body) return jsonError("Expected JSON body");
 
-  const villageRaw = String(body.villageId || "").trim();
+  const villageRaw = String(body.villageId || user.villageId || "").trim();
   if (!isVillageId(villageRaw)) {
     return jsonError("Pick which village this channel belongs to");
   }
@@ -43,10 +45,15 @@ export async function POST(req: NextRequest) {
   const title = String(body.title || "").trim();
   if (!title) return jsonError("Give your channel a name");
 
+  const isGlobal =
+    Boolean(body.isGlobal) ||
+    title.toLowerCase() === SHARED_CHANNEL_TITLE.toLowerCase();
+
   const channel = createChannel({
     title,
     villageId: villageRaw,
     createdBy: user.id,
+    isGlobal,
   });
 
   return NextResponse.json({ channel });
