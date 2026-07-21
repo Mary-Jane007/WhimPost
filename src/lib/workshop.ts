@@ -222,7 +222,6 @@ export type WorkshopAction =
       activityId: string;
       activityName: string;
       xp: number;
-      note: string;
       badge?: string;
       photoUrl?: string;
     }
@@ -276,15 +275,6 @@ export function applyWorkshopAction(
       xp += action.xp;
       if (action.badge) badges = addBadge(badges, action.badge);
       if (action.photoUrl) photos[action.key] = action.photoUrl;
-      insertJournal({
-        userId,
-        activityType: action.activityType,
-        activityId: action.activityId,
-        activityName: action.activityName,
-        photoUrl: action.photoUrl,
-        xpEarned: action.xp,
-        note: action.note,
-      });
     } else if (action.photoUrl) {
       photos[action.key] = action.photoUrl;
     }
@@ -297,22 +287,11 @@ export function applyWorkshopAction(
     if (action.photoUrl) questPhotos[action.itemId] = action.photoUrl;
     if (action.checked && !was) {
       xp += WORKSHOP_XP.questItem;
-      insertJournal({
-        userId,
-        activityType: "quest",
-        activityId: action.itemId,
-        activityName:
-          QUEST_ITEMS.find((q) => q.id === action.itemId)?.label ||
-          "Woodland discovery",
-        photoUrl: action.photoUrl,
-        xpEarned: WORKSHOP_XP.questItem,
-        note: "Another soft discovery for the explorer’s satchel.",
-      });
       const done = QUEST_ITEMS.every((q) => questChecks[q.id]);
       if (done) badges = addBadge(badges, "Explorer");
     }
     if (!action.checked && was) {
-      // Do not claw back XP; keep journal history.
+      // Do not claw back XP.
       void key;
     }
   } else if (action.type === "choosePlant") {
@@ -324,17 +303,6 @@ export function applyWorkshopAction(
     if (!plantWeeks[weekKey]) {
       plantWeeks[weekKey] = action.photoUrl;
       xp += WORKSHOP_XP.growWeek;
-      const plantName =
-        PLANTS.find((p) => p.id === plantId)?.name || "your plant";
-      insertJournal({
-        userId,
-        activityType: "grow",
-        activityId: `${plantId || "plant"}-week-${action.week}`,
-        activityName: `${plantName} · Week ${action.week}`,
-        photoUrl: action.photoUrl,
-        xpEarned: WORKSHOP_XP.growWeek,
-        note: `Week ${action.week} — the green things keep surprising me.`,
-      });
       if (action.week === 1) badges = addBadge(badges, "Tiny Sprout");
       if (action.week === 3) badges = addBadge(badges, "Gardener");
       if (action.week === 4) {
@@ -352,15 +320,6 @@ export function applyWorkshopAction(
         photoUrl: action.photoUrl,
       };
       xp += WORKSHOP_XP.bird;
-      insertJournal({
-        userId,
-        activityType: "bird",
-        activityId: action.birdId,
-        activityName: `Spotted a bird`,
-        photoUrl: action.photoUrl,
-        xpEarned: WORKSHOP_XP.bird,
-        note: "A quick wingbeat and the field guide gained a new mark.",
-      });
       if (Object.values(birds).filter((b) => b.spotted).length >= 5) {
         badges = addBadge(badges, "Bird Watcher");
       }
@@ -373,15 +332,6 @@ export function applyWorkshopAction(
       seasonal[key] = true;
       xp += WORKSHOP_XP.seasonal;
       const panel = SEASONAL_PANELS.find((p) => p.id === action.eventId);
-      const task = panel?.tasks[action.taskIndex] || "Seasonal task";
-      insertJournal({
-        userId,
-        activityType: "seasonal",
-        activityId: key,
-        activityName: `${panel?.title || "Season"} · ${task}`,
-        xpEarned: WORKSHOP_XP.seasonal,
-        note: "A seasonal ritual for Bramblewood’s calendar.",
-      });
       const allDone =
         panel &&
         panel.tasks.every((_, i) => seasonal[`${action.eventId}:${i}`]);
@@ -515,7 +465,6 @@ export function craftCompletionPayload(craftId: string, photoUrl?: string) {
     activityId: craft.id,
     activityName: craft.title,
     xp: WORKSHOP_XP.craft,
-    note: craft.note,
     badge: "Craftsman Badge",
     photoUrl,
   };
@@ -530,7 +479,6 @@ export function recipeCompletionPayload(recipeId: string, photoUrl?: string) {
     activityId: recipe.id,
     activityName: recipe.title,
     xp: WORKSHOP_XP.recipe,
-    note: recipe.note,
     badge: recipe.badge,
     photoUrl,
   };
@@ -546,7 +494,6 @@ export function promptCompletionPayload(promptId: string, photoUrl?: string) {
     activityId: prompt.id,
     activityName: prompt.text,
     xp: WORKSHOP_XP.prompt,
-    note: prompt.note,
     badge: "Creative Heart",
     photoUrl,
   };
