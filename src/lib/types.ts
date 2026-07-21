@@ -7,7 +7,8 @@ export type PaperStyle =
   | "lined"
   | "floral"
   | "night"
-  | "hearthwick";
+  | "hearthwick"
+  | "bramblewood";
 
 /** Handwriting / typeface for letter subject + body. */
 export type LetterFont =
@@ -314,6 +315,11 @@ export const PAPER_OPTIONS: {
     id: "hearthwick",
     name: "Hearthwick Stationery",
     hint: "Lined parchment & hedgehog meadow",
+  },
+  {
+    id: "bramblewood",
+    name: "Bramblewood Stationery",
+    hint: "Fox trail & peach wildflowers",
   },
   { id: "parchment", name: "Parchment", hint: "Tea-stained & soft" },
   { id: "cream", name: "Cream Linen", hint: "Quiet & classic" },

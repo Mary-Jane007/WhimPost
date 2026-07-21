@@ -23,24 +23,41 @@ export default async function ComposePage({
     : friends;
 
   const isHearthwick = user.villageId === "hearthwick";
+  const isBramblewood = user.villageId === "bramblewood";
 
   return (
     <main
-      className={`app-main forest-panel ${isHearthwick ? "compose-page-hearthwick" : ""}`}
+      className={`app-main forest-panel ${
+        isHearthwick
+          ? "compose-page-hearthwick"
+          : isBramblewood
+            ? "compose-page-bramblewood"
+            : ""
+      }`}
     >
       <PageCrest
         kinds={
           isHearthwick
             ? ["pie", "candle-jar", "jam-jar"]
-            : ["frogs-tandem", "butterfly-green", "narcissus"]
+            : isBramblewood
+              ? ["fox-seated", "mushroom-amanita", "leafy-branch"]
+              : ["frogs-tandem", "butterfly-green", "narcissus"]
         }
       />
       <header className="page-header">
-        <h1>{isHearthwick ? "Write by the hearth" : "Write a letter"}</h1>
+        <h1>
+          {isHearthwick
+            ? "Write by the hearth"
+            : isBramblewood
+              ? "Write on the trail"
+              : "Write a letter"}
+        </h1>
         <p>
           {isHearthwick
             ? "Lined cottage parchment, a meadow hedgehog in the corner, and room for whatever you need to say."
-            : "Pick paper and an envelope, scatter stickers and scraps, then seal it shut."}
+            : isBramblewood
+              ? "Cream trail paper framed with peach blossoms, a fox on mossy stones, and space for your next note."
+              : "Pick paper and an envelope, scatter stickers and scraps, then seal it shut."}
         </p>
       </header>
       <ComposeStudio friends={ordered} villageId={user.villageId} />

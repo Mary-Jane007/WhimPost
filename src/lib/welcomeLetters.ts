@@ -380,7 +380,7 @@ The finest adventures are rarely planned.
 Welcome to **Bramblewood**.
 
 *May curiosity always know the way.*`,
-    paperStyle: "parchment",
+    paperStyle: "bramblewood",
     envelopeStyle: "kraft",
     waxSeal: "spiral",
     stampStyle: "fox-seated",

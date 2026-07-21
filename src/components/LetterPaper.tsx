@@ -20,6 +20,7 @@ const paperClass: Record<PaperStyle, string> = {
   floral: "paper-floral",
   night: "paper-night",
   hearthwick: "paper-hearthwick",
+  bramblewood: "paper-bramblewood",
 };
 
 const fontClass: Record<LetterFont, string> = {
