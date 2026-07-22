@@ -225,6 +225,66 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_library_thoughts_prompt
       ON library_thoughts(prompt_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS garden_progress (
+      user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      xp INTEGER NOT NULL DEFAULT 0,
+      badges_json TEXT NOT NULL DEFAULT '[]',
+      decorations_json TEXT NOT NULL DEFAULT '[]',
+      blooms INTEGER NOT NULL DEFAULT 1,
+      daily_json TEXT NOT NULL DEFAULT '{}',
+      spotted_json TEXT NOT NULL DEFAULT '{}',
+      kindness_json TEXT NOT NULL DEFAULT '{}',
+      rare_json TEXT NOT NULL DEFAULT '[]',
+      visitors_json TEXT NOT NULL DEFAULT '{}',
+      collections_json TEXT NOT NULL DEFAULT '{}',
+      wish_id TEXT,
+      wish_week INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS garden_journal (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      activity_type TEXT NOT NULL,
+      activity_id TEXT NOT NULL,
+      activity_name TEXT NOT NULL,
+      flower TEXT NOT NULL DEFAULT '',
+      note TEXT NOT NULL DEFAULT '',
+      mood TEXT NOT NULL DEFAULT '',
+      photo_url TEXT,
+      xp_earned INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_garden_journal_user
+      ON garden_journal(user_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS garden_wishes (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      body TEXT NOT NULL,
+      gestures_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_garden_wishes_created
+      ON garden_wishes(created_at);
+
+    CREATE TABLE IF NOT EXISTS garden_petals (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      prompt_id TEXT NOT NULL,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_garden_petals_prompt
+      ON garden_petals(prompt_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS garden_community (
+      id TEXT PRIMARY KEY,
+      blooms INTEGER NOT NULL DEFAULT 0,
+      kindness INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
 
   ensureColumn(
