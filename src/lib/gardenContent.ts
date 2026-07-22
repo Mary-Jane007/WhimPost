@@ -717,7 +717,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "great-tit",
     name: "Great Tit",
     emoji: "🐦",
-    image: VIMG.songbird,
+    image: "/garden/visitors/great-tit.jpg",
     category: "birds",
     region: "netherlands",
     seasons: ["spring", "summer", "autumn", "winter"],
