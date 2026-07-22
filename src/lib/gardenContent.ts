@@ -596,7 +596,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "troupial",
     name: "Troupial (Trupial)",
     emoji: "🧡",
-    image: VIMG.bird,
+    image: "/garden/visitors/troupial.jpg",
     category: "birds",
     region: "curaçao",
     seasons: ["spring", "summer", "autumn"],
