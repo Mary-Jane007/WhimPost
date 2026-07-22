@@ -681,7 +681,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "great-kiskadee",
     name: "Great Kiskadee",
     emoji: "🐦",
-    image: VIMG.songbird,
+    image: "/garden/visitors/great-kiskadee.jpg",
     category: "birds",
     region: "suriname",
     seasons: ["spring", "summer", "autumn"],
