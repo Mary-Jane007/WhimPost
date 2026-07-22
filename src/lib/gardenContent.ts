@@ -5,7 +5,6 @@ export type GardenTabId =
   | "kindness"
   | "seeds"
   | "visitors"
-  | "wish"
   | "community"
   | "journal";
 
@@ -20,7 +19,6 @@ export const GARDEN_TABS: Array<{
   { id: "kindness", label: "Acts of Kindness", emoji: "💛" },
   { id: "seeds", label: "Seeds of Joy", emoji: "✨" },
   { id: "visitors", label: "Wild Visitors", emoji: "🦋" },
-  { id: "wish", label: "The Wish Tree", emoji: "🌳" },
   { id: "community", label: "Community Meadow", emoji: "🏕" },
   { id: "journal", label: "Garden Journal", emoji: "📔" },
 ];
@@ -30,8 +28,6 @@ export const GARDEN_XP = {
   spotting: 70,
   kindness: 100,
   seed: 35,
-  wish: 30,
-  encourage: 10,
   journal: 25,
 } as const;
 
@@ -472,17 +468,9 @@ export const COMMUNITY_MILESTONES = [
   { id: "festival", at: 100000, label: "100,000 blooms · The Clover Festival begins", badge: "Clover Festival Badge" },
 ];
 
-export const WISH_GESTURES = [
-  { id: "bloom", label: "Bloom", emoji: "🌸" },
-  { id: "warmth", label: "Warmth", emoji: "💛" },
-  { id: "hope", label: "Hope", emoji: "🕊" },
-  { id: "light", label: "Light", emoji: "✨" },
-] as const;
-
 export const GARDEN_ART = {
   meadowBg: "/garden/decor/meadow-bg.jpg",
   birdhouse: "/garden/decor/birdhouse.jpg",
-  wishTree: "/garden/decor/wish-tree.jpg",
 } as const;
 
 export const MEADOW_FLOWER_IMAGES = [

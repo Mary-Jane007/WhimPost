@@ -13,7 +13,6 @@ import {
   MEADOW_FLOWER_IMAGES,
   SPOT_FLOWERS,
   WILD_VISITORS,
-  WISH_GESTURES,
   dailyTasksForDay,
   featuredJoySeed,
   weeklyKindness,
@@ -32,7 +31,6 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [bloomBurst, setBloomBurst] = useState(false);
-  const [wishBody, setWishBody] = useState("");
   const [seedBody, setSeedBody] = useState("");
   const [spotId, setSpotId] = useState(SPOT_FLOWERS[0]?.id || "daisy");
   const [spotNote, setSpotNote] = useState("");
@@ -644,87 +642,6 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
                   </li>
                 ))}
               </ul>
-            </div>
-          </section>
-        )}
-
-        {tab === "wish" && (
-          <section className="cm-section">
-            <h2>The Wish Tree</h2>
-            <p className="cm-section-lead">
-              Hang one wish each week. Others leave quiet gestures — Bloom,
-              Warmth, Hope, or Light — not comments.
-            </p>
-            <div className="cm-wish-tree-wrap">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={GARDEN_ART.wishTree}
-                alt=""
-                className="cm-wish-tree-img"
-              />
-            </div>
-            <form
-              className="cm-card cm-form"
-              onSubmit={(e: FormEvent) => {
-                e.preventDefault();
-                void postAction({ type: "hangWish", body: wishBody }).then(
-                  (p) => {
-                    if (p) {
-                      setWishBody("");
-                      setToast("Your wish hangs among the blossoms.");
-                    }
-                  }
-                );
-              }}
-            >
-              <label>
-                <span>This week&apos;s wish</span>
-                <textarea
-                  rows={3}
-                  value={wishBody}
-                  onChange={(e) => setWishBody(e.target.value)}
-                  disabled={busy}
-                  placeholder='e.g. "I hope to be kinder to myself."'
-                  required
-                  minLength={8}
-                  maxLength={280}
-                />
-              </label>
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={busy || wishBody.trim().length < 8}
-              >
-                Hang wish
-              </button>
-            </form>
-            <div className="cm-wish-list">
-              {progress.wishes.map((w) => (
-                <article key={w.id} className="cm-card">
-                  <p className="cm-wish-body">“{w.body}”</p>
-                  <p className="cm-meta">from {w.authorName}</p>
-                  <div className="cm-gestures">
-                    {WISH_GESTURES.map((g) => (
-                      <button
-                        key={g.id}
-                        type="button"
-                        className="btn-secondary"
-                        disabled={busy}
-                        onClick={() =>
-                          void postAction({
-                            type: "encourageWish",
-                            wishId: w.id,
-                            gesture: g.id,
-                          })
-                        }
-                        title={g.label}
-                      >
-                        {g.emoji} {w.gestures[g.id] || 0}
-                      </button>
-                    ))}
-                  </div>
-                </article>
-              ))}
             </div>
           </section>
         )}

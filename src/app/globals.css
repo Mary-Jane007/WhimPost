@@ -7286,32 +7286,6 @@ button.linkish:hover {
   color: #5a3f4a;
 }
 
-.cm-wish-tree {
-  font-size: 3.5rem;
-  text-align: center;
-  margin: 0.25rem 0 0.85rem;
-  filter: drop-shadow(0 8px 12px rgba(80, 100, 40, 0.2));
-}
-
-.cm-wish-list {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.cm-wish-body {
-  margin: 0;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 1.05rem;
-}
-
-.cm-gestures {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.55rem;
-}
-
 .cm-milestones {
   list-style: none;
   margin: 1rem 0 0;
@@ -7414,21 +7388,6 @@ button.linkish:hover {
   object-fit: cover;
   border-radius: 1rem;
   margin-bottom: 0.55rem;
-}
-
-.cm-wish-tree-wrap {
-  margin: 0.25rem 0 1rem;
-  border-radius: 1.2rem;
-  overflow: hidden;
-  border: 1px solid rgba(140, 170, 100, 0.3);
-  box-shadow: 0 10px 22px rgba(80, 100, 40, 0.14);
-}
-
-.cm-wish-tree-img {
-  display: block;
-  width: 100%;
-  max-height: 16rem;
-  object-fit: cover;
 }
 
 .cm-flower-chip {

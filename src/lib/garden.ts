@@ -27,14 +27,6 @@ export type GardenJournalEntry = {
   createdAt: string;
 };
 
-export type GardenWish = {
-  id: string;
-  body: string;
-  authorName: string;
-  createdAt: string;
-  gestures: Record<string, number>;
-};
-
 export type JoyPetal = {
   id: string;
   promptId: string;
@@ -54,10 +46,7 @@ export type GardenProgress = {
   rareFlowers: string[];
   visitors: Record<string, boolean>;
   collections: Record<string, number>;
-  wishId: string | null;
-  wishWeek: number;
   journal: GardenJournalEntry[];
-  wishes: GardenWish[];
   petals: JoyPetal[];
   communityBlooms: number;
   communityKindness: number;
@@ -175,32 +164,6 @@ function listJournal(userId: string): GardenJournalEntry[] {
   }));
 }
 
-function listWishes(): GardenWish[] {
-  const db = getDb();
-  const rows = db
-    .prepare(
-      `SELECT w.id, w.body, w.gestures_json, w.created_at, u.display_name
-       FROM garden_wishes w
-       JOIN users u ON u.id = w.user_id
-       ORDER BY w.created_at DESC
-       LIMIT 40`
-    )
-    .all() as Array<{
-    id: string;
-    body: string;
-    gestures_json: string;
-    created_at: string;
-    display_name: string;
-  }>;
-  return rows.map((r) => ({
-    id: r.id,
-    body: r.body,
-    authorName: r.display_name,
-    createdAt: r.created_at,
-    gestures: parseJson(r.gestures_json, {}),
-  }));
-}
-
 function listPetals(promptId: string): JoyPetal[] {
   const db = getDb();
   const rows = db
@@ -258,10 +221,6 @@ function addBadge(badges: string[], badge: string) {
   return badges;
 }
 
-function currentWishWeek(now = new Date()) {
-  return Math.floor(now.getTime() / (7 * 86_400_000));
-}
-
 export function getGardenProgress(userId: string): GardenProgress {
   const row = readRow(userId);
   const community = readCommunity();
@@ -281,10 +240,7 @@ export function getGardenProgress(userId: string): GardenProgress {
     rareFlowers: parseJson(row.rare_json, []),
     visitors: parseJson(row.visitors_json, {}),
     collections: parseJson(row.collections_json, {}),
-    wishId: row.wish_id,
-    wishWeek: Number(row.wish_week) || 0,
     journal: listJournal(userId),
-    wishes: listWishes(),
     petals: listPetals(seed.id),
     communityBlooms: Number(community.blooms) || 0,
     communityKindness: Number(community.kindness) || 0,
@@ -307,8 +263,6 @@ export type GardenAction =
     }
   | { type: "completeKindness"; missionId: string; note?: string; mood?: string }
   | { type: "submitSeed"; promptId: string; body: string }
-  | { type: "hangWish"; body: string }
-  | { type: "encourageWish"; wishId: string; gesture: string }
   | {
       type: "journalEntry";
       activityName: string;
@@ -341,8 +295,8 @@ export function applyGardenAction(
     row.collections_json,
     {}
   );
-  let wishId = row.wish_id;
-  let wishWeek = Number(row.wish_week) || 0;
+  const wishId = row.wish_id;
+  const wishWeek = Number(row.wish_week) || 0;
 
   const bumpCollection = (id: string, by = 1) => {
     collections[id] = (collections[id] || 0) + by;
@@ -478,45 +432,6 @@ export function applyGardenAction(
         mood: "joyful",
         xpEarned: GARDEN_XP.seed,
       });
-    }
-  } else if (action.type === "hangWish") {
-    const week = currentWishWeek();
-    const body = action.body.trim().slice(0, 280);
-    if (body.length >= 8 && (wishWeek !== week || !wishId)) {
-      const id = randomUUID();
-      db.prepare(
-        `INSERT INTO garden_wishes (id, user_id, body, gestures_json)
-         VALUES (?, ?, ?, '{}')`
-      ).run(id, userId, body);
-      wishId = id;
-      wishWeek = week;
-      xp += GARDEN_XP.wish;
-      const flower = bloomOne(`wish:${id}`);
-      insertJournal({
-        userId,
-        activityType: "wish",
-        activityId: id,
-        activityName: "Wish Tree",
-        flower,
-        note: body,
-        mood: "hopeful",
-        xpEarned: GARDEN_XP.wish,
-      });
-    }
-  } else if (action.type === "encourageWish") {
-    const wish = db
-      .prepare(`SELECT id, gestures_json, user_id FROM garden_wishes WHERE id = ?`)
-      .get(action.wishId) as
-      | { id: string; gestures_json: string; user_id: string }
-      | undefined;
-    if (wish && wish.user_id !== userId) {
-      const gestures = parseJson<Record<string, number>>(wish.gestures_json, {});
-      gestures[action.gesture] = (gestures[action.gesture] || 0) + 1;
-      db.prepare(`UPDATE garden_wishes SET gestures_json = ? WHERE id = ?`).run(
-        JSON.stringify(gestures),
-        wish.id
-      );
-      xp += GARDEN_XP.encourage;
     }
   } else if (action.type === "journalEntry") {
     const note = action.note.trim().slice(0, 2000);
