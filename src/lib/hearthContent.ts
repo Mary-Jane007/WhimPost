@@ -126,7 +126,7 @@ export const HERBS: Herb[] = [
     id: "lavender",
     name: "Lavender",
     emoji: "💜",
-    image: "/garden/flowers/lavender.jpg",
+    image: "/hearth/recipes/hot-chocolate.jpg",
     category: "calming",
     description: "Soft purple spikes that scent linens, baths, and sleepy evenings.",
     facts: "Lavender thrives in sunny, well-drained soil and draws bees all summer.",
@@ -373,7 +373,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "A soft loaf that smells like golden afternoons.",
     ingredients: ["flour", "warm water", "yeast", "honey", "salt", "butter"],
     herbalPairing: "Rosemary",
-    image: "/stickers/collectibles/hearthwick/hearth-muffins.png",
+    image: "/hearth/recipes/honey-bread.jpg",
   },
   {
     id: "cinnamon-bread",
@@ -385,7 +385,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Swirled with spice — best sliced while still warm.",
     ingredients: ["flour", "milk", "yeast", "sugar", "cinnamon", "butter", "egg"],
     herbalPairing: "Cinnamon",
-    image: "/stickers/villages/hearthwick/cinnamon-roll.png",
+    image: "/hearth/recipes/cinnamon-bread.jpg",
   },
   {
     id: "pumpkin-bread",
@@ -397,7 +397,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Moist autumn loaf for rainy window mornings.",
     ingredients: ["pumpkin puree", "flour", "eggs", "sugar", "oil", "spice blend"],
     herbalPairing: "Clove",
-    image: "/stickers/collectibles/hearthwick/hearth-recipes.png",
+    image: "/hearth/recipes/pumpkin-bread.jpg",
   },
   {
     id: "lavender-cookies",
@@ -409,7 +409,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Delicate, floral, and perfect with afternoon tea.",
     ingredients: ["butter", "sugar", "flour", "egg", "dried lavender", "vanilla"],
     herbalPairing: "Lavender",
-    image: "/stickers/villages/hearthwick/lavender-bouquet.png",
+    image: "/hearth/recipes/lavender-cookies.jpg",
   },
   {
     id: "oatmeal-cookies",
@@ -421,7 +421,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Chewy comfort with a hint of brown sugar.",
     ingredients: ["oats", "flour", "butter", "brown sugar", "egg", "raisins optional"],
     herbalPairing: "Cinnamon",
-    image: "/stickers/collectibles/hearthwick/hearth-muffins.png",
+    image: "/hearth/recipes/oatmeal-cookies.jpg",
   },
   {
     id: "ginger-cookies",
@@ -433,7 +433,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Spicy snaps that warm cold fingers.",
     ingredients: ["flour", "butter", "brown sugar", "ginger", "molasses", "spice"],
     herbalPairing: "Ginger",
-    image: "/stickers/villages/hearthwick/walnuts.png",
+    image: "/hearth/recipes/ginger-cookies.jpg",
   },
   {
     id: "apple-pie",
@@ -445,7 +445,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "The classic fireside dessert — cinnamon steam and golden crust.",
     ingredients: ["apples", "pie crust", "sugar", "cinnamon", "butter", "lemon"],
     herbalPairing: "Cinnamon",
-    image: "/stickers/collectibles/hearthwick/hearth-recipes.png",
+    image: "/hearth/recipes/apple-pie.jpg",
   },
   {
     id: "blackberry-crumble",
@@ -457,7 +457,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Bubbling fruit under a buttery oat blanket.",
     ingredients: ["blackberries", "sugar", "oats", "flour", "butter"],
     herbalPairing: "Vanilla",
-    image: "/stickers/villages/hearthwick/red-berries.png",
+    image: "/hearth/recipes/blackberry-crumble.jpg",
   },
   {
     id: "rice-pudding",
@@ -469,7 +469,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Slow-stirred creaminess for quiet nights.",
     ingredients: ["rice", "milk", "sugar", "vanilla", "cinnamon"],
     herbalPairing: "Vanilla",
-    image: "/stickers/collectibles/hearthwick/hearth-teacups.png",
+    image: "/hearth/recipes/rice-pudding.jpg",
   },
   {
     id: "hot-chocolate",
@@ -493,7 +493,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Simmered orchard warmth with spice.",
     ingredients: ["apple juice or cider", "cinnamon sticks", "cloves", "orange peel"],
     herbalPairing: "Clove",
-    image: "/stickers/villages/hearthwick/cinnamon-sticks.png",
+    image: "/hearth/recipes/apple-cider.jpg",
   },
   {
     id: "vanilla-chai",
@@ -505,7 +505,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Spiced tea softened with vanilla and milk.",
     ingredients: ["black tea", "milk", "ginger", "cardamom", "cinnamon", "vanilla"],
     herbalPairing: "Vanilla",
-    image: "/stickers/collectibles/hearthwick/hearth-teacups.png",
+    image: "/hearth/recipes/vanilla-chai.jpg",
   },
   {
     id: "chamomile-tea",
@@ -517,7 +517,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "A pale gold cup for winding down.",
     ingredients: ["dried chamomile", "hot water", "honey optional"],
     herbalPairing: "Chamomile",
-    image: "/garden/flowers/daisy.jpg",
+    image: "/hearth/recipes/chamomile-tea.jpg",
   },
   {
     id: "mint-tea",
@@ -529,7 +529,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Cool and clear — good after rich meals.",
     ingredients: ["fresh or dried mint", "hot water", "lemon optional"],
     herbalPairing: "Mint",
-    image: "/stickers/villages/hearthwick/leaf-jar.png",
+    image: "/hearth/recipes/mint-tea.jpg",
   },
   {
     id: "golden-milk",
@@ -541,7 +541,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Turmeric-glowing comfort in a mug.",
     ingredients: ["milk", "turmeric", "ginger", "cinnamon", "honey", "black pepper"],
     herbalPairing: "Ginger",
-    image: "/stickers/collectibles/hearthwick/hearth-embers.png",
+    image: "/hearth/recipes/golden-milk.jpg",
   },
   {
     id: "pumpkin-soup",
@@ -553,7 +553,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Silky orange warmth for chilly evenings.",
     ingredients: ["pumpkin", "onion", "stock", "cream", "sage", "salt"],
     herbalPairing: "Sage",
-    image: "/stickers/villages/hearthwick/ceramic-crock.png",
+    image: "/hearth/recipes/pumpkin-soup.jpg",
   },
   {
     id: "tomato-soup",
@@ -565,7 +565,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Bright comfort with grilled bread on the side.",
     ingredients: ["tomatoes", "onion", "garlic", "stock", "basil", "cream optional"],
     herbalPairing: "Thyme",
-    image: "/stickers/villages/hearthwick/wooden-crate.png",
+    image: "/hearth/recipes/tomato-soup.jpg",
   },
   {
     id: "potato-leek-soup",
@@ -577,7 +577,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Quiet, creamy, and made for soft rain.",
     ingredients: ["potatoes", "leeks", "butter", "stock", "cream", "thyme"],
     herbalPairing: "Thyme",
-    image: "/stickers/villages/hearthwick/ceramic-crock.png",
+    image: "/hearth/recipes/potato-leek-soup.jpg",
   },
 ];
 
