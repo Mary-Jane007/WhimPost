@@ -7653,6 +7653,14 @@ button.linkish:hover {
   line-height: 1.5;
 }
 
+.hw-welcome-title {
+  color: #c4a484 !important;
+}
+
+.hw-welcome-lead {
+  color: #c4a484;
+}
+
 .hw-fireplace {
   position: relative;
   margin-bottom: 1.1rem;

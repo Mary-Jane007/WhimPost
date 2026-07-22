@@ -177,8 +177,8 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
                 className="hw-fireplace-art"
               />
             </div>
-            <h2>Welcome to the Fireside</h2>
-            <p className="hw-section-lead">
+            <h2 className="hw-welcome-title">Welcome to the Fireside</h2>
+            <p className="hw-section-lead hw-welcome-lead">
               The central room is already fully decorated — a stone fireplace,
               wooden beams with dried herbs, knitted blankets, and copper
               kettles. Pull up a chair.
