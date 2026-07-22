@@ -6917,9 +6917,14 @@ button.linkish:hover {
 .cm-butterfly.b2 { left: -5%; top: 55%; animation: cm-flutter 22s linear infinite reverse; animation-delay: -6s; }
 .cm-bee { left: -5%; top: 45%; animation: cm-flutter 14s linear infinite; animation-delay: -3s; }
 
-.cm-butterfly.b1::before { content: "🦋"; }
-.cm-butterfly.b2::before { content: "🦋"; }
-.cm-bee::before { content: "🐝"; }
+.cm-butterfly img,
+.cm-bee img {
+  width: 2.4rem;
+  height: 2.4rem;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(60, 80, 40, 0.2);
+}
 
 .cm-deco {
   position: absolute;
@@ -6951,14 +6956,21 @@ button.linkish:hover {
   pointer-events: none;
   display: grid;
   place-items: center;
-  font-size: 2.5rem;
   gap: 1rem;
   animation: cm-burst 1.5s ease-out forwards;
 }
-.cm-bloom-burst span { animation: cm-pop 1.5s ease-out forwards; }
-.cm-bloom-burst span:nth-child(2) { transform: translate(40px, -30px); }
-.cm-bloom-burst span:nth-child(3) { transform: translate(-50px, 20px); }
-.cm-bloom-burst span:nth-child(4) { transform: translate(20px, 50px); }
+.cm-bloom-burst img {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 250, 235, 0.9);
+  box-shadow: 0 8px 20px rgba(80, 100, 40, 0.25);
+  animation: cm-pop 1.5s ease-out forwards;
+}
+.cm-bloom-burst img:nth-child(2) { transform: translate(48px, -34px); }
+.cm-bloom-burst img:nth-child(3) { transform: translate(-54px, 22px); }
+.cm-bloom-burst img:nth-child(4) { transform: translate(24px, 52px); }
 
 @keyframes cm-burst {
   0% { opacity: 0; }
@@ -7075,14 +7087,23 @@ button.linkish:hover {
 
 .cm-meadow {
   position: relative;
-  height: 16rem;
+  height: 18rem;
   margin-bottom: 1rem;
   border-radius: 1.3rem;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 100%, rgba(255, 230, 150, 0.35), transparent 55%),
-    linear-gradient(180deg, #b7d98a 0%, #7fb35a 55%, #5f9342 100%);
+  background-size: cover;
+  background-position: center bottom;
   border: 1px solid rgba(120, 150, 80, 0.4);
+  box-shadow: inset 0 -30px 40px rgba(40, 70, 20, 0.18);
+}
+
+.cm-meadow-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 240, 200, 0.18), transparent 40%),
+    linear-gradient(0deg, rgba(40, 70, 25, 0.22), transparent 45%);
+  pointer-events: none;
 }
 
 .cm-path {
@@ -7090,24 +7111,38 @@ button.linkish:hover {
   left: 42%;
   bottom: 0;
   width: 16%;
-  height: 70%;
-  background: linear-gradient(180deg, rgba(196, 160, 110, 0.55), rgba(160, 120, 70, 0.7));
+  height: 55%;
+  background: linear-gradient(180deg, rgba(196, 160, 110, 0.35), rgba(160, 120, 70, 0.55));
   border-radius: 40% 40% 0 0;
+  mix-blend-mode: multiply;
 }
 
-.cm-birdhouse {
+.cm-birdhouse-img {
   position: absolute;
-  right: 14%;
-  top: 18%;
-  font-size: 1.6rem;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+  right: 10%;
+  top: 10%;
+  width: 4.8rem;
+  height: 4.8rem;
+  object-fit: cover;
+  border-radius: 0.85rem;
+  border: 2px solid rgba(255, 250, 235, 0.85);
+  box-shadow: 0 8px 16px rgba(40, 50, 20, 0.28);
+  z-index: 2;
 }
 
 .cm-meadow-flower {
   position: absolute;
-  font-size: 1.25rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 252, 240, 0.85);
+  box-shadow: 0 4px 10px rgba(40, 60, 20, 0.25);
   animation: cm-sway 3.5s ease-in-out infinite;
+  z-index: 1;
 }
+.cm-meadow-flower.f2 { width: 3rem; height: 3rem; }
+.cm-meadow-flower.f4 { width: 2.2rem; height: 2.2rem; }
 
 @keyframes cm-sway {
   0%, 100% { transform: rotate(-4deg); }
@@ -7287,4 +7322,59 @@ button.linkish:hover {
 .cm-flower-tag {
   margin: 0 0 0.35rem;
   color: #6b8448;
+}
+
+
+.cm-starter-card img {
+  width: 100%;
+  height: 7rem;
+  object-fit: cover;
+  border-radius: 0.85rem;
+  margin-bottom: 0.55rem;
+}
+
+.cm-flower-plate {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 1rem;
+  margin-bottom: 0.55rem;
+  border: 1px solid rgba(140, 170, 100, 0.28);
+}
+
+.cm-flower-facts .cm-flower-plate {
+  max-width: 14rem;
+}
+
+.cm-visitor-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 1rem;
+  margin-bottom: 0.55rem;
+}
+
+.cm-wish-tree-wrap {
+  margin: 0.25rem 0 1rem;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  border: 1px solid rgba(140, 170, 100, 0.3);
+  box-shadow: 0 10px 22px rgba(80, 100, 40, 0.14);
+}
+
+.cm-wish-tree-img {
+  display: block;
+  width: 100%;
+  max-height: 16rem;
+  object-fit: cover;
+}
+
+.cm-flower-chip {
+  width: 1.35rem;
+  height: 1.35rem;
+  object-fit: cover;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 0.25rem;
 }

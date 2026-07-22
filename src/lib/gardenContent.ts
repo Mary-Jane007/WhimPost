@@ -108,6 +108,7 @@ export type SpotFlower = {
   id: string;
   name: string;
   emoji: string;
+  image: string;
   facts: string;
   season: string;
   pollinators: string;
@@ -119,6 +120,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "daisy",
     name: "Daisy",
     emoji: "🌼",
+    image: "/garden/flowers/daisy.jpg",
     facts: "Daisies open with the sun and close at dusk — little meadow clocks.",
     season: "Spring–summer",
     pollinators: "Bees, butterflies",
@@ -128,6 +130,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "rose",
     name: "Rose",
     emoji: "🌹",
+    image: "/garden/flowers/rose.jpg",
     facts: "Roses have been cultivated for thousands of years as symbols of devotion.",
     season: "Late spring–autumn",
     pollinators: "Bees, beetles",
@@ -137,6 +140,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "tulip",
     name: "Tulip",
     emoji: "🌷",
+    image: "/garden/flowers/tulip.jpg",
     facts: "Tulips once sparked a frenzy of trade in the Dutch Golden Age.",
     season: "Spring",
     pollinators: "Bees",
@@ -146,6 +150,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "lavender",
     name: "Lavender",
     emoji: "💜",
+    image: "/garden/flowers/lavender.jpg",
     facts: "Lavender's scent calms minds and draws pollinators in soft purple waves.",
     season: "Summer",
     pollinators: "Bees, butterflies",
@@ -155,6 +160,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "sunflower",
     name: "Sunflower",
     emoji: "🌻",
+    image: "/garden/flowers/sunflower.jpg",
     facts: "Young sunflowers track the sun across the sky (heliotropism).",
     season: "Summer–early autumn",
     pollinators: "Bees, birds",
@@ -164,6 +170,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "bluebell",
     name: "Bluebell",
     emoji: "🪻",
+    image: "/garden/flowers/bluebell.jpg",
     facts: "Bluebell woods carpet forest floors in a single enchanted week each spring.",
     season: "Spring",
     pollinators: "Bees, hoverflies",
@@ -173,6 +180,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "hibiscus",
     name: "Hibiscus",
     emoji: "🌺",
+    image: "/garden/flowers/hibiscus.jpg",
     facts: "Many hibiscus blooms last only a day — beauty in a brief visit.",
     season: "Warm months",
     pollinators: "Hummingbirds, bees",
@@ -182,6 +190,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "cherry-blossom",
     name: "Cherry Blossom",
     emoji: "🌸",
+    image: "/garden/flowers/cherry-blossom.jpg",
     facts: "Sakura reminds us that fleeting moments can be the most precious.",
     season: "Early spring",
     pollinators: "Bees",
@@ -191,6 +200,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "dandelion",
     name: "Dandelion",
     emoji: "🌼",
+    image: "/garden/flowers/dandelion.jpg",
     facts: "Every part of a dandelion is useful — from root tea to seed wishes.",
     season: "Spring–autumn",
     pollinators: "Bees, butterflies",
@@ -200,6 +210,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "hydrangea",
     name: "Hydrangea",
     emoji: "🌹",
+    image: "/garden/flowers/hydrangea.jpg",
     facts: "Hydrangea color can shift with soil acidity — chemistry as watercolor.",
     season: "Summer",
     pollinators: "Bees",
@@ -209,6 +220,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "bougainvillea",
     name: "Bougainvillea",
     emoji: "🌺",
+    image: "/garden/flowers/bougainvillea.jpg",
     facts: "The bright “petals” are actually bracts; tiny flowers hide in the center.",
     season: "Warm seasons",
     pollinators: "Butterflies, bees",
@@ -218,6 +230,7 @@ export const SPOT_FLOWERS: SpotFlower[] = [
     id: "clover",
     name: "Clover",
     emoji: "🌿",
+    image: "/garden/flowers/clover.jpg",
     facts: "Clover feeds soil with nitrogen and bees with nectar — a quiet helper.",
     season: "Spring–autumn",
     pollinators: "Bees",
@@ -279,20 +292,21 @@ export type WildVisitor = {
   id: string;
   name: string;
   emoji: string;
+  image: string;
   prefers: string;
   needBlooms: number;
 };
 
 export const WILD_VISITORS: WildVisitor[] = [
-  { id: "butterflies", name: "Butterflies", emoji: "🦋", prefers: "Wildflowers & nectar", needBlooms: 3 },
-  { id: "bees", name: "Bees", emoji: "🐝", prefers: "Lavender & clover", needBlooms: 5 },
-  { id: "ladybugs", name: "Ladybugs", emoji: "🐞", prefers: "Sunny leaf edges", needBlooms: 4 },
-  { id: "hedgehogs", name: "Hedgehogs", emoji: "🦔", prefers: "Quiet undergrowth", needBlooms: 8 },
-  { id: "rabbits", name: "Rabbits", emoji: "🐇", prefers: "Daisy patches", needBlooms: 6 },
-  { id: "bluebirds", name: "Bluebirds", emoji: "🐦", prefers: "Open meadows", needBlooms: 7 },
-  { id: "robins", name: "Robins", emoji: "🧡", prefers: "Morning paths", needBlooms: 7 },
-  { id: "foxes", name: "Foxes", emoji: "🦊", prefers: "Twilight edges", needBlooms: 12 },
-  { id: "hummingbirds", name: "Hummingbirds", emoji: "✨", prefers: "Hibiscus & bright tubes", needBlooms: 10 },
+  { id: "butterflies", name: "Butterflies", emoji: "🦋", image: "/garden/visitors/butterfly.jpg", prefers: "Wildflowers & nectar", needBlooms: 3 },
+  { id: "bees", name: "Bees", emoji: "🐝", image: "/garden/visitors/bee.jpg", prefers: "Lavender & clover", needBlooms: 5 },
+  { id: "ladybugs", name: "Ladybugs", emoji: "🐞", image: "/garden/visitors/ladybug.jpg", prefers: "Sunny leaf edges", needBlooms: 4 },
+  { id: "hedgehogs", name: "Hedgehogs", emoji: "🦔", image: "/garden/visitors/hedgehog.jpg", prefers: "Quiet undergrowth", needBlooms: 8 },
+  { id: "rabbits", name: "Rabbits", emoji: "🐇", image: "/garden/visitors/rabbit.jpg", prefers: "Daisy patches", needBlooms: 6 },
+  { id: "bluebirds", name: "Bluebirds", emoji: "🐦", image: "/garden/visitors/bluebird.jpg", prefers: "Open meadows", needBlooms: 7 },
+  { id: "robins", name: "Robins", emoji: "🧡", image: "/garden/visitors/robin.jpg", prefers: "Morning paths", needBlooms: 7 },
+  { id: "foxes", name: "Foxes", emoji: "🦊", image: "/garden/visitors/fox.jpg", prefers: "Twilight edges", needBlooms: 12 },
+  { id: "hummingbirds", name: "Hummingbirds", emoji: "✨", image: "/garden/visitors/hummingbird.jpg", prefers: "Hibiscus & bright tubes", needBlooms: 10 },
 ];
 
 export type GardenCollection = {
@@ -325,6 +339,23 @@ export const WISH_GESTURES = [
   { id: "warmth", label: "Warmth", emoji: "💛" },
   { id: "hope", label: "Hope", emoji: "🕊" },
   { id: "light", label: "Light", emoji: "✨" },
+] as const;
+
+export const GARDEN_ART = {
+  meadowBg: "/garden/decor/meadow-bg.jpg",
+  birdhouse: "/garden/decor/birdhouse.jpg",
+  wishTree: "/garden/decor/wish-tree.jpg",
+} as const;
+
+export const MEADOW_FLOWER_IMAGES = [
+  "/garden/flowers/daisy.jpg",
+  "/garden/flowers/tulip.jpg",
+  "/garden/flowers/sunflower.jpg",
+  "/garden/flowers/lavender.jpg",
+  "/garden/flowers/rose.jpg",
+  "/garden/flowers/clover.jpg",
+  "/garden/flowers/cherry-blossom.jpg",
+  "/garden/flowers/dandelion.jpg",
 ] as const;
 
 export const BLOOM_FLOWERS = [
