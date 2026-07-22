@@ -608,7 +608,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "brown-throated-parakeet",
     name: "Brown-throated Parakeet",
     emoji: "🦜",
-    image: VIMG.songbird,
+    image: "/garden/visitors/brown-throated-parakeet.jpg",
     category: "birds",
     region: "curaçao",
     seasons: ["spring", "summer", "autumn", "winter"],
