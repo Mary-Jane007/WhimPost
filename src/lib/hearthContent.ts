@@ -607,7 +607,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Trim the wick to about 1 cm and set upright to firm.",
     ],
     safety: "Never leave a burning candle unattended. Keep away from drafts and fabrics.",
-    image: "/stickers/collectibles/hearthwick/hearth-embers.png",
+    image: "/hearth/candles/beeswax.jpg",
   },
   {
     id: "dried-flower",
@@ -622,7 +622,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Pour a base layer, cool slightly, then press dried flowers against the glass and finish pouring.",
     ],
     safety: "Keep botanicals away from the immediate wick path to reduce flare-ups.",
-    image: "/stickers/villages/hearthwick/pink-flower.png",
+    image: "/hearth/candles/dried-flower.jpg",
   },
   {
     id: "cinnamon-stick",
@@ -637,7 +637,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Trim ends evenly for a tidy cottage look.",
     ],
     safety: "Cinnamon is decorative — do not let sticks sit in open flame.",
-    image: "/stickers/villages/hearthwick/cinnamon-sticks.png",
+    image: "/hearth/candles/cinnamon-stick.jpg",
   },
   {
     id: "lavender-candle",
@@ -652,7 +652,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Sprinkle a few buds on the cooling surface — sparingly.",
     ],
     safety: "Essential oils are flammable — use lightly and keep buds off the wick.",
-    image: "/stickers/villages/hearthwick/lavender-bouquet.png",
+    image: "/hearth/candles/lavender-candle.jpg",
   },
   {
     id: "orange-peel",
@@ -667,7 +667,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Light the pith wick carefully for a short, fragrant glow.",
     ],
     safety: "Short burns only. Place on a fire-safe dish and watch closely.",
-    image: "/stickers/villages/hearthwick/maple-leaves.png",
+    image: "/hearth/candles/orange-peel.jpg",
   },
   {
     id: "pressed-flower",
@@ -682,7 +682,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Cure fully before lighting.",
     ],
     safety: "Keep paper-thin botanicals outside the flame chamber.",
-    image: "/stickers/villages/hearthwick/lavender-bouquet.png",
+    image: "/hearth/candles/pressed-flower.jpg",
   },
   {
     id: "teacup",
@@ -697,7 +697,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Pour melted wax and hold wick upright until set.",
     ],
     safety: "Use cups without cracks. Burn on a heat-safe saucer.",
-    image: "/stickers/collectibles/hearthwick/hearth-teacups.png",
+    image: "/hearth/candles/teacup.jpg",
   },
   {
     id: "floating",
@@ -712,7 +712,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Float in a bowl with petals or cranberries.",
     ],
     safety: "Keep water bowls stable and away from edges.",
-    image: "/stickers/collectibles/hearthwick/hearth-embers.png",
+    image: "/hearth/candles/floating.jpg",
   },
   {
     id: "soy",
@@ -727,7 +727,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Allow a full cure before the first long burn.",
     ],
     safety: "Follow wax temperature guides; never melt wax directly on a flame.",
-    image: "/stickers/villages/hearthwick/herbal-jar.png",
+    image: "/hearth/candles/soy.jpg",
   },
   {
     id: "autumn",
@@ -742,7 +742,7 @@ export const CANDLE_CRAFTS: CandleCraft[] = [
       "Style on the mantel beside the fire.",
     ],
     safety: "Keep dried leaves well below the rim and flame.",
-    image: "/stickers/villages/hearthwick/maple-leaves.png",
+    image: "/hearth/candles/autumn.jpg",
   },
 ];
 
