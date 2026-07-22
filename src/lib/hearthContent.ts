@@ -126,7 +126,7 @@ export const HERBS: Herb[] = [
     id: "lavender",
     name: "Lavender",
     emoji: "💜",
-    image: "/hearth/recipes/hot-chocolate.jpg",
+    image: "/garden/flowers/lavender.jpg",
     category: "calming",
     description: "Soft purple spikes that scent linens, baths, and sleepy evenings.",
     facts: "Lavender thrives in sunny, well-drained soil and draws bees all summer.",
