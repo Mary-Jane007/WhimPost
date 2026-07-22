@@ -299,6 +299,46 @@ function migrate(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_hearth_notes_created
       ON hearth_notes(created_at);
 
+    CREATE TABLE IF NOT EXISTS moon_progress (
+      user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      xp INTEGER NOT NULL DEFAULT 0,
+      badges_json TEXT NOT NULL DEFAULT '[]',
+      rituals_json TEXT NOT NULL DEFAULT '{}',
+      stardust_json TEXT NOT NULL DEFAULT '{}',
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS moon_wishes (
+      id TEXT PRIMARY KEY,
+      body TEXT NOT NULL,
+      author_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_moon_wishes_created
+      ON moon_wishes(created_at);
+
+    CREATE TABLE IF NOT EXISTS moon_dreams (
+      id TEXT PRIMARY KEY,
+      body TEXT NOT NULL,
+      theme TEXT NOT NULL,
+      author_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_moon_dreams_theme
+      ON moon_dreams(theme, created_at);
+
+    CREATE TABLE IF NOT EXISTS moon_journal (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      prompt_id TEXT NOT NULL,
+      prompt TEXT NOT NULL,
+      body TEXT NOT NULL,
+      day_key INTEGER NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_moon_journal_user
+      ON moon_journal(user_id, created_at);
+
     CREATE TABLE IF NOT EXISTS garden_community (
       id TEXT PRIMARY KEY,
       blooms INTEGER NOT NULL DEFAULT 0,
