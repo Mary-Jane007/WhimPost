@@ -7202,6 +7202,67 @@ button.linkish:hover {
   font: inherit;
 }
 
+.cm-daily-cat {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7a9260;
+}
+
+.cm-daily-card h3 {
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.cm-daily-photo {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.65rem 0 0.85rem;
+}
+
+.cm-photo-drop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(120, 150, 80, 0.55);
+  background: rgba(240, 250, 220, 0.65);
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: #3f5a2e;
+  cursor: pointer;
+}
+
+.cm-photo-drop:hover {
+  border-color: #6f9a48;
+  background: rgba(220, 240, 190, 0.8);
+}
+
+.cm-daily-note {
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(140, 170, 100, 0.4);
+  background: #fffef8;
+  color: #3d4a32;
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.cm-daily-note:focus {
+  outline: 2px solid rgba(140, 190, 90, 0.45);
+  outline-offset: 1px;
+}
+
+.cm-daily-card .btn-primary {
+  margin-top: 0.55rem;
+}
+
 .cm-photo-preview {
   display: block;
   width: 100%;

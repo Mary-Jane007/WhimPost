@@ -297,7 +297,7 @@ export function getGardenProgress(userId: string): GardenProgress {
 }
 
 export type GardenAction =
-  | { type: "completeDaily"; taskId: string; note?: string; mood?: string }
+  | { type: "completeDaily"; taskId: string; note?: string; mood?: string; photoUrl?: string }
   | {
       type: "spotFlower";
       flowerId: string;
@@ -372,21 +372,31 @@ export function applyGardenAction(
     const task = todays.find((t) => t.id === action.taskId);
     const dayKey = `${Math.floor(Date.now() / 86_400_000)}:${action.taskId}`;
     if (task && !dailyDone[dayKey]) {
-      dailyDone[dayKey] = true;
-      const flower = bloomOne(dayKey);
-      xp += GARDEN_XP.daily;
-      bumpCollection("wildflowers");
-      refreshVisitors();
-      insertJournal({
-        userId,
-        activityType: "daily",
-        activityId: action.taskId,
-        activityName: task.label,
-        flower,
-        note: action.note || "A small kindness made the meadow brighter.",
-        mood: action.mood || "gentle",
-        xpEarned: GARDEN_XP.daily,
-      });
+      if (task.allowsPhoto && !action.photoUrl) {
+        // Photo tasks need an upload; leave incomplete.
+      } else {
+        dailyDone[dayKey] = true;
+        const flower = bloomOne(dayKey);
+        let earned = GARDEN_XP.daily;
+        if (task.communityBonus) {
+          earned += 15;
+          bumpCommunity(2, 1);
+        }
+        xp += earned;
+        bumpCollection("wildflowers");
+        refreshVisitors();
+        insertJournal({
+          userId,
+          activityType: "daily",
+          activityId: action.taskId,
+          activityName: task.label,
+          flower,
+          note: action.note || "A small kindness made the meadow brighter.",
+          mood: action.mood || "gentle",
+          photoUrl: action.photoUrl,
+          xpEarned: earned,
+        });
+      }
     }
   } else if (action.type === "spotFlower") {
     const flower = SPOT_FLOWERS.find((f) => f.id === action.flowerId);
