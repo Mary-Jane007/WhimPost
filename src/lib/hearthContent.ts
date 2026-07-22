@@ -982,4 +982,5 @@ export const HEARTH_ART = {
   apothecary: "/stickers/villages/hearthwick/apothecary-table.png",
   books: "/stickers/villages/hearthwick/vintage-books.png",
   hedgehog: "/stickers/villages/hearthwick/hedgehog.png",
+  fireplace: "/hearth/fireplace.jpg",
 } as const;
