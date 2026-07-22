@@ -52,55 +52,193 @@ export function titleForGardenXp(xp: number) {
   return current;
 }
 
+export type DailyCategory =
+  | "kindness"
+  | "flower"
+  | "nature"
+  | "joy"
+  | "cozy"
+  | "adventure"
+  | "community";
+
 export type DailyTask = {
   id: string;
   label: string;
   emoji: string;
+  category: DailyCategory;
+  /** Photo upload encouraged / required for completion. */
+  allowsPhoto: boolean;
+  /** Extra contribution to the shared Community Meadow. */
+  communityBonus?: boolean;
+};
+
+export const DAILY_CATEGORY_LABELS: Record<DailyCategory, string> = {
+  kindness: "Kindness",
+  flower: "Flower Spotting",
+  nature: "Nature Moments",
+  joy: "Joy & Gratitude",
+  cozy: "Cozy Living",
+  adventure: "Tiny Adventures",
+  community: "Community Blooms",
 };
 
 export const DAILY_TASK_POOL: DailyTask[] = [
-  { id: "compliment", label: "Give someone a genuine compliment.", emoji: "💛" },
-  { id: "appreciate", label: "Tell someone why you appreciate them.", emoji: "💌" },
-  { id: "favorite-flower", label: "Pick your favorite flower from today's garden.", emoji: "🌼" },
-  { id: "happy-memory", label: "Share a happy memory.", emoji: "🌸" },
-  { id: "outside-10", label: "Spend 10 minutes outside.", emoji: "☀️" },
-  { id: "smell-flower", label: "Smell a real flower.", emoji: "🌷" },
-  { id: "photo-new-flower", label: "Photograph a flower you've never noticed before.", emoji: "🌺" },
-  { id: "learn-flower", label: "Learn the name of one flower.", emoji: "🌻" },
-  { id: "watch-bee", label: "Watch a bee or butterfly for one minute.", emoji: "🐝" },
-  { id: "favorite-color", label: "Wear your favorite color today.", emoji: "🌈" },
-  { id: "make-smile", label: "Make someone smile.", emoji: "😊" },
-  { id: "comfort-song", label: "Share a comforting song.", emoji: "🎵" },
-  { id: "photo-beautiful", label: "Photograph something beautiful.", emoji: "📷" },
-  { id: "new-conversation", label: "Start a conversation with someone new.", emoji: "💬" },
-  { id: "warm-drink", label: "Make yourself a warm drink and enjoy it without distractions.", emoji: "🍵" },
-  { id: "read-poem", label: "Read a poem.", emoji: "📖" },
-  { id: "water-plant", label: "Water a real plant.", emoji: "🌿" },
-  { id: "arrange-flowers", label: "Arrange flowers in a vase.", emoji: "💐" },
-  { id: "watch-sunset", label: "Watch the sunset.", emoji: "🌙" },
-  { id: "watch-sunrise", label: "Watch the sunrise.", emoji: "⭐" },
-  { id: "listen-birds", label: "Listen to birds for five minutes.", emoji: "🐦" },
-  { id: "new-fruit", label: "Eat a piece of fruit you've never tried.", emoji: "🍓" },
-  { id: "call-someone", label: "Call someone you haven't spoken to in a while.", emoji: "📞" },
-  { id: "forgive-self", label: "Forgive yourself for one mistake.", emoji: "🕊" },
-  { id: "grateful", label: "Write down one thing you're grateful for.", emoji: "💭" },
+  // Kindness
+  { id: "k-compliment", label: "Give someone a genuine compliment.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-thank", label: "Thank someone for something they've done.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-appreciate", label: "Tell a loved one you appreciate them.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-encourage", label: "Send an encouraging message.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-review", label: "Write a positive review for a local business.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-kind-comment", label: "Leave a kind comment online.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-hold-door", label: "Hold the door open for someone.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-introduce", label: "Introduce yourself to someone new.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-smile-five", label: "Smile at five people today.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-make-laugh", label: "Make someone laugh.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-surprise-snack", label: "Surprise someone with a snack or drink.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-offer-help", label: "Offer to help someone with a task.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-thank-you-note", label: "Write a thank-you note.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-admire", label: "Tell someone what you admire about them.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+  { id: "k-umbrella", label: "Share your umbrella if it's raining.", emoji: "🌸", category: "kindness", allowsPhoto: false },
+
+  // Flower Spotting (photo tasks)
+  { id: "f-photo-daisy", label: "Photograph a daisy.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-yellow", label: "Find a yellow flower.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-never-seen", label: "Find a flower you've never seen before.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-learn-name", label: "Learn the name of one flower.", emoji: "🌼", category: "flower", allowsPhoto: false },
+  { id: "f-unexpected", label: "Photograph a flower growing in an unexpected place.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-three", label: "Find three different flowers.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-bee-flower", label: "Spot a bee visiting a flower.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-butterfly-flower", label: "Spot a butterfly on a flower.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-clover-patch", label: "Find a clover patch.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-wildflowers", label: "Photograph wildflowers.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-five-petals", label: "Find a flower with five petals.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-visit-garden", label: "Visit a garden or park.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-smell-describe", label: "Smell a flower and describe its scent.", emoji: "🌼", category: "flower", allowsPhoto: false },
+  { id: "f-brightest", label: "Find the brightest flower you can.", emoji: "🌼", category: "flower", allowsPhoto: true },
+  { id: "f-favorite-today", label: "Upload your favorite flower of the day.", emoji: "🌼", category: "flower", allowsPhoto: true },
+
+  // Nature Moments
+  { id: "n-outside-15", label: "Spend 15 minutes outside.", emoji: "🌿", category: "nature", allowsPhoto: false },
+  { id: "n-listen-birds", label: "Listen to birds for five minutes.", emoji: "🌿", category: "nature", allowsPhoto: false },
+  { id: "n-clouds", label: "Watch the clouds.", emoji: "🌿", category: "nature", allowsPhoto: true },
+  { id: "n-sunset", label: "Watch the sunset.", emoji: "🌿", category: "nature", allowsPhoto: true },
+  { id: "n-sunrise", label: "Watch the sunrise.", emoji: "🌿", category: "nature", allowsPhoto: true },
+  { id: "n-listen-rain", label: "Listen to the rain.", emoji: "🌿", category: "nature", allowsPhoto: false },
+  { id: "n-tree-bark", label: "Touch the bark of an old tree.", emoji: "🌿", category: "nature", allowsPhoto: false },
+  { id: "n-barefoot", label: "Walk barefoot on grass (if safe).", emoji: "🌿", category: "nature", allowsPhoto: false },
+  { id: "n-interesting-leaf", label: "Find an interesting leaf.", emoji: "🌿", category: "nature", allowsPhoto: true },
+  { id: "n-photo-green", label: "Photograph something green.", emoji: "🌿", category: "nature", allowsPhoto: true },
+  { id: "n-watch-bees", label: "Watch bees for one minute.", emoji: "🌿", category: "nature", allowsPhoto: true },
+  { id: "n-no-phone", label: "Listen without using your phone for ten minutes.", emoji: "🌿", category: "nature", allowsPhoto: false },
+  { id: "n-heart-nature", label: "Find something shaped like a heart in nature.", emoji: "🌿", category: "nature", allowsPhoto: true },
+  { id: "n-leaves-wind", label: "Watch leaves moving in the wind.", emoji: "🌿", category: "nature", allowsPhoto: false },
+  { id: "n-sit-peaceful", label: "Sit somewhere peaceful for ten minutes.", emoji: "🌿", category: "nature", allowsPhoto: false },
+
+  // Joy & Gratitude
+  { id: "j-grateful-three", label: "Write down three things you're grateful for.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-childhood", label: "Think of your happiest childhood memory.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-smile-today", label: "Share something that made you smile today.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-favorite-season", label: "Write about your favorite season.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-favorite-smell", label: "Write about your favorite smell.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-love-home", label: "Write one thing you love about your home.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-inspires", label: "Name someone who inspires you.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-favorite-nature", label: "Think of your favorite place in nature.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-favorite-birthday", label: "Remember your favorite birthday.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-spring-afternoon", label: "Describe your perfect spring afternoon.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-proud", label: "Write one thing you're proud of.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-beautiful-noticed", label: "Reflect on something beautiful you noticed today.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-small-win", label: "Celebrate one small win.", emoji: "💛", category: "joy", allowsPhoto: false },
+  { id: "j-mood-flower", label: "Write down your current mood with one flower that matches it.", emoji: "💛", category: "joy", allowsPhoto: false },
+
+  // Cozy Living
+  { id: "c-tea", label: "Make yourself a cup of tea.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-warm-drink", label: "Enjoy a warm drink without distractions.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-open-window", label: "Open your window and enjoy the fresh air.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-candle", label: "Light a candle (if safe).", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-arrange-vase", label: "Arrange flowers in a vase.", emoji: "🌷", category: "cozy", allowsPhoto: true },
+  { id: "c-water-plant", label: "Water a houseplant.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-relax-ten", label: "Sit somewhere cozy and relax for ten minutes.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-calming-music", label: "Listen to calming music.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-cozy-sweater", label: "Wear your favorite cozy sweater.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-sweet-treat", label: "Bake or enjoy a sweet treat.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-fresh-table", label: "Put fresh flowers on your table.", emoji: "🌷", category: "cozy", allowsPhoto: true },
+  { id: "c-tidy-corner", label: "Tidy one cozy corner of your home.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-rain-window", label: "Watch the rain from a window.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+  { id: "c-breakfast", label: "Enjoy breakfast without looking at a screen.", emoji: "🌷", category: "cozy", allowsPhoto: false },
+
+  // Tiny Adventures
+  { id: "a-new-walk", label: "Visit somewhere you've never walked before.", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-different-route", label: "Take a different route home.", emoji: "🦋", category: "adventure", allowsPhoto: false },
+  { id: "a-colorful-door", label: "Photograph a colorful door.", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-flower-shop", label: "Visit a local flower shop.", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-birds-nest", label: "Find a bird's nest (without disturbing it).", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-farmers-market", label: "Visit a farmers' market.", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-count-butterflies", label: "Count how many butterflies you see.", emoji: "🦋", category: "adventure", allowsPhoto: false },
+  { id: "a-new-tree", label: "Discover a new tree.", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-reminds-clover", label: "Find something that reminds you of Clovermeadow.", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-nearby-garden", label: "Explore a nearby garden.", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-crack-pavement", label: "Find something growing through a crack in the pavement.", emoji: "🦋", category: "adventure", allowsPhoto: true },
+  { id: "a-five-greens", label: "Notice five different shades of green.", emoji: "🦋", category: "adventure", allowsPhoto: false },
+
+  // Community Blooms
+  { id: "cm-brighten", label: "Brighten someone's day.", emoji: "🌻", category: "community", allowsPhoto: false, communityBonus: true },
+  { id: "cm-welcome", label: "Welcome a new villager.", emoji: "🌻", category: "community", allowsPhoto: false, communityBonus: true },
+  { id: "cm-recommend", label: "Share a wholesome recommendation.", emoji: "🌻", category: "community", allowsPhoto: false, communityBonus: true },
+  { id: "cm-celebrate", label: "Celebrate another villager's achievement.", emoji: "🌻", category: "community", allowsPhoto: false, communityBonus: true },
+  { id: "cm-board", label: "Leave an encouraging message on the Community Board.", emoji: "🌻", category: "community", allowsPhoto: false, communityBonus: true },
+  { id: "cm-invite", label: "Invite someone to join a village activity.", emoji: "🌻", category: "community", allowsPhoto: false, communityBonus: true },
+  { id: "cm-share-flower", label: "Share your favorite flower with the community gallery.", emoji: "🌻", category: "community", allowsPhoto: true, communityBonus: true },
+  { id: "cm-photo-beautiful", label: "Post a photo of something beautiful you discovered today.", emoji: "🌻", category: "community", allowsPhoto: true, communityBonus: true },
+  { id: "cm-unique", label: "Tell someone what makes them unique.", emoji: "🌻", category: "community", allowsPhoto: false, communityBonus: true },
+  { id: "cm-three-tasks", label: "Help Clovermeadow bloom by completing three Daily Bloom Tasks.", emoji: "🌻", category: "community", allowsPhoto: false, communityBonus: true },
 ];
 
+/** Deterministic day seed → 5 unique tasks, preferably from different categories. */
 export function dailyTasksForDay(now = new Date()): DailyTask[] {
   const day = Math.floor(now.getTime() / 86_400_000);
+  const categories: DailyCategory[] = [
+    "kindness",
+    "flower",
+    "nature",
+    "joy",
+    "cozy",
+    "adventure",
+    "community",
+  ];
+
+  // Rotate category order by day so the mix feels fresh.
+  const rotated = categories.map(
+    (_, i) => categories[(day + i) % categories.length]
+  );
+
   const picks: DailyTask[] = [];
+  const used = new Set<string>();
+
+  // First pass: one task from five different categories.
   for (let i = 0; i < 5; i++) {
-    const idx = (day * 7 + i * 3) % DAILY_TASK_POOL.length;
+    const cat = rotated[i];
+    const pool = DAILY_TASK_POOL.filter(
+      (t) => t.category === cat && !used.has(t.id)
+    );
+    if (!pool.length) continue;
+    const idx = (day * 11 + i * 5) % pool.length;
+    const task = pool[idx];
+    picks.push(task);
+    used.add(task.id);
+  }
+
+  // Fill if needed with unused tasks from the full pool.
+  let guard = 0;
+  while (picks.length < 5 && guard < DAILY_TASK_POOL.length * 2) {
+    const idx = (day * 13 + guard * 7) % DAILY_TASK_POOL.length;
     const task = DAILY_TASK_POOL[idx];
-    if (!picks.find((p) => p.id === task.id)) picks.push(task);
-    else {
-      const alt = DAILY_TASK_POOL[(idx + 5) % DAILY_TASK_POOL.length];
-      if (!picks.find((p) => p.id === alt.id)) picks.push(alt);
+    if (!used.has(task.id)) {
+      picks.push(task);
+      used.add(task.id);
     }
+    guard += 1;
   }
-  while (picks.length < 5) {
-    picks.push(DAILY_TASK_POOL[picks.length % DAILY_TASK_POOL.length]);
-  }
+
   return picks.slice(0, 5);
 }
 

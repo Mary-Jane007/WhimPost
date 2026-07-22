@@ -5,6 +5,7 @@ import type { UserPublic } from "@/lib/types";
 import type { GardenProgress } from "@/lib/garden";
 import {
   COMMUNITY_MILESTONES,
+  DAILY_CATEGORY_LABELS,
   GARDEN_ART,
   GARDEN_COLLECTIONS,
   GARDEN_TABS,
@@ -39,6 +40,8 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
   const [journalName, setJournalName] = useState("");
   const [journalNote, setJournalNote] = useState("");
   const [journalMood, setJournalMood] = useState("gentle");
+  const [dailyPhotos, setDailyPhotos] = useState<Record<string, string>>({});
+  const [dailyNotes, setDailyNotes] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState(false);
 
   const daily = dailyTasksForDay();
@@ -81,20 +84,24 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
     }
   }
 
-  async function onPhoto(file: File | null) {
+  async function onPhoto(
+    file: File | null,
+    target: "spot" | { dailyId: string }
+  ) {
     if (!file) return;
     setUploading(true);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      // Reuse workshop-style upload via a data URL for simplicity in this garden.
       const reader = new FileReader();
       const dataUrl = await new Promise<string>((resolve, reject) => {
         reader.onload = () => resolve(String(reader.result || ""));
         reader.onerror = () => reject(new Error("Could not read photo"));
         reader.readAsDataURL(file);
       });
-      setSpotPhoto(dataUrl.slice(0, 1_500_000));
+      const clipped = dataUrl.slice(0, 1_500_000);
+      if (target === "spot") setSpotPhoto(clipped);
+      else {
+        setDailyPhotos((prev) => ({ ...prev, [target.dailyId]: clipped }));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Photo upload failed");
     } finally {
@@ -270,33 +277,112 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
           <section className="cm-section">
             <h2>Daily Bloom Tasks</h2>
             <p className="cm-section-lead">
-              Five gentle tasks each day · +{GARDEN_XP.daily} XP and a bloom
-              each.
+              Five fresh tasks each day (refresh every 24 hours). Complete
+              manually or with a photo when asked · +{GARDEN_XP.daily} XP and a
+              bloom each. Community Blooms give the meadow a little extra.
             </p>
             <div className="cm-grid">
               {daily.map((task) => {
                 const key = `${dayKey}:${task.id}`;
                 const done = Boolean(progress.dailyDone[key]);
+                const photo = dailyPhotos[task.id];
+                const note = dailyNotes[task.id] || "";
+                const needsPhoto = task.allowsPhoto && !done;
                 return (
-                  <article key={task.id} className="cm-card">
+                  <article key={task.id} className="cm-card cm-daily-card">
+                    <p className="cm-daily-cat">
+                      {DAILY_CATEGORY_LABELS[task.category]}
+                      {task.communityBonus ? " · Community" : ""}
+                    </p>
                     <h3>
                       <span aria-hidden>{task.emoji}</span> {task.label}
                     </h3>
+                    {!done ? (
+                      <div className="cm-daily-photo">
+                        {needsPhoto ? (
+                          <>
+                            <label className="cm-photo-drop">
+                              <span>
+                                {photo
+                                  ? "Change photo"
+                                  : "Add a photo for this task"}
+                              </span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                disabled={busy || uploading}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0] || null;
+                                  e.target.value = "";
+                                  void onPhoto(file, { dailyId: task.id });
+                                }}
+                              />
+                            </label>
+                            {photo ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={photo}
+                                alt="Task photo preview"
+                                className="cm-photo-preview"
+                              />
+                            ) : null}
+                          </>
+                        ) : null}
+                        <input
+                          type="text"
+                          className="cm-daily-note"
+                          placeholder="Optional note…"
+                          value={note}
+                          disabled={busy}
+                          onChange={(e) =>
+                            setDailyNotes((prev) => ({
+                              ...prev,
+                              [task.id]: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    ) : null}
                     <button
                       type="button"
                       className="btn-primary"
-                      disabled={busy || done}
+                      disabled={
+                        busy ||
+                        done ||
+                        (task.allowsPhoto && !photo) ||
+                        uploading
+                      }
                       onClick={() =>
                         void postAction({
                           type: "completeDaily",
                           taskId: task.id,
                           mood: "gentle",
+                          note: note || undefined,
+                          photoUrl: photo || undefined,
                         }).then((p) => {
-                          if (p) setToast("A flower bloomed in your meadow.");
+                          if (p?.dailyDone[key]) {
+                            setToast(
+                              task.communityBonus
+                                ? "Community meadow brightened — and a flower bloomed."
+                                : "A flower bloomed in your meadow."
+                            );
+                            setDailyPhotos((prev) => {
+                              const next = { ...prev };
+                              delete next[task.id];
+                              return next;
+                            });
+                          } else if (task.allowsPhoto && !photo) {
+                            setError("Add a photo to complete this bloom task.");
+                          }
                         })
                       }
                     >
-                      {done ? "Bloomed today" : "I did this"}
+                      {done
+                        ? "Bloomed today"
+                        : task.allowsPhoto
+                          ? "Bloom with photo"
+                          : "I did this"}
                     </button>
                   </article>
                 );
@@ -370,7 +456,7 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
                   onChange={(e) => {
                     const file = e.target.files?.[0] || null;
                     e.target.value = "";
-                    void onPhoto(file);
+                    void onPhoto(file, "spot");
                   }}
                 />
               </label>
