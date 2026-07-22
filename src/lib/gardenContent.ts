@@ -584,7 +584,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "bananaquit",
     name: "Bananaquit (Suikerdiefje)",
     emoji: "🍌",
-    image: VIMG.hummingbird,
+    image: "/garden/visitors/bananaquit.jpg",
     category: "birds",
     region: "curaçao",
     seasons: ["spring", "summer", "autumn"],
