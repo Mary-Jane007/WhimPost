@@ -75,8 +75,8 @@ const SYSTEM_SENDERS: Partial<Record<VillageId, SystemVillageSender>> = {
     username: "moonmere_moth",
     displayName: "Moonmere",
     email: "system+moonmere@whimpost.local",
-    forestName: "The Moon Dock",
-    bio: "Where dreams become letters.",
+    forestName: "The Observatory",
+    bio: "Some answers only arrive after sunset.",
   },
   bramblewood: {
     id: "system-bramblewood",
