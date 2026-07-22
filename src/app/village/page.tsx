@@ -245,6 +245,13 @@ export default async function VillagePage() {
             </Link>
           </p>
         ) : null}
+        {village.id === "clovermeadow" && user.villageId === "clovermeadow" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/garden" className="btn-primary">
+              Enter The Bloomkeeper&apos;s Garden
+            </Link>
+          </p>
+        ) : null}
       </section>
 
       <section className="village-panel">
