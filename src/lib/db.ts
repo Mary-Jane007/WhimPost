@@ -279,6 +279,26 @@ function migrate(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_garden_petals_prompt
       ON garden_petals(prompt_id, created_at);
 
+    CREATE TABLE IF NOT EXISTS hearth_progress (
+      user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      xp INTEGER NOT NULL DEFAULT 0,
+      badges_json TEXT NOT NULL DEFAULT '[]',
+      rituals_json TEXT NOT NULL DEFAULT '{}',
+      favorite_recipes_json TEXT NOT NULL DEFAULT '{}',
+      kindling_json TEXT NOT NULL DEFAULT '{}',
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS hearth_notes (
+      id TEXT PRIMARY KEY,
+      body TEXT NOT NULL,
+      author_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+      favorite_count INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_hearth_notes_created
+      ON hearth_notes(created_at);
+
     CREATE TABLE IF NOT EXISTS garden_community (
       id TEXT PRIMARY KEY,
       blooms INTEGER NOT NULL DEFAULT 0,
