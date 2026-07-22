@@ -149,10 +149,10 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
           <em>“Every flower begins with a small act of kindness.”</em>
         </p>
         <p className="cm-lead">
-          Legends say the Evergarden only blooms for those who spread warmth
-          wherever they go, {user.displayName}. Complete gentle daily tasks to
-          fill your meadow with flowers, attract woodland creatures, and uncover
-          hidden corners of the garden.
+          Legends say the Bloomkeeper&apos;s Garden only blooms for those who
+          spread warmth wherever they go, {user.displayName}. Complete gentle
+          daily tasks to fill your meadow with flowers, attract woodland
+          creatures, and uncover hidden corners of the garden.
         </p>
         <div className="cm-status">
           <span>
