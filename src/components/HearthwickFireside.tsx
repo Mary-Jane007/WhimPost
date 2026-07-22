@@ -169,14 +169,13 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
       <div className="hw-panel">
         {tab === "overview" && (
           <section className="hw-section">
-            <div className="hw-fireplace" aria-hidden>
-              <div className="hw-fire">
-                <span className="hw-flame f1" />
-                <span className="hw-flame f2" />
-                <span className="hw-flame f3" />
-              </div>
+            <div className="hw-fireplace">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={HEARTH_ART.embers} alt="" className="hw-fire-glow" />
+              <img
+                src={HEARTH_ART.fireplace}
+                alt="A watercolor cottage fireplace with warm amber light"
+                className="hw-fireplace-art"
+              />
             </div>
             <h2>Welcome to the Fireside</h2>
             <p className="hw-section-lead">
