@@ -657,7 +657,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "scarlet-macaw",
     name: "Scarlet Macaw",
     emoji: "🦜",
-    image: VIMG.bird,
+    image: "/garden/visitors/scarlet-macaw.jpg",
     category: "birds",
     region: "suriname",
     seasons: ["spring", "summer", "autumn"],
