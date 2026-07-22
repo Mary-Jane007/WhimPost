@@ -7643,12 +7643,12 @@ button.linkish:hover {
 .hw-section h2 {
   margin: 0 0 0.35rem;
   font-family: var(--font-display), Georgia, serif;
-  color: #3a2618;
+  color: #c4a484;
 }
 
 .hw-section-lead {
   margin: 0 0 1rem;
-  color: #4a3424;
+  color: #c4a484;
   max-width: 42rem;
   line-height: 1.5;
 }
