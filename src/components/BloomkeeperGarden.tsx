@@ -5,9 +5,11 @@ import type { UserPublic } from "@/lib/types";
 import type { GardenProgress } from "@/lib/garden";
 import {
   COMMUNITY_MILESTONES,
+  GARDEN_ART,
   GARDEN_COLLECTIONS,
   GARDEN_TABS,
   GARDEN_XP,
+  MEADOW_FLOWER_IMAGES,
   SPOT_FLOWERS,
   WILD_VISITORS,
   WISH_GESTURES,
@@ -110,9 +112,18 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
         <span className="cm-petal p3" />
         <span className="cm-seed s1" />
         <span className="cm-seed s2" />
-        <span className="cm-butterfly b1" />
-        <span className="cm-butterfly b2" />
-        <span className="cm-bee" />
+        <span className="cm-butterfly b1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/garden/visitors/butterfly.jpg" alt="" />
+        </span>
+        <span className="cm-butterfly b2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/garden/visitors/butterfly.jpg" alt="" />
+        </span>
+        <span className="cm-bee">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/garden/visitors/bee.jpg" alt="" />
+        </span>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/stickers/villages/clovermeadow/pack/butterfly-silk.png"
@@ -135,10 +146,10 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
 
       {bloomBurst ? (
         <div className="cm-bloom-burst" aria-hidden>
-          <span>🌸</span>
-          <span>🌼</span>
-          <span>🌷</span>
-          <span>💛</span>
+          {MEADOW_FLOWER_IMAGES.slice(0, 4).map((src) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={src} src={src} alt="" />
+          ))}
         </div>
       ) : null}
 
@@ -193,35 +204,51 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
               Every completed task blooms a new flower — nothing here can be
               bought.
             </p>
-            <div className="cm-meadow" aria-label="Your magical meadow">
+            <div
+              className="cm-meadow"
+              aria-label="Your magical meadow"
+              style={{ backgroundImage: `url(${GARDEN_ART.meadowBg})` }}
+            >
+              <div className="cm-meadow-shade" />
               <div className="cm-path" />
-              <div className="cm-birdhouse" title="Tiny birdhouse">
-                🏠
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={GARDEN_ART.birdhouse}
+                alt=""
+                className="cm-birdhouse-img"
+                title="Tiny birdhouse"
+              />
               {Array.from({ length: meadowFlowers }).map((_, i) => (
-                <span
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   key={i}
+                  src={MEADOW_FLOWER_IMAGES[i % MEADOW_FLOWER_IMAGES.length]}
+                  alt=""
                   className={`cm-meadow-flower f${(i % 6) + 1}`}
                   style={{
                     left: `${8 + ((i * 17) % 84)}%`,
-                    bottom: `${10 + ((i * 11) % 55)}%`,
+                    bottom: `${8 + ((i * 11) % 52)}%`,
                     animationDelay: `${(i % 7) * 0.2}s`,
                   }}
-                >
-                  {["🌼", "🌸", "🌷", "🌻", "💜", "🌿"][i % 6]}
-                </span>
+                />
               ))}
             </div>
             <div className="cm-starter">
-              <article className="cm-card">
+              <article className="cm-card cm-starter-card">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/garden/flowers/daisy.jpg" alt="" />
                 <h3>Daisy patch</h3>
                 <p>Your first soft circle of white and gold.</p>
               </article>
-              <article className="cm-card">
+              <article className="cm-card cm-starter-card">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={GARDEN_ART.meadowBg} alt="" />
                 <h3>Dirt path</h3>
                 <p>A gentle walkway waiting for more footsteps of kindness.</p>
               </article>
-              <article className="cm-card">
+              <article className="cm-card cm-starter-card">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={GARDEN_ART.birdhouse} alt="" />
                 <h3>Tiny birdhouse</h3>
                 <p>Ready for the first wild visitor.</p>
               </article>
@@ -317,7 +344,7 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
                       value={f.id}
                       disabled={Boolean(progress.spotted[f.id])}
                     >
-                      {f.emoji} {f.name}
+                      {f.name}
                       {progress.spotted[f.id] ? " · found" : ""}
                     </option>
                   ))}
@@ -325,6 +352,8 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
               </label>
               {SPOT_FLOWERS.filter((f) => f.id === spotId).map((f) => (
                 <div key={f.id} className="cm-flower-facts">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={f.image} alt={f.name} className="cm-flower-plate" />
                   <p>{f.facts}</p>
                   <p className="cm-meta">
                     Season · {f.season} · Pollinators · {f.pollinators}
@@ -368,18 +397,14 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
             </form>
             <div className="cm-grid">
               {SPOT_FLOWERS.filter((f) => progress.spotted[f.id]).map((f) => (
-                <article key={f.id} className="cm-card">
-                  <h3>
-                    {f.emoji} {f.name}
-                  </h3>
-                  {progress.spotted[f.id]?.photoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={progress.spotted[f.id].photoUrl}
-                      alt={f.name}
-                      className="cm-photo-preview"
-                    />
-                  ) : null}
+                <article key={f.id} className="cm-card cm-spot-card">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={progress.spotted[f.id]?.photoUrl || f.image}
+                    alt={f.name}
+                    className="cm-flower-plate"
+                  />
+                  <h3>{f.name}</h3>
                   <p className="cm-meta">{f.symbolism}</p>
                 </article>
               ))}
@@ -504,11 +529,11 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
                 return (
                   <article
                     key={v.id}
-                    className={here ? "cm-card visitor-here" : "cm-card"}
+                    className={here ? "cm-card visitor-here cm-visitor-card" : "cm-card cm-visitor-card"}
                   >
-                    <h3>
-                      <span aria-hidden>{v.emoji}</span> {v.name}
-                    </h3>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={v.image} alt={v.name} className="cm-visitor-img" />
+                    <h3>{v.name}</h3>
                     <p>{v.prefers}</p>
                     <p className="cm-meta">
                       Needs {v.needBlooms} blooms · you have {progress.blooms}
@@ -544,8 +569,13 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
               Hang one wish each week. Others leave quiet gestures — Bloom,
               Warmth, Hope, or Light — not comments.
             </p>
-            <div className="cm-wish-tree" aria-hidden>
-              🌳
+            <div className="cm-wish-tree-wrap">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={GARDEN_ART.wishTree}
+                alt=""
+                className="cm-wish-tree-img"
+              />
             </div>
             <form
               className="cm-card cm-form"
@@ -725,7 +755,15 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
                     </header>
                     <h3>{entry.activityName}</h3>
                     {entry.flower ? (
-                      <p className="cm-flower-tag">🌸 {entry.flower}</p>
+                      <p className="cm-flower-tag">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src="/garden/flowers/daisy.jpg"
+                          alt=""
+                          className="cm-flower-chip"
+                        />{" "}
+                        {entry.flower}
+                      </p>
                     ) : null}
                     {entry.photoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
