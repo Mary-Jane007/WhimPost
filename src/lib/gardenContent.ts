@@ -693,7 +693,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "blue-gray-tanager",
     name: "Blue-gray Tanager",
     emoji: "🐦",
-    image: VIMG.songbird,
+    image: "/garden/visitors/blue-gray-tanager.jpg",
     category: "birds",
     region: "suriname",
     seasons: ["spring", "summer", "autumn"],
