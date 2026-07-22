@@ -620,7 +620,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "tropical-mockingbird",
     name: "Tropical Mockingbird",
     emoji: "🐦",
-    image: VIMG.songbird,
+    image: "/garden/visitors/tropical-mockingbird.jpg",
     category: "birds",
     region: "curaçao",
     seasons: ["spring", "summer", "autumn"],
