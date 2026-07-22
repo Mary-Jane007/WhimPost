@@ -481,7 +481,7 @@ export const COZY_RECIPES: CozyRecipe[] = [
     description: "Deep cocoa with a soft foam crown.",
     ingredients: ["milk", "cocoa", "sugar", "vanilla", "pinch of salt"],
     herbalPairing: "Cinnamon or mint",
-    image: "/stickers/collectibles/hearthwick/hearth-kettles.png",
+    image: "/hearth/recipes/hot-chocolate.jpg",
   },
   {
     id: "apple-cider",
