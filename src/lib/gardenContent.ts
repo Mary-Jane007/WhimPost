@@ -729,7 +729,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "european-blackbird",
     name: "European Blackbird",
     emoji: "🐦",
-    image: VIMG.bird,
+    image: "/garden/visitors/european-blackbird.jpg",
     category: "birds",
     region: "netherlands",
     seasons: ["spring", "summer", "autumn"],
