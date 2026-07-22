@@ -632,7 +632,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "caribbean-elaenia",
     name: "Caribbean Elaenia",
     emoji: "🐦",
-    image: VIMG.songbird,
+    image: "/garden/visitors/caribbean-elaenia.jpg",
     category: "birds",
     region: "curaçao",
     seasons: ["spring", "summer"],
