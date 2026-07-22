@@ -753,7 +753,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "barn-swallow",
     name: "Barn Swallow",
     emoji: "🐦",
-    image: VIMG.songbird,
+    image: "/garden/visitors/barn-swallow.jpg",
     category: "birds",
     region: "netherlands",
     seasons: ["spring", "summer"],
