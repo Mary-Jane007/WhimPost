@@ -770,7 +770,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["worsted yarn", "needles 5mm", "button"],
     size: "Fits most mugs",
     tips: "Knit a flat rectangle and seam with a button loop.",
-    image: "/stickers/collectibles/hearthwick/hearth-teacups.png",
+    image: "/hearth/knitting/mug-cozy.jpg",
   },
   {
     id: "dishcloth",
@@ -781,7 +781,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["cotton yarn", "needles 4.5mm"],
     size: "About 20×20 cm",
     tips: "Garter stitch forgives everything — perfect first project.",
-    image: "/stickers/villages/hearthwick/wooden-crate.png",
+    image: "/hearth/knitting/dishcloth.jpg",
   },
   {
     id: "bookmark",
@@ -792,7 +792,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["leftover yarn", "needles 3.5mm"],
     size: "3×20 cm",
     tips: "Add a tiny tassel for cottage charm.",
-    image: "/stickers/villages/hearthwick/vintage-books.png",
+    image: "/hearth/knitting/bookmark.jpg",
   },
   {
     id: "scarf",
@@ -803,7 +803,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["soft wool", "needles 6mm"],
     size: "20×150 cm",
     tips: "Choose a forgiving stitch like seed or garter.",
-    image: "/stickers/collectibles/hearthwick/hearth-blankets.png",
+    image: "/hearth/knitting/scarf.jpg",
   },
   {
     id: "beanie",
@@ -814,7 +814,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["worsted yarn", "circular needles", "stitch marker"],
     size: "Adult medium",
     tips: "Try it on as you decrease — every head is different.",
-    image: "/stickers/villages/hearthwick/hedgehog.png",
+    image: "/hearth/knitting/beanie.jpg",
   },
   {
     id: "mittens",
@@ -825,7 +825,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["wool yarn", "DPNs or magic loop"],
     size: "Adult pair",
     tips: "Make a gauge swatch — mittens hate surprises.",
-    image: "/stickers/collectibles/hearthwick/hearth-blankets.png",
+    image: "/hearth/knitting/mittens.jpg",
   },
   {
     id: "socks",
@@ -836,7 +836,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["sock yarn", "2.5mm needles"],
     size: "Custom foot length",
     tips: "Master the heel flap once — then it becomes meditation.",
-    image: "/stickers/villages/hearthwick/paintbrush.png",
+    image: "/hearth/knitting/socks.jpg",
   },
   {
     id: "shawl",
@@ -847,7 +847,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["fingering yarn", "circular needles"],
     size: "Wraps the shoulders",
     tips: "Place markers every lace repeat to stay oriented.",
-    image: "/stickers/villages/hearthwick/lavender-bouquet.png",
+    image: "/hearth/knitting/shawl.jpg",
   },
   {
     id: "sweater",
@@ -858,7 +858,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["worsted yarn", "needles per pattern", "stitch holders"],
     size: "Choose your ease",
     tips: "Measure a favorite sweater and match those numbers.",
-    image: "/stickers/collectibles/hearthwick/hearth-blankets.png",
+    image: "/hearth/knitting/sweater.jpg",
   },
   {
     id: "blanket",
@@ -869,7 +869,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["bulky or worsted yarn", "large needles or hook"],
     size: "Lap or full throw",
     tips: "Work in strips if the weight on your lap gets heavy.",
-    image: "/stickers/collectibles/hearthwick/hearth-blankets.png",
+    image: "/hearth/knitting/blanket.jpg",
   },
   {
     id: "cardigan",
@@ -880,7 +880,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["yarn per pattern", "buttons", "needles"],
     size: "Custom fit",
     tips: "Block pieces before seaming for a polished cottage finish.",
-    image: "/stickers/villages/hearthwick/hedgehog.png",
+    image: "/hearth/knitting/cardigan.jpg",
   },
   {
     id: "plush-hedgehog",
@@ -891,7 +891,7 @@ export const KNIT_PROJECTS: KnitProject[] = [
     materials: ["brown & cream yarn", "safety eyes", "stuffing"],
     size: "Palm-sized friend",
     tips: "Hearthwick's favorite — stitch slowly and stuff firmly.",
-    image: "/villages/hearthwick/mascot.png",
+    image: "/hearth/knitting/plush-hedgehog.jpg",
   },
 ];
 
