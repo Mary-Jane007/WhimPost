@@ -5,11 +5,15 @@ import {
   GARDEN_COLLECTIONS,
   GARDEN_XP,
   KINDNESS_MISSIONS,
+  NATURE_JOURNAL_REWARDS,
   SPOT_FLOWERS,
-  WILD_VISITORS,
   bloomFlowerForKey,
+  currentGardenSeason,
   dailyTasksForDay,
+  evaluateWildVisitors,
   featuredJoySeed,
+  natureJournalProgress,
+  syncBloomDecorations,
   titleForGardenXp,
   weeklyKindness,
 } from "@/lib/gardenContent";
@@ -221,7 +225,87 @@ function addBadge(badges: string[], badge: string) {
   return badges;
 }
 
+function persistAttractors(
+  userId: string,
+  input: {
+    badges: string[];
+    decorations: string[];
+    visitors: Record<string, boolean>;
+  }
+) {
+  const db = getDb();
+  db.prepare(
+    `UPDATE garden_progress SET
+      badges_json = ?,
+      decorations_json = ?,
+      visitors_json = ?,
+      updated_at = datetime('now')
+     WHERE user_id = ?`
+  ).run(
+    JSON.stringify(input.badges),
+    JSON.stringify(input.decorations),
+    JSON.stringify(input.visitors),
+    userId
+  );
+}
+
+function syncAttractorsForUser(userId: string) {
+  const row = readRow(userId);
+  const community = readCommunity();
+  let badges = parseJson<string[]>(row.badges_json, []);
+  let decorations = parseJson<string[]>(row.decorations_json, []);
+  const visitors = parseJson<Record<string, boolean>>(row.visitors_json, {});
+  const spotted = parseJson<Record<string, unknown>>(row.spotted_json, {});
+  const collections = parseJson<Record<string, number>>(
+    row.collections_json,
+    {}
+  );
+  const blooms = Number(row.blooms) || 1;
+
+  decorations = syncBloomDecorations(blooms, decorations);
+  const arrived = evaluateWildVisitors({
+    blooms,
+    decorations,
+    spotted,
+    collections,
+    communityBlooms: Number(community.blooms) || 0,
+    communityKindness: Number(community.kindness) || 0,
+    season: currentGardenSeason(),
+  });
+  let changed = false;
+  for (const [id, on] of Object.entries(arrived)) {
+    if (on && !visitors[id]) {
+      visitors[id] = true;
+      changed = true;
+    }
+  }
+  const beforeDeco = parseJson<string[]>(row.decorations_json, []);
+  if (decorations.length !== beforeDeco.length) changed = true;
+
+  const journal = natureJournalProgress(visitors);
+  if (journal.complete) {
+    if (!decorations.includes(NATURE_JOURNAL_REWARDS.decoration)) {
+      decorations = [...decorations, NATURE_JOURNAL_REWARDS.decoration];
+      changed = true;
+    }
+    if (!decorations.includes(NATURE_JOURNAL_REWARDS.lookout)) {
+      decorations = [...decorations, NATURE_JOURNAL_REWARDS.lookout];
+      changed = true;
+    }
+    const beforeBadges = badges.length;
+    badges = addBadge(badges, NATURE_JOURNAL_REWARDS.badge);
+    if (badges.length !== beforeBadges) changed = true;
+  }
+
+  if (changed) {
+    persistAttractors(userId, { badges, decorations, visitors });
+  }
+
+  return { badges, decorations, visitors };
+}
+
 export function getGardenProgress(userId: string): GardenProgress {
+  const synced = syncAttractorsForUser(userId);
   const row = readRow(userId);
   const community = readCommunity();
   const daily = dailyTasksForDay();
@@ -231,14 +315,14 @@ export function getGardenProgress(userId: string): GardenProgress {
   return {
     xp: Number(row.xp) || 0,
     title: titleForGardenXp(Number(row.xp) || 0),
-    badges: parseJson(row.badges_json, []),
-    decorations: parseJson(row.decorations_json, []),
+    badges: synced.badges,
+    decorations: synced.decorations,
     blooms: Number(row.blooms) || 1,
     dailyDone: parseJson(row.daily_json, {}),
     spotted: parseJson(row.spotted_json, {}),
     kindnessDone: parseJson(row.kindness_json, {}),
     rareFlowers: parseJson(row.rare_json, []),
-    visitors: parseJson(row.visitors_json, {}),
+    visitors: synced.visitors,
     collections: parseJson(row.collections_json, {}),
     journal: listJournal(userId),
     petals: listPetals(seed.id),
@@ -310,8 +394,29 @@ export function applyGardenAction(
   };
 
   const refreshVisitors = () => {
-    for (const v of WILD_VISITORS) {
-      if (blooms >= v.needBlooms) visitors[v.id] = true;
+    decorations = syncBloomDecorations(blooms, decorations);
+    const community = readCommunity();
+    const arrived = evaluateWildVisitors({
+      blooms,
+      decorations,
+      spotted,
+      collections,
+      communityBlooms: Number(community.blooms) || 0,
+      communityKindness: Number(community.kindness) || 0,
+      season: currentGardenSeason(),
+    });
+    for (const [id, on] of Object.entries(arrived)) {
+      if (on) visitors[id] = true;
+    }
+    const journal = natureJournalProgress(visitors);
+    if (journal.complete) {
+      if (!decorations.includes(NATURE_JOURNAL_REWARDS.decoration)) {
+        decorations = [...decorations, NATURE_JOURNAL_REWARDS.decoration];
+      }
+      if (!decorations.includes(NATURE_JOURNAL_REWARDS.lookout)) {
+        decorations = [...decorations, NATURE_JOURNAL_REWARDS.lookout];
+      }
+      badges = addBadge(badges, NATURE_JOURNAL_REWARDS.badge);
     }
   };
 
