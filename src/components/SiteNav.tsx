@@ -22,6 +22,9 @@ export function SiteNav({ user }: { user: UserPublic | null }) {
     ...(user?.villageId === "hearthwick"
       ? [{ href: "/fireside", label: "Fireside" }]
       : []),
+    ...(user?.villageId === "moonmere"
+      ? [{ href: "/observatory", label: "Observatory" }]
+      : []),
     { href: "/tv-corner", label: "TV Corner" },
     { href: "/inbox", label: "Inbox" },
     { href: "/sent", label: "Sent" },

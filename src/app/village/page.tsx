@@ -259,6 +259,13 @@ export default async function VillagePage() {
             </Link>
           </p>
         ) : null}
+        {village.id === "moonmere" && user.villageId === "moonmere" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/observatory" className="btn-primary">
+              Enter The Observatory
+            </Link>
+          </p>
+        ) : null}
       </section>
 
       <section className="village-panel">
