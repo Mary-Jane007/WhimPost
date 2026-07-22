@@ -7,16 +7,24 @@ import {
   COMMUNITY_MILESTONES,
   DAILY_CATEGORY_LABELS,
   GARDEN_ART,
+  GARDEN_ATTRACTORS,
   GARDEN_COLLECTIONS,
   GARDEN_TABS,
   GARDEN_XP,
   MEADOW_FLOWER_IMAGES,
+  NATURE_JOURNAL_REWARDS,
   SPOT_FLOWERS,
+  VISITOR_CATEGORY_LABELS,
+  VISITOR_REGION_LABELS,
   WILD_VISITORS,
+  currentGardenSeason,
   dailyTasksForDay,
   featuredJoySeed,
+  natureJournalProgress,
+  unlockedAttractorIds,
   weeklyKindness,
   type GardenTabId,
+  type VisitorCategory,
 } from "@/lib/gardenContent";
 
 type Props = {
@@ -46,6 +54,22 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
   const kindness = weeklyKindness();
   const seed = featuredJoySeed();
   const dayKey = Math.floor(Date.now() / 86_400_000);
+  const season = currentGardenSeason();
+  const journalProg = natureJournalProgress(progress.visitors);
+  const attractorsOn = unlockedAttractorIds({
+    blooms: progress.blooms,
+    decorations: progress.decorations,
+    spotted: progress.spotted,
+    collections: progress.collections,
+    communityBlooms: progress.communityBlooms,
+    communityKindness: progress.communityKindness,
+    season,
+  });
+  const visitorCategories = Object.keys(
+    VISITOR_CATEGORY_LABELS
+  ) as VisitorCategory[];
+  const attractorLabel = (id: string) =>
+    GARDEN_ATTRACTORS.find((a) => a.id === id)?.label || id;
 
   useEffect(() => {
     if (!toast) return;
@@ -604,31 +628,132 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
           <section className="cm-section">
             <h2>Wild Visitors</h2>
             <p className="cm-section-lead">
-              As flowers bloom, animals begin visiting. Each species prefers
-              different blooms.
+              As your garden blooms, wildlife from Curaçao, Suriname, and the
+              Netherlands begins to visit. Favorite plants, decorations, and the
+              current season ({season}) decide who arrives.
             </p>
-            <div className="cm-grid">
-              {WILD_VISITORS.map((v) => {
-                const here = Boolean(progress.visitors[v.id]);
-                return (
-                  <article
-                    key={v.id}
-                    className={here ? "cm-card visitor-here cm-visitor-card" : "cm-card cm-visitor-card"}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={v.image} alt={v.name} className="cm-visitor-img" />
-                    <h3>{v.name}</h3>
-                    <p>{v.prefers}</p>
-                    <p className="cm-meta">
-                      Needs {v.needBlooms} blooms · you have {progress.blooms}
-                    </p>
-                    <p className={here ? "cm-done" : "muted"}>
-                      {here ? "Visiting your garden" : "Not yet arrived"}
-                    </p>
-                  </article>
-                );
-              })}
+
+            <article className="cm-card cm-nature-journal">
+              <h3>Nature Journal</h3>
+              <p>
+                {journalProg.found}/{journalProg.total} daytime visitors
+                discovered
+                {journalProg.nightFound > 0
+                  ? ` · ${journalProg.nightFound}/${journalProg.nightTotal} night visitors`
+                  : ""}
+              </p>
+              <div className="cm-journal-bar" aria-hidden>
+                <span
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      (journalProg.found / Math.max(1, journalProg.total)) * 100
+                    )}%`,
+                  }}
+                />
+              </div>
+              <p className={journalProg.complete ? "cm-done" : "cm-meta"}>
+                {journalProg.complete
+                  ? `Complete · unlocked ${NATURE_JOURNAL_REWARDS.decoration} & ${NATURE_JOURNAL_REWARDS.lookout}`
+                  : "Discover every daytime visitor to unlock special garden decorations."}
+              </p>
+            </article>
+
+            <div className="cm-attraction-guide">
+              <h3>Attraction system</h3>
+              <p className="cm-meta">
+                Grow the right plants and decorations — sunflowers for bees,
+                hibiscus for hummingbirds, lavender for butterflies, berry
+                bushes for robins and tanagers, native trees for parakeets and
+                toucans, ponds for frogs and dragonflies, birdhouses for tits
+                and bananaquits, wildflower meadows for butterflies and
+                ladybugs.
+              </p>
+              <ul className="cm-attractor-chips">
+                {GARDEN_ATTRACTORS.map((a) => {
+                  const on = attractorsOn.has(a.id);
+                  return (
+                    <li key={a.id} className={on ? "on" : ""}>
+                      <span aria-hidden>{a.emoji}</span> {a.label}
+                      <span className="cm-meta">
+                        {on ? " · active" : ` · ${a.hint}`}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
+
+            {visitorCategories.map((cat) => {
+              const meta = VISITOR_CATEGORY_LABELS[cat];
+              const list = WILD_VISITORS.filter((v) => v.category === cat);
+              return (
+                <div key={cat} className="cm-visitor-group">
+                  <h3>
+                    <span aria-hidden>{meta.emoji}</span> {meta.label}
+                  </h3>
+                  {cat === "night" ? (
+                    <p className="cm-meta">
+                      Appear only after special seasonal or community events —
+                      keep a moonlit garden ready.
+                    </p>
+                  ) : null}
+                  <div className="cm-grid">
+                    {list.map((v) => {
+                      const here = Boolean(progress.visitors[v.id]);
+                      const inSeason = v.seasons.includes(season);
+                      return (
+                        <article
+                          key={v.id}
+                          className={
+                            here
+                              ? "cm-card visitor-here cm-visitor-card"
+                              : "cm-card cm-visitor-card"
+                          }
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={v.image}
+                            alt={v.name}
+                            className="cm-visitor-img"
+                          />
+                          <h3>
+                            <span aria-hidden>{v.emoji}</span> {v.name}
+                          </h3>
+                          <p className="cm-meta">
+                            {VISITOR_REGION_LABELS[v.region]}
+                            {v.note ? ` · ${v.note}` : ""}
+                          </p>
+                          <p>
+                            Loves{" "}
+                            {v.favorites.map(attractorLabel).join(", ")}
+                          </p>
+                          <p className="cm-meta">
+                            Season · {v.seasons.join(", ")}
+                            {!inSeason ? " · resting this season" : ""}
+                          </p>
+                          <p className="cm-meta">
+                            Needs {v.needBlooms} blooms · you have{" "}
+                            {progress.blooms}
+                            {v.rarity === "rare" || v.rarity === "night"
+                              ? ` · ${v.rarity}`
+                              : ""}
+                          </p>
+                          <p className={here ? "cm-done" : "muted"}>
+                            {here
+                              ? "Visiting your garden"
+                              : inSeason
+                                ? "Not yet arrived"
+                                : "Out of season"}
+                          </p>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
             <div className="cm-collections">
               <h3>Flower Collections</h3>
               <ul>

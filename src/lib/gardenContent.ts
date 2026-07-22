@@ -422,26 +422,893 @@ export function featuredJoySeed(now = new Date()) {
   return JOY_SEEDS[week % JOY_SEEDS.length];
 }
 
+export type GardenSeason = "spring" | "summer" | "autumn" | "winter";
+
+export type VisitorCategory =
+  | "birds"
+  | "butterflies"
+  | "pollinators"
+  | "gardenFriends"
+  | "mammals"
+  | "tiny"
+  | "night";
+
+export type VisitorRegion =
+  | "curaçao"
+  | "suriname"
+  | "netherlands"
+  | "shared";
+
+export type VisitorRarity = "common" | "uncommon" | "rare" | "night";
+
+export const VISITOR_CATEGORY_LABELS: Record<
+  VisitorCategory,
+  { label: string; emoji: string }
+> = {
+  birds: { label: "Birds", emoji: "🐦" },
+  butterflies: { label: "Butterflies", emoji: "🦋" },
+  pollinators: { label: "Helpful Pollinators", emoji: "🐝" },
+  gardenFriends: { label: "Garden Friends", emoji: "🦎" },
+  mammals: { label: "Small Mammals", emoji: "🐇" },
+  tiny: { label: "Tiny Visitors", emoji: "🐞" },
+  night: { label: "Rare Night Visitors", emoji: "🌙" },
+};
+
+export const VISITOR_REGION_LABELS: Record<VisitorRegion, string> = {
+  curaçao: "Curaçao",
+  suriname: "Suriname",
+  netherlands: "Netherlands",
+  shared: "Shared skies",
+};
+
+const VIMG = {
+  bird: "/garden/visitors/robin.jpg",
+  songbird: "/garden/visitors/bluebird.jpg",
+  hummingbird: "/garden/visitors/hummingbird.jpg",
+  butterfly: "/garden/visitors/butterfly.jpg",
+  bee: "/garden/visitors/bee.jpg",
+  ladybug: "/garden/visitors/ladybug.jpg",
+  hedgehog: "/garden/visitors/hedgehog.jpg",
+  rabbit: "/garden/visitors/rabbit.jpg",
+  fox: "/garden/visitors/fox.jpg",
+} as const;
+
+/** Plants & decorations that draw wildlife into the meadow. */
+export type GardenAttractor = {
+  id: string;
+  label: string;
+  emoji: string;
+  hint: string;
+};
+
+export const GARDEN_ATTRACTORS: GardenAttractor[] = [
+  {
+    id: "sunflowers",
+    label: "Sunflowers",
+    emoji: "🌻",
+    hint: "Spot a sunflower or unlock Summer Blooms.",
+  },
+  {
+    id: "hibiscus",
+    label: "Hibiscus",
+    emoji: "🌺",
+    hint: "Spot a hibiscus blossom.",
+  },
+  {
+    id: "lavender",
+    label: "Lavender",
+    emoji: "🪻",
+    hint: "Spot lavender or unlock the Herb spiral.",
+  },
+  {
+    id: "berry-bushes",
+    label: "Berry bushes",
+    emoji: "🍓",
+    hint: "Unlocks around 12 blooms.",
+  },
+  {
+    id: "native-trees",
+    label: "Large native trees",
+    emoji: "🌳",
+    hint: "Unlocks around 22 blooms.",
+  },
+  {
+    id: "pond",
+    label: "Small pond",
+    emoji: "🪨",
+    hint: "Unlocks around 18 blooms.",
+  },
+  {
+    id: "birdhouse",
+    label: "Birdhouses",
+    emoji: "🪺",
+    hint: "Unlocks around 8 blooms.",
+  },
+  {
+    id: "wildflower-meadow",
+    label: "Wildflower meadows",
+    emoji: "🌼",
+    hint: "Complete the Wildflowers collection.",
+  },
+  {
+    id: "undergrowth",
+    label: "Quiet undergrowth",
+    emoji: "🌿",
+    hint: "Unlocks around 28 blooms.",
+  },
+  {
+    id: "night-garden",
+    label: "Moonlit garden",
+    emoji: "🌙",
+    hint: "Unlock Night Flowers or Community Meadow milestones.",
+  },
+];
+
+/** Decorations granted purely by bloom count (attraction infrastructure). */
+export const BLOOM_ATTRACTOR_DECORATIONS: Array<{
+  needBlooms: number;
+  decoration: string;
+  attractorId: string;
+}> = [
+  { needBlooms: 8, decoration: "Birdhouse", attractorId: "birdhouse" },
+  { needBlooms: 12, decoration: "Berry bushes", attractorId: "berry-bushes" },
+  { needBlooms: 15, decoration: "Wildflower meadow", attractorId: "wildflower-meadow" },
+  { needBlooms: 18, decoration: "Garden pond", attractorId: "pond" },
+  { needBlooms: 22, decoration: "Native shade trees", attractorId: "native-trees" },
+  { needBlooms: 28, decoration: "Quiet undergrowth", attractorId: "undergrowth" },
+];
+
+export const NATURE_JOURNAL_REWARDS = {
+  decoration: "Nature Journal alcove",
+  lookout: "Wildlife lookout",
+  badge: "Nature Journal Complete",
+} as const;
+
 export type WildVisitor = {
   id: string;
   name: string;
   emoji: string;
   image: string;
-  prefers: string;
+  category: VisitorCategory;
+  region: VisitorRegion;
+  seasons: GardenSeason[];
+  favorites: string[];
   needBlooms: number;
+  rarity: VisitorRarity;
+  note?: string;
 };
 
 export const WILD_VISITORS: WildVisitor[] = [
-  { id: "butterflies", name: "Butterflies", emoji: "🦋", image: "/garden/visitors/butterfly.jpg", prefers: "Wildflowers & nectar", needBlooms: 3 },
-  { id: "bees", name: "Bees", emoji: "🐝", image: "/garden/visitors/bee.jpg", prefers: "Lavender & clover", needBlooms: 5 },
-  { id: "ladybugs", name: "Ladybugs", emoji: "🐞", image: "/garden/visitors/ladybug.jpg", prefers: "Sunny leaf edges", needBlooms: 4 },
-  { id: "hedgehogs", name: "Hedgehogs", emoji: "🦔", image: "/garden/visitors/hedgehog.jpg", prefers: "Quiet undergrowth", needBlooms: 8 },
-  { id: "rabbits", name: "Rabbits", emoji: "🐇", image: "/garden/visitors/rabbit.jpg", prefers: "Daisy patches", needBlooms: 6 },
-  { id: "bluebirds", name: "Bluebirds", emoji: "🐦", image: "/garden/visitors/bluebird.jpg", prefers: "Open meadows", needBlooms: 7 },
-  { id: "robins", name: "Robins", emoji: "🧡", image: "/garden/visitors/robin.jpg", prefers: "Morning paths", needBlooms: 7 },
-  { id: "foxes", name: "Foxes", emoji: "🦊", image: "/garden/visitors/fox.jpg", prefers: "Twilight edges", needBlooms: 12 },
-  { id: "hummingbirds", name: "Hummingbirds", emoji: "✨", image: "/garden/visitors/hummingbird.jpg", prefers: "Hibiscus & bright tubes", needBlooms: 10 },
+  // Birds
+  {
+    id: "bananaquit",
+    name: "Bananaquit (Suikerdiefje)",
+    emoji: "🍌",
+    image: VIMG.hummingbird,
+    category: "birds",
+    region: "curaçao",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["hibiscus", "birdhouse", "native-trees"],
+    needBlooms: 6,
+    rarity: "common",
+  },
+  {
+    id: "troupial",
+    name: "Troupial (Trupial)",
+    emoji: "🧡",
+    image: VIMG.bird,
+    category: "birds",
+    region: "curaçao",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["native-trees", "berry-bushes"],
+    needBlooms: 10,
+    rarity: "uncommon",
+  },
+  {
+    id: "brown-throated-parakeet",
+    name: "Brown-throated Parakeet",
+    emoji: "🦜",
+    image: VIMG.songbird,
+    category: "birds",
+    region: "curaçao",
+    seasons: ["spring", "summer", "autumn", "winter"],
+    favorites: ["native-trees"],
+    needBlooms: 14,
+    rarity: "uncommon",
+  },
+  {
+    id: "tropical-mockingbird",
+    name: "Tropical Mockingbird",
+    emoji: "🐦",
+    image: VIMG.songbird,
+    category: "birds",
+    region: "curaçao",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["berry-bushes", "birdhouse"],
+    needBlooms: 8,
+    rarity: "common",
+  },
+  {
+    id: "caribbean-elaenia",
+    name: "Caribbean Elaenia",
+    emoji: "🐦",
+    image: VIMG.songbird,
+    category: "birds",
+    region: "curaçao",
+    seasons: ["spring", "summer"],
+    favorites: ["native-trees", "wildflower-meadow"],
+    needBlooms: 11,
+    rarity: "uncommon",
+  },
+  {
+    id: "hummingbird",
+    name: "Hummingbird",
+    emoji: "✨",
+    image: VIMG.hummingbird,
+    category: "birds",
+    region: "shared",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["hibiscus", "lavender"],
+    needBlooms: 9,
+    rarity: "common",
+    note: "Curaçao & Suriname",
+  },
+  {
+    id: "scarlet-macaw",
+    name: "Scarlet Macaw",
+    emoji: "🦜",
+    image: VIMG.bird,
+    category: "birds",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["native-trees"],
+    needBlooms: 24,
+    rarity: "rare",
+  },
+  {
+    id: "toucan",
+    name: "Toucan",
+    emoji: "🦜",
+    image: VIMG.bird,
+    category: "birds",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["native-trees", "berry-bushes"],
+    needBlooms: 26,
+    rarity: "rare",
+  },
+  {
+    id: "great-kiskadee",
+    name: "Great Kiskadee",
+    emoji: "🐦",
+    image: VIMG.songbird,
+    category: "birds",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["berry-bushes", "pond"],
+    needBlooms: 12,
+    rarity: "uncommon",
+  },
+  {
+    id: "blue-gray-tanager",
+    name: "Blue-gray Tanager",
+    emoji: "🐦",
+    image: VIMG.songbird,
+    category: "birds",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["berry-bushes"],
+    needBlooms: 13,
+    rarity: "uncommon",
+  },
+  {
+    id: "robin",
+    name: "Robin",
+    emoji: "🧡",
+    image: VIMG.bird,
+    category: "birds",
+    region: "netherlands",
+    seasons: ["spring", "autumn", "winter"],
+    favorites: ["berry-bushes", "birdhouse"],
+    needBlooms: 7,
+    rarity: "common",
+  },
+  {
+    id: "great-tit",
+    name: "Great Tit",
+    emoji: "🐦",
+    image: VIMG.songbird,
+    category: "birds",
+    region: "netherlands",
+    seasons: ["spring", "summer", "autumn", "winter"],
+    favorites: ["birdhouse", "native-trees"],
+    needBlooms: 8,
+    rarity: "common",
+  },
+  {
+    id: "european-blackbird",
+    name: "European Blackbird",
+    emoji: "🐦",
+    image: VIMG.bird,
+    category: "birds",
+    region: "netherlands",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["berry-bushes", "undergrowth"],
+    needBlooms: 9,
+    rarity: "common",
+  },
+  {
+    id: "eurasian-blue-tit",
+    name: "Eurasian Blue Tit",
+    emoji: "🐦",
+    image: VIMG.songbird,
+    category: "birds",
+    region: "netherlands",
+    seasons: ["spring", "summer", "autumn", "winter"],
+    favorites: ["birdhouse"],
+    needBlooms: 7,
+    rarity: "common",
+  },
+  {
+    id: "barn-swallow",
+    name: "Barn Swallow",
+    emoji: "🐦",
+    image: VIMG.songbird,
+    category: "birds",
+    region: "netherlands",
+    seasons: ["spring", "summer"],
+    favorites: ["wildflower-meadow", "pond"],
+    needBlooms: 10,
+    rarity: "uncommon",
+  },
+
+  // Butterflies
+  {
+    id: "monarch",
+    name: "Monarch Butterfly",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "butterflies",
+    region: "shared",
+    seasons: ["summer", "autumn"],
+    favorites: ["wildflower-meadow", "sunflowers"],
+    needBlooms: 4,
+    rarity: "common",
+  },
+  {
+    id: "julia",
+    name: "Julia Butterfly",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "butterflies",
+    region: "curaçao",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["hibiscus", "wildflower-meadow"],
+    needBlooms: 5,
+    rarity: "common",
+  },
+  {
+    id: "gulf-fritillary",
+    name: "Gulf Fritillary",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "butterflies",
+    region: "curaçao",
+    seasons: ["spring", "summer"],
+    favorites: ["wildflower-meadow", "hibiscus"],
+    needBlooms: 6,
+    rarity: "common",
+  },
+  {
+    id: "painted-lady",
+    name: "Painted Lady",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "butterflies",
+    region: "shared",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["wildflower-meadow", "lavender"],
+    needBlooms: 5,
+    rarity: "common",
+  },
+  {
+    id: "small-white",
+    name: "Small White",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "butterflies",
+    region: "netherlands",
+    seasons: ["spring", "summer"],
+    favorites: ["wildflower-meadow"],
+    needBlooms: 3,
+    rarity: "common",
+  },
+  {
+    id: "peacock-butterfly",
+    name: "Peacock Butterfly",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "butterflies",
+    region: "netherlands",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["wildflower-meadow", "undergrowth"],
+    needBlooms: 7,
+    rarity: "uncommon",
+  },
+  {
+    id: "common-buckeye",
+    name: "Common Buckeye",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "butterflies",
+    region: "shared",
+    seasons: ["summer", "autumn"],
+    favorites: ["wildflower-meadow", "sunflowers"],
+    needBlooms: 6,
+    rarity: "common",
+  },
+  {
+    id: "blue-morpho",
+    name: "Blue Morpho",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "butterflies",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["native-trees", "wildflower-meadow"],
+    needBlooms: 20,
+    rarity: "rare",
+  },
+
+  // Pollinators
+  {
+    id: "honey-bee",
+    name: "Honey Bee",
+    emoji: "🐝",
+    image: VIMG.bee,
+    category: "pollinators",
+    region: "shared",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["sunflowers", "lavender", "wildflower-meadow"],
+    needBlooms: 4,
+    rarity: "common",
+  },
+  {
+    id: "carpenter-bee",
+    name: "Carpenter Bee",
+    emoji: "🐝",
+    image: VIMG.bee,
+    category: "pollinators",
+    region: "shared",
+    seasons: ["spring", "summer"],
+    favorites: ["sunflowers", "hibiscus"],
+    needBlooms: 7,
+    rarity: "uncommon",
+  },
+  {
+    id: "bumblebee",
+    name: "Bumblebee",
+    emoji: "🐝",
+    image: VIMG.bee,
+    category: "pollinators",
+    region: "netherlands",
+    seasons: ["spring", "summer"],
+    favorites: ["lavender", "wildflower-meadow"],
+    needBlooms: 5,
+    rarity: "common",
+  },
+  {
+    id: "stingless-bee",
+    name: "Stingless Bee",
+    emoji: "🐝",
+    image: VIMG.bee,
+    category: "pollinators",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["hibiscus", "native-trees"],
+    needBlooms: 8,
+    rarity: "uncommon",
+  },
+  {
+    id: "hoverfly",
+    name: "Hoverfly",
+    emoji: "🐝",
+    image: VIMG.bee,
+    category: "pollinators",
+    region: "shared",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["wildflower-meadow", "lavender"],
+    needBlooms: 3,
+    rarity: "common",
+  },
+
+  // Garden friends
+  {
+    id: "green-iguana",
+    name: "Green Iguana",
+    emoji: "🦎",
+    image: VIMG.fox,
+    category: "gardenFriends",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["native-trees", "pond"],
+    needBlooms: 16,
+    rarity: "uncommon",
+  },
+  {
+    id: "curacao-whiptail",
+    name: "Curaçao Whiptail Lizard",
+    emoji: "🦎",
+    image: VIMG.fox,
+    category: "gardenFriends",
+    region: "curaçao",
+    seasons: ["spring", "summer", "autumn", "winter"],
+    favorites: ["undergrowth", "wildflower-meadow"],
+    needBlooms: 9,
+    rarity: "common",
+  },
+  {
+    id: "house-gecko",
+    name: "House Gecko",
+    emoji: "🦎",
+    image: VIMG.hedgehog,
+    category: "gardenFriends",
+    region: "shared",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["birdhouse", "undergrowth"],
+    needBlooms: 5,
+    rarity: "common",
+  },
+  {
+    id: "anole-lizard",
+    name: "Anole Lizard",
+    emoji: "🦎",
+    image: VIMG.fox,
+    category: "gardenFriends",
+    region: "curaçao",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["native-trees", "hibiscus"],
+    needBlooms: 8,
+    rarity: "common",
+  },
+  {
+    id: "tiny-tree-frog",
+    name: "Tiny Tree Frog",
+    emoji: "🐸",
+    image: VIMG.hedgehog,
+    category: "gardenFriends",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["pond", "native-trees"],
+    needBlooms: 14,
+    rarity: "uncommon",
+  },
+
+  // Mammals
+  {
+    id: "european-hedgehog",
+    name: "European Hedgehog",
+    emoji: "🦔",
+    image: VIMG.hedgehog,
+    category: "mammals",
+    region: "netherlands",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["undergrowth"],
+    needBlooms: 11,
+    rarity: "uncommon",
+  },
+  {
+    id: "european-rabbit",
+    name: "European Rabbit",
+    emoji: "🐇",
+    image: VIMG.rabbit,
+    category: "mammals",
+    region: "netherlands",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["wildflower-meadow", "berry-bushes"],
+    needBlooms: 8,
+    rarity: "common",
+  },
+  {
+    id: "red-squirrel",
+    name: "Red Squirrel",
+    emoji: "🐿️",
+    image: VIMG.rabbit,
+    category: "mammals",
+    region: "netherlands",
+    seasons: ["spring", "summer", "autumn", "winter"],
+    favorites: ["native-trees", "berry-bushes"],
+    needBlooms: 12,
+    rarity: "uncommon",
+  },
+  {
+    id: "agouti",
+    name: "Agouti",
+    emoji: "🐇",
+    image: VIMG.rabbit,
+    category: "mammals",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["native-trees", "undergrowth"],
+    needBlooms: 18,
+    rarity: "rare",
+  },
+  {
+    id: "nine-banded-armadillo",
+    name: "Nine-banded Armadillo",
+    emoji: "🐾",
+    image: VIMG.fox,
+    category: "mammals",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["undergrowth", "native-trees"],
+    needBlooms: 35,
+    rarity: "rare",
+    note: "Very rare visitor",
+  },
+
+  // Tiny
+  {
+    id: "ladybug",
+    name: "Ladybug",
+    emoji: "🐞",
+    image: VIMG.ladybug,
+    category: "tiny",
+    region: "shared",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["wildflower-meadow", "lavender"],
+    needBlooms: 3,
+    rarity: "common",
+  },
+  {
+    id: "dragonfly",
+    name: "Dragonfly",
+    emoji: "🪰",
+    image: VIMG.ladybug,
+    category: "tiny",
+    region: "shared",
+    seasons: ["spring", "summer"],
+    favorites: ["pond"],
+    needBlooms: 10,
+    rarity: "uncommon",
+  },
+  {
+    id: "praying-mantis",
+    name: "Praying Mantis",
+    emoji: "🪲",
+    image: VIMG.ladybug,
+    category: "tiny",
+    region: "shared",
+    seasons: ["summer", "autumn"],
+    favorites: ["wildflower-meadow", "undergrowth"],
+    needBlooms: 12,
+    rarity: "uncommon",
+  },
+  {
+    id: "leafcutter-ant",
+    name: "Leafcutter Ant",
+    emoji: "🐜",
+    image: VIMG.ladybug,
+    category: "tiny",
+    region: "suriname",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["native-trees", "undergrowth"],
+    needBlooms: 15,
+    rarity: "uncommon",
+  },
+  {
+    id: "firefly",
+    name: "Firefly",
+    emoji: "✨",
+    image: VIMG.ladybug,
+    category: "tiny",
+    region: "suriname",
+    seasons: ["summer", "autumn"],
+    favorites: ["pond", "night-garden", "undergrowth"],
+    needBlooms: 16,
+    rarity: "uncommon",
+  },
+  {
+    id: "walking-stick",
+    name: "Walking Stick Insect",
+    emoji: "🪲",
+    image: VIMG.ladybug,
+    category: "tiny",
+    region: "shared",
+    seasons: ["summer", "autumn"],
+    favorites: ["native-trees", "undergrowth"],
+    needBlooms: 13,
+    rarity: "uncommon",
+  },
+
+  // Rare night visitors
+  {
+    id: "barn-owl",
+    name: "Barn Owl",
+    emoji: "🦉",
+    image: VIMG.fox,
+    category: "night",
+    region: "netherlands",
+    seasons: ["autumn", "winter"],
+    favorites: ["night-garden", "native-trees"],
+    needBlooms: 30,
+    rarity: "night",
+    note: "Appears after seasonal or community events",
+  },
+  {
+    id: "spectacled-owl",
+    name: "Spectacled Owl",
+    emoji: "🦉",
+    image: VIMG.fox,
+    category: "night",
+    region: "suriname",
+    seasons: ["autumn", "winter"],
+    favorites: ["night-garden", "native-trees"],
+    needBlooms: 32,
+    rarity: "night",
+    note: "Appears after seasonal or community events",
+  },
+  {
+    id: "nectar-bat",
+    name: "Nectar Bat",
+    emoji: "🦇",
+    image: VIMG.hummingbird,
+    category: "night",
+    region: "curaçao",
+    seasons: ["spring", "summer", "autumn"],
+    favorites: ["night-garden", "hibiscus"],
+    needBlooms: 28,
+    rarity: "night",
+    note: "Appears after seasonal or community events",
+  },
+  {
+    id: "luna-moth",
+    name: "Luna Moth",
+    emoji: "🦋",
+    image: VIMG.butterfly,
+    category: "night",
+    region: "shared",
+    seasons: ["spring", "summer"],
+    favorites: ["night-garden", "native-trees"],
+    needBlooms: 25,
+    rarity: "night",
+    note: "Appears after seasonal or community events",
+  },
+  {
+    id: "fireflies-night",
+    name: "Fireflies",
+    emoji: "✨",
+    image: VIMG.ladybug,
+    category: "night",
+    region: "suriname",
+    seasons: ["summer", "autumn"],
+    favorites: ["night-garden", "pond"],
+    needBlooms: 27,
+    rarity: "night",
+    note: "Appears after seasonal or community events",
+  },
 ];
+
+export function currentGardenSeason(now = new Date()): GardenSeason {
+  const month = now.getUTCMonth();
+  if (month >= 2 && month <= 4) return "spring";
+  if (month >= 5 && month <= 7) return "summer";
+  if (month >= 8 && month <= 10) return "autumn";
+  return "winter";
+}
+
+export type VisitorAttractionContext = {
+  blooms: number;
+  decorations: string[];
+  spotted: Record<string, unknown>;
+  collections: Record<string, number>;
+  communityBlooms: number;
+  communityKindness: number;
+  season?: GardenSeason;
+};
+
+export function unlockedAttractorIds(
+  ctx: VisitorAttractionContext
+): Set<string> {
+  const unlocked = new Set<string>();
+  const { blooms, decorations, spotted, collections } = ctx;
+
+  for (const row of BLOOM_ATTRACTOR_DECORATIONS) {
+    if (blooms >= row.needBlooms || decorations.includes(row.decoration)) {
+      unlocked.add(row.attractorId);
+    }
+  }
+
+  if (spotted.sunflower || collections.summer) unlocked.add("sunflowers");
+  if (spotted.hibiscus) unlocked.add("hibiscus");
+  if (spotted.lavender || collections.herbs || decorations.includes("Herb spiral")) {
+    unlocked.add("lavender");
+  }
+  if (
+    collections.wildflowers ||
+    decorations.includes("Wildflower border") ||
+    decorations.includes("Wildflower meadow")
+  ) {
+    unlocked.add("wildflower-meadow");
+  }
+  if (
+    decorations.includes("Moonlit lanterns") ||
+    collections.night ||
+    ctx.communityBlooms >= 10000
+  ) {
+    unlocked.add("night-garden");
+  }
+
+  return unlocked;
+}
+
+export function syncBloomDecorations(
+  blooms: number,
+  decorations: string[]
+): string[] {
+  let next = [...decorations];
+  for (const row of BLOOM_ATTRACTOR_DECORATIONS) {
+    if (blooms >= row.needBlooms && !next.includes(row.decoration)) {
+      next = [...next, row.decoration];
+    }
+  }
+  return next;
+}
+
+export function visitorCanArrive(
+  visitor: WildVisitor,
+  ctx: VisitorAttractionContext
+): boolean {
+  const season = ctx.season || currentGardenSeason();
+  if (ctx.blooms < visitor.needBlooms) return false;
+  if (!visitor.seasons.includes(season)) return false;
+
+  const unlocked = unlockedAttractorIds(ctx);
+  const hasFavorite = visitor.favorites.some((id) => unlocked.has(id));
+  if (!hasFavorite) return false;
+
+  if (visitor.rarity === "night") {
+    const eventReady =
+      unlocked.has("night-garden") ||
+      ctx.communityBlooms >= 10000 ||
+      ctx.communityKindness >= 25000;
+    if (!eventReady) return false;
+  }
+
+  if (visitor.id === "nine-banded-armadillo") {
+    if (ctx.blooms < 35 || !unlocked.has("undergrowth") || !unlocked.has("native-trees")) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function evaluateWildVisitors(
+  ctx: VisitorAttractionContext
+): Record<string, boolean> {
+  const next: Record<string, boolean> = {};
+  for (const visitor of WILD_VISITORS) {
+    if (visitorCanArrive(visitor, ctx)) next[visitor.id] = true;
+  }
+  return next;
+}
+
+export function natureJournalProgress(visitors: Record<string, boolean>) {
+  const discoverable = WILD_VISITORS.filter((v) => v.rarity !== "night");
+  const found = discoverable.filter((v) => visitors[v.id]).length;
+  const nightFound = WILD_VISITORS.filter(
+    (v) => v.rarity === "night" && visitors[v.id]
+  ).length;
+  const complete = found >= discoverable.length;
+  return {
+    found,
+    total: discoverable.length,
+    nightFound,
+    nightTotal: WILD_VISITORS.filter((v) => v.rarity === "night").length,
+    complete,
+  };
+}
 
 export type GardenCollection = {
   id: string;
