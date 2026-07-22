@@ -669,7 +669,7 @@ export const WILD_VISITORS: WildVisitor[] = [
     id: "toucan",
     name: "Toucan",
     emoji: "🦜",
-    image: VIMG.bird,
+    image: "/garden/visitors/toucan.jpg",
     category: "birds",
     region: "suriname",
     seasons: ["spring", "summer", "autumn"],
