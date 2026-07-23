@@ -34,7 +34,7 @@ export function LoginForm() {
   return (
     <form className="auth-form" onSubmit={onSubmit}>
       <label>
-        Username or email
+        Username, display name, or email
         <input
           value={login}
           onChange={(e) => setLogin(e.target.value)}

@@ -37,6 +37,12 @@ function migrate(db: Database.Database) {
     "collectibles_json",
     "collectibles_json TEXT NOT NULL DEFAULT '{}'"
   );
+  ensureColumn(
+    db,
+    "users",
+    "notifications_json",
+    "notifications_json TEXT NOT NULL DEFAULT '{}'"
+  );
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
   ensureColumn(
@@ -440,6 +446,7 @@ function createDb() {
       village_id TEXT,
       reputation INTEGER NOT NULL DEFAULT 0,
       collectibles_json TEXT NOT NULL DEFAULT '{}',
+      notifications_json TEXT NOT NULL DEFAULT '{}',
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
