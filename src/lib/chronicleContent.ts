@@ -152,8 +152,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "clovermeadow",
     pageNumber: 1,
-    title: "When the First Seeds Were Shared",
-    body: "Before the meadows had names, a traveler spilled a handful of clover seeds beside a quiet brook. Bees arrived before the travelers did, humming the village into being. Every bloom since has been a thank-you letter to that first kindness.",
+    title: "Before the Footpaths",
+    body: "Long before cottages dotted the hills, there was only a meadow. Travelers often took a shortcut through it, yet many found themselves lingering far longer than they had planned. Some claimed it was the quiet, others the endless wildflowers. Whatever the reason, people kept returning until worn footpaths slowly became village lanes.",
     illustrationUrl: "",
     unlockKey: "garden.completeDaily",
     unlockCount: 1,
@@ -162,8 +162,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "clovermeadow",
     pageNumber: 2,
-    title: "The Bloomkeeper's Promise",
-    body: "The first Bloomkeeper swore never to hoard a flower. Petals were pressed into pages, nectar into jars, and joy into the hands of strangers. To tend the garden was to tend the heart of Clovermeadow.",
+    title: "The Gardener Without a Name",
+    body: 'The oldest records mention someone simply called "the gardener." No one knows who they were, only that every spring new flower beds appeared where there had been none before. The villagers continued the work without ever discovering who planted the very first ones.',
     illustrationUrl: "",
     unlockKey: "garden.spotFlower",
     unlockCount: 1,
@@ -172,8 +172,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "clovermeadow",
     pageNumber: 3,
-    title: "Wild Visitors at Dawn",
-    body: "Butterflies mapped the lanes. Hedgehogs counted the dew. When a rare visitor lingered, villagers left a saucer of water and a poem. The meadow remembered every guest by the color of its wings.",
+    title: "Forgotten Corners",
+    body: "Even now, old stone borders and hidden garden paths occasionally appear beneath the grass after heavy rain. No one remembers who built them, but no one removes them either. Instead, new flowers are planted there, as though finishing a task someone began long ago.",
     illustrationUrl: "",
     unlockKey: "garden.completeDaily",
     unlockCount: 3,
@@ -182,8 +182,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "clovermeadow",
     pageNumber: 4,
-    title: "The Endless Picnic",
-    body: "On the longest warm evening, the whole village laid blankets end to end until the meadow became one table. They say if you listen closely at dusk, you can still hear laughter in the clover.",
+    title: "The Meadow Remembers",
+    body: "Every season adds another layer to Clovermeadow. New gardens bloom beside old ones, and each villager quietly leaves something behind for the next. Perhaps that is why the village never feels finished—there is always another corner waiting to be cared for.",
     illustrationUrl: "",
     unlockKey: "garden.completeKindness",
     unlockCount: 1,
@@ -193,8 +193,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "mosshollow",
     pageNumber: 1,
-    title: "The Library That Grew From Roots",
-    body: "An oak fell in a storm and hollowed into shelves. Owls nested in the rafters and kept watch over unfinished stories. Mosshollow's first books were written on bark, then on paper soft as moss.",
+    title: "Four Books",
+    body: "The oldest shelf in the library once held only four books. No title pages. No author's names. No record of who placed them there. They contained no grand adventures, only observations, sketches, recipes, poems, and quiet moments from ordinary lives. Somehow, they became the foundation of everything that followed.",
     illustrationUrl: "",
     unlockKey: "library.finishBook",
     unlockCount: 1,
@@ -203,8 +203,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "mosshollow",
     pageNumber: 2,
-    title: "Riddles in the Stacks",
-    body: "Archivists hid truths inside questions. Solve one, and a candle lit itself. Solve three, and a secret door sighed open. The library never locked knowledge — it only asked you to knock politely.",
+    title: "The Empty Shelf",
+    body: "For reasons no one remembers, one shelf in the library has always remained empty. Every librarian has considered filling it, and every librarian has quietly decided against it. Today, it remains exactly as it has for generations.",
     illustrationUrl: "",
     unlockKey: "library.solveMystery",
     unlockCount: 1,
@@ -213,8 +213,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "mosshollow",
     pageNumber: 3,
-    title: "The Forgotten Margin",
-    body: "In the margins of a water-stained folio, a note waited: 'For the reader who stays past midnight.' Those who found it received a page that wrote itself — ink blooming like night flowers.",
+    title: "Notes Between the Pages",
+    body: "Readers occasionally discover handwritten notes tucked inside borrowed books. Some are decades old, others seem surprisingly recent. No one knows who leaves them, but returning the note to its place has become an unwritten rule among the villagers.",
     illustrationUrl: "",
     unlockKey: "library.claimSecret",
     unlockCount: 1,
@@ -223,8 +223,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "mosshollow",
     pageNumber: 4,
-    title: "Keepers of Quiet Lore",
-    body: "When the last candle guttered, the owls recited the village's true name — a soft syllable meaning 'home among pages.' Every Archivist since has carried that word like a bookmark in the heart.",
+    title: "Stories That Stay",
+    body: "Mosshollow has never tried to collect every book in the world. It only asks that no story worth remembering is allowed to disappear. Every book returned, every page preserved, and every thoughtful conversation adds another line to its history.",
     illustrationUrl: "",
     unlockKey: "library.journalEntry",
     unlockCount: 1,
@@ -234,8 +234,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "hearthwick",
     pageNumber: 1,
-    title: "The First Ember",
-    body: "A stranger arrived soaked by soft rain. The villagers made room beside the fire without asking their name. That night, the hearth learned a new rule: every stranger is welcomed home.",
+    title: "The Light in the Window",
+    body: "There was once a single cottage on the hillside whose window remained lit every evening. Travelers crossing the valley soon learned that if they reached that light before nightfall, they would always find a warm fire and someone willing to share a meal. The cottage is long gone, but the habit remained.",
     illustrationUrl: "",
     unlockKey: "hearth.completeRitual",
     unlockCount: 1,
@@ -244,8 +244,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "hearthwick",
     pageNumber: 2,
-    title: "Notes Beside the Fire",
-    body: "Someone left a folded scrap of kindness on the mantel. No signature. By morning, three more had joined it. The fire did not burn them — it warmed the words until the whole room felt braver.",
+    title: "The Unwritten Tradition",
+    body: "No document ever established Hearthwick's customs. There was never a meeting, nor a list of rules. Yet somehow everyone knew to bake an extra loaf, set another place at the table, and keep the kettle warm. No one can say exactly when these traditions began—only that they have always been there.",
     illustrationUrl: "",
     unlockKey: "hearth.leaveNote",
     unlockCount: 1,
@@ -254,8 +254,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "hearthwick",
     pageNumber: 3,
-    title: "Herbs and Soft Evenings",
-    body: "Lavender dried above the beams. Chamomile steeped in copper kettles. The apothecary taught that rest is a craft — measured in sips, stitches, and the hush after rain.",
+    title: "The Basket Beside the Fire",
+    body: "Old journals mention a small basket that once stood beside the village fireplace. Inside were folded notes containing encouragement, recipes, memories, and simple acts of kindness. The writers never signed their names. Generations later, the basket is still there, though no one remembers who placed it by the fire in the first place.",
     illustrationUrl: "",
     unlockKey: "hearth.completeRitual",
     unlockCount: 3,
@@ -264,8 +264,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "hearthwick",
     pageNumber: 4,
-    title: "The Hearth Hall Feast",
-    body: "Recipes traveled faster than rumors. A favorite pie, a shared soup, a loaf broken for latecomers — the Chronicle says Hearthwick was never built of stone, but of evenings spent together.",
+    title: "Home",
+    body: 'Visitors often ask what makes Hearthwick feel different from anywhere else. The villagers usually smile and shrug. Some say it\'s the smell of fresh bread. Others say it\'s the fire. Most simply point to the empty chair beside the hearth and say,\n\n"It has been waiting for you."',
     illustrationUrl: "",
     unlockKey: "hearth.toggleRecipeFavorite",
     unlockCount: 1,
@@ -275,8 +275,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "moonmere",
     pageNumber: 1,
-    title: "Answers After Sunset",
-    body: "The lake kept secrets until the sky darkened. Then stars wrote themselves across still water, and villagers learned: some answers only arrive after sunset.",
+    title: "The Bench by the Lake",
+    body: "Before Moonmere became a village, there was only a weathered wooden bench overlooking the lake. No one knows who built it, yet someone always seemed to be sitting there after sunset. Over time, more benches appeared, followed by lanterns, cottages, and eventually the village itself.",
     illustrationUrl: "",
     unlockKey: "moon.completeRitual",
     unlockCount: 1,
@@ -285,8 +285,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "moonmere",
     pageNumber: 2,
-    title: "Pages of the Moon Journal",
-    body: "Each night a prompt rose with the moon. Ink met parchment in private — no audience, only honesty. The Observatory kept those truths the way the lake keeps reflections.",
+    title: "The Observatory Logbook",
+    body: "The observatory keeps a logbook dating back further than anyone can explain. Each page records the phases of the moon, unusual weather, and familiar constellations in remarkably consistent handwriting. The earliest pages are unsigned, and no one has discovered who began them.",
     illustrationUrl: "",
     unlockKey: "moon.saveJournal",
     unlockCount: 1,
@@ -295,8 +295,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "moonmere",
     pageNumber: 3,
-    title: "Dreams in Glass Bottles",
-    body: "Dreams were sealed without interpretation. Flying, forests, strange places — imagination alone. The archive taught that wonder needs no explanation to be precious.",
+    title: "Evenings Worth Remembering",
+    body: "Moonmere never became famous for festivals or markets. Instead, people remembered evenings spent talking beneath the stars, listening to the lake, and watching the moon rise above the trees. The village slowly earned a reputation as a place where people stayed longer than they intended.",
     illustrationUrl: "",
     unlockKey: "moon.submitDream",
     unlockCount: 1,
@@ -305,8 +305,8 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
   {
     villageId: "moonmere",
     pageNumber: 4,
-    title: "The Restored Dome",
-    body: "When the last page returned, the telescope found a constellation shaped like home. Moonmere's Chronicle ends where it begins: under a sky full of quiet questions.",
+    title: "Looking Up",
+    body: "Every clear evening, someone still unlocks the observatory before sunset. Sometimes it's a lifelong resident, sometimes a first-time visitor. The telescope is adjusted, the lanterns are lit, and another page is added to the logbook. No one knows how many pages it already holds—but everyone agrees it should never stop growing.",
     illustrationUrl: "",
     unlockKey: "moon.completeRitual",
     unlockCount: 3,
@@ -354,6 +354,9 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     published: true,
   },
 ];
+
+/** Bump when default lore should refresh into the DB (preserves unlock settings). */
+export const CHRONICLE_LORE_VERSION = 2;
 
 export function defaultPagesForVillage(
   villageId: VillageId

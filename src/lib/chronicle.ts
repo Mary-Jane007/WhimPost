@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { getDb } from "@/lib/db";
 import {
   CHRONICLE_ACTIVITY_LABELS,
+  CHRONICLE_LORE_VERSION,
   CHRONICLE_META,
   DEFAULT_CHRONICLE_PAGES,
   ROMAN_PAGES,
@@ -55,16 +56,19 @@ function parseJson<T>(raw: string | null | undefined, fallback: T): T {
 
 function ensureSeedPages() {
   const db = getDb();
-  const count = db
-    .prepare(`SELECT COUNT(*) as c FROM chronicle_pages`)
-    .get() as { c: number };
-  if (count.c > 0) return;
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS app_meta (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
 
   const insert = db.prepare(
     `INSERT INTO chronicle_pages (
       id, village_id, page_number, title, body, illustration_url,
       unlock_key, unlock_count, published, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    ON CONFLICT(village_id, page_number) DO NOTHING`
   );
 
   for (const page of DEFAULT_CHRONICLE_PAGES) {
@@ -80,6 +84,30 @@ function ensureSeedPages() {
       page.published ? 1 : 0
     );
   }
+
+  const loreRow = db
+    .prepare(`SELECT value FROM app_meta WHERE key = 'chronicle_lore_v'`)
+    .get() as { value: string } | undefined;
+  const currentLore = Number(loreRow?.value || 0);
+  if (currentLore >= CHRONICLE_LORE_VERSION) return;
+
+  const refresh = db.prepare(
+    `UPDATE chronicle_pages
+     SET title = ?, body = ?, updated_at = datetime('now')
+     WHERE village_id = ? AND page_number = ?`
+  );
+
+  for (const page of DEFAULT_CHRONICLE_PAGES) {
+    // Fresh village lore for the four manuscripts provided; leave Bramblewood alone
+    // if it already had custom text from an earlier seed (still refresh if empty DB path).
+    if (page.villageId === "bramblewood" && currentLore > 0) continue;
+    refresh.run(page.title, page.body, page.villageId, page.pageNumber);
+  }
+
+  db.prepare(
+    `INSERT INTO app_meta (key, value) VALUES ('chronicle_lore_v', ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`
+  ).run(String(CHRONICLE_LORE_VERSION));
 }
 
 function ensureProgressRow(userId: string, villageId: VillageId) {
