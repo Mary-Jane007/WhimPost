@@ -75,12 +75,21 @@ export function exportPersistentAccounts(db: Database) {
 
 /**
  * Restore accounts from the snapshot into SQLite.
- * Inserts missing users and refreshes credentials / profile fields for known ids
- * so a new empty server can accept the same logins.
+ * Matches by id, username, or email so a local user with a different UUID still
+ * gets credentials refreshed (keeps the local id for foreign-key integrity).
+ * Inserts only when no matching account exists.
  */
 export function importPersistentAccounts(db: Database) {
   const file = readFile();
   if (!file || file.accounts.length === 0) return;
+
+  const findMatch = db.prepare(
+    `SELECT id FROM users
+     WHERE id = ?
+        OR lower(username) = lower(?)
+        OR lower(email) = lower(?)
+     LIMIT 1`
+  );
 
   const insert = db.prepare(
     `INSERT INTO users (
@@ -89,27 +98,39 @@ export function importPersistentAccounts(db: Database) {
     ) VALUES (
       @id, @username, @display_name, @email, @password_hash, @bio, @forest_name,
       @is_owner, @village_id, @reputation, @collectibles_json, @created_at
-    )
-    ON CONFLICT(id) DO UPDATE SET
-      username = excluded.username,
-      display_name = excluded.display_name,
-      email = excluded.email,
-      password_hash = excluded.password_hash,
-      bio = excluded.bio,
-      forest_name = excluded.forest_name,
-      is_owner = excluded.is_owner,
-      village_id = excluded.village_id,
-      reputation = excluded.reputation,
-      collectibles_json = excluded.collectibles_json`
+    )`
+  );
+
+  const update = db.prepare(
+    `UPDATE users SET
+      username = @username,
+      display_name = @display_name,
+      email = @email,
+      password_hash = @password_hash,
+      bio = @bio,
+      forest_name = @forest_name,
+      is_owner = @is_owner,
+      village_id = @village_id,
+      reputation = @reputation,
+      collectibles_json = @collectibles_json
+     WHERE id = @id`
   );
 
   const sync = db.transaction((accounts: PersistentAccount[]) => {
     for (const account of accounts) {
-      insert.run({
-        id: account.id,
-        username: account.username,
-        display_name: account.display_name,
-        email: account.email,
+      const username = String(account.username || "").trim();
+      const email = String(account.email || "").trim();
+      if (!username || !email || !account.password_hash) continue;
+
+      const matched = findMatch.get(account.id, username, email) as
+        | { id: string }
+        | undefined;
+
+      const row = {
+        id: matched?.id ?? account.id,
+        username,
+        display_name: account.display_name || username,
+        email,
         password_hash: account.password_hash,
         bio: account.bio ?? "",
         forest_name: account.forest_name ?? "",
@@ -118,7 +139,13 @@ export function importPersistentAccounts(db: Database) {
         reputation: account.reputation ?? 0,
         collectibles_json: account.collectibles_json || "{}",
         created_at: account.created_at || new Date().toISOString(),
-      });
+      };
+
+      if (matched) {
+        update.run(row);
+      } else {
+        insert.run(row);
+      }
     }
   });
 
