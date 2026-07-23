@@ -4,15 +4,18 @@ import { useMemo, useRef, useState, type FormEvent } from "react";
 import type { UserPublic } from "@/lib/types";
 import type { WorkshopProgress } from "@/lib/workshop";
 import {
-  BIRDS,
-  CRAFTS,
+  DISCOVERY_COLLECTIONS,
+  EXPLORER_PROMPTS,
+  LOCAL_WILDLIFE,
+  OUTDOOR_SKILLS,
   PLANTS,
-  QUEST_ITEMS,
+  PLANT_TREE_GUIDE,
   RECIPES,
-  SEASONAL_PANELS,
+  WOODLAND_ADVENTURES,
+  WOODLAND_DIY,
   WORKSHOP_TABS,
-  featuredCraft,
-  featuredPrompt,
+  featuredExpedition,
+  todaysWoodlandInspiration,
   type WorkshopTabId,
 } from "@/lib/workshopContent";
 
@@ -31,12 +34,11 @@ async function uploadPhoto(file: File) {
 }
 
 export function BramblewoodWorkshop({ user, initialProgress }: Props) {
-  const [tab, setTab] = useState<WorkshopTabId>("craft");
+  const [tab, setTab] = useState<WorkshopTabId>("inspiration");
   const [progress, setProgress] = useState(initialProgress);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [galleryOpen, setGalleryOpen] = useState(false);
   const [journalCraftId, setJournalCraftId] = useState("");
   const [journalTitle, setJournalTitle] = useState("");
   const [journalNote, setJournalNote] = useState("");
@@ -44,29 +46,41 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
   const [journalMarkComplete, setJournalMarkComplete] = useState(true);
   const [journalShareVillage, setJournalShareVillage] = useState(false);
   const [journalUploading, setJournalUploading] = useState(false);
+  const [journalPrompt, setJournalPrompt] = useState<string>(EXPLORER_PROMPTS[0]);
   const fileRef = useRef<HTMLInputElement>(null);
   const journalFileRef = useRef<HTMLInputElement>(null);
   const pendingPhotoKey = useRef<string | null>(null);
   const pendingPhotoKind = useRef<
     | "generic"
-    | "craft"
+    | "diy"
     | "recipe"
-    | "prompt"
     | "quest"
     | "plant"
-    | "bird"
+    | "wildlife"
+    | "expedition"
     | null
   >(null);
   const pendingMeta = useRef<Record<string, string | number>>({});
 
-  const craft = useMemo(
-    () => CRAFTS.find((c) => c.id === progress.featured.craftId) || featuredCraft(),
-    [progress.featured.craftId]
-  );
-  const weeklyPrompt = featuredPrompt();
+  const inspiration = useMemo(() => todaysWoodlandInspiration(), []);
+  const expedition = useMemo(() => featuredExpedition(), []);
+  const weeklyDiy = useMemo(() => WOODLAND_DIY[weekDiyIndex()], []);
 
-  const questDone = QUEST_ITEMS.filter((q) => progress.questChecks[q.id]).length;
-  const questPct = Math.round((questDone / QUEST_ITEMS.length) * 100);
+  const todayAnimal =
+    LOCAL_WILDLIFE.find((w) => w.id === inspiration.animalId) || LOCAL_WILDLIFE[0];
+  const todayPlant =
+    PLANT_TREE_GUIDE.find((p) => p.id === inspiration.plantId) || PLANT_TREE_GUIDE[0];
+  const todaySkill =
+    OUTDOOR_SKILLS.find((s) => s.id === inspiration.skillId) || OUTDOOR_SKILLS[0];
+  const todayDiy =
+    WOODLAND_DIY.find((d) => d.id === inspiration.diyId) || WOODLAND_DIY[0];
+
+  const adventureDone = WOODLAND_ADVENTURES.filter(
+    (a) => progress.questChecks[a.id]
+  ).length;
+  const adventurePct = Math.round(
+    (adventureDone / WOODLAND_ADVENTURES.length) * 100
+  );
 
   async function postAction(body: Record<string, unknown>) {
     setBusy(true);
@@ -82,7 +96,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
       setProgress(data.progress);
       const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
       emitChronicleUnlock(data.chronicleUnlock);
-      setStatus("Saved to your Craft Journal");
+      setStatus("Saved to your Explorer's Journal");
       window.setTimeout(() => setStatus(null), 2800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save");
@@ -112,10 +126,10 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
       const key = pendingPhotoKey.current;
       const meta = pendingMeta.current;
 
-      if (kind === "craft") {
+      if (kind === "diy") {
         await postAction({
           type: "complete",
-          completeKind: "craft",
+          completeKind: "diy",
           id: key,
           photoUrl: url,
         });
@@ -123,13 +137,6 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
         await postAction({
           type: "complete",
           completeKind: "recipe",
-          id: key,
-          photoUrl: url,
-        });
-      } else if (kind === "prompt") {
-        await postAction({
-          type: "complete",
-          completeKind: "prompt",
           id: key,
           photoUrl: url,
         });
@@ -146,10 +153,17 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
           week: Number(meta.week),
           photoUrl: url,
         });
-      } else if (kind === "bird") {
+      } else if (kind === "wildlife") {
         await postAction({
-          type: "bird",
-          birdId: key,
+          type: "wildlife",
+          wildlifeId: key,
+          photoUrl: url,
+        });
+      } else if (kind === "expedition") {
+        await postAction({
+          type: "complete",
+          completeKind: "expedition",
+          id: key,
           photoUrl: url,
         });
       } else {
@@ -157,10 +171,10 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
-      setBusy(false);
     } finally {
       pendingPhotoKind.current = null;
       pendingPhotoKey.current = null;
+      setBusy(false);
       if (fileRef.current) fileRef.current.value = "";
     }
   }
@@ -182,32 +196,19 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
 
   async function submitJournalEntry(e: FormEvent) {
     e.preventDefault();
-    const craft = CRAFTS.find((c) => c.id === journalCraftId);
-    const title = (journalTitle.trim() || craft?.title || "").trim();
-    const note = journalNote.trim();
-    if (!title) {
-      setError("Give your journal entry a craft name");
-      return;
-    }
-    if (!note) {
-      setError("Write a little about how it went");
-      return;
-    }
     await postAction({
       type: "journalEntry",
       activityId: journalCraftId || undefined,
-      activityName: title,
-      note,
+      activityName: journalTitle || journalPrompt,
+      note: journalNote,
       photoUrl: journalPhoto || undefined,
       markCraftComplete: Boolean(journalCraftId) && journalMarkComplete,
       shareWithVillage: journalShareVillage,
     });
-    setJournalCraftId("");
-    setJournalTitle("");
     setJournalNote("");
     setJournalPhoto(null);
-    setJournalMarkComplete(true);
-    setJournalShareVillage(false);
+    setJournalTitle("");
+    setJournalCraftId("");
   }
 
   return (
@@ -221,6 +222,59 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
         <span className="bw-bird b2" />
       </div>
 
+      <header className="bw-hero">
+        <div>
+          <p className="bw-eyebrow">Explorer&apos;s Guild · Bramblewood</p>
+          <h1>The Woodland Workshop</h1>
+          <p className="bw-quote">
+            Close the laptop. Step outside. Come back with a story.
+          </p>
+          <p className="bw-lead">
+            Welcome, {user.displayName}. Adventures for Curaçao, Suriname, and
+            the Netherlands — maps, lanterns, and mossy notebooks included.
+          </p>
+          <div className="bw-xp-row">
+            <span>
+              {progress.title.emoji} {progress.title.title}
+            </span>
+            <span>{progress.xp} XP</span>
+          </div>
+          {progress.badges.length > 0 ? (
+            <ul className="bw-badges">
+              {progress.badges.slice(0, 8).map((b) => (
+                <li key={b}>{b}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+        <div className="bw-hero-atelier" aria-hidden>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/stickers/villages/bramblewood/fox-sitting.png"
+            alt=""
+            className="bw-hero-fox"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/stickers/villages/bramblewood/compass.png"
+            alt=""
+            className="bw-hero-compass"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/stickers/villages/bramblewood/maple-branch.png"
+            alt=""
+            className="bw-hero-maple"
+          />
+        </div>
+      </header>
+
+      {(status || error) && (
+        <p className={error ? "bw-flash error" : "bw-flash"} role="status">
+          {error || status}
+        </p>
+      )}
+
       <input
         ref={fileRef}
         type="file"
@@ -229,166 +283,336 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
         onChange={(e) => void onPickFile(e.target.files?.[0] || null)}
       />
 
-      <header className="bw-hero">
-        <div className="bw-hero-copy">
-          <p className="bw-eyebrow">Bramblewood Village</p>
-          <h1>The Bramblewood Workshop</h1>
-          <p className="bw-subtitle">
-            “The forest is full of things waiting to be made.”
-          </p>
-          <p className="bw-lead">
-            In Bramblewood, villagers don&apos;t simply watch stories—they create
-            them. Every week brings new crafts, recipes, creative prompts, and
-            woodland adventures. Complete activities to earn badges, collect
-            memories in your Craft Journal, and help the village flourish.
-          </p>
-          <div className="bw-rank">
-            <strong>
-              {progress.title.emoji} {progress.title.title}
-            </strong>
-            <span>{progress.xp} workshop XP</span>
-            {progress.badges.length ? (
-              <em>{progress.badges.slice(-3).join(" · ")}</em>
-            ) : (
-              <em>Welcome, {user.displayName}</em>
-            )}
-          </div>
-        </div>
-        <div className="bw-hero-atelier" aria-hidden>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/stickers/villages/bramblewood/candle-jar.png" alt="" className="a candle" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/stickers/villages/bramblewood/bouquet.png" alt="" className="a flowers" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/stickers/villages/bramblewood/book-leaf.png" alt="" className="a books" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/stickers/villages/bramblewood/mushroom.png" alt="" className="a mush" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/stickers/villages/bramblewood/fox-sitting.png" alt="" className="a fox" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/stickers/villages/bramblewood/maple-branch.png" alt="" className="a maple" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/stickers/villages/bramblewood/teapot.png" alt="" className="a tea" />
-          <div className="bw-hero-table" />
-        </div>
-      </header>
-
-      {(status || error) && (
-        <p className={`bw-toast ${error ? "err" : ""}`} role="status">
-          {error || status}
-        </p>
-      )}
-
-      <div className="bw-tabs" role="tablist" aria-label="Workshop sections">
+      <nav className="bw-tabs" aria-label="Workshop sections">
         {WORKSHOP_TABS.map((t) => (
           <button
             key={t.id}
             type="button"
-            role="tab"
-            aria-selected={tab === t.id}
             className={tab === t.id ? "active" : ""}
             onClick={() => setTab(t.id)}
           >
-            <span aria-hidden>{t.emoji}</span>
-            {t.label}
+            <span aria-hidden>{t.emoji}</span> {t.label}
           </button>
         ))}
-      </div>
+      </nav>
 
-      <div className="bw-panel" role="tabpanel">
-        {tab === "craft" && (
+      <div className="bw-panel">
+        {tab === "inspiration" && (
           <section className="bw-section">
-            <h2>Weekly Craft</h2>
+            <h2>Daily Inspiration</h2>
             <p className="bw-section-lead">
-              One featured craft each week — mark complete for XP and the
-              Craftsman Badge.
+              A soft rotation for today — notice one wild thing, then go outside.
             </p>
-            <article className="bw-card craft-card">
-              <div className="bw-craft-copy">
-                <p className="bw-meta">
-                  {craft.difficulty} · {craft.time}
+            <div className="bw-inspire-grid">
+              <article className="bw-card bw-inspire">
+                <h3>Today&apos;s Adventure</h3>
+                <p>{inspiration.adventure}</p>
+              </article>
+              <article className="bw-card bw-inspire">
+                <h3>Today&apos;s Animal</h3>
+                <p>
+                  {todayAnimal.emoji} {todayAnimal.name}
                 </p>
-                <h3>{craft.title}</h3>
-                <h4>Materials</h4>
+                <p className="bw-meta">{todayAnimal.countries.join(" · ")}</p>
+              </article>
+              <article className="bw-card bw-inspire">
+                <h3>Today&apos;s Plant</h3>
+                <p>
+                  {todayPlant.emoji} {todayPlant.name}
+                </p>
+              </article>
+              <article className="bw-card bw-inspire">
+                <h3>Today&apos;s Outdoor Skill</h3>
+                <p>
+                  {todaySkill.emoji} {todaySkill.title}
+                </p>
+              </article>
+              <article className="bw-card bw-inspire">
+                <h3>Today&apos;s DIY</h3>
+                <p>{todayDiy.title}</p>
+              </article>
+              <article className="bw-card bw-inspire">
+                <h3>Today&apos;s Journal Prompt</h3>
+                <p>{inspiration.journalPrompt}</p>
+              </article>
+              <article className="bw-card bw-inspire quote">
+                <h3>Today&apos;s Explorer Quote</h3>
+                <p className="bw-handnote">{inspiration.quote}</p>
+              </article>
+              <article className="bw-card bw-inspire">
+                <h3>Today&apos;s Nature Fact</h3>
+                <p>{inspiration.natureFact}</p>
+              </article>
+            </div>
+          </section>
+        )}
+
+        {tab === "expeditions" && (
+          <section className="bw-section">
+            <h2>Weekly Expeditions</h2>
+            <p className="bw-section-lead">
+              A fresh outdoor challenge each week — curiosity over competition.
+            </p>
+            <article className="bw-card bw-expedition">
+              <p className="bw-eyebrow">This week</p>
+              <h3>
+                <span aria-hidden>{expedition.emoji}</span> {expedition.title}
+              </h3>
+              <p className="bw-prompt-text">{expedition.challenge}</p>
+              <p>{expedition.detail}</p>
+              <div className="bw-actions">
+                <button
+                  type="button"
+                  className="btn-primary"
+                  disabled={
+                    busy || progress.completed[`expedition:${expedition.id}`]
+                  }
+                  onClick={() =>
+                    void postAction({
+                      type: "complete",
+                      completeKind: "expedition",
+                      id: expedition.id,
+                    })
+                  }
+                >
+                  {progress.completed[`expedition:${expedition.id}`]
+                    ? "Completed this week"
+                    : "Mark expedition done"}
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  disabled={busy}
+                  onClick={() => requestPhoto("expedition", expedition.id)}
+                >
+                  Upload field photo
+                </button>
+              </div>
+              {progress.photos[`expedition:${expedition.id}`] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={progress.photos[`expedition:${expedition.id}`]}
+                  alt="Your expedition"
+                  className="bw-upload-preview"
+                />
+              ) : null}
+            </article>
+          </section>
+        )}
+
+        {tab === "adventures" && (
+          <section className="bw-section">
+            <h2>Woodland Adventures</h2>
+            <p className="bw-section-lead">
+              Outdoor challenges for Curaçao, Suriname, and the Netherlands ·{" "}
+              {adventurePct}% explored
+            </p>
+            <div className="bw-progress-bar" aria-hidden>
+              <span style={{ width: `${adventurePct}%` }} />
+            </div>
+            <ul className="bw-quest-list">
+              {WOODLAND_ADVENTURES.map((a) => (
+                <li key={a.id}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(progress.questChecks[a.id])}
+                      disabled={busy}
+                      onChange={(e) =>
+                        void postAction({
+                          type: "questToggle",
+                          itemId: a.id,
+                          checked: e.target.checked,
+                        })
+                      }
+                    />
+                    <span aria-hidden>{a.emoji}</span>
+                    <span>
+                      <strong>{a.label}</strong>
+                      <em>{a.hint}</em>
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    disabled={busy}
+                    onClick={() => requestPhoto("quest", a.id)}
+                  >
+                    Photo
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {tab === "skills" && (
+          <section className="bw-section">
+            <h2>Outdoor Skills</h2>
+            <p className="bw-section-lead">
+              Beginner-friendly lessons — rope, maps, weather, and gentle safety.
+            </p>
+            <div className="bw-grid">
+              {OUTDOOR_SKILLS.map((skill) => {
+                const done = progress.completed[`skill:${skill.id}`];
+                return (
+                  <article key={skill.id} className="bw-card skill-card">
+                    <h3>
+                      <span aria-hidden>{skill.emoji}</span> {skill.title}
+                    </h3>
+                    <p className="bw-meta">{skill.time}</p>
+                    <p>{skill.summary}</p>
+                    <ol>
+                      {skill.steps.map((s) => (
+                        <li key={s}>{s}</li>
+                      ))}
+                    </ol>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      disabled={busy || done}
+                      onClick={() =>
+                        void postAction({
+                          type: "complete",
+                          completeKind: "skill",
+                          id: skill.id,
+                        })
+                      }
+                    >
+                      {done ? "Practiced" : "Mark practiced"}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {tab === "diy" && (
+          <section className="bw-section">
+            <h2>Woodland DIY</h2>
+            <p className="bw-section-lead">
+              Safe outdoor-inspired crafts — no dangerous tools, only gentle
+              making.
+            </p>
+            <article className="bw-card craft-card bw-featured-diy">
+              <div>
+                <p className="bw-eyebrow">Featured this week</p>
+                <h3>{weeklyDiy.title}</h3>
+                <p className="bw-meta">
+                  {weeklyDiy.difficulty} · {weeklyDiy.time}
+                </p>
                 <ul>
-                  {craft.materials.map((m) => (
+                  {weeklyDiy.materials.map((m) => (
                     <li key={m}>{m}</li>
                   ))}
                 </ul>
-                <h4>Instructions</h4>
                 <ol>
-                  {craft.instructions.map((step) => (
-                    <li key={step}>{step}</li>
+                  {weeklyDiy.instructions.map((s) => (
+                    <li key={s}>{s}</li>
                   ))}
                 </ol>
                 <div className="bw-actions">
                   <button
                     type="button"
                     className="btn-primary"
-                    disabled={busy || progress.completed[`craft:${craft.id}`]}
+                    disabled={
+                      busy || progress.completed[`diy:${weeklyDiy.id}`]
+                    }
                     onClick={() =>
                       void postAction({
                         type: "complete",
-                        completeKind: "craft",
-                        id: craft.id,
+                        completeKind: "diy",
+                        id: weeklyDiy.id,
                       })
                     }
                   >
-                    {progress.completed[`craft:${craft.id}`]
-                      ? "Completed"
+                    {progress.completed[`diy:${weeklyDiy.id}`]
+                      ? "Made"
                       : "Mark Complete"}
                   </button>
-                </div>
-                <div className="bw-photo-drop bw-photo-drop-compact">
-                  <p className="bw-photo-drop-title">Your finished photo</p>
                   <button
                     type="button"
-                    className="bw-photo-pick-btn"
+                    className="btn-secondary"
                     disabled={busy}
-                    onClick={() => requestPhoto("craft", craft.id)}
+                    onClick={() => requestPhoto("diy", weeklyDiy.id)}
                   >
-                    📷 Add image of this craft
+                    Upload finished craft
                   </button>
-                  {progress.photos[`craft:${craft.id}`] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={progress.photos[`craft:${craft.id}`]}
-                      alt="Your craft"
-                      className="bw-upload-preview"
-                    />
-                  ) : null}
                 </div>
               </div>
-              <figure className="bw-craft-example">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={craft.image}
-                  alt={`Example of finished craft: ${craft.title}`}
-                  className="bw-card-art"
-                />
-                <figcaption>Inspiration · finished example</figcaption>
-              </figure>
+              {weeklyDiy.image ? (
+                <figure className="bw-recipe-example">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={weeklyDiy.image} alt="" />
+                  <figcaption>Inspiration</figcaption>
+                </figure>
+              ) : (
+                <div className="bw-diy-plate" aria-hidden>
+                  🪵
+                </div>
+              )}
             </article>
-            <details className="bw-more">
-              <summary>More craft ideas</summary>
-              <ul className="bw-idea-list">
-                {CRAFTS.map((c) => (
-                  <li key={c.id} className="bw-idea-craft">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={c.image}
-                      alt={`Example of finished craft: ${c.title}`}
-                    />
-                    <div>
-                      <strong>{c.title}</strong>
-                      <span>
-                        {c.difficulty} · {c.time}
-                      </span>
+
+            <h3 className="bw-subhead">More woodland crafts</h3>
+            <div className="bw-grid">
+              {WOODLAND_DIY.map((diy) => {
+                const done = progress.completed[`diy:${diy.id}`];
+                return (
+                  <article key={diy.id} className="bw-card craft-card">
+                    {diy.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={diy.image} alt="" className="bw-diy-thumb" />
+                    ) : (
+                      <div className="bw-diy-plate small" aria-hidden>
+                        🪵
+                      </div>
+                    )}
+                    <h3>{diy.title}</h3>
+                    <p className="bw-meta">
+                      {diy.difficulty} · {diy.time}
+                    </p>
+                    <details>
+                      <summary>Materials &amp; steps</summary>
+                      <ul>
+                        {diy.materials.map((m) => (
+                          <li key={m}>{m}</li>
+                        ))}
+                      </ul>
+                      <ol>
+                        {diy.instructions.map((s) => (
+                          <li key={s}>{s}</li>
+                        ))}
+                      </ol>
+                    </details>
+                    <div className="bw-actions">
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        disabled={busy || done}
+                        onClick={() =>
+                          void postAction({
+                            type: "complete",
+                            completeKind: "diy",
+                            id: diy.id,
+                          })
+                        }
+                      >
+                        {done ? "Made" : "Mark Complete"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        disabled={busy}
+                        onClick={() => requestPhoto("diy", diy.id)}
+                      >
+                        Photo
+                      </button>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </details>
+                  </article>
+                );
+              })}
+            </div>
           </section>
         )}
 
@@ -396,7 +620,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
           <section className="bw-section">
             <h2>Cozy Kitchen</h2>
             <p className="bw-section-lead">
-              Cottage recipes — finish a dish to unlock kitchen badges.
+              Warm recipes for after the trail — bake, steep, and share.
             </p>
             <div className="bw-grid">
               {RECIPES.map((r) => {
@@ -461,111 +685,126 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
           </section>
         )}
 
-        {tab === "prompt" && (
+        {tab === "wildlife" && (
           <section className="bw-section">
-            <h2>Creative Prompt</h2>
-            <p className="bw-section-lead">This week&apos;s woodland invitation.</p>
-            <article className="bw-card prompt-card">
-              <p className="bw-prompt-text">{weeklyPrompt.text}</p>
-              <div className="bw-actions">
-                <button
-                  type="button"
-                  className="btn-primary"
-                  disabled={busy}
-                  onClick={() => requestPhoto("prompt", weeklyPrompt.id)}
-                >
-                  Upload Artwork
-                </button>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => setGalleryOpen((v) => !v)}
-                >
-                  View Community Gallery
-                </button>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  disabled={
-                    busy || progress.completed[`prompt:${weeklyPrompt.id}`]
-                  }
-                  onClick={() =>
-                    void postAction({
-                      type: "complete",
-                      completeKind: "prompt",
-                      id: weeklyPrompt.id,
-                    })
-                  }
-                >
-                  Mark Prompt Done
-                </button>
-              </div>
-              {galleryOpen ? (
-                <div className="bw-gallery">
-                  <p>
-                    Community walls fill as villagers upload. Your pieces appear
-                    in the Craft Journal scrapbook below.
-                  </p>
-                  {progress.photos[`prompt:${weeklyPrompt.id}`] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={progress.photos[`prompt:${weeklyPrompt.id}`]}
-                      alt="Your artwork"
-                    />
-                  ) : (
-                    <p className="muted">Upload to pin the first scrap.</p>
-                  )}
-                </div>
-              ) : null}
-            </article>
-          </section>
-        )}
-
-        {tab === "quest" && (
-          <section className="bw-section">
-            <h2>Woodland Quest</h2>
+            <h2>Local Wildlife</h2>
             <p className="bw-section-lead">
-              A real-life scavenger hunt · {questPct}% complete · Explorer XP
+              A pocket field guide for animals you can meet in Curaçao, Suriname,
+              or the Netherlands.
             </p>
-            <div className="bw-progress-bar" aria-hidden>
-              <span style={{ width: `${questPct}%` }} />
+            <div className="bw-grid birds">
+              {LOCAL_WILDLIFE.map((w) => {
+                const spotted = progress.birds[w.id]?.spotted;
+                const photo = progress.birds[w.id]?.photoUrl;
+                return (
+                  <article key={w.id} className="bw-card bird-card bw-field-card">
+                    <figure className="bw-bird-figure">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photo || w.image}
+                        alt={photo ? `Your photo of a ${w.name}` : w.name}
+                        className="bw-bird-image"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                      <div className="bw-field-fallback" aria-hidden>
+                        {w.emoji}
+                      </div>
+                      <figcaption>
+                        {spotted ? "Logged in your guide" : "Field guide plate"}
+                      </figcaption>
+                    </figure>
+                    <h3>
+                      {w.emoji} {w.name}
+                    </h3>
+                    <p className="bw-meta">{w.countries.join(" · ")}</p>
+                    <p>
+                      <strong>Habitat:</strong> {w.habitat}
+                    </p>
+                    <p>
+                      <strong>Best time:</strong> {w.bestTime}
+                    </p>
+                    <ul className="bw-fact-list">
+                      {w.facts.map((f) => (
+                        <li key={f}>{f}</li>
+                      ))}
+                    </ul>
+                    <div className="bw-actions">
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        disabled={busy || spotted}
+                        onClick={() =>
+                          void postAction({
+                            type: "wildlife",
+                            wildlifeId: w.id,
+                          })
+                        }
+                      >
+                        {spotted ? "Spotted" : "Log sighting"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        disabled={busy}
+                        onClick={() => requestPhoto("wildlife", w.id)}
+                      >
+                        Upload photo
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-            <ul className="bw-quest-list">
-              {QUEST_ITEMS.map((q) => (
-                <li key={q.id}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={Boolean(progress.questChecks[q.id])}
-                      disabled={busy}
-                      onChange={(e) =>
-                        void postAction({
-                          type: "questToggle",
-                          itemId: q.id,
-                          checked: e.target.checked,
-                        })
-                      }
-                    />
-                    <span aria-hidden>{q.emoji}</span>
-                    {q.label}
-                  </label>
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    disabled={busy}
-                    onClick={() => requestPhoto("quest", q.id)}
-                  >
-                    Photo
-                  </button>
-                </li>
-              ))}
-            </ul>
           </section>
         )}
 
-        {tab === "grow" && (
+        {tab === "flora" && (
           <section className="bw-section">
-            <h2>Grow Something</h2>
+            <h2>Plant &amp; Tree Guide</h2>
+            <p className="bw-section-lead">
+              Beginner-friendly flora from Caribbean shores to Dutch woods —
+              plus a quiet grow journal.
+            </p>
+            <div className="bw-grid birds">
+              {PLANT_TREE_GUIDE.map((p) => (
+                <article key={p.id} className="bw-card bird-card bw-field-card">
+                  <figure className="bw-bird-figure">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="bw-bird-image"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                    <div className="bw-field-fallback" aria-hidden>
+                      {p.emoji}
+                    </div>
+                    <figcaption>Botanical plate</figcaption>
+                  </figure>
+                  <h3>
+                    {p.emoji} {p.name}
+                  </h3>
+                  <p className="bw-meta">{p.countries.join(" · ")}</p>
+                  <p>
+                    <strong>Habitat:</strong> {p.habitat}
+                  </p>
+                  <p>
+                    <strong>How to recognize:</strong> {p.recognize}
+                  </p>
+                  <ul className="bw-fact-list">
+                    {p.facts.map((f) => (
+                      <li key={f}>{f}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+
+            <h3 className="bw-subhead">Grow Something</h3>
             <p className="bw-section-lead">
               Choose one plant and upload a progress photo each week.
             </p>
@@ -617,60 +856,45 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
             ) : (
               <p className="muted">Pick a plant to begin your grow journal.</p>
             )}
-            <p className="bw-rewards">
-              Rewards: 🌱 Tiny Sprout · 🌿 Gardener · 🌻 Green Thumb
-            </p>
           </section>
         )}
 
-        {tab === "birds" && (
+        {tab === "collections" && (
           <section className="bw-section">
-            <h2>Bird Watch</h2>
+            <h2>Discovery Collections</h2>
             <p className="bw-section-lead">
-              Log species in your illustrated field guide.
+              Slow collections that reward curiosity — stamp your finds one by
+              one.
             </p>
-            <div className="bw-grid birds">
-              {BIRDS.map((b) => {
-                const spotted = progress.birds[b.id]?.spotted;
-                const photo = progress.birds[b.id]?.photoUrl;
+            <div className="bw-grid">
+              {DISCOVERY_COLLECTIONS.map((c) => {
+                const count = progress.collections[c.id] || 0;
+                const pct = Math.round((count / c.goal) * 100);
                 return (
-                  <article key={b.id} className="bw-card bird-card">
-                    <figure className="bw-bird-figure">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={photo || b.image}
-                        alt={photo ? `Your photo of a ${b.name}` : b.name}
-                        className="bw-bird-image"
-                      />
-                      <figcaption>
-                        <span className="bw-bird-emoji" aria-hidden>
-                          {b.emoji}
-                        </span>
-                        {spotted ? "Spotted in your guide" : "Field guide plate"}
-                      </figcaption>
-                    </figure>
-                    <h3>{b.name}</h3>
-                    <p>{b.hint}</p>
-                    <div className="bw-actions">
-                      <button
-                        type="button"
-                        className="btn-primary"
-                        disabled={busy || spotted}
-                        onClick={() =>
-                          void postAction({ type: "bird", birdId: b.id })
-                        }
-                      >
-                        {spotted ? "Spotted" : "Log sighting"}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-secondary"
-                        disabled={busy}
-                        onClick={() => requestPhoto("bird", b.id)}
-                      >
-                        Upload photo
-                      </button>
+                  <article key={c.id} className="bw-card bw-collection-card">
+                    <h3>
+                      <span aria-hidden>{c.emoji}</span> {c.title}
+                    </h3>
+                    <p>{c.blurb}</p>
+                    <div className="bw-progress-bar" aria-hidden>
+                      <span style={{ width: `${pct}%` }} />
                     </div>
+                    <p className="bw-meta">
+                      {count} / {c.goal} noticed
+                    </p>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      disabled={busy || count >= c.goal}
+                      onClick={() =>
+                        void postAction({
+                          type: "collectionBump",
+                          collectionId: c.id,
+                        })
+                      }
+                    >
+                      {count >= c.goal ? "Collection complete" : "I noticed one"}
+                    </button>
                   </article>
                 );
               })}
@@ -680,28 +904,46 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
 
         {tab === "journal" && (
           <section className="bw-section">
-            <h2>Craft Journal</h2>
+            <h2>Explorer&apos;s Journal</h2>
             <p className="bw-section-lead">
-              Open this tab to save a journal page: pick a craft, write about
-              it, <strong>add your photo</strong>, and optionally share it on
-              the village square.
+              Record adventures, surprises, sounds, and what you want to explore
+              next.
             </p>
 
-            <form className="bw-card bw-journal-form" onSubmit={submitJournalEntry}>
+            <form
+              className="bw-card bw-journal-form"
+              onSubmit={submitJournalEntry}
+            >
               <h3>New journal page</h3>
               <label className="bw-field">
-                <span>Which craft?</span>
+                <span>Prompt</span>
+                <select
+                  value={journalPrompt}
+                  onChange={(e) => {
+                    setJournalPrompt(e.target.value);
+                    if (!journalTitle) setJournalTitle(e.target.value);
+                  }}
+                >
+                  {EXPLORER_PROMPTS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="bw-field">
+                <span>Related DIY (optional)</span>
                 <select
                   value={journalCraftId}
                   onChange={(e) => {
                     const id = e.target.value;
                     setJournalCraftId(id);
-                    const craft = CRAFTS.find((c) => c.id === id);
-                    if (craft) setJournalTitle(craft.title);
+                    const diy = WOODLAND_DIY.find((c) => c.id === id);
+                    if (diy) setJournalTitle(diy.title);
                   }}
                 >
-                  <option value="">Something else / custom</option>
-                  {CRAFTS.map((c) => (
+                  <option value="">Something else / adventure note</option>
+                  {WOODLAND_DIY.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.title}
                     </option>
@@ -714,28 +956,24 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                   type="text"
                   value={journalTitle}
                   onChange={(e) => setJournalTitle(e.target.value)}
-                  placeholder="e.g. Pressed flower bookmarks"
+                  placeholder="e.g. Mangrove walk at dusk"
                   maxLength={120}
                   required
                 />
               </label>
               <label className="bw-field">
-                <span>Your experience</span>
+                <span>Your adventure note</span>
                 <textarea
                   value={journalNote}
                   onChange={(e) => setJournalNote(e.target.value)}
-                  placeholder="How did it feel? What surprised you? Did the moss stick? Write it like a scrapbook note…"
+                  placeholder="Where did you go? What surprised you? What animal or sound did you notice?"
                   rows={5}
                   maxLength={2000}
                   required
                 />
               </label>
               <div className="bw-photo-drop">
-                <p className="bw-photo-drop-title">Finished craft photo</p>
-                <p className="bw-photo-drop-hint">
-                  Add a picture of what you made — you can share it to the
-                  village square below.
-                </p>
+                <p className="bw-photo-drop-title">Field photo</p>
                 <input
                   ref={journalFileRef}
                   type="file"
@@ -750,7 +988,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={journalPhoto}
-                      alt="Finished craft preview"
+                      alt="Field photo preview"
                       className="bw-journal-form-preview"
                     />
                     <button
@@ -782,7 +1020,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                     checked={journalMarkComplete}
                     onChange={(e) => setJournalMarkComplete(e.target.checked)}
                   />
-                  Also mark this craft complete (+XP &amp; Craftsman Badge)
+                  Also mark this DIY complete (+XP)
                 </label>
               ) : null}
               <label className="bw-check">
@@ -792,23 +1030,19 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                   onChange={(e) => setJournalShareVillage(e.target.checked)}
                 />
                 Share with the village square
-                {journalPhoto
-                  ? " (includes your photo)"
-                  : " — add a photo to show your finished craft"}
               </label>
               <button
                 type="submit"
                 className="btn-primary"
                 disabled={busy || journalUploading}
               >
-                Save to Craft Journal
+                Save to Explorer&apos;s Journal
               </button>
             </form>
 
             {progress.journal.length === 0 ? (
               <p className="muted">
-                Your scrapbook is waiting for its first page — add a finished
-                craft above.
+                Your scrapbook is waiting for its first adventure page.
               </p>
             ) : (
               <div className="bw-journal">
@@ -845,7 +1079,9 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                     <p className="bw-handnote">{entry.note}</p>
                     <div className="bw-journal-share-row">
                       {entry.shared ? (
-                        <em className="bw-shared-tag">Shared on the village square</em>
+                        <em className="bw-shared-tag">
+                          Shared on the village square
+                        </em>
                       ) : (
                         <button
                           type="button"
@@ -869,45 +1105,12 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
           </section>
         )}
       </div>
-
-      <section className="bw-seasonal">
-        <h2>Seasonal Events</h2>
-        <div className="bw-grid seasonal">
-          {SEASONAL_PANELS.map((panel) => (
-            <article key={panel.id} className="bw-card">
-              <h3>
-                <span aria-hidden>{panel.emoji}</span> {panel.title}
-              </h3>
-              <ul className="bw-season-tasks">
-                {panel.tasks.map((task, index) => {
-                  const key = `${panel.id}:${index}`;
-                  const done = progress.seasonal[key];
-                  return (
-                    <li key={task}>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={Boolean(done)}
-                          disabled={busy || done}
-                          onChange={() =>
-                            void postAction({
-                              type: "seasonal",
-                              eventId: panel.id,
-                              taskIndex: index,
-                            })
-                          }
-                        />
-                        {task}
-                      </label>
-                    </li>
-                  );
-                })}
-              </ul>
-              <p className="bw-meta">Reward: {panel.reward}</p>
-            </article>
-          ))}
-        </div>
-      </section>
     </div>
   );
+}
+
+function weekDiyIndex() {
+  const start = Date.UTC(new Date().getUTCFullYear(), 0, 1);
+  const day = Math.floor((Date.now() - start) / 86_400_000);
+  return Math.floor(day / 7) % WOODLAND_DIY.length;
 }

@@ -3,12 +3,18 @@ import { getDb } from "@/lib/db";
 import {
   CRAFTS,
   CREATIVE_PROMPTS,
+  DISCOVERY_COLLECTIONS,
+  LOCAL_WILDLIFE,
+  OUTDOOR_SKILLS,
   PLANTS,
   QUEST_ITEMS,
   RECIPES,
-  SEASONAL_PANELS,
+  WEEKLY_EXPEDITIONS,
+  WOODLAND_ADVENTURES,
+  WOODLAND_DIY,
   WORKSHOP_XP,
   featuredCraft,
+  featuredExpedition,
   featuredPrompt,
   titleForXp,
   type WorkshopTabId,
@@ -32,16 +38,19 @@ export type WorkshopProgress = {
   badges: string[];
   completed: Record<string, boolean>;
   photos: Record<string, string>;
+  /** Woodland Adventures checklist (also stores legacy quest ids). */
   questChecks: Record<string, boolean>;
   questPhotos: Record<string, string>;
   plantId: string | null;
   plantWeeks: Record<string, string>;
+  /** Wildlife + legacy bird sightings. */
   birds: Record<string, { spotted: boolean; photoUrl?: string }>;
-  seasonal: Record<string, boolean>;
+  collections: Record<string, number>;
   journal: JournalEntry[];
   featured: {
     craftId: string;
     promptId: string;
+    expeditionId: string;
   };
 };
 
@@ -127,6 +136,10 @@ function listJournal(userId: string): JournalEntry[] {
 export function getWorkshopProgress(userId: string): WorkshopProgress {
   const row = readRow(userId);
   const xp = Number(row.xp) || 0;
+  const broadcast = parseJson<{ collections?: Record<string, number> }>(
+    row.broadcast_json,
+    {}
+  );
   return {
     xp,
     title: titleForXp(xp),
@@ -138,11 +151,12 @@ export function getWorkshopProgress(userId: string): WorkshopProgress {
     plantId: row.plant_id,
     plantWeeks: parseJson<Record<string, string>>(row.plant_weeks_json, {}),
     birds: parseJson(row.birds_json, {}),
-    seasonal: parseJson(row.seasonal_json, {}),
+    collections: broadcast.collections || {},
     journal: listJournal(userId),
     featured: {
       craftId: featuredCraft().id,
       promptId: featuredPrompt().id,
+      expeditionId: featuredExpedition().id,
     },
   };
 }
@@ -230,7 +244,8 @@ export type WorkshopAction =
   | { type: "choosePlant"; plantId: string }
   | { type: "plantWeek"; week: number; photoUrl: string }
   | { type: "bird"; birdId: string; photoUrl?: string }
-  | { type: "seasonal"; eventId: string; taskIndex: number }
+  | { type: "wildlife"; wildlifeId: string; photoUrl?: string }
+  | { type: "collectionBump"; collectionId: string }
   | {
       type: "journalEntry";
       activityId?: string;
@@ -266,8 +281,11 @@ export function applyWorkshopAction(
   const birds = parseJson<
     Record<string, { spotted: boolean; photoUrl?: string }>
   >(row.birds_json, {});
-  const broadcast = parseJson(row.broadcast_json, {});
-  const seasonal = parseJson<Record<string, boolean>>(row.seasonal_json, {});
+  const broadcast = parseJson<{ collections?: Record<string, number> }>(
+    row.broadcast_json,
+    {}
+  );
+  const collections = { ...(broadcast.collections || {}) };
 
   if (action.type === "complete") {
     if (!completed[action.key]) {
@@ -281,18 +299,16 @@ export function applyWorkshopAction(
   } else if (action.type === "photo") {
     photos[action.key] = action.photoUrl;
   } else if (action.type === "questToggle") {
-    const key = `quest:${action.itemId}`;
     const was = Boolean(questChecks[action.itemId]);
     questChecks[action.itemId] = action.checked;
     if (action.photoUrl) questPhotos[action.itemId] = action.photoUrl;
     if (action.checked && !was) {
-      xp += WORKSHOP_XP.questItem;
-      const done = QUEST_ITEMS.every((q) => questChecks[q.id]);
-      if (done) badges = addBadge(badges, "Explorer");
-    }
-    if (!action.checked && was) {
-      // Do not claw back XP.
-      void key;
+      const isAdventure = WOODLAND_ADVENTURES.some((a) => a.id === action.itemId);
+      xp += isAdventure ? WORKSHOP_XP.adventure : WORKSHOP_XP.questItem;
+      const adventureDone = WOODLAND_ADVENTURES.every((a) => questChecks[a.id]);
+      const questDone = QUEST_ITEMS.every((q) => questChecks[q.id]);
+      if (adventureDone) badges = addBadge(badges, "Woodland Adventurer");
+      if (questDone) badges = addBadge(badges, "Explorer");
     }
   } else if (action.type === "choosePlant") {
     if (PLANTS.some((p) => p.id === action.plantId)) {
@@ -312,30 +328,38 @@ export function applyWorkshopAction(
     } else {
       plantWeeks[weekKey] = action.photoUrl;
     }
-  } else if (action.type === "bird") {
-    const prior = birds[action.birdId];
+  } else if (action.type === "bird" || action.type === "wildlife") {
+    const id =
+      action.type === "bird" ? action.birdId : action.wildlifeId;
+    const prior = birds[id];
     if (!prior?.spotted) {
-      birds[action.birdId] = {
+      birds[id] = {
         spotted: true,
         photoUrl: action.photoUrl,
       };
-      xp += WORKSHOP_XP.bird;
-      if (Object.values(birds).filter((b) => b.spotted).length >= 5) {
-        badges = addBadge(badges, "Bird Watcher");
+      xp +=
+        action.type === "wildlife" ? WORKSHOP_XP.wildlife : WORKSHOP_XP.bird;
+      const spottedCount = Object.values(birds).filter((b) => b.spotted).length;
+      if (spottedCount >= 5) badges = addBadge(badges, "Field Guide Friend");
+      if (
+        LOCAL_WILDLIFE.every((w) => birds[w.id]?.spotted)
+      ) {
+        badges = addBadge(badges, "Local Wildlife Keeper");
       }
     } else if (action.photoUrl) {
-      birds[action.birdId] = { spotted: true, photoUrl: action.photoUrl };
+      birds[id] = { spotted: true, photoUrl: action.photoUrl };
     }
-  } else if (action.type === "seasonal") {
-    const key = `${action.eventId}:${action.taskIndex}`;
-    if (!seasonal[key]) {
-      seasonal[key] = true;
-      xp += WORKSHOP_XP.seasonal;
-      const panel = SEASONAL_PANELS.find((p) => p.id === action.eventId);
-      const allDone =
-        panel &&
-        panel.tasks.every((_, i) => seasonal[`${action.eventId}:${i}`]);
-      if (allDone && panel) badges = addBadge(badges, panel.reward);
+  } else if (action.type === "collectionBump") {
+    const meta = DISCOVERY_COLLECTIONS.find((c) => c.id === action.collectionId);
+    if (meta) {
+      const current = collections[meta.id] || 0;
+      if (current < meta.goal) {
+        collections[meta.id] = current + 1;
+        xp += WORKSHOP_XP.collection;
+        if (collections[meta.id] >= meta.goal) {
+          badges = addBadge(badges, `${meta.title} Complete`);
+        }
+      }
     }
   } else if (action.type === "journalEntry") {
     const name = action.activityName.trim().slice(0, 120);
@@ -345,16 +369,18 @@ export function applyWorkshopAction(
     }
 
     const craft = CRAFTS.find((c) => c.id === action.activityId);
+    const diy = WOODLAND_DIY.find((c) => c.id === action.activityId);
     const recipe = RECIPES.find((r) => r.id === action.activityId);
     let xpEarned = WORKSHOP_XP.journal;
     const activityId = action.activityId || `custom-${Date.now()}`;
-    const activityType = craft ? "craft" : recipe ? "recipe" : "journal";
+    const activityType = craft || diy ? "craft" : recipe ? "recipe" : "journal";
 
-    if (action.markCraftComplete && craft) {
-      const key = `craft:${craft.id}`;
+    if (action.markCraftComplete && (craft || diy)) {
+      const item = craft || diy!;
+      const key = `craft:${item.id}`;
       if (!completed[key]) {
         completed[key] = true;
-        xpEarned += WORKSHOP_XP.craft;
+        xpEarned += craft ? WORKSHOP_XP.craft : WORKSHOP_XP.diy;
         badges = addBadge(badges, "Craftsman Badge");
       }
     } else if (action.markCraftComplete && recipe) {
@@ -369,6 +395,7 @@ export function applyWorkshopAction(
     if (action.photoUrl) {
       photos[`journal:${activityId}:${Date.now()}`] = action.photoUrl;
       if (craft) photos[`craft:${craft.id}`] = action.photoUrl;
+      if (diy) photos[`diy:${diy.id}`] = action.photoUrl;
       if (recipe) photos[`recipe:${recipe.id}`] = action.photoUrl;
     }
 
@@ -448,8 +475,8 @@ export function applyWorkshopAction(
     plantId,
     JSON.stringify(plantWeeks),
     JSON.stringify(birds),
-    JSON.stringify(broadcast),
-    JSON.stringify(seasonal),
+    JSON.stringify({ collections }),
+    "{}",
     userId
   );
 
@@ -466,6 +493,48 @@ export function craftCompletionPayload(craftId: string, photoUrl?: string) {
     activityName: craft.title,
     xp: WORKSHOP_XP.craft,
     badge: "Craftsman Badge",
+    photoUrl,
+  };
+}
+
+export function diyCompletionPayload(diyId: string, photoUrl?: string) {
+  const diy = WOODLAND_DIY.find((c) => c.id === diyId) || WOODLAND_DIY[0];
+  return {
+    type: "complete" as const,
+    key: `diy:${diy.id}`,
+    activityType: "diy",
+    activityId: diy.id,
+    activityName: diy.title,
+    xp: WORKSHOP_XP.diy,
+    badge: "Woodland Maker",
+    photoUrl,
+  };
+}
+
+export function skillCompletionPayload(skillId: string) {
+  const skill = OUTDOOR_SKILLS.find((s) => s.id === skillId) || OUTDOOR_SKILLS[0];
+  return {
+    type: "complete" as const,
+    key: `skill:${skill.id}`,
+    activityType: "skill",
+    activityId: skill.id,
+    activityName: skill.title,
+    xp: WORKSHOP_XP.skill,
+    badge: "Outdoor Learner",
+  };
+}
+
+export function expeditionCompletionPayload(expeditionId: string, photoUrl?: string) {
+  const found =
+    WEEKLY_EXPEDITIONS.find((e) => e.id === expeditionId) || featuredExpedition();
+  return {
+    type: "complete" as const,
+    key: `expedition:${found.id}`,
+    activityType: "expedition",
+    activityId: found.id,
+    activityName: found.title,
+    xp: WORKSHOP_XP.expedition,
+    badge: "Weekly Explorer",
     photoUrl,
   };
 }

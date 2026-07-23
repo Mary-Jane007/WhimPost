@@ -21,7 +21,7 @@ export default async function WorkshopPage() {
           ]}
         />
         <header className="page-header">
-          <h1>The Bramblewood Workshop</h1>
+          <h1>The Woodland Workshop</h1>
           <p>Join Bramblewood first — every workshop needs a woodland home.</p>
         </header>
         <p className="muted">
@@ -37,7 +37,7 @@ export default async function WorkshopPage() {
       <main className="app-main forest-panel">
         <PageCrest kinds={["fox-seated", "leafy-branch", "candle-jar"]} />
         <header className="page-header">
-          <h1>The Bramblewood Workshop</h1>
+          <h1>The Woodland Workshop</h1>
           <p>
             This atelier is exclusive to Bramblewood. Join that village if you
             want a seat among the autumn crafts.
