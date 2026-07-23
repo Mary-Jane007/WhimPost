@@ -42,8 +42,6 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
   >(null);
   const [selectedCreature, setSelectedCreature] = useState<string | null>(null);
   const [listeningId, setListeningId] = useState<string | null>(null);
-  const [showStardustOnly, setShowStardustOnly] = useState(false);
-  const [randomWishId, setRandomWishId] = useState<string | null>(null);
 
   const rituals = dailyRituals();
   const moon = todaysMoonPhase();
@@ -93,17 +91,6 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
     return progress.dreams.filter((d) => d.theme === dreamFilter);
   }, [progress.dreams, dreamFilter]);
 
-  const visibleWishes = useMemo(() => {
-    if (showStardustOnly) {
-      return progress.wishes.filter((w) => progress.stardust[w.id]);
-    }
-    if (randomWishId) {
-      const one = progress.wishes.find((w) => w.id === randomWishId);
-      return one ? [one] : progress.wishes.slice(0, 1);
-    }
-    return progress.wishes;
-  }, [progress.wishes, progress.stardust, showStardustOnly, randomWishId]);
-
   const inspConstellation =
     CONSTELLATIONS.find((c) => c.id === inspiration.constellationId) ||
     constellation;
@@ -111,13 +98,6 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
     SKY_FACTS.find((f) => f.id === inspiration.factId) || fact;
   const inspCreature =
     NIGHT_CREATURES.find((c) => c.id === inspiration.creatureId) || creature;
-
-  function pickRandomWish() {
-    if (progress.wishes.length === 0) return;
-    const idx = Math.floor(Math.random() * progress.wishes.length);
-    setRandomWishId(progress.wishes[idx].id);
-    setShowStardustOnly(false);
-  }
 
   async function onJournal(e: FormEvent) {
     e.preventDefault();
@@ -176,9 +156,7 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
             {progress.title.emoji} {progress.title.title}
           </span>
           <span>{progress.xp} XP</span>
-          <span>
-            {Object.keys(progress.stardust).length} stardust wishes
-          </span>
+          <span>{progress.dreams.length} bottled dreams</span>
           <span>{progress.journal.length} journal pages</span>
         </div>
       </header>
@@ -251,18 +229,18 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
               </article>
               <article className="mm-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={MOON_ART.starlight} alt="" className="mm-card-img" />
-                <h3>Shooting Star Wishes</h3>
+                <img src={MOON_ART.dreams} alt="" className="mm-card-img" />
+                <h3>Dream Archive</h3>
                 <p>
-                  Anonymous hopes drift across the sky. No replies — only
-                  stardust you choose to keep.
+                  Anonymous dreams sealed like folded pages in glass bottles —
+                  imagination only, no interpretation.
                 </p>
                 <button
                   type="button"
                   className="btn-secondary"
-                  onClick={() => setTab("wishes")}
+                  onClick={() => setTab("dreams")}
                 >
-                  Read wishes
+                  Browse dreams
                 </button>
               </article>
             </div>
@@ -515,75 +493,6 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                   <p>{f.body}</p>
                 </article>
               ))}
-            </div>
-          </section>
-        )}
-
-        {tab === "wishes" && (
-          <section className="mm-section">
-            <h2>Shooting Star Wishes</h2>
-            <p className="mm-section-lead">
-              Anonymous hopes drift across the sky. Nobody replies. Nobody knows
-              who wrote them. Save favorites into Stardust.
-            </p>
-            <div className="mm-wish-sky" aria-hidden>
-              <span className="mm-shooting w1" />
-              <span className="mm-shooting w2" />
-              <span className="mm-shooting w3" />
-            </div>
-            <div className="mm-chip-row">
-              <button
-                type="button"
-                className={!showStardustOnly && !randomWishId ? "active" : ""}
-                onClick={() => {
-                  setShowStardustOnly(false);
-                  setRandomWishId(null);
-                }}
-              >
-                All wishes
-              </button>
-              <button
-                type="button"
-                className={showStardustOnly ? "active" : ""}
-                onClick={() => {
-                  setShowStardustOnly(true);
-                  setRandomWishId(null);
-                }}
-              >
-                ✦ Stardust
-              </button>
-              <button type="button" onClick={pickRandomWish}>
-                Read a random wish
-              </button>
-            </div>
-            <div className="mm-wish-list">
-              {visibleWishes.map((w) => {
-                const saved = Boolean(progress.stardust[w.id]);
-                return (
-                  <article key={w.id} className="mm-wish-card">
-                    <p>{w.body}</p>
-                    <button
-                      type="button"
-                      className={saved ? "btn-primary" : "btn-secondary"}
-                      disabled={busy}
-                      onClick={() =>
-                        void postAction({
-                          type: "toggleStardust",
-                          wishId: w.id,
-                        }).then(() =>
-                          setToast(
-                            saved
-                              ? "Released from Stardust."
-                              : "Saved to your Stardust collection."
-                          )
-                        )
-                      }
-                    >
-                      {saved ? "✦ In Stardust" : "☆ Save to Stardust"}
-                    </button>
-                  </article>
-                );
-              })}
             </div>
           </section>
         )}

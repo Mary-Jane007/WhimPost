@@ -304,18 +304,8 @@ function migrate(db: Database.Database) {
       xp INTEGER NOT NULL DEFAULT 0,
       badges_json TEXT NOT NULL DEFAULT '[]',
       rituals_json TEXT NOT NULL DEFAULT '{}',
-      stardust_json TEXT NOT NULL DEFAULT '{}',
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
-
-    CREATE TABLE IF NOT EXISTS moon_wishes (
-      id TEXT PRIMARY KEY,
-      body TEXT NOT NULL,
-      author_id TEXT REFERENCES users(id) ON DELETE SET NULL,
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    CREATE INDEX IF NOT EXISTS idx_moon_wishes_created
-      ON moon_wishes(created_at);
 
     CREATE TABLE IF NOT EXISTS moon_dreams (
       id TEXT PRIMARY KEY,

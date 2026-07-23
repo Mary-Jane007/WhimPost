@@ -8201,7 +8201,7 @@ button.linkish:hover {
   gap: 0.9rem;
 }
 
-.mm-card, .mm-feature-card, .mm-ritual, .mm-wish-card, .mm-dream-bottle, .mm-journal-entry {
+.mm-card, .mm-feature-card, .mm-ritual, .mm-dream-bottle, .mm-journal-entry {
   background:
     radial-gradient(ellipse at 20% 0%, rgba(184, 168, 212, 0.1), transparent 55%),
     linear-gradient(165deg, rgba(36, 51, 86, 0.92), rgba(26, 39, 68, 0.95));
@@ -8362,53 +8362,6 @@ button.linkish:hover {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(184, 168, 212, 0.28), transparent 70%);
   pointer-events: none;
-}
-
-.mm-wish-sky {
-  position: relative;
-  height: 3.5rem;
-  margin-bottom: 0.75rem;
-  overflow: hidden;
-  border-radius: 0.85rem;
-  background: linear-gradient(180deg, rgba(16, 24, 44, 0.6), transparent);
-}
-.mm-shooting {
-  position: absolute;
-  width: 70px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(232, 238, 248, 0.95), transparent);
-  border-radius: 2px;
-  animation: mm-shoot 7s linear infinite;
-  opacity: 0;
-}
-.mm-shooting.w1 { top: 30%; left: -10%; animation-delay: 0s; }
-.mm-shooting.w2 { top: 55%; left: -10%; animation-delay: 2.4s; width: 55px; }
-.mm-shooting.w3 { top: 20%; left: -10%; animation-delay: 4.5s; width: 90px; }
-@keyframes mm-shoot {
-  0% { transform: translate(0, 0) rotate(18deg); opacity: 0; }
-  8% { opacity: 1; }
-  35% { transform: translate(70vw, 45px) rotate(18deg); opacity: 0; }
-  100% { opacity: 0; }
-}
-
-.mm-wish-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-.mm-wish-card {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: space-between;
-  align-items: center;
-}
-.mm-wish-card p {
-  margin: 0;
-  flex: 1 1 14rem;
-  font-family: var(--font-display), Georgia, serif;
-  font-style: italic;
-  font-size: 1.05rem;
 }
 
 .mm-listening {
