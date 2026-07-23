@@ -13,6 +13,7 @@ import {
   PAPER_OPTIONS,
   SCRAP_OPTIONS,
   STAMP_OPTIONS,
+  VILLAGE_STATIONERY,
   WAX_OPTIONS,
   sharedStickers,
   villagePackStickers,
@@ -50,7 +51,9 @@ export function ComposeStudio({
   const [recipientId, setRecipientId] = useState(friends[0]?.id || "");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
-  const [paperStyle, setPaperStyle] = useState<PaperStyle>("parchment");
+  const [paperStyle, setPaperStyle] = useState<PaperStyle>(
+    (villageId && VILLAGE_STATIONERY[villageId]) || "parchment"
+  );
   const [fontStyle, setFontStyle] = useState<LetterFont>("quill");
   const [envelopeStyle, setEnvelopeStyle] = useState<EnvelopeStyle>("kraft");
   const [waxSeal, setWaxSeal] = useState<WaxSeal>("fern");
@@ -78,6 +81,28 @@ export function ComposeStudio({
   );
   const village = getVillage(villageId);
   const villagePackName = village ? `${village.name} pack` : null;
+  const villageStationery = villageId ? VILLAGE_STATIONERY[villageId] : undefined;
+  const paperChoices = useMemo(() => {
+    if (villageStationery) {
+      return PAPER_OPTIONS.filter((p) => p.id === villageStationery);
+    }
+    return PAPER_OPTIONS.filter((p) => !(p.id in VILLAGE_STATIONERY));
+  }, [villageStationery]);
+  const composeThemeClass = villageStationery
+    ? `compose-village compose-${villageStationery}`
+    : "";
+  const stationeryHint =
+    villageStationery === "mosshollow"
+      ? "You're writing on Mosshollow stationery — sage paper, a quiet frame, and the library owl keeping watch."
+      : villageStationery === "clovermeadow"
+        ? "You're writing on Clovermeadow stationery — blush paper, a quiet frame, and a honeybee on clover."
+        : villageStationery === "moonmere"
+          ? "You're writing on Moonmere stationery — misty paper, a quiet frame, and a luna moth by the shore."
+          : villageStationery === "bramblewood"
+            ? "You're writing on Bramblewood's trail stationery — a quiet frame and a fox on mossy stones, with room to decorate."
+            : villageStationery === "hearthwick"
+              ? "You're writing on Hearthwick stationery — warm parchment, a quiet frame, and a hedgehog by the hearth."
+              : null;
 
   function addSticker(kind: StickerKind) {
     const place = scatter(stickers.length + 3, stickers.length);
@@ -256,7 +281,7 @@ export function ComposeStudio({
   }
 
   return (
-    <div className="compose-studio">
+    <div className={`compose-studio ${composeThemeClass}`.trim()}>
       <div className="compose-toolbar">
         <label className="recipient-pick">
           To
@@ -324,8 +349,11 @@ export function ComposeStudio({
 
           {tab === "paper" && (
             <div className="palette-stack">
+              {stationeryHint ? (
+                <p className="compose-hint">{stationeryHint}</p>
+              ) : null}
               <div className="option-grid">
-                {PAPER_OPTIONS.map((opt) => (
+                {paperChoices.map((opt) => (
                   <button
                     key={opt.id}
                     type="button"

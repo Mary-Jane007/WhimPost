@@ -19,6 +19,11 @@ const paperClass: Record<PaperStyle, string> = {
   lined: "paper-lined",
   floral: "paper-floral",
   night: "paper-night",
+  mosshollow: "paper-mosshollow",
+  clovermeadow: "paper-clovermeadow",
+  moonmere: "paper-moonmere",
+  bramblewood: "paper-bramblewood",
+  hearthwick: "paper-hearthwick",
 };
 
 const fontClass: Record<LetterFont, string> = {

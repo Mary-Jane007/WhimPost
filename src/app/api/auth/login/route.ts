@@ -14,14 +14,17 @@ export async function POST(req: NextRequest) {
   if (!login || !password) return jsonError("Login and password are required");
 
   const db = getDb();
+  const loginKey = login.toLowerCase();
   const row = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, password_hash, email, is_owner,
               village_id, reputation
        FROM users
-       WHERE username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE`
+       WHERE username = ? COLLATE NOCASE
+          OR email = ? COLLATE NOCASE
+          OR display_name = ? COLLATE NOCASE`
     )
-    .get(login, login.toLowerCase()) as
+    .get(login, loginKey, login) as
     | {
         id: string;
         username: string;
