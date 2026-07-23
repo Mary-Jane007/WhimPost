@@ -97,9 +97,7 @@ export function LostChronicles({ villageId }: Props) {
 
   return (
     <section className="village-panel lc-book-panel" style={themeStyle}>
-      <h2>
-        {meta.emoji} The Lost Chronicles
-      </h2>
+      <h2>The Lost Chronicles</h2>
       <p className="section-lead">
         {meta.name} — open the bound manuscript to rediscover forgotten pages.
       </p>
@@ -148,7 +146,13 @@ export function LostChronicles({ villageId }: Props) {
               <span className="lc-cover-corner bl" aria-hidden />
               <span className="lc-cover-corner br" aria-hidden />
               <span className="lc-cover-emblem" aria-hidden>
-                {meta.emoji}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={meta.mascotImage}
+                  alt=""
+                  className="lc-cover-mascot"
+                  draggable={false}
+                />
               </span>
               <span className="lc-cover-title">{meta.name}</span>
               <span className="lc-cover-motif">{meta.motif}</span>
@@ -169,9 +173,14 @@ export function LostChronicles({ villageId }: Props) {
             <div className="lc-open-left" aria-hidden>
               <div className="lc-stack-edge" />
               <p className="lc-open-side-label">
-                {meta.emoji}
-                <br />
-                {ROMAN_PAGES[leaf]}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={meta.mascotImage}
+                  alt=""
+                  className="lc-spine-mascot"
+                  draggable={false}
+                />
+                <span>{ROMAN_PAGES[leaf]}</span>
               </p>
             </div>
             <article
