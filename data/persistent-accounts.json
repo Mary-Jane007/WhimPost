@@ -1,5 +1,34 @@
 {
   "version": 1,
-  "updatedAt": "1970-01-01T00:00:00.000Z",
-  "accounts": []
+  "updatedAt": "2026-07-23T19:01:57.606Z",
+  "accounts": [
+    {
+      "id": "5f78f77b-96f1-44ef-84ce-db999bd65e1a",
+      "username": "Mary_Jane",
+      "display_name": "InkWanderer",
+      "email": "marisolleefland@gmail.com",
+      "password_hash": "$2b$10$RKgK8F2aFme2L4I7WQ56mey10ky.PxoEECWMXHExZGCL/MAHmUkxu",
+      "bio": "",
+      "forest_name": "mosshollow",
+      "is_owner": 1,
+      "village_id": "mosshollow",
+      "reputation": 0,
+      "collectibles_json": "{\"mushrooms\":1,\"leaves\":1,\"feathers\":1,\"lost-pages\":1,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":0,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":0,\"clover-cherries\":0,\"clover-honey\":0,\"clover-blossoms\":0,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":0,\"moon-lanterns\":0,\"moon-lilies\":0,\"moon-dreams\":0,\"moon-dust\":0,\"bramble-fox-tails\":0,\"bramble-maple\":0,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":0,\"bramble-compasses\":0,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":0,\"hearth-muffins\":0,\"hearth-recipes\":0,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":0}",
+      "created_at": "2026-07-23 19:01:57"
+    },
+    {
+      "id": "system-mosshollow",
+      "username": "mosshollow_owl",
+      "display_name": "Mosshollow",
+      "email": "system+mosshollow@whimpost.local",
+      "password_hash": "$2b$10$f4NznmusxShIO8VmKdzaVek96x5ozDRkXuHCAB2JcsSdrQ1WwX8y6",
+      "bio": "Where stories are preserved.",
+      "forest_name": "The Great Library",
+      "is_owner": 0,
+      "village_id": "mosshollow",
+      "reputation": 0,
+      "collectibles_json": "{}",
+      "created_at": "2026-07-23 19:01:57"
+    }
+  ]
 }
