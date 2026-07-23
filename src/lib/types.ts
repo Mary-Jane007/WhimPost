@@ -6,7 +6,12 @@ export type PaperStyle =
   | "moss"
   | "lined"
   | "floral"
-  | "night";
+  | "night"
+  | "mosshollow"
+  | "clovermeadow"
+  | "moonmere"
+  | "bramblewood"
+  | "hearthwick";
 
 /** Handwriting / typeface for letter subject + body. */
 export type LetterFont =
@@ -180,7 +185,26 @@ export type StickerKind =
   | "bramble-earring-a"
   | "bramble-earring-b"
   | "bramble-scrunchie"
-  | "bramble-hair-claw";
+  | "bramble-hair-claw"
+
+  // Hearthwick apothecary pack
+  | "hearth-apothecary-desk"
+  | "hearth-hedgehog"
+  | "hearth-apothecary-table"
+  | "hearth-potion-bottles"
+  | "hearth-herbal-jar"
+  | "hearth-lavender-bouquet"
+  | "hearth-pink-flower"
+  | "hearth-red-berries"
+  | "hearth-maple-leaves"
+  | "hearth-walnuts"
+  | "hearth-cinnamon-sticks"
+  | "hearth-cinnamon-roll"
+  | "hearth-ceramic-crock"
+  | "hearth-leaf-jar"
+  | "hearth-wooden-crate"
+  | "hearth-vintage-books"
+  | "hearth-paintbrush";
 
 export type ScrapKind =
   | "quote-trees"
@@ -290,6 +314,31 @@ export const PAPER_OPTIONS: {
   name: string;
   hint: string;
 }[] = [
+  {
+    id: "mosshollow",
+    name: "Mosshollow Stationery",
+    hint: "Sage paper & library owl",
+  },
+  {
+    id: "clovermeadow",
+    name: "Clovermeadow Stationery",
+    hint: "Blush paper & honeybee",
+  },
+  {
+    id: "moonmere",
+    name: "Moonmere Stationery",
+    hint: "Mist paper & luna moth",
+  },
+  {
+    id: "bramblewood",
+    name: "Bramblewood Stationery",
+    hint: "Fox on the stones & a quiet frame",
+  },
+  {
+    id: "hearthwick",
+    name: "Hearthwick Stationery",
+    hint: "Warm parchment & hedgehog",
+  },
   { id: "parchment", name: "Parchment", hint: "Tea-stained & soft" },
   { id: "cream", name: "Cream Linen", hint: "Quiet & classic" },
   { id: "moss", name: "Moss Green", hint: "Forest floor hush" },
@@ -297,6 +346,15 @@ export const PAPER_OPTIONS: {
   { id: "floral", name: "Pressed Petals", hint: "Soft botanical wash" },
   { id: "night", name: "Night Ink", hint: "Moonlit charcoal" },
 ];
+
+/** Village write desks use themed stationery paper styles. */
+export const VILLAGE_STATIONERY: Record<string, PaperStyle> = {
+  mosshollow: "mosshollow",
+  clovermeadow: "clovermeadow",
+  moonmere: "moonmere",
+  bramblewood: "bramblewood",
+  hearthwick: "hearthwick",
+};
 
 export const FONT_OPTIONS: {
   id: LetterFont;
@@ -1041,6 +1099,109 @@ export const STICKER_OPTIONS: {
     src: "/stickers/villages/bramblewood/pack/hair-claw.png",
   },
 
+  // Hearthwick-only apothecary pack
+  {
+    id: "hearth-apothecary-desk",
+    name: "Hedgehog Apothecary",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/apothecary-desk.png",
+  },
+  {
+    id: "hearth-hedgehog",
+    name: "Hearth Hedgehog",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/hedgehog.png",
+  },
+  {
+    id: "hearth-apothecary-table",
+    name: "Apothecary Table",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/apothecary-table.png",
+  },
+  {
+    id: "hearth-potion-bottles",
+    name: "Potion Bottles",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/potion-bottles.png",
+  },
+  {
+    id: "hearth-herbal-jar",
+    name: "Herbal Jar",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/herbal-jar.png",
+  },
+  {
+    id: "hearth-lavender-bouquet",
+    name: "Lavender Bouquet",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/lavender-bouquet.png",
+  },
+  {
+    id: "hearth-pink-flower",
+    name: "Pink Blossom",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/pink-flower.png",
+  },
+  {
+    id: "hearth-red-berries",
+    name: "Winter Berries",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/red-berries.png",
+  },
+  {
+    id: "hearth-maple-leaves",
+    name: "Maple Leaves",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/maple-leaves.png",
+  },
+  {
+    id: "hearth-walnuts",
+    name: "Walnuts",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/walnuts.png",
+  },
+  {
+    id: "hearth-cinnamon-sticks",
+    name: "Cinnamon Sticks",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/cinnamon-sticks.png",
+  },
+  {
+    id: "hearth-cinnamon-roll",
+    name: "Cinnamon Roll",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/cinnamon-roll.png",
+  },
+  {
+    id: "hearth-ceramic-crock",
+    name: "Ceramic Crock",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/ceramic-crock.png",
+  },
+  {
+    id: "hearth-leaf-jar",
+    name: "Leaf Jar",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/leaf-jar.png",
+  },
+  {
+    id: "hearth-wooden-crate",
+    name: "Wooden Crate",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/wooden-crate.png",
+  },
+  {
+    id: "hearth-vintage-books",
+    name: "Vintage Books",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/vintage-books.png",
+  },
+  {
+    id: "hearth-paintbrush",
+    name: "Paintbrush",
+    villageId: "hearthwick",
+    src: "/stickers/villages/hearthwick/pack/paintbrush.png",
+  },
 ];
 
 export function stickerSrc(kind: StickerKind) {

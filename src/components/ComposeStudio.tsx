@@ -13,6 +13,7 @@ import {
   PAPER_OPTIONS,
   SCRAP_OPTIONS,
   STAMP_OPTIONS,
+  VILLAGE_STATIONERY,
   WAX_OPTIONS,
   sharedStickers,
   villagePackStickers,
@@ -28,6 +29,14 @@ import {
   type WaxSeal,
 } from "@/lib/types";
 import { getVillage } from "@/lib/villages";
+
+function defaultPaperForVillage(villageId: string | null | undefined): PaperStyle {
+  return (villageId && VILLAGE_STATIONERY[villageId]) || "parchment";
+}
+
+function defaultFontForVillage(villageId: string | null | undefined): LetterFont {
+  return villageId && VILLAGE_STATIONERY[villageId] ? "typewriter" : "quill";
+}
 
 function scatter(seed: number, index: number) {
   const n = seed * 17 + index * 41;
@@ -50,8 +59,12 @@ export function ComposeStudio({
   const [recipientId, setRecipientId] = useState(friends[0]?.id || "");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
-  const [paperStyle, setPaperStyle] = useState<PaperStyle>("parchment");
-  const [fontStyle, setFontStyle] = useState<LetterFont>("quill");
+  const [paperStyle, setPaperStyle] = useState<PaperStyle>(
+    defaultPaperForVillage(villageId)
+  );
+  const [fontStyle, setFontStyle] = useState<LetterFont>(
+    defaultFontForVillage(villageId)
+  );
   const [envelopeStyle, setEnvelopeStyle] = useState<EnvelopeStyle>("kraft");
   const [waxSeal, setWaxSeal] = useState<WaxSeal>("fern");
   const [stampStyle, setStampStyle] = useState<StampStyle>("mushroom-amanita");
@@ -78,6 +91,32 @@ export function ComposeStudio({
   );
   const village = getVillage(villageId);
   const villagePackName = village ? `${village.name} pack` : null;
+  const villageStationery = villageId ? VILLAGE_STATIONERY[villageId] : undefined;
+  const paperChoices = useMemo(() => {
+    if (villageStationery) {
+      return PAPER_OPTIONS.filter((p) => p.id === villageStationery);
+    }
+    return PAPER_OPTIONS.filter((p) => !VILLAGE_STATIONERY[p.id]);
+  }, [villageStationery]);
+  const composeThemeClass = villageStationery
+    ? `compose-village compose-${villageStationery}`
+    : "";
+  const stationeryHint =
+    villageStationery === "mosshollow"
+      ? "You're writing on Mosshollow stationery — sage paper, a quiet frame, and the library owl keeping watch."
+      : villageStationery === "clovermeadow"
+        ? "You're writing on Clovermeadow stationery — blush paper, a quiet frame, and a honeybee on clover."
+        : villageStationery === "moonmere"
+          ? "You're writing on Moonmere stationery — misty paper, a quiet frame, and a luna moth by the shore."
+          : villageStationery === "bramblewood"
+            ? "You're writing on Bramblewood's trail stationery — a quiet frame and a fox on mossy stones, with room to decorate."
+            : villageStationery === "hearthwick"
+              ? "You're writing on Hearthwick stationery — warm parchment, a quiet frame, and a hedgehog by the hearth."
+              : null;
+  const stageHint =
+    villageStationery
+      ? "Write inside the frame — leave room for stickers and scraps if you like, then seal when ready."
+      : "Drag stickers, scraps, and photos across the page. Use the gold corner on a photo to resize. Seal when your letter feels complete.";
 
   function addSticker(kind: StickerKind) {
     const place = scatter(stickers.length + 3, stickers.length);
@@ -256,7 +295,7 @@ export function ComposeStudio({
   }
 
   return (
-    <div className="compose-studio">
+    <div className={`compose-studio ${composeThemeClass}`}>
       <div className="compose-toolbar">
         <label className="recipient-pick">
           To
@@ -324,8 +363,11 @@ export function ComposeStudio({
 
           {tab === "paper" && (
             <div className="palette-stack">
+              {stationeryHint ? (
+                <p className="compose-hint">{stationeryHint}</p>
+              ) : null}
               <div className="option-grid">
-                {PAPER_OPTIONS.map((opt) => (
+                {paperChoices.map((opt) => (
                   <button
                     key={opt.id}
                     type="button"
@@ -557,10 +599,7 @@ export function ComposeStudio({
               waxSeal={waxSeal}
             />
           )}
-          <p className="compose-hint">
-            Drag stickers, scraps, and photos across the page. Use the gold corner
-            on a photo to resize. Seal when your letter feels complete.
-          </p>
+          <p className="compose-hint">{stageHint}</p>
         </section>
       </div>
     </div>
