@@ -12,23 +12,36 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ login, password }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) {
-      setError(data.error || "Could not sign in");
-      return;
+    setSignedIn(false);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ login, password }),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        error?: string;
+        user?: { displayName?: string };
+      } | null;
+      if (!res.ok) {
+        setError(data?.error || "Could not sign in");
+        setLoading(false);
+        return;
+      }
+      setSignedIn(true);
+      // Full navigation so the new session cookie is applied before /village loads.
+      window.location.replace("/village");
+    } catch {
+      setError("Could not reach the forest post. Try again in a moment.");
+      setLoading(false);
     }
-    window.location.assign("/village");
   }
 
   return (
@@ -40,6 +53,7 @@ export function LoginForm() {
           onChange={(e) => setLogin(e.target.value)}
           autoComplete="username"
           required
+          disabled={loading || signedIn}
         />
       </label>
       <label>
@@ -50,11 +64,21 @@ export function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
           required
+          disabled={loading || signedIn}
         />
       </label>
       {error && <p className="form-error">{error}</p>}
-      <button type="submit" className="btn-primary" disabled={loading}>
-        {loading ? "Opening mailbox…" : "Enter the forest post"}
+      {signedIn && (
+        <p className="form-success" role="status">
+          Signed in — opening your village…
+        </p>
+      )}
+      <button type="submit" className="btn-primary" disabled={loading || signedIn}>
+        {signedIn
+          ? "Heading to your village…"
+          : loading
+            ? "Opening mailbox…"
+            : "Enter the forest post"}
       </button>
       <p className="auth-switch">
         New here? <Link href="/register">Create a mailbox</Link>
@@ -120,25 +144,33 @@ export function RegisterForm() {
     }
     setLoading(true);
     setError("");
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username,
-        displayName,
-        email,
-        password,
-        forestName,
-        villageId,
-      }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) {
-      setError(data.error || "Could not create mailbox");
-      return;
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          username,
+          displayName,
+          email,
+          password,
+          forestName,
+          villageId,
+        }),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        error?: string;
+      } | null;
+      if (!res.ok) {
+        setError(data?.error || "Could not create mailbox");
+        setLoading(false);
+        return;
+      }
+      window.location.replace("/village");
+    } catch {
+      setError("Could not reach the forest post. Try again in a moment.");
+      setLoading(false);
     }
-    window.location.assign("/village");
   }
 
   if (step === "belonging") {

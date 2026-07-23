@@ -18,7 +18,10 @@ export default async function LoginPage() {
           <StickerArt kind="moon-full" className="w-12 h-12" />
         </div>
         <h1>Welcome back</h1>
-        <p className="lede">Slip into your forest mailbox.</p>
+        <p className="lede">
+          Slip into your forest mailbox — you&apos;ll land in your village after
+          signing in.
+        </p>
         <LoginForm />
       </div>
     </main>

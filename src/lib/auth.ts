@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify } from "jose";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { getDb } from "./db";
 import type { UserPublic } from "./types";
@@ -34,22 +34,47 @@ export async function verifySessionToken(token: string) {
   }
 }
 
+/** True when the request reached us over HTTPS (direct or via preview proxy). */
+async function requestIsHttps() {
+  if (process.env.COOKIE_SECURE === "true") return true;
+  if (process.env.VERCEL === "1") return true;
+  if (process.env.WHIMPOST_HTTPS === "1" || process.env.WHIMPOST_HTTPS === "true") {
+    return true;
+  }
+  try {
+    const hdrs = await headers();
+    const proto = (
+      hdrs.get("x-forwarded-proto") ||
+      hdrs.get("x-forwarded-protocol") ||
+      ""
+    )
+      .split(",")[0]
+      ?.trim()
+      .toLowerCase();
+    if (proto === "https") return true;
+    const host = (hdrs.get("x-forwarded-host") || hdrs.get("host") || "").toLowerCase();
+    // Cloud agent preview hosts are always HTTPS in the browser.
+    if (host.includes(".agent.cvm.dev") || host.includes(".cursor.sh")) return true;
+  } catch {
+    // headers() unavailable outside a request — fall through
+  }
+  return false;
+}
+
 export async function setSessionCookie(token: string) {
   const cookieStore = await cookies();
-  // Only mark Secure on real HTTPS deploys. Production `next start` on
-  // http://localhost would otherwise drop the session in the browser.
-  const secure =
-    process.env.COOKIE_SECURE === "true" ||
-    process.env.VERCEL === "1" ||
-    (process.env.NODE_ENV === "production" &&
-      Boolean(process.env.WHIMPOST_HTTPS));
+  // HTTP localhost must stay non-Secure + Lax or the browser drops the cookie.
+  // HTTPS (including Cursor preview iframes) needs Secure + SameSite=None so the
+  // session survives after login and the redirect to /village actually sticks.
+  const secure = await requestIsHttps();
 
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: secure ? "none" : "lax",
     secure,
     path: "/",
     maxAge: 60 * 60 * 24 * 14,
+    ...(secure ? { partitioned: true } : {}),
   });
 }
 
