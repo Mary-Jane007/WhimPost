@@ -487,7 +487,12 @@ function createDb() {
 
   migrate(db);
   // Restore accounts saved in git so logins work on fresh servers.
-  importPersistentAccounts(db);
+  // Never let a snapshot conflict brick auth / the whole app.
+  try {
+    importPersistentAccounts(db);
+  } catch (err) {
+    console.error("[persistent-accounts] import failed:", err);
+  }
   return db;
 }
 
