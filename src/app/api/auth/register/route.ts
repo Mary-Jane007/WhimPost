@@ -1,7 +1,12 @@
 import { hashSync } from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { NextRequest, NextResponse } from "next/server";
-import { createSessionToken, jsonError, mapUser, setSessionCookie } from "@/lib/auth";
+import {
+  attachSessionCookie,
+  createSessionToken,
+  jsonError,
+  mapUser,
+} from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { claimOwnerIfUnset } from "@/lib/owner";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
@@ -88,7 +93,7 @@ export async function POST(req: NextRequest) {
   };
 
   const token = await createSessionToken({ userId: id, username });
-  await setSessionCookie(token);
-
-  return NextResponse.json({ user: mapUser(user) });
+  const res = NextResponse.json({ user: mapUser(user) });
+  await attachSessionCookie(res, token);
+  return res;
 }

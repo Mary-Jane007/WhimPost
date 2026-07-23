@@ -22,6 +22,11 @@ export default async function LoginPage() {
           Slip into your forest mailbox — you&apos;ll land in your village after
           signing in.
         </p>
+        <p className="lede muted" style={{ marginTop: "-0.35rem" }}>
+          If you only see a single “token” password box, open port 3333 from
+          Cursor&apos;s Ports panel first — that screen is Cursor&apos;s gate,
+          not WhimPost.
+        </p>
         <LoginForm />
       </div>
     </main>

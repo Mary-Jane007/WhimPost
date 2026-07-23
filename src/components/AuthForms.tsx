@@ -23,7 +23,7 @@ export function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: "same-origin",
         body: JSON.stringify({ login, password }),
       });
       const data = (await res.json().catch(() => null)) as {
@@ -35,8 +35,22 @@ export function LoginForm() {
         setLoading(false);
         return;
       }
+
+      // Confirm the browser actually stored the session before navigating.
+      // If this fails, /village would bounce straight back to /login.
+      const me = await fetch("/api/auth/me", { credentials: "same-origin" });
+      const meData = (await me.json().catch(() => null)) as {
+        user?: { id?: string };
+      } | null;
+      if (!me.ok || !meData?.user?.id) {
+        setError(
+          "Signed in on the server, but this browser blocked the session cookie. Open the site from Cursor → Ports → 3333 (Open in Browser), then try again."
+        );
+        setLoading(false);
+        return;
+      }
+
       setSignedIn(true);
-      // Full navigation so the new session cookie is applied before /village loads.
       window.location.replace("/village");
     } catch {
       setError("Could not reach the forest post. Try again in a moment.");

@@ -1,6 +1,11 @@
 import { compareSync } from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
-import { createSessionToken, jsonError, mapUser, setSessionCookie } from "@/lib/auth";
+import {
+  attachSessionCookie,
+  createSessionToken,
+  jsonError,
+  mapUser,
+} from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { claimOwnerIfUnset } from "@/lib/owner";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
@@ -72,7 +77,10 @@ export async function POST(req: NextRequest) {
     userId: refreshed.id,
     username: refreshed.username,
   });
-  await setSessionCookie(token);
 
-  return NextResponse.json({ user: mapUser(refreshed) });
+  // Set-Cookie on the response itself — more reliable than cookies().set() alone
+  // when the browser immediately navigates after fetch().
+  const res = NextResponse.json({ user: mapUser(refreshed) });
+  await attachSessionCookie(res, token);
+  return res;
 }
