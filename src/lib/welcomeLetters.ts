@@ -380,7 +380,7 @@ The finest adventures are rarely planned.
 Welcome to **Bramblewood**.
 
 *May curiosity always know the way.*`,
-    paperStyle: "parchment",
+    paperStyle: "bramblewood",
     envelopeStyle: "kraft",
     waxSeal: "spiral",
     stampStyle: "fox-seated",
@@ -464,7 +464,7 @@ We hope you'll pull it a little closer to the fire.
 Welcome to **Hearthwick**.
 
 *May every letter you send feel like coming home.*`,
-    paperStyle: "cream",
+    paperStyle: "hearthwick",
     envelopeStyle: "kraft",
     waxSeal: "heart",
     stampStyle: "mushroom-amanita",

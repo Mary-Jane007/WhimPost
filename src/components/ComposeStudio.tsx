@@ -29,6 +29,19 @@ import {
 } from "@/lib/types";
 import { getVillage } from "@/lib/villages";
 
+const VILLAGE_STATIONERY: Record<string, PaperStyle> = {
+  hearthwick: "hearthwick",
+  bramblewood: "bramblewood",
+};
+
+function defaultPaperForVillage(villageId: string | null | undefined): PaperStyle {
+  return (villageId && VILLAGE_STATIONERY[villageId]) || "parchment";
+}
+
+function defaultFontForVillage(villageId: string | null | undefined): LetterFont {
+  return villageId && VILLAGE_STATIONERY[villageId] ? "typewriter" : "quill";
+}
+
 function scatter(seed: number, index: number) {
   const n = seed * 17 + index * 41;
   return {
@@ -50,8 +63,12 @@ export function ComposeStudio({
   const [recipientId, setRecipientId] = useState(friends[0]?.id || "");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
-  const [paperStyle, setPaperStyle] = useState<PaperStyle>("parchment");
-  const [fontStyle, setFontStyle] = useState<LetterFont>("quill");
+  const [paperStyle, setPaperStyle] = useState<PaperStyle>(
+    defaultPaperForVillage(villageId)
+  );
+  const [fontStyle, setFontStyle] = useState<LetterFont>(
+    defaultFontForVillage(villageId)
+  );
   const [envelopeStyle, setEnvelopeStyle] = useState<EnvelopeStyle>("kraft");
   const [waxSeal, setWaxSeal] = useState<WaxSeal>("fern");
   const [stampStyle, setStampStyle] = useState<StampStyle>("mushroom-amanita");
@@ -78,6 +95,19 @@ export function ComposeStudio({
   );
   const village = getVillage(villageId);
   const villagePackName = village ? `${village.name} pack` : null;
+  const villageStationery = villageId ? VILLAGE_STATIONERY[villageId] : undefined;
+  const paperChoices = useMemo(() => {
+    if (villageStationery) {
+      return PAPER_OPTIONS.filter((p) => p.id === villageStationery);
+    }
+    return PAPER_OPTIONS.filter((p) => !VILLAGE_STATIONERY[p.id]);
+  }, [villageStationery]);
+  const composeThemeClass =
+    villageId === "hearthwick"
+      ? "compose-hearthwick"
+      : villageId === "bramblewood"
+        ? "compose-bramblewood"
+        : "";
 
   function addSticker(kind: StickerKind) {
     const place = scatter(stickers.length + 3, stickers.length);
@@ -256,7 +286,7 @@ export function ComposeStudio({
   }
 
   return (
-    <div className="compose-studio">
+    <div className={`compose-studio ${composeThemeClass}`}>
       <div className="compose-toolbar">
         <label className="recipient-pick">
           To
@@ -324,8 +354,19 @@ export function ComposeStudio({
 
           {tab === "paper" && (
             <div className="palette-stack">
+              {villageStationery === "hearthwick" ? (
+                <p className="compose-hint">
+                  You&apos;re writing on Hearthwick&apos;s cottage stationery —
+                  lined parchment with a meadow hedgehog in the corner.
+                </p>
+              ) : villageStationery === "bramblewood" ? (
+                <p className="compose-hint">
+                  You&apos;re writing on Bramblewood&apos;s trail stationery —
+                  a quiet frame and a fox on mossy stones, with room to decorate.
+                </p>
+              ) : null}
               <div className="option-grid">
-                {PAPER_OPTIONS.map((opt) => (
+                {paperChoices.map((opt) => (
                   <button
                     key={opt.id}
                     type="button"
@@ -558,8 +599,11 @@ export function ComposeStudio({
             />
           )}
           <p className="compose-hint">
-            Drag stickers, scraps, and photos across the page. Use the gold corner
-            on a photo to resize. Seal when your letter feels complete.
+            {villageStationery === "hearthwick"
+              ? "Type on the lined parchment — the hedgehog keeps the corner warm. Drag stickers and photos if you like, then seal when ready."
+              : villageStationery === "bramblewood"
+                ? "Write inside the floral frame — the fox keeps watch from the stones. Drag stickers and photos if you like, then seal when ready."
+                : "Drag stickers, scraps, and photos across the page. Use the gold corner on a photo to resize. Seal when your letter feels complete."}
           </p>
         </section>
       </div>
