@@ -702,7 +702,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Year-round in mild regions",
     trivia: "A barn owl's call is a long eerie shriek — not a hoot.",
-    image: MOON_ART.moth,
+    image: "/moon/creatures/barn-owl.jpg",
   },
   {
     id: "potoo",
@@ -716,7 +716,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Warm nights year-round in the tropics",
     trivia: "Potoos can open their mouths nearly as wide as their faces.",
-    image: MOON_ART.crescent,
+    image: "/moon/creatures/potoo.jpg",
   },
   {
     id: "nightjar",
@@ -730,7 +730,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Spring through autumn in temperate zones",
     trivia: "Their soft churring song can carry for a kilometer.",
-    image: MOON_ART.starfield,
+    image: "/moon/creatures/nightjar.jpg",
   },
   {
     id: "fireflies",
@@ -744,7 +744,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Warm summer nights",
     trivia: "Some fireflies synchronize their flashes across whole trees.",
-    image: MOON_ART.starlight,
+    image: "/moon/creatures/fireflies.jpg",
   },
   {
     id: "moths",
@@ -758,7 +758,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Peak in late spring and summer",
     trivia: "Moonmere's mascot is a luna moth — soft green silk of the night.",
-    image: MOON_ART.moths,
+    image: "/moon/creatures/moths.jpg",
   },
   {
     id: "tree-frogs",
@@ -772,7 +772,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Spring and summer breeding nights",
     trivia: "Some species change shade to match moonlit leaves.",
-    image: MOON_ART.lilies,
+    image: "/moon/creatures/tree-frogs.jpg",
   },
   {
     id: "bats",
@@ -786,7 +786,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Active from dusk through warm months",
     trivia: "Moonmere villagers leave porch lights soft so moths — and bats — can feast.",
-    image: MOON_ART.lantern,
+    image: "/moon/creatures/bats.jpg",
   },
   {
     id: "foxes",
@@ -800,7 +800,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Year-round; kits in spring",
     trivia: "A fox's eyes shine green-gold in lantern light.",
-    image: MOON_ART.fullMoon,
+    image: "/moon/creatures/foxes.jpg",
   },
   {
     id: "hedgehogs",
@@ -814,7 +814,7 @@ export const NIGHT_CREATURES: NightCreature[] = [
     ],
     season: "Spring to autumn nights",
     trivia: "A bowl of water is the kindest night gift for a visiting hedgehog.",
-    image: MOON_ART.pearls,
+    image: "/moon/creatures/hedgehogs.jpg",
   },
 ];
 
