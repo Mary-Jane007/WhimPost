@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "./db";
 import type { UserPublic } from "./types";
 
-const COOKIE_NAME = "whimpost_session";
+export const COOKIE_NAME = "whimpost_session";
 const secret = new TextEncoder().encode(
   process.env.WHIMPOST_SECRET || "whimpost-dev-secret-change-me-in-prod"
 );
@@ -61,21 +61,32 @@ async function requestIsHttps() {
   return false;
 }
 
-export async function setSessionCookie(token: string) {
-  const cookieStore = await cookies();
+async function sessionCookieOptions() {
   // HTTP localhost must stay non-Secure + Lax or the browser drops the cookie.
-  // HTTPS (including Cursor preview iframes) needs Secure + SameSite=None so the
-  // session survives after login and the redirect to /village actually sticks.
+  // HTTPS preview hosts need Secure + SameSite=None so login survives redirects
+  // (including Cursor embedded browser / port-forward panels).
   const secure = await requestIsHttps();
-
-  cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: secure ? "none" : "lax",
+  return {
+    httpOnly: true as const,
+    sameSite: (secure ? "none" : "lax") as "none" | "lax",
     secure,
     path: "/",
     maxAge: 60 * 60 * 24 * 14,
-    ...(secure ? { partitioned: true } : {}),
-  });
+  };
+}
+
+/** Attach the session cookie directly on a response (most reliable in Route Handlers). */
+export async function attachSessionCookie(
+  res: NextResponse,
+  token: string
+): Promise<NextResponse> {
+  res.cookies.set(COOKIE_NAME, token, await sessionCookieOptions());
+  return res;
+}
+
+export async function setSessionCookie(token: string) {
+  const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, token, await sessionCookieOptions());
 }
 
 export async function clearSessionCookie() {
