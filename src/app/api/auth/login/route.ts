@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, jsonError, mapUser, setSessionCookie } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { claimOwnerIfUnset } from "@/lib/owner";
+import { exportPersistentAccounts } from "@/lib/persistentAccounts";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -42,7 +43,10 @@ export async function POST(req: NextRequest) {
 
   // The account you sign in with becomes the remembered site owner
   // when no owner has been claimed yet.
-  claimOwnerIfUnset(db, row.id);
+  const becameOwner = claimOwnerIfUnset(db, row.id);
+  if (becameOwner && !row.is_owner) {
+    exportPersistentAccounts(db);
+  }
   const refreshed = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,

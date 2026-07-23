@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, jsonError, mapUser, setSessionCookie } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { claimOwnerIfUnset } from "@/lib/owner";
+import { exportPersistentAccounts } from "@/lib/persistentAccounts";
 import { isVillageId } from "@/lib/villages";
 import {
   deliverWelcomeLetter,
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
 
   claimOwnerIfUnset(db, id);
   deliverWelcomeLetter(db, id, villageId);
+  exportPersistentAccounts(db);
 
   const user = db
     .prepare(
