@@ -1,21 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-23T19:23:31.995Z",
+  "updatedAt": "2026-07-23T19:23:52.679Z",
   "accounts": [
-    {
-      "id": "069d86d8-b738-4d08-9ea9-2ed97985a2bf",
-      "username": "beekind",
-      "display_name": "Bee Kind",
-      "email": "bee@whim.post",
-      "password_hash": "$2b$10$dBwccbxjpkiV93cQvgpc7OyDADNBLr5DnG9nJ2EBxJN8K.ehGN54.",
-      "bio": "",
-      "forest_name": "",
-      "is_owner": 0,
-      "village_id": "clovermeadow",
-      "reputation": 0,
-      "collectibles_json": "{}",
-      "created_at": "2026-07-20 18:49:05"
-    },
     {
       "id": "system-bramblewood",
       "username": "bramblewood_fox",
@@ -43,20 +29,6 @@
       "reputation": 0,
       "collectibles_json": "{}",
       "created_at": "2026-07-20 19:15:24"
-    },
-    {
-      "id": "fabae3fe-ae9d-4036-9d4d-cf83795da21f",
-      "username": "cookiecheck",
-      "display_name": "Cookie Check",
-      "email": "cookie@test.com",
-      "password_hash": "$2b$10$UWa6Gqu/miB4SMPQpBU2wOBr/zjXnVibjPu9crcf1eQVbeLnEZOgu",
-      "bio": "",
-      "forest_name": "",
-      "is_owner": 0,
-      "village_id": null,
-      "reputation": 0,
-      "collectibles_json": "{}",
-      "created_at": "2026-07-20 18:02:39"
     },
     {
       "id": "system-hearthwick",
@@ -113,48 +85,6 @@
       "reputation": 0,
       "collectibles_json": "{}",
       "created_at": "2026-07-20 19:08:57"
-    },
-    {
-      "id": "18ded644-63c0-4a25-9bc2-b3cc2620a56c",
-      "username": "owlreader3",
-      "display_name": "Owl Reader",
-      "email": "owl3@whim.post",
-      "password_hash": "$2b$10$OnMUql7yfbYIQQPE.xw1EO2NmKRme6nFVdmDs1W/UwULiqybS/XxO",
-      "bio": "",
-      "forest_name": "",
-      "is_owner": 0,
-      "village_id": "mosshollow",
-      "reputation": 0,
-      "collectibles_json": "{}",
-      "created_at": "2026-07-20 18:48:40"
-    },
-    {
-      "id": "965264d0-57a6-459e-bcac-f1eb9b938990",
-      "username": "test_acc",
-      "display_name": "test_acc",
-      "email": "jwbestlife11@gmail.com",
-      "password_hash": "$2b$10$V2nDEE0ls.n480f4LwksWOZ/xKOxKpQn0PoCDPxZxgTserj79TjV.",
-      "bio": "",
-      "forest_name": "Mossglen",
-      "is_owner": 0,
-      "village_id": null,
-      "reputation": 0,
-      "collectibles_json": "{}",
-      "created_at": "2026-07-20 18:04:35"
-    },
-    {
-      "id": "7f1a5928-b125-4e1c-8412-540543b5fc67",
-      "username": "testowner",
-      "display_name": "Test Owner",
-      "email": "owner@test.com",
-      "password_hash": "$2b$10$u5Ee8nZFzFyxLCgpfV8DceWEz.PQv7IJzA8IOt4XknmZIM6KH618W",
-      "bio": "",
-      "forest_name": "",
-      "is_owner": 0,
-      "village_id": null,
-      "reputation": 0,
-      "collectibles_json": "{}",
-      "created_at": "2026-07-20 18:01:43"
     }
   ]
 }
