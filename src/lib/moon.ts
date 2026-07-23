@@ -216,7 +216,6 @@ export type MoonAction =
   | { type: "completeRitual"; ritualId: string }
   | { type: "saveJournal"; body: string }
   | { type: "submitDream"; body: string; theme: DreamTheme }
-  | { type: "makeWish"; body: string }
   | { type: "toggleStardust"; wishId: string };
 
 export function applyMoonAction(
@@ -275,15 +274,6 @@ export function applyMoonAction(
       ).run(randomUUID(), body, theme, userId);
       xp += MOON_XP.dream;
       badges = addBadge(badges, "Dream Bottler");
-    }
-  } else if (action.type === "makeWish") {
-    const body = action.body.trim().slice(0, 200);
-    if (body.length >= 6) {
-      db.prepare(
-        `INSERT INTO moon_wishes (id, body, author_id) VALUES (?, ?, ?)`
-      ).run(randomUUID(), body, userId);
-      xp += MOON_XP.wish;
-      badges = addBadge(badges, "Wish Weaver");
     }
   } else if (action.type === "toggleStardust") {
     const wish = db

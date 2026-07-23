@@ -28,7 +28,6 @@ export const MOON_XP = {
   ritual: 25,
   journal: 20,
   dream: 20,
-  wish: 15,
   stardust: 5,
 } as const;
 

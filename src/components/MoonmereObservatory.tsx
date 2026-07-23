@@ -34,7 +34,6 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [journalBody, setJournalBody] = useState("");
-  const [wishBody, setWishBody] = useState("");
   const [dreamBody, setDreamBody] = useState("");
   const [dreamTheme, setDreamTheme] = useState<DreamTheme>("flying");
   const [dreamFilter, setDreamFilter] = useState<DreamTheme | "all">("all");
@@ -126,15 +125,6 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
     if (next) {
       setJournalBody("");
       setToast("Saved privately in your Moon Journal.");
-    }
-  }
-
-  async function onWish(e: FormEvent) {
-    e.preventDefault();
-    const next = await postAction({ type: "makeWish", body: wishBody });
-    if (next) {
-      setWishBody("");
-      setToast("Your wish drifts among the shooting stars.");
     }
   }
 
@@ -272,7 +262,7 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                   className="btn-secondary"
                   onClick={() => setTab("wishes")}
                 >
-                  Make a wish
+                  Read wishes
                 </button>
               </article>
             </div>
@@ -533,32 +523,14 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
           <section className="mm-section">
             <h2>Shooting Star Wishes</h2>
             <p className="mm-section-lead">
-              Write anonymous wishes onto falling stars. Nobody replies. Nobody
-              knows who wrote them. Save favorites into Stardust.
+              Anonymous hopes drift across the sky. Nobody replies. Nobody knows
+              who wrote them. Save favorites into Stardust.
             </p>
             <div className="mm-wish-sky" aria-hidden>
               <span className="mm-shooting w1" />
               <span className="mm-shooting w2" />
               <span className="mm-shooting w3" />
             </div>
-            <form onSubmit={onWish} className="mm-form mm-card">
-              <h3>Make a wish</h3>
-              <textarea
-                value={wishBody}
-                onChange={(e) => setWishBody(e.target.value)}
-                rows={3}
-                maxLength={200}
-                placeholder="I hope…"
-                required
-              />
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={busy || wishBody.trim().length < 6}
-              >
-                Send among the stars
-              </button>
-            </form>
             <div className="mm-chip-row">
               <button
                 type="button"
