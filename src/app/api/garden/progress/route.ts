@@ -6,6 +6,8 @@ import {
   getGardenProgress,
   type GardenAction,
 } from "@/lib/garden";
+import { chronicleAfterActivity } from "@/lib/chronicle";
+import type { ChronicleActivityKey } from "@/lib/chronicleContent";
 
 async function requireGardenUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
@@ -23,6 +25,13 @@ async function requireGardenUser(): Promise<
   return { user };
 }
 
+const GARDEN_KEYS: Partial<Record<GardenAction["type"], ChronicleActivityKey>> =
+  {
+    completeDaily: "garden.completeDaily",
+    spotFlower: "garden.spotFlower",
+    completeKindness: "garden.completeKindness",
+  };
+
 export async function GET() {
   const gate = await requireGardenUser();
   if ("error" in gate) return gate.error;
@@ -39,5 +48,9 @@ export async function POST(req: NextRequest) {
   }
 
   const progress = applyGardenAction(gate.user.id, body);
-  return NextResponse.json({ progress });
+  const key = GARDEN_KEYS[body.type];
+  const chronicleUnlock = key
+    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    : null;
+  return NextResponse.json({ progress, chronicleUnlock });
 }

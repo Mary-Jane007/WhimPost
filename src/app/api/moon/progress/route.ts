@@ -6,6 +6,8 @@ import {
   getMoonProgress,
   type MoonAction,
 } from "@/lib/moon";
+import { chronicleAfterActivity } from "@/lib/chronicle";
+import type { ChronicleActivityKey } from "@/lib/chronicleContent";
 
 async function requireMoonUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
@@ -23,6 +25,12 @@ async function requireMoonUser(): Promise<
   return { user };
 }
 
+const MOON_KEYS: Partial<Record<MoonAction["type"], ChronicleActivityKey>> = {
+  completeRitual: "moon.completeRitual",
+  saveJournal: "moon.saveJournal",
+  submitDream: "moon.submitDream",
+};
+
 export async function GET() {
   const gate = await requireMoonUser();
   if ("error" in gate) return gate.error;
@@ -39,5 +47,9 @@ export async function POST(req: NextRequest) {
   }
 
   const progress = applyMoonAction(gate.user.id, body);
-  return NextResponse.json({ progress });
+  const key = MOON_KEYS[body.type];
+  const chronicleUnlock = key
+    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    : null;
+  return NextResponse.json({ progress, chronicleUnlock });
 }

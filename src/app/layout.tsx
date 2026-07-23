@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteForestStickers } from "@/components/SiteForestStickers";
+import { ChronicleUnlockHost } from "@/components/ChronicleUnlockHost";
 import { getCurrentUser } from "@/lib/auth";
 import { getVillageTheme } from "@/lib/villageThemes";
 import { isVillageId, type VillageId } from "@/lib/villages";
@@ -47,6 +48,7 @@ export default async function RootLayout({
           <SiteForestStickers villageId={villageId} />
           <SiteNav user={user} />
           {children}
+          <ChronicleUnlockHost />
         </div>
       </body>
     </html>

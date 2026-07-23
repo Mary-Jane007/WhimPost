@@ -74,6 +74,8 @@ export function MosshollowLibrary({ user, initialProgress }: Props) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not update the library");
       if (data.progress) setProgress(data.progress);
+      const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
+      emitChronicleUnlock(data.chronicleUnlock);
       return data.progress as LibraryProgress;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

@@ -6,6 +6,8 @@ import {
   getLibraryProgress,
   type LibraryAction,
 } from "@/lib/library";
+import { chronicleAfterActivity } from "@/lib/chronicle";
+import type { ChronicleActivityKey } from "@/lib/chronicleContent";
 
 async function requireLibraryUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
@@ -23,6 +25,15 @@ async function requireLibraryUser(): Promise<
   return { user };
 }
 
+const LIBRARY_KEYS: Partial<
+  Record<LibraryAction["type"], ChronicleActivityKey>
+> = {
+  finishBook: "library.finishBook",
+  solveMystery: "library.solveMystery",
+  claimSecret: "library.claimSecret",
+  journalEntry: "library.journalEntry",
+};
+
 export async function GET() {
   const gate = await requireLibraryUser();
   if ("error" in gate) return gate.error;
@@ -39,5 +50,9 @@ export async function POST(req: NextRequest) {
   }
 
   const progress = applyLibraryAction(gate.user.id, body);
-  return NextResponse.json({ progress });
+  const key = LIBRARY_KEYS[body.type];
+  const chronicleUnlock = key
+    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    : null;
+  return NextResponse.json({ progress, chronicleUnlock });
 }
