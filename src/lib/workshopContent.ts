@@ -1,12 +1,15 @@
 export type Difficulty = "Easy" | "Medium" | "Hard";
 
 export type WorkshopTabId =
-  | "craft"
+  | "inspiration"
+  | "expeditions"
+  | "adventures"
+  | "skills"
+  | "diy"
   | "kitchen"
-  | "prompt"
-  | "quest"
-  | "grow"
-  | "birds"
+  | "wildlife"
+  | "flora"
+  | "collections"
   | "journal";
 
 export const WORKSHOP_TABS: Array<{
@@ -14,13 +17,16 @@ export const WORKSHOP_TABS: Array<{
   label: string;
   emoji: string;
 }> = [
-  { id: "craft", label: "Weekly Craft", emoji: "🌿" },
+  { id: "inspiration", label: "Daily Inspiration", emoji: "✨" },
+  { id: "expeditions", label: "Weekly Expeditions", emoji: "🏕" },
+  { id: "adventures", label: "Woodland Adventures", emoji: "🥾" },
+  { id: "skills", label: "Outdoor Skills", emoji: "🧭" },
+  { id: "diy", label: "Woodland DIY", emoji: "🪵" },
   { id: "kitchen", label: "Cozy Kitchen", emoji: "🍪" },
-  { id: "prompt", label: "Creative Prompt", emoji: "🎨" },
-  { id: "quest", label: "Woodland Quest", emoji: "📷" },
-  { id: "grow", label: "Grow Something", emoji: "🌱" },
-  { id: "birds", label: "Bird Watch", emoji: "🐦" },
-  { id: "journal", label: "Craft Journal", emoji: "📖" },
+  { id: "wildlife", label: "Local Wildlife", emoji: "🦎" },
+  { id: "flora", label: "Plant & Tree Guide", emoji: "🌿" },
+  { id: "collections", label: "Discovery Collections", emoji: "🗂" },
+  { id: "journal", label: "Explorer's Journal", emoji: "📖" },
 ];
 
 export const WORKSHOP_XP = {
@@ -28,10 +34,16 @@ export const WORKSHOP_XP = {
   recipe: 75,
   prompt: 50,
   questItem: 40,
+  adventure: 40,
+  skill: 35,
+  diy: 100,
   bird: 20,
+  wildlife: 25,
+  floraLog: 20,
   growWeek: 30,
   growComplete: 80,
-  seasonal: 60,
+  expedition: 60,
+  collection: 15,
   journal: 25,
 } as const;
 
@@ -541,58 +553,6 @@ export const BIRDS = [
   },
 ];
 
-export const SEASONAL_PANELS = [
-  {
-    id: "spring",
-    title: "Spring Bloom Festival",
-    emoji: "🌸",
-    tasks: [
-      "Plant something new",
-      "Press flowers",
-      "Make a flower crown",
-      "Photograph blossoms",
-    ],
-    reward: "Spring Bloom Badge",
-  },
-  {
-    id: "summer",
-    title: "Summer Picnic Week",
-    emoji: "☀",
-    tasks: [
-      "Pack a picnic",
-      "Read beneath a tree",
-      "Paint outdoors",
-      "Identify five birds",
-    ],
-    reward: "Picnic Day Badge",
-  },
-  {
-    id: "harvest",
-    title: "Harvest Festival",
-    emoji: "🍂",
-    tasks: [
-      "Bake something with apples",
-      "Decorate with leaves",
-      "Carve a pumpkin",
-      "Make cinnamon ornaments",
-    ],
-    reward: "Harvest Badge",
-  },
-  {
-    id: "winter",
-    title: "Winter Hearth Week",
-    emoji: "❄",
-    tasks: [
-      "Bake cookies",
-      "Knit something",
-      "Make paper snowflakes",
-      "Write a gratitude letter",
-      "Read beside candlelight",
-    ],
-    reward: "Hearth Keeper Badge",
-  },
-];
-
 /** Deterministic weekly index from UTC date. */
 export function weekIndex(length: number, now = new Date()) {
   if (length <= 0) return 0;
@@ -617,3 +577,27 @@ export function featuredCraft(now = new Date()) {
 export function featuredPrompt(now = new Date()) {
   return CREATIVE_PROMPTS[weekIndex(CREATIVE_PROMPTS.length, now)];
 }
+
+// Re-export woodland expansions for a single import surface.
+export {
+  WOODLAND_ADVENTURES,
+  OUTDOOR_SKILLS,
+  WOODLAND_DIY,
+  LOCAL_WILDLIFE,
+  PLANT_TREE_GUIDE,
+  WEEKLY_EXPEDITIONS,
+  EXPLORER_PROMPTS,
+  DISCOVERY_COLLECTIONS,
+  featuredExpedition,
+  todaysWoodlandInspiration,
+} from "@/lib/workshopWoodland";
+export type {
+  AdventureItem,
+  OutdoorSkill,
+  DiyProject,
+  WildlifeEntry,
+  FloraEntry,
+  Expedition,
+  DiscoveryCollection,
+  DailyInspiration,
+} from "@/lib/workshopWoodland";

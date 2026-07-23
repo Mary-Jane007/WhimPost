@@ -5784,6 +5784,133 @@ button.linkish:hover {
   color: #fff8ea;
 }
 
+.bw-inspire-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+.bw-inspire h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: #6a5238;
+}
+.bw-inspire.quote {
+  grid-column: 1 / -1;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 250, 235, 0.9), transparent 50%),
+    linear-gradient(165deg, #f4e6c8, #e4d0a8);
+}
+.bw-expedition { max-width: 42rem; }
+.bw-subhead {
+  margin: 1.5rem 0 0.5rem;
+  font-family: var(--font-display), Georgia, serif;
+  color: #3a2818;
+}
+.bw-featured-diy {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+@media (min-width: 800px) {
+  .bw-featured-diy {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: start;
+  }
+}
+.bw-diy-thumb {
+  width: 100%;
+  height: 8rem;
+  object-fit: cover;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(110, 75, 40, 0.22);
+  margin-bottom: 0.5rem;
+}
+.bw-diy-plate {
+  display: grid;
+  place-items: center;
+  min-height: 10rem;
+  border-radius: 0.85rem;
+  font-size: 3rem;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 22px,
+      rgba(120, 90, 50, 0.05) 23px
+    ),
+    linear-gradient(160deg, #efe0c4, #dcc49a);
+  border: 1px dashed rgba(110, 75, 40, 0.35);
+}
+.bw-diy-plate.small {
+  min-height: 6rem;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.bw-field-card { position: relative; }
+.bw-field-fallback {
+  position: absolute;
+  inset: 0.75rem;
+  display: grid;
+  place-items: center;
+  font-size: 3rem;
+  border-radius: 0.65rem;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 250, 235, 0.7), transparent 55%),
+    linear-gradient(160deg, #e8d4b0, #cbb48a);
+  z-index: 0;
+  pointer-events: none;
+}
+.bw-bird-figure { position: relative; }
+.bw-bird-figure .bw-bird-image {
+  position: relative;
+  z-index: 1;
+  background: #efe0c4;
+}
+.bw-fact-list {
+  margin: 0.4rem 0 0.75rem;
+  padding-left: 1.1rem;
+  color: #5a442e;
+  font-size: 0.92rem;
+}
+.bw-collection-card .bw-progress-bar { margin: 0.55rem 0; }
+.bw-quest-list em {
+  display: block;
+  font-style: normal;
+  font-size: 0.8rem;
+  color: #7a6248;
+  margin-top: 0.15rem;
+}
+.bw-quest-list strong { font-weight: 600; }
+.bw-hero-atelier { position: relative; min-height: 10rem; }
+.bw-hero-compass {
+  width: 3.2rem;
+  position: absolute;
+  right: 12%;
+  top: 18%;
+  opacity: 0.9;
+  animation: bwDrift 10s ease-in-out infinite;
+}
+.bw-hero-maple {
+  width: 4rem;
+  position: absolute;
+  left: 8%;
+  bottom: 12%;
+  opacity: 0.85;
+}
+.skill-card ol {
+  margin: 0.4rem 0 0.85rem;
+  padding-left: 1.15rem;
+  color: #5a442e;
+  font-size: 0.9rem;
+}
+.bw-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.bw-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(42, 24, 12, 0.16);
+}
+
 .bw-panel,
 .bw-seasonal {
   margin-bottom: 1.5rem;

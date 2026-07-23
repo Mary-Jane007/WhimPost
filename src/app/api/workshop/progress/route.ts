@@ -4,9 +4,12 @@ import type { UserPublic } from "@/lib/types";
 import {
   applyWorkshopAction,
   craftCompletionPayload,
+  diyCompletionPayload,
+  expeditionCompletionPayload,
   getWorkshopProgress,
   promptCompletionPayload,
   recipeCompletionPayload,
+  skillCompletionPayload,
   type WorkshopAction,
 } from "@/lib/workshop";
 import { chronicleAfterActivity } from "@/lib/chronicle";
@@ -41,7 +44,13 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as
     | (Partial<WorkshopAction> & {
         type?: string;
-        completeKind?: "craft" | "recipe" | "prompt";
+        completeKind?:
+          | "craft"
+          | "recipe"
+          | "prompt"
+          | "diy"
+          | "skill"
+          | "expedition";
         id?: string;
         photoUrl?: string;
       })
@@ -60,6 +69,12 @@ export async function POST(req: NextRequest) {
       action = recipeCompletionPayload(body.id, body.photoUrl);
     } else if (body.completeKind === "prompt" && body.id) {
       action = promptCompletionPayload(body.id, body.photoUrl);
+    } else if (body.completeKind === "diy" && body.id) {
+      action = diyCompletionPayload(body.id, body.photoUrl);
+    } else if (body.completeKind === "skill" && body.id) {
+      action = skillCompletionPayload(body.id);
+    } else if (body.completeKind === "expedition" && body.id) {
+      action = expeditionCompletionPayload(body.id, body.photoUrl);
     } else {
       return jsonError("Unknown completion kind");
     }
@@ -72,7 +87,9 @@ export async function POST(req: NextRequest) {
   let key: ChronicleActivityKey | null = null;
   if (action.type === "complete") key = "workshop.complete";
   else if (action.type === "journalEntry") key = "workshop.journalEntry";
-  else if (action.type === "bird") key = "workshop.bird";
+  else if (action.type === "bird" || action.type === "wildlife") {
+    key = "workshop.bird";
+  }
 
   const chronicleUnlock = key
     ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)

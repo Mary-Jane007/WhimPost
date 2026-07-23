@@ -236,7 +236,7 @@ export default async function VillagePage() {
         {village.id === "bramblewood" && user.villageId === "bramblewood" ? (
           <p className="muted" style={{ marginTop: "0.85rem" }}>
             <Link href="/workshop" className="btn-primary">
-              Enter The Bramblewood Workshop
+              Enter The Woodland Workshop
             </Link>
           </p>
         ) : null}
