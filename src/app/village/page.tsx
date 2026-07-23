@@ -13,15 +13,18 @@ import {
   collectiblesForVillage,
   getVillage,
   RANK_LADDER,
-  SEASONAL_EVENTS,
   SHARED_FEATURES,
   type VillageId,
 } from "@/lib/villages";
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
 import { VillageChangePanel } from "@/components/VillageChangePanel";
 import { NoticeBoard } from "@/components/NoticeBoard";
+import { CollectibleIcon } from "@/components/CollectibleIcon";
 import { PageCrest } from "@/components/PageCrest";
+import { WelcomeLetterEditor } from "@/components/WelcomeLetterEditor";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
+import { LostChronicles } from "@/components/LostChronicles";
+import { ChronicleAdminEditor } from "@/components/ChronicleAdminEditor";
 import { VillageMascot } from "@/components/VillageMascot";
 import {
   deliverWelcomeLetter,
@@ -77,19 +80,20 @@ export default async function VillagePage() {
 
   const noteRows = db
     .prepare(
-      `SELECT n.id, n.body, n.anonymous, n.created_at,
+      `SELECT n.id, n.body, n.anonymous, n.image_url, n.created_at,
               u.id as uid, u.username, u.display_name, u.bio, u.forest_name,
               u.created_at as ucreated, u.is_owner, u.village_id, u.reputation
        FROM village_notes n
        JOIN users u ON u.id = n.author_id
        WHERE n.village_id = ?
        ORDER BY n.created_at DESC
-       LIMIT 30`
+       LIMIT 40`
     )
     .all(stats.villageId) as Array<{
     id: string;
     body: string;
     anonymous: number;
+    image_url: string | null;
     created_at: string;
     uid: string;
     username: string;
@@ -106,6 +110,7 @@ export default async function VillagePage() {
     id: r.id,
     body: r.body,
     anonymous: Boolean(r.anonymous),
+    imageUrl: r.image_url || null,
     createdAt: r.created_at,
     author: r.anonymous
       ? null
@@ -117,7 +122,7 @@ export default async function VillagePage() {
 
   const unlockLabels = [
     "Lantern path lit",
-    "Seasonal bunting",
+    "Village bunting",
     "Visiting wildlife",
     "Special building glow",
   ];
@@ -140,7 +145,11 @@ export default async function VillagePage() {
               ? ["mushroom-amanita", "leafy-branch", "skeleton-key"]
               : village.id === "moonmere"
                 ? ["moon-full", "moon-crescent", "butterfly-green"]
-                : ["fox-seated", "mushroom-amanita", "moon-full"]
+                : village.id === "bramblewood"
+                  ? ["fox-seated", "pinecone", "candle-jar"]
+                  : village.id === "hearthwick"
+                    ? ["candle-jar", "jam-jar", "leafy-branch"]
+                    : ["fox-seated", "mushroom-amanita", "moon-full"]
         }
         villageStickers={
           village.id === "clovermeadow"
@@ -151,7 +160,19 @@ export default async function VillagePage() {
                   { village: "moonmere", id: "luna-moth" },
                   { village: "moonmere", id: "fairy-moon" },
                 ]
-              : undefined
+              : village.id === "bramblewood"
+                ? [
+                    { village: "bramblewood", id: "fox-face" },
+                    { village: "bramblewood", id: "monarch" },
+                    { village: "bramblewood", id: "maple-branch" },
+                  ]
+                : village.id === "hearthwick"
+                  ? [
+                      { village: "hearthwick", id: "hedgehog" },
+                      { village: "hearthwick", id: "potion-bottles" },
+                      { village: "hearthwick", id: "lavender-bouquet" },
+                    ]
+                  : undefined
         }
       />
       {welcomeLetter ? <WelcomeLetterModal letter={welcomeLetter} /> : null}
@@ -212,6 +233,41 @@ export default async function VillagePage() {
             </span>
           ))}
         </div>
+        {village.id === "bramblewood" && user.villageId === "bramblewood" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/workshop" className="btn-primary">
+              Enter The Woodland Workshop
+            </Link>
+          </p>
+        ) : null}
+        {village.id === "mosshollow" && user.villageId === "mosshollow" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/library" className="btn-primary">
+              Enter The Grand Library
+            </Link>
+          </p>
+        ) : null}
+        {village.id === "clovermeadow" && user.villageId === "clovermeadow" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/garden" className="btn-primary">
+              Enter The Bloomkeeper&apos;s Garden
+            </Link>
+          </p>
+        ) : null}
+        {village.id === "hearthwick" && user.villageId === "hearthwick" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/fireside" className="btn-primary">
+              Enter The Fireside
+            </Link>
+          </p>
+        ) : null}
+        {village.id === "moonmere" && user.villageId === "moonmere" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            <Link href="/observatory" className="btn-primary">
+              Enter The Observatory
+            </Link>
+          </p>
+        ) : null}
       </section>
 
       <section className="village-panel">
@@ -219,12 +275,6 @@ export default async function VillagePage() {
         <ul className="belong-list">
           {village.belongs.map((b) => (
             <li key={b}>{b}</li>
-          ))}
-        </ul>
-        <h3>Village tasks</h3>
-        <ul className="task-list">
-          {village.tasks.map((t) => (
-            <li key={t}>{t}</li>
           ))}
         </ul>
         <p className="muted">
@@ -248,9 +298,7 @@ export default async function VillagePage() {
             const have = liveStats.collectibles[key] || 0;
             return (
               <div key={key} className="collectible-chip">
-                <span className="collectible-emoji" aria-hidden>
-                  {meta.emoji}
-                </span>
+                <CollectibleIcon kind={key} />
                 <strong>{meta.name}</strong>
                 <em>
                   {have}/{meta.max}
@@ -263,6 +311,8 @@ export default async function VillagePage() {
           })}
         </div>
       </section>
+
+      <LostChronicles villageId={village.id} />
 
       <NoticeBoard initialNotes={notes} />
 
@@ -311,14 +361,18 @@ export default async function VillagePage() {
         )}
       </section>
 
-      <section className="village-panel">
-        <h2>Seasonal spirit</h2>
-        <div className="season-list">
-          {SEASONAL_EVENTS.map((e) => (
-            <span key={e}>{e}</span>
-          ))}
-        </div>
-      </section>
+      {user.isOwner ? (
+        <>
+          <WelcomeLetterEditor
+            initialVillageId={stats.villageId as VillageId}
+          />
+          <div style={{ marginTop: "0.75rem" }}>
+            <ChronicleAdminEditor
+              initialVillageId={stats.villageId as VillageId}
+            />
+          </div>
+        </>
+      ) : null}
 
       <VillageChangePanel
         currentVillageId={stats.villageId as VillageId}
