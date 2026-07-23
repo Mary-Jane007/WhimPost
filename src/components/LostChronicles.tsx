@@ -129,32 +129,42 @@ export function LostChronicles({ villageId }: Props) {
           .join(" ")}
       >
         {!opened ? (
-          <button
-            type="button"
-            className="lc-cover"
-            onClick={openBook}
-            aria-label={`Open ${meta.name}`}
-          >
-            <span className="lc-cover-edge" aria-hidden />
-            <span className="lc-cover-band" aria-hidden />
-            <span className="lc-cover-corner tl" aria-hidden />
-            <span className="lc-cover-corner tr" aria-hidden />
-            <span className="lc-cover-corner bl" aria-hidden />
-            <span className="lc-cover-corner br" aria-hidden />
-            <span className="lc-cover-emblem" aria-hidden>
-              {meta.emoji}
-            </span>
-            <span className="lc-cover-title">{meta.name}</span>
-            <span className="lc-cover-motif">{meta.motif}</span>
-            <span className="lc-cover-hint">
-              {opening ? "Opening…" : "Click to open"}
-            </span>
-            <span className="lc-cover-seal" aria-hidden>
-              ✦
-            </span>
-          </button>
+          <div className="lc-closed-stage">
+            <button
+              type="button"
+              className="lc-cover"
+              onClick={openBook}
+              aria-label={`Open ${meta.name}`}
+            >
+              <span className="lc-cover-boards" aria-hidden>
+                <span className="lc-cover-ridge" />
+                <span className="lc-cover-ridge mid" />
+                <span className="lc-cover-ridge low" />
+              </span>
+              <span className="lc-cover-edge" aria-hidden />
+              <span className="lc-cover-frame" aria-hidden />
+              <span className="lc-cover-corner tl" aria-hidden />
+              <span className="lc-cover-corner tr" aria-hidden />
+              <span className="lc-cover-corner bl" aria-hidden />
+              <span className="lc-cover-corner br" aria-hidden />
+              <span className="lc-cover-emblem" aria-hidden>
+                {meta.emoji}
+              </span>
+              <span className="lc-cover-title">{meta.name}</span>
+              <span className="lc-cover-motif">{meta.motif}</span>
+              <span className="lc-cover-hint">
+                {opening ? "Opening…" : "Click to open"}
+              </span>
+              <span className="lc-cover-seal" aria-hidden>
+                ✦
+              </span>
+            </button>
+            <span className="lc-page-block" aria-hidden />
+            <span className="lc-page-block-bottom" aria-hidden />
+          </div>
         ) : (
           <div className="lc-open-book" role="region" aria-label={meta.name}>
+            <div className="lc-open-back" aria-hidden />
             <div className="lc-open-spine" aria-hidden />
             <div className="lc-open-left" aria-hidden>
               <div className="lc-stack-edge" />
