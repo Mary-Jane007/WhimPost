@@ -20,7 +20,7 @@ type SystemVillageSender = {
   bio: string;
 };
 
-type WelcomeTemplate = {
+export type WelcomeTemplate = {
   subject: string;
   body: string;
   paperStyle: string;
@@ -45,6 +45,14 @@ type WelcomeTemplate = {
   }>;
 };
 
+export type WelcomeTemplateEdit = {
+  villageId: VillageId;
+  subject: string;
+  body: string;
+  isCustom: boolean;
+  updatedAt: string | null;
+};
+
 const SYSTEM_SENDERS: Partial<Record<VillageId, SystemVillageSender>> = {
   mosshollow: {
     id: "system-mosshollow",
@@ -67,8 +75,24 @@ const SYSTEM_SENDERS: Partial<Record<VillageId, SystemVillageSender>> = {
     username: "moonmere_moth",
     displayName: "Moonmere",
     email: "system+moonmere@whimpost.local",
-    forestName: "The Moon Dock",
-    bio: "Where dreams become letters.",
+    forestName: "The Observatory",
+    bio: "Some answers only arrive after sunset.",
+  },
+  bramblewood: {
+    id: "system-bramblewood",
+    username: "bramblewood_fox",
+    displayName: "Bramblewood",
+    email: "system+bramblewood@whimpost.local",
+    forestName: "Explorer's Guild",
+    bio: "Where every path hides a story.",
+  },
+  hearthwick: {
+    id: "system-hearthwick",
+    username: "hearthwick_hedgehog",
+    displayName: "Hearthwick",
+    email: "system+hearthwick@whimpost.local",
+    forestName: "The Hearth Hall",
+    bio: "Where every stranger is welcomed home.",
   },
 };
 
@@ -93,10 +117,10 @@ A small satchel has been prepared for you — the first pieces of your Mosshollo
 
 Inside you'll find:
 
-* 🍄 A soft woodland mushroom for your jar.
-* 🍃 A pressed oak leaf, the first of many.
-* 🪶 A feather from the library owl.
-* 📖 A lost page, waiting to join your shelf of stories.
+* ![Mushrooms](/stickers/collectibles/forest/mushrooms.png) A soft woodland mushroom for your jar.
+* ![Leaves](/stickers/collectibles/forest/leaves.png) A pressed oak leaf, the first of many.
+* ![Feathers](/stickers/collectibles/forest/feathers.png) A feather from the library owl.
+* ![Lost Pages](/stickers/collectibles/forest/lost-pages.png) A lost page, waiting to join your shelf of stories.
 
 These are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the village. Your cottage will fill as your collection grows.
 
@@ -166,10 +190,10 @@ Beside your doorstep, we've left a woven basket — the first pieces of your Clo
 
 Inside you'll discover:
 
-* 🦋 A pink meadow butterfly for your jar.
-* 🎀 A soft ribbon for tying kindness into letters.
-* 🍯 A spoon of village honey from the bees.
-* 🌸 A handful of cherry blossoms to start your shelf.
+* ![Pink Butterflies](/stickers/collectibles/clovermeadow/clover-butterflies.png) A pink meadow butterfly for your jar.
+* ![Pink Ribbons](/stickers/collectibles/clovermeadow/clover-ribbon.png) A soft ribbon for tying kindness into letters.
+* ![Village Honey](/stickers/collectibles/clovermeadow/clover-honey.png) A spoon of village honey from the bees.
+* ![Cherry Blossoms](/stickers/collectibles/clovermeadow/clover-blossoms.png) A handful of cherry blossoms to start your shelf.
 
 These are only the beginning. Write letters, welcome friends, and gather more keepsakes as kindness grows. Your cottage will fill as your collection blooms.
 
@@ -253,10 +277,10 @@ Waiting at your window is a silver lantern — the first pieces of your Moonmere
 
 Inside it you'll find:
 
-* 🪷 Night lily petals from the lakeshore blooms.
-* 🫧 A mere pearl, smooth as the water's hush.
-* 🏮 A dock lantern that burns with a quiet light.
-* 💭 A dream note that asks only one question:
+* ![Night Lilies](/stickers/collectibles/moonmere/moon-lilies.png) Night lily petals from the lakeshore blooms.
+* ![Mere Pearls](/stickers/collectibles/moonmere/moon-pearls.png) A mere pearl, smooth as the water's hush.
+* ![Dock Lanterns](/stickers/collectibles/moonmere/moon-lanterns.png) A dock lantern that burns with a quiet light.
+* ![Dream Notes](/stickers/collectibles/moonmere/moon-dreams.png) A dream note that asks only one question:
 
 *"What have you been dreaming about lately?"*
 
@@ -320,6 +344,175 @@ Welcome to **Moonmere**.
       },
     ],
   },
+  bramblewood: {
+    subject: "Welcome to Bramblewood",
+    body: `**Greetings, explorer,**
+
+We were beginning to wonder when you'd find us.
+
+The foxes insisted you'd taken the longer trail.
+
+The ravens claimed you were distracted by something interesting.
+
+As usual, they were probably both right.
+
+Welcome to **Bramblewood**, where every winding path hides a story, every forgotten ruin whispers a mystery, and every letter is the beginning of another adventure.
+
+Before setting off, we've packed a travel satchel for you — the first pieces of your Bramblewood collection.
+
+Inside you'll find:
+
+* ![Fox Tails](/stickers/collectibles/bramblewood/bramble-fox-tails.png) A soft fox tail for luck on every trail.
+* ![Maple Leaves](/stickers/collectibles/bramblewood/bramble-maple.png) A pressed maple leaf from the dens.
+* ![Hello Fall Candles](/stickers/collectibles/bramblewood/bramble-candles.png) A Hello Fall candle to warm your satchel.
+* ![Wonder Compasses](/stickers/collectibles/bramblewood/bramble-compasses.png) A compass that occasionally points toward wonder instead of north.
+
+These are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the trails. Your cottage will fill as your collection grows.
+
+Should you stumble upon something extraordinary, write about it.
+
+The village has always loved a good tale.
+
+And remember—
+
+The finest adventures are rarely planned.
+
+Welcome to **Bramblewood**.
+
+*May curiosity always know the way.*`,
+    paperStyle: "parchment",
+    envelopeStyle: "kraft",
+    waxSeal: "spiral",
+    stampStyle: "fox-seated",
+    stickers: [
+      {
+        id: "welcome-fox",
+        kind: "bramble-fox-sitting",
+        x: 92,
+        y: 8,
+        scale: 0.68,
+        rotation: 10,
+      },
+      {
+        id: "welcome-maple",
+        kind: "bramble-maple-leaf",
+        x: 8,
+        y: 10,
+        scale: 0.58,
+        rotation: -14,
+      },
+      {
+        id: "welcome-compass",
+        kind: "bramble-compass",
+        x: 9,
+        y: 88,
+        scale: 0.55,
+        rotation: -6,
+      },
+      {
+        id: "welcome-mushroom",
+        kind: "bramble-mushroom",
+        x: 93,
+        y: 92,
+        scale: 0.55,
+        rotation: 8,
+      },
+    ],
+    scraps: [
+      {
+        id: "welcome-stain",
+        kind: "tea-stain",
+        x: 8,
+        y: 6,
+        scale: 0.5,
+        rotation: -8,
+      },
+    ],
+  },
+  hearthwick: {
+    subject: "Welcome to Hearthwick",
+    body: `**Dear neighbor,**
+
+The kettle has been waiting for you.
+
+Not for long—just long enough to brew the perfect cup.
+
+Welcome to **Hearthwick**, where windows glow warmly at dusk, fresh bread cools on every windowsill, and no one stays a stranger for very long.
+
+You'll soon discover that letters here travel with more than words.
+
+They carry recipes.
+Stories.
+Laughter.
+Comfort.
+
+Sometimes they simply arrive to remind someone they are not alone.
+
+On your kitchen table, we've left a small welcome basket.
+
+Inside you'll find:
+
+* ![Hearth Muffins](/stickers/collectibles/hearthwick/hearth-muffins.png) A loaf of warm honey bread.
+* ![Recipes](/stickers/collectibles/hearthwick/hearth-recipes.png) A sprig of lavender.
+* ![Knit Blankets](/stickers/collectibles/hearthwick/hearth-blankets.png) A cozy blanket stitched by village hands.
+* ![Fireside Notes](/stickers/collectibles/hearthwick/hearth-letters.png) And a bundle of handmade stationery, ready for the conversations waiting ahead.
+
+When evening falls, you'll always find someone by the hearth with an empty chair beside them.
+
+We hope you'll pull it a little closer to the fire.
+
+Welcome to **Hearthwick**.
+
+*May every letter you send feel like coming home.*`,
+    paperStyle: "cream",
+    envelopeStyle: "kraft",
+    waxSeal: "heart",
+    stampStyle: "mushroom-amanita",
+    stickers: [
+      {
+        id: "welcome-pie",
+        kind: "pie",
+        x: 92,
+        y: 8,
+        scale: 0.62,
+        rotation: 8,
+      },
+      {
+        id: "welcome-candle",
+        kind: "candle-jar",
+        x: 8,
+        y: 10,
+        scale: 0.58,
+        rotation: -12,
+      },
+      {
+        id: "welcome-honey",
+        kind: "honey-jar",
+        x: 9,
+        y: 88,
+        scale: 0.55,
+        rotation: -6,
+      },
+      {
+        id: "welcome-jam",
+        kind: "jam-jar",
+        x: 93,
+        y: 92,
+        scale: 0.55,
+        rotation: 10,
+      },
+    ],
+    scraps: [
+      {
+        id: "welcome-stain",
+        kind: "tea-stain",
+        x: 8,
+        y: 6,
+        scale: 0.5,
+        rotation: -8,
+      },
+    ],
+  },
 };
 
 export function isSystemUsername(username: string) {
@@ -359,22 +552,122 @@ export function ensureVillageSystemUser(
   return sender.id;
 }
 
-/** Keep welcome-letter body & decorations aligned with the current template. */
-export function syncWelcomeLetterDecorations(db: Database.Database) {
-  for (const [villageId, template] of Object.entries(WELCOME_TEMPLATES)) {
+/** Default hardcoded welcome template (before owner edits). */
+export function getDefaultWelcomeTemplate(
+  villageId: VillageId
+): WelcomeTemplate | null {
+  return WELCOME_TEMPLATES[villageId] || null;
+}
+
+/** Effective welcome template: owner edit if present, else default. */
+export function getEffectiveWelcomeTemplate(
+  db: Database.Database,
+  villageId: VillageId
+): WelcomeTemplate | null {
+  const defaults = getDefaultWelcomeTemplate(villageId);
+  if (!defaults) return null;
+
+  const row = db
+    .prepare(
+      `SELECT subject, body FROM welcome_letter_templates WHERE village_id = ?`
+    )
+    .get(villageId) as { subject: string; body: string } | undefined;
+
+  if (!row) return defaults;
+  return {
+    ...defaults,
+    subject: row.subject,
+    body: row.body,
+  };
+}
+
+export function getWelcomeTemplateEdit(
+  db: Database.Database,
+  villageId: VillageId
+): WelcomeTemplateEdit | null {
+  const defaults = getDefaultWelcomeTemplate(villageId);
+  if (!defaults) return null;
+
+  const row = db
+    .prepare(
+      `SELECT subject, body, updated_at
+       FROM welcome_letter_templates WHERE village_id = ?`
+    )
+    .get(villageId) as
+    | { subject: string; body: string; updated_at: string }
+    | undefined;
+
+  return {
+    villageId,
+    subject: row?.subject ?? defaults.subject,
+    body: row?.body ?? defaults.body,
+    isCustom: Boolean(row),
+    updatedAt: row?.updated_at ?? null,
+  };
+}
+
+export function upsertWelcomeTemplate(
+  db: Database.Database,
+  villageId: VillageId,
+  subject: string,
+  body: string,
+  updatedBy: string | null
+): WelcomeTemplateEdit | null {
+  db.prepare(
+    `INSERT INTO welcome_letter_templates (village_id, subject, body, updated_at, updated_by)
+     VALUES (?, ?, ?, datetime('now'), ?)
+     ON CONFLICT(village_id) DO UPDATE SET
+       subject = excluded.subject,
+       body = excluded.body,
+       updated_at = datetime('now'),
+       updated_by = excluded.updated_by`
+  ).run(villageId, subject, body, updatedBy);
+
+  syncWelcomeLetterDecorations(db, villageId);
+  return getWelcomeTemplateEdit(db, villageId);
+}
+
+export function resetWelcomeTemplate(
+  db: Database.Database,
+  villageId: VillageId
+): WelcomeTemplateEdit | null {
+  db.prepare(`DELETE FROM welcome_letter_templates WHERE village_id = ?`).run(
+    villageId
+  );
+  syncWelcomeLetterDecorations(db, villageId);
+  return getWelcomeTemplateEdit(db, villageId);
+}
+
+/** Keep welcome letters aligned with the effective (possibly owner-edited) template. */
+export function syncWelcomeLetterDecorations(
+  db: Database.Database,
+  onlyVillageId?: VillageId
+) {
+  const villageIds = onlyVillageId
+    ? [onlyVillageId]
+    : (Object.keys(WELCOME_TEMPLATES) as VillageId[]);
+
+  for (const villageId of villageIds) {
+    const template = getEffectiveWelcomeTemplate(db, villageId);
     if (!template) continue;
-    const senderId = ensureVillageSystemUser(db, villageId as VillageId);
+    const senderId = ensureVillageSystemUser(db, villageId);
     if (!senderId) continue;
     db.prepare(
       `UPDATE letters
-       SET body = ?, stickers_json = ?, scrap_json = ?
-       WHERE sender_id = ? AND subject = ?`
+       SET subject = ?, body = ?, stickers_json = ?, scrap_json = ?,
+           paper_style = ?, envelope_style = ?, wax_seal = ?, stamp_style = ?,
+           font_style = 'typewriter'
+       WHERE sender_id = ?`
     ).run(
+      template.subject,
       template.body,
       JSON.stringify(template.stickers),
       JSON.stringify(template.scraps),
-      senderId,
-      template.subject
+      template.paperStyle,
+      template.envelopeStyle,
+      template.waxSeal,
+      template.stampStyle,
+      senderId
     );
   }
 }
@@ -391,6 +684,18 @@ const WELCOME_COLLECTION_GIFTS: Partial<
     "clover-blossoms",
   ],
   moonmere: ["moon-lilies", "moon-pearls", "moon-lanterns", "moon-dreams"],
+  bramblewood: [
+    "bramble-fox-tails",
+    "bramble-maple",
+    "bramble-candles",
+    "bramble-compasses",
+  ],
+  hearthwick: [
+    "hearth-muffins",
+    "hearth-recipes",
+    "hearth-blankets",
+    "hearth-letters",
+  ],
 };
 
 function grantWelcomeCollectionGifts(
@@ -422,19 +727,19 @@ export function deliverWelcomeLetter(
   villageId: string
 ): LetterView | null {
   if (!isVillageId(villageId)) return null;
-  const template = WELCOME_TEMPLATES[villageId];
+  const template = getEffectiveWelcomeTemplate(db, villageId);
   const senderId = ensureVillageSystemUser(db, villageId);
   if (!template || !senderId) return null;
 
-  syncWelcomeLetterDecorations(db);
+  syncWelcomeLetterDecorations(db, villageId);
 
   const existing = db
     .prepare(
       `SELECT * FROM letters
-       WHERE recipient_id = ? AND sender_id = ? AND subject = ?
+       WHERE recipient_id = ? AND sender_id = ?
        LIMIT 1`
     )
-    .get(recipientId, senderId, template.subject) as LetterRecord | undefined;
+    .get(recipientId, senderId) as LetterRecord | undefined;
 
   if (existing) {
     // Backfill starter gifts for villagers who got the letter before gifts existed.
@@ -446,9 +751,9 @@ export function deliverWelcomeLetter(
   db.prepare(
     `INSERT INTO letters (
       id, sender_id, recipient_id, subject, body,
-      paper_style, envelope_style, wax_seal, stamp_style,
+      paper_style, envelope_style, wax_seal, stamp_style, font_style,
       stickers_json, scrap_json, status, is_read, sent_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sent', 0, datetime('now'))`
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'typewriter', ?, ?, 'sent', 0, datetime('now'))`
   ).run(
     id,
     senderId,
@@ -478,22 +783,21 @@ export function getUnreadWelcomeLetter(
 ): LetterView | null {
   if (!villageId || !isVillageId(villageId)) return null;
   const sender = SYSTEM_SENDERS[villageId];
-  const template = WELCOME_TEMPLATES[villageId];
+  const template = getEffectiveWelcomeTemplate(db, villageId);
   if (!sender || !template) return null;
 
-  syncWelcomeLetterDecorations(db);
+  syncWelcomeLetterDecorations(db, villageId);
 
   const row = db
     .prepare(
       `SELECT * FROM letters
        WHERE recipient_id = ?
          AND sender_id = ?
-         AND subject = ?
          AND is_read = 0
          AND status = 'sent'
        LIMIT 1`
     )
-    .get(recipientId, sender.id, template.subject) as LetterRecord | undefined;
+    .get(recipientId, sender.id) as LetterRecord | undefined;
 
   return row ? toLetterView(row) : null;
 }

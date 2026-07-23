@@ -4,18 +4,34 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { UserPublic } from "@/lib/types";
 
-const links = [
-  { href: "/village", label: "Village" },
-  { href: "/inbox", label: "Inbox" },
-  { href: "/sent", label: "Sent" },
-  { href: "/compose", label: "Write" },
-  { href: "/friends", label: "Friends" },
-  { href: "/profile", label: "Profile" },
-];
-
 export function SiteNav({ user }: { user: UserPublic | null }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const links = [
+    { href: "/village", label: "Village" },
+    ...(user?.villageId === "bramblewood"
+      ? [{ href: "/workshop", label: "Workshop" }]
+      : []),
+    ...(user?.villageId === "mosshollow"
+      ? [{ href: "/library", label: "Library" }]
+      : []),
+    ...(user?.villageId === "clovermeadow"
+      ? [{ href: "/garden", label: "Garden" }]
+      : []),
+    ...(user?.villageId === "hearthwick"
+      ? [{ href: "/fireside", label: "Fireside" }]
+      : []),
+    ...(user?.villageId === "moonmere"
+      ? [{ href: "/observatory", label: "Observatory" }]
+      : []),
+    { href: "/tv-corner", label: "TV Corner" },
+    { href: "/inbox", label: "Inbox" },
+    { href: "/sent", label: "Sent" },
+    { href: "/compose", label: "Write" },
+    { href: "/friends", label: "Friends" },
+    { href: "/profile", label: "Profile" },
+  ];
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });

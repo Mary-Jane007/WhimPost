@@ -3,6 +3,7 @@
 import { LetterBodyText } from "@/components/LetterBodyText";
 import { StickerArt, ScrapArt } from "@/components/stickers/StickerArt";
 import type {
+  LetterFont,
   PaperStyle,
   PlacedImage,
   PlacedScrap,
@@ -20,8 +21,19 @@ const paperClass: Record<PaperStyle, string> = {
   night: "paper-night",
 };
 
+const fontClass: Record<LetterFont, string> = {
+  quill: "font-quill",
+  typewriter: "font-typewriter",
+  "ink-hand": "font-ink-hand",
+  "soft-hand": "font-soft-hand",
+  letterpress: "font-letterpress",
+  storybook: "font-storybook",
+  flourish: "font-flourish",
+};
+
 export function LetterPaper({
   paperStyle,
+  fontStyle = "quill",
   body,
   subject,
   stickers,
@@ -39,6 +51,7 @@ export function LetterPaper({
   className = "",
 }: {
   paperStyle: PaperStyle;
+  fontStyle?: LetterFont;
   body: string;
   subject: string;
   stickers: PlacedSticker[];
@@ -113,7 +126,7 @@ export function LetterPaper({
 
   return (
     <div
-      className={`letter-paper ${paperClass[paperStyle]} ${className}`}
+      className={`letter-paper ${paperClass[paperStyle]} ${fontClass[fontStyle]} ${className}`}
       onClick={() => onSelectItem?.(null)}
     >
       {editable ? (
