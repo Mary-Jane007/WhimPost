@@ -56,6 +56,8 @@ export type ChronicleMeta = {
   name: string;
   keeperTitle: string;
   emoji: string;
+  mascotName: string;
+  mascotImage: string;
   accent: string;
   cover: string;
   coverDeep: string;
@@ -69,7 +71,9 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     villageId: "clovermeadow",
     name: "Clovermeadow Chronicle",
     keeperTitle: "Keeper of Clovermeadow",
-    emoji: "🌼",
+    emoji: "🐝",
+    mascotName: "Bee",
+    mascotImage: "/villages/clovermeadow/mascot.png",
     accent: "#d4849a",
     cover: "#8f4f63",
     coverDeep: "#5c2f3f",
@@ -81,7 +85,9 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     villageId: "mosshollow",
     name: "Mosshollow Chronicle",
     keeperTitle: "Keeper of Mosshollow",
-    emoji: "📚",
+    emoji: "🦉",
+    mascotName: "Owl",
+    mascotImage: "/villages/mosshollow/mascot.png",
     accent: "#5a7a4a",
     cover: "#3f5a38",
     coverDeep: "#243522",
@@ -93,7 +99,9 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     villageId: "hearthwick",
     name: "Hearthwick Chronicle",
     keeperTitle: "Keeper of Hearthwick",
-    emoji: "❤️",
+    emoji: "🦔",
+    mascotName: "Hedgehog",
+    mascotImage: "/villages/hearthwick/mascot.png",
     accent: "#c4784a",
     cover: "#8a4a2e",
     coverDeep: "#5a2e1c",
@@ -105,7 +113,9 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     villageId: "moonmere",
     name: "Moonmere Chronicle",
     keeperTitle: "Keeper of Moonmere",
-    emoji: "🌙",
+    emoji: "🦋",
+    mascotName: "Luna moth",
+    mascotImage: "/villages/moonmere/mascot.png",
     accent: "#7a8ab8",
     cover: "#2a3550",
     coverDeep: "#161e30",
@@ -118,6 +128,8 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     name: "Bramblewood Chronicle",
     keeperTitle: "Keeper of Bramblewood",
     emoji: "🦊",
+    mascotName: "Fox",
+    mascotImage: "/villages/bramblewood/mascot.png",
     accent: "#e07020",
     cover: "#8a4a18",
     coverDeep: "#5a2e0c",
