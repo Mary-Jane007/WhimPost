@@ -8553,7 +8553,7 @@ button.linkish:hover {
   overflow: hidden;
   transform-origin: left center;
   transform-style: preserve-3d;
-  transition: transform 0.45s cubic-bezier(0.4, 0.05, 0.2, 1);
+  transition: transform 0.45s cubic-bezier(0.4, 0.05, 0.2, 1), box-shadow 0.45s ease;
   background:
     radial-gradient(ellipse at 68% 16%, color-mix(in srgb, var(--lc-foil) 16%, transparent), transparent 42%),
     radial-gradient(ellipse at 35% 88%, color-mix(in srgb, var(--lc-accent) 14%, transparent), transparent 40%),
@@ -8579,18 +8579,26 @@ button.linkish:hover {
     inset 0 0 0 8px color-mix(in srgb, var(--lc-foil) 18%, transparent),
     inset 12px 0 22px rgba(0, 0, 0, 0.32),
     inset 0 -18px 28px rgba(0, 0, 0, 0.18),
-    0 1px 0 rgba(255, 255, 255, 0.08);
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    4px 6px 0 color-mix(in srgb, var(--lc-spine) 70%, black),
+    10px 14px 28px rgba(28, 16, 6, 0.42),
+    0 22px 40px rgba(20, 12, 4, 0.28);
 }
 .lc-cover:hover {
   transform: translateY(-3px) rotateY(-6deg) rotateX(1.5deg);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--lc-foil) 32%, transparent),
+    inset 0 0 0 6px color-mix(in srgb, var(--lc-cover-deep) 78%, black),
+    inset 0 0 0 8px color-mix(in srgb, var(--lc-foil) 18%, transparent),
+    inset 12px 0 22px rgba(0, 0, 0, 0.32),
+    inset 0 -18px 28px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    6px 8px 0 color-mix(in srgb, var(--lc-spine) 70%, black),
+    14px 18px 34px rgba(28, 16, 6, 0.48),
+    0 28px 48px rgba(20, 12, 4, 0.32);
 }
 .lc-tome.is-opening .lc-cover {
   animation: lc-cover-open 0.7s cubic-bezier(0.45, 0.05, 0.25, 1) forwards;
-}
-.lc-tome.is-opening .lc-page-block,
-.lc-tome.is-opening .lc-page-block-bottom {
-  opacity: 0;
-  transition: opacity 0.35s ease;
 }
 
 .lc-cover-boards {
@@ -8772,47 +8780,6 @@ button.linkish:hover {
     0 4px 10px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     inset 0 -2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Visible page stack (closed book thickness) */
-.lc-page-block {
-  position: absolute;
-  z-index: 1;
-  top: 0.55rem;
-  right: 0.05rem;
-  bottom: 1.35rem;
-  width: 0.85rem;
-  border-radius: 0 0.2rem 0.15rem 0;
-  background:
-    repeating-linear-gradient(
-      180deg,
-      #f7ecd4 0 2px,
-      #ead7b4 2px 3px,
-      #dfc79a 3px 5px
-    );
-  box-shadow:
-    inset -2px 0 3px rgba(90, 60, 20, 0.18),
-    2px 3px 6px rgba(0, 0, 0, 0.18);
-}
-.lc-page-block-bottom {
-  position: absolute;
-  z-index: 0;
-  left: 0.75rem;
-  right: 0.75rem;
-  bottom: 0.2rem;
-  height: 0.85rem;
-  border-radius: 0 0 0.35rem 0.2rem;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #f4e4c4 0 3px,
-      #e4d0a8 3px 4px,
-      #d8c090 4px 7px
-    );
-  box-shadow:
-    inset 0 2px 3px rgba(90, 60, 20, 0.15),
-    0 4px 8px rgba(0, 0, 0, 0.16);
-  transform: skewX(-8deg);
 }
 
 /* Village-specific cover flourishes */
