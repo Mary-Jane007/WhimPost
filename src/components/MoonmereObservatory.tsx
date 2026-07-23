@@ -237,6 +237,10 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                 <h3>
                   Today&apos;s Moon · {moon.emoji} {moon.name}
                 </h3>
+                <p className="mm-meta">
+                  Live sky · {Math.round(moon.illumination * 100)}% lit ·{" "}
+                  {moon.ageDays.toFixed(1)} days since new
+                </p>
                 <p>{moon.detail}</p>
               </article>
               <article className="mm-card">
@@ -707,6 +711,10 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                 <h3>Today&apos;s Moon</h3>
                 <p>
                   {inspiration.moon.emoji} {inspiration.moon.name}
+                </p>
+                <p className="mm-meta">
+                  Live sky · {Math.round(inspiration.moon.illumination * 100)}%
+                  lit · {inspiration.moon.ageDays.toFixed(1)} days since new
                 </p>
                 <p>{inspiration.moon.detail}</p>
               </article>
