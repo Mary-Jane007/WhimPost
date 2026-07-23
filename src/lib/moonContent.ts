@@ -348,7 +348,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "Orion's belt points toward Sirius, the night's brightest star.",
     ],
     brightestStars: ["Betelgeuse", "Rigel", "Bellatrix"],
-    image: MOON_ART.starfield,
+    image: "/moon/constellations/orion.jpg",
   },
   {
     id: "cassiopeia",
@@ -363,7 +363,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "The constellation hosts several open star clusters.",
     ],
     brightestStars: ["Schedar", "Caph", "Gamma Cas"],
-    image: MOON_ART.shards,
+    image: "/moon/constellations/cassiopeia.jpg",
   },
   {
     id: "ursa-major",
@@ -378,7 +378,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "Mizar and Alcor form a famous naked-eye double.",
     ],
     brightestStars: ["Alioth", "Dubhe", "Alkaid"],
-    image: MOON_ART.starlight,
+    image: "/moon/constellations/ursa-major.jpg",
   },
   {
     id: "cygnus",
@@ -393,7 +393,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "The North America Nebula nestles near Deneb.",
     ],
     brightestStars: ["Deneb", "Sadr", "Albireo"],
-    image: MOON_ART.dust,
+    image: "/moon/constellations/cygnus.jpg",
   },
   {
     id: "lyra",
@@ -408,7 +408,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "Lyra is compact but unmistakable once Vega is found.",
     ],
     brightestStars: ["Vega", "Sheliak", "Sulafat"],
-    image: MOON_ART.pearls,
+    image: "/moon/constellations/lyra.jpg",
   },
   {
     id: "scorpius",
@@ -423,7 +423,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "Many Messier clusters glitter near the Milky Way here.",
     ],
     brightestStars: ["Antares", "Shaula", "Sargas"],
-    image: MOON_ART.lanterns,
+    image: "/moon/constellations/scorpius.jpg",
   },
   {
     id: "draco",
@@ -438,7 +438,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "The Cat's Eye Nebula lives within the dragon's coils.",
     ],
     brightestStars: ["Eltanin", "Rastaban", "Thuban"],
-    image: MOON_ART.moths,
+    image: "/moon/constellations/draco.jpg",
   },
   {
     id: "pegasus",
@@ -453,7 +453,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "51 Pegasi hosted the first exoplanet found around a Sun-like star.",
     ],
     brightestStars: ["Enif", "Scheat", "Markab"],
-    image: MOON_ART.fairy,
+    image: "/moon/constellations/pegasus.jpg",
   },
   {
     id: "andromeda",
@@ -468,7 +468,7 @@ export const CONSTELLATIONS: Constellation[] = [
       "Andromeda shares a corner star with Pegasus.",
     ],
     brightestStars: ["Alpheratz", "Mirach", "Almach"],
-    image: MOON_ART.dreams,
+    image: "/moon/constellations/andromeda.jpg",
   },
 ];
 
