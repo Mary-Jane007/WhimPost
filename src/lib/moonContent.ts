@@ -843,7 +843,7 @@ export const CELESTIAL_PLAYLISTS: CelestialPlaylist[] = [
     mood: "Soft settling",
     description: "A slow roof-rain for reading and moon tea.",
     listenFor: ["distant drops", "soft gutter hush", "warm indoor quiet"],
-    image: MOON_ART.pearls,
+    image: "/moon/playlists/gentle-rain.jpg",
   },
   {
     id: "forest-night",
@@ -852,7 +852,7 @@ export const CELESTIAL_PLAYLISTS: CelestialPlaylist[] = [
     mood: "Deep green hush",
     description: "Leaves, soft wind, and the far call of something kind.",
     listenFor: ["crickets", "branch creaks", "owl silence"],
-    image: MOON_ART.moth,
+    image: "/moon/playlists/forest-night.jpg",
   },
   {
     id: "campfire",
@@ -861,7 +861,7 @@ export const CELESTIAL_PLAYLISTS: CelestialPlaylist[] = [
     mood: "Amber comfort",
     description: "Embers talking softly while the lake stays still.",
     listenFor: ["snap of twigs", "low flame", "night air"],
-    image: MOON_ART.lantern,
+    image: "/moon/playlists/campfire.jpg",
   },
   {
     id: "ocean-waves",
@@ -870,7 +870,7 @@ export const CELESTIAL_PLAYLISTS: CelestialPlaylist[] = [
     mood: "Tidal calm",
     description: "Long breaths of water for drifting thoughts.",
     listenFor: ["slow breakers", "foam hush", "distant gull quiet"],
-    image: MOON_ART.dreams,
+    image: "/moon/playlists/ocean-waves.jpg",
   },
   {
     id: "wind-trees",
@@ -879,7 +879,7 @@ export const CELESTIAL_PLAYLISTS: CelestialPlaylist[] = [
     mood: "Silver motion",
     description: "A night breeze combing pines along the dock.",
     listenFor: ["needle whisper", "soft sway", "open sky"],
-    image: MOON_ART.dust,
+    image: "/moon/playlists/wind-trees.jpg",
   },
   {
     id: "owls-calling",
@@ -888,7 +888,7 @@ export const CELESTIAL_PLAYLISTS: CelestialPlaylist[] = [
     mood: "Watchful peace",
     description: "Sparse hoots across a meadow of fog.",
     listenFor: ["far hoot", "grass hush", "moon stillness"],
-    image: MOON_ART.crescent,
+    image: "/moon/playlists/owls-calling.jpg",
   },
   {
     id: "soft-piano",
@@ -897,7 +897,7 @@ export const CELESTIAL_PLAYLISTS: CelestialPlaylist[] = [
     mood: "Quiet wonder",
     description: "Sparse notes like stars appearing one by one.",
     listenFor: ["gentle keys", "long rests", "room reverb"],
-    image: MOON_ART.starlight,
+    image: "/moon/playlists/soft-piano.jpg",
   },
   {
     id: "night-jazz",
@@ -906,7 +906,7 @@ export const CELESTIAL_PLAYLISTS: CelestialPlaylist[] = [
     mood: "Velvet midnight",
     description: "Slow brass and brushed drums for late observatory hours.",
     listenFor: ["brushed snare", "warm bass", "muted horn"],
-    image: MOON_ART.lanterns,
+    image: "/moon/playlists/night-jazz.jpg",
   },
 ];
 
