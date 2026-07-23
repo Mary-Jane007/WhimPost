@@ -57,6 +57,11 @@ export type ChronicleMeta = {
   keeperTitle: string;
   emoji: string;
   accent: string;
+  cover: string;
+  coverDeep: string;
+  spine: string;
+  foil: string;
+  motif: string;
 };
 
 export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
@@ -66,6 +71,11 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     keeperTitle: "Keeper of Clovermeadow",
     emoji: "🌼",
     accent: "#d4849a",
+    cover: "#8f4f63",
+    coverDeep: "#5c2f3f",
+    spine: "#3d1f2a",
+    foil: "#f0d4a8",
+    motif: "clovers & soft blooms",
   },
   mosshollow: {
     villageId: "mosshollow",
@@ -73,6 +83,11 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     keeperTitle: "Keeper of Mosshollow",
     emoji: "📚",
     accent: "#5a7a4a",
+    cover: "#3f5a38",
+    coverDeep: "#243522",
+    spine: "#162016",
+    foil: "#d8c48a",
+    motif: "oak leaves & owl feathers",
   },
   hearthwick: {
     villageId: "hearthwick",
@@ -80,6 +95,11 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     keeperTitle: "Keeper of Hearthwick",
     emoji: "❤️",
     accent: "#c4784a",
+    cover: "#8a4a2e",
+    coverDeep: "#5a2e1c",
+    spine: "#3a1c10",
+    foil: "#f0c878",
+    motif: "embers & warm copper",
   },
   moonmere: {
     villageId: "moonmere",
@@ -87,6 +107,11 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     keeperTitle: "Keeper of Moonmere",
     emoji: "🌙",
     accent: "#7a8ab8",
+    cover: "#2a3550",
+    coverDeep: "#161e30",
+    spine: "#0c121c",
+    foil: "#c8d4f0",
+    motif: "crescents & starlight",
   },
   bramblewood: {
     villageId: "bramblewood",
@@ -94,6 +119,11 @@ export const CHRONICLE_META: Record<VillageId, ChronicleMeta> = {
     keeperTitle: "Keeper of Bramblewood",
     emoji: "🦊",
     accent: "#e07020",
+    cover: "#8a4a18",
+    coverDeep: "#5a2e0c",
+    spine: "#3a1c08",
+    foil: "#f0c090",
+    motif: "autumn leaves & fox trails",
   },
 };
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import type { ChronicleProgressView } from "@/lib/chronicle";
 import type { VillageId } from "@/lib/villages";
-import { ROMAN_PAGES } from "@/lib/chronicleContent";
+import { ROMAN_PAGES, type ChroniclePageNumber } from "@/lib/chronicleContent";
 
 type Props = {
   villageId: VillageId;
@@ -12,8 +12,11 @@ type Props = {
 export function LostChronicles({ villageId }: Props) {
   const [progress, setProgress] = useState<ChronicleProgressView | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [openPage, setOpenPage] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [opened, setOpened] = useState(false);
+  const [opening, setOpening] = useState(false);
+  /** Which leaf is face-up inside the open book (1–4). */
+  const [leaf, setLeaf] = useState<ChroniclePageNumber>(1);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -45,11 +48,27 @@ export function LostChronicles({ villageId }: Props) {
       window.removeEventListener("whimpost:chronicle-unlock", onUnlock);
   }, [load]);
 
+  function openBook() {
+    if (opening || opened) return;
+    setOpening(true);
+    window.setTimeout(() => {
+      setOpened(true);
+      setOpening(false);
+      setLeaf(1);
+    }, 700);
+  }
+
+  function closeBook() {
+    setOpened(false);
+    setOpening(false);
+    setLeaf(1);
+  }
+
   if (loading && !progress) {
     return (
       <section className="village-panel lc-book-panel">
         <h2>📜 The Lost Chronicles</h2>
-        <p className="section-lead">Opening the leather-bound book…</p>
+        <p className="section-lead">The manuscript rests on the shelf…</p>
       </section>
     );
   }
@@ -58,21 +77,31 @@ export function LostChronicles({ villageId }: Props) {
     return (
       <section className="village-panel lc-book-panel">
         <h2>📜 The Lost Chronicles</h2>
-        <p className="section-lead">{error || "The Chronicle is silent for now."}</p>
+        <p className="section-lead">
+          {error || "The Chronicle is silent for now."}
+        </p>
       </section>
     );
   }
 
   const pct = Math.round((progress.recovered / progress.total) * 100);
-  const viewing = progress.pages.find((p) => p.pageNumber === openPage);
+  const meta = progress.meta;
+  const current = progress.pages.find((p) => p.pageNumber === leaf)!;
+  const themeStyle = {
+    "--lc-cover": meta.cover,
+    "--lc-cover-deep": meta.coverDeep,
+    "--lc-spine": meta.spine,
+    "--lc-foil": meta.foil,
+    "--lc-accent": meta.accent,
+  } as CSSProperties;
 
   return (
-    <section className="village-panel lc-book-panel">
+    <section className="village-panel lc-book-panel" style={themeStyle}>
       <h2>
-        {progress.meta.emoji} The Lost Chronicles
+        {meta.emoji} The Lost Chronicles
       </h2>
       <p className="section-lead">
-        {progress.meta.name} — forgotten pages return through gentle deeds.
+        {meta.name} — open the bound manuscript to rediscover forgotten pages.
       </p>
 
       <div className="lc-progress-block">
@@ -89,34 +118,158 @@ export function LostChronicles({ villageId }: Props) {
         </div>
       </div>
 
-      <div className="lc-book">
-        <div className="lc-book-spine" aria-hidden />
-        <div className="lc-book-pages">
-          {progress.pages.map((page) => (
-            <button
-              key={page.pageNumber}
-              type="button"
+      <div
+        className={[
+          "lc-tome",
+          `lc-tome-${villageId}`,
+          opened ? "is-open" : "",
+          opening ? "is-opening" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        {!opened ? (
+          <button
+            type="button"
+            className="lc-cover"
+            onClick={openBook}
+            aria-label={`Open ${meta.name}`}
+          >
+            <span className="lc-cover-edge" aria-hidden />
+            <span className="lc-cover-band" aria-hidden />
+            <span className="lc-cover-corner tl" aria-hidden />
+            <span className="lc-cover-corner tr" aria-hidden />
+            <span className="lc-cover-corner bl" aria-hidden />
+            <span className="lc-cover-corner br" aria-hidden />
+            <span className="lc-cover-emblem" aria-hidden>
+              {meta.emoji}
+            </span>
+            <span className="lc-cover-title">{meta.name}</span>
+            <span className="lc-cover-motif">{meta.motif}</span>
+            <span className="lc-cover-hint">
+              {opening ? "Opening…" : "Click to open"}
+            </span>
+            <span className="lc-cover-seal" aria-hidden>
+              ✦
+            </span>
+          </button>
+        ) : (
+          <div className="lc-open-book" role="region" aria-label={meta.name}>
+            <div className="lc-open-spine" aria-hidden />
+            <div className="lc-open-left" aria-hidden>
+              <div className="lc-stack-edge" />
+              <p className="lc-open-side-label">
+                {meta.emoji}
+                <br />
+                {ROMAN_PAGES[leaf]}
+              </p>
+            </div>
+            <article
+              key={leaf}
               className={
-                page.unlocked ? "lc-slot unlocked" : "lc-slot locked"
+                current.unlocked
+                  ? "lc-leaf unlocked"
+                  : "lc-leaf locked"
               }
-              onClick={() => {
-                if (page.unlocked) setOpenPage(page.pageNumber);
-              }}
-              disabled={!page.unlocked}
             >
-              <span className="lc-slot-roman">Page {page.roman}</span>
-              <span className="lc-slot-title">
-                {page.unlocked ? page.title : `❓ ${page.lockedLabel}`}
-              </span>
-              {!page.unlocked ? (
-                <span className="lc-slot-hint">Faded · torn · waiting</span>
+              <header className="lc-leaf-head">
+                <span>Page {current.roman}</span>
+                <span>
+                  {leaf} / 4
+                </span>
+              </header>
+
+              {current.unlocked ? (
+                <>
+                  {current.illustrationUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={current.illustrationUrl}
+                      alt=""
+                      className="lc-page-illustration"
+                    />
+                  ) : null}
+                  <h3 className="lc-page-title">{current.title}</h3>
+                  <p className="lc-page-body">
+                    <span className="lc-dropcap">
+                      {current.body.trim().charAt(0)}
+                    </span>
+                    {current.body.trim().slice(1)}
+                  </p>
+                </>
               ) : (
-                <span className="lc-slot-hint">Open parchment</span>
+                <div className="lc-leaf-mystery">
+                  <span className="lc-mystery-mark" aria-hidden>
+                    ❓
+                  </span>
+                  <h3 className="lc-page-title">Unknown</h3>
+                  <p>
+                    This leaf is faded, torn, and waiting. Keep tending your
+                    village — the ink will return.
+                  </p>
+                  <div className="lc-mystery-lines" aria-hidden>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
               )}
-            </button>
-          ))}
-        </div>
+
+              <footer className="lc-leaf-nav">
+                <button
+                  type="button"
+                  className="lc-leaf-btn"
+                  disabled={leaf <= 1}
+                  onClick={() =>
+                    setLeaf((n) => Math.max(1, n - 1) as ChroniclePageNumber)
+                  }
+                >
+                  ← Prev
+                </button>
+                <div className="lc-leaf-dots" aria-hidden>
+                  {([1, 2, 3, 4] as ChroniclePageNumber[]).map((n) => {
+                    const page = progress.pages.find((p) => p.pageNumber === n)!;
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        className={[
+                          "lc-dot",
+                          leaf === n ? "active" : "",
+                          page.unlocked ? "found" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        aria-label={`Go to page ${ROMAN_PAGES[n]}`}
+                        onClick={() => setLeaf(n)}
+                      />
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  className="lc-leaf-btn"
+                  disabled={leaf >= 4}
+                  onClick={() =>
+                    setLeaf((n) => Math.min(4, n + 1) as ChroniclePageNumber)
+                  }
+                >
+                  Next →
+                </button>
+              </footer>
+            </article>
+          </div>
+        )}
       </div>
+
+      {opened ? (
+        <p className="lc-close-row">
+          <button type="button" className="lc-close-book" onClick={closeBook}>
+            Close the book
+          </button>
+        </p>
+      ) : null}
 
       {progress.complete ? (
         <div className="lc-keeper-banner">
@@ -126,40 +279,6 @@ export function LostChronicles({ villageId }: Props) {
           <div>
             <strong>Chronicle Restored</strong>
             <p>You are a {progress.keeperTitle}.</p>
-          </div>
-        </div>
-      ) : null}
-
-      {viewing ? (
-        <div className="lc-reader-overlay" role="dialog" aria-modal="true">
-          <div className="lc-reader">
-            <button
-              type="button"
-              className="lc-reader-close"
-              onClick={() => setOpenPage(null)}
-            >
-              Close
-            </button>
-            <article className="lc-parchment">
-              <p className="lc-discover-eyebrow">
-                Page {ROMAN_PAGES[viewing.pageNumber]}
-              </p>
-              {viewing.illustrationUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={viewing.illustrationUrl}
-                  alt=""
-                  className="lc-page-illustration"
-                />
-              ) : null}
-              <h3 className="lc-page-title">{viewing.title}</h3>
-              <p className="lc-page-body">
-                <span className="lc-dropcap">
-                  {viewing.body.trim().charAt(0)}
-                </span>
-                {viewing.body.trim().slice(1)}
-              </p>
-            </article>
           </div>
         </div>
       ) : null}
