@@ -8433,3 +8433,40 @@ button.linkish:hover {
   }
   .mm-deco { display: none; }
 }
+
+.mm-audio {
+  width: 100%;
+  margin: 0.55rem 0 0.65rem;
+  border-radius: 0.65rem;
+  height: 2.2rem;
+}
+
+.mm-owner-sound {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(197, 206, 221, 0.18);
+}
+
+.mm-upload-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(184, 168, 212, 0.55);
+  background: rgba(26, 39, 68, 0.45);
+  color: var(--mm-silver);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.mm-upload-label input {
+  display: none;
+}
+.mm-upload-label:hover {
+  color: var(--mm-moon);
+  border-color: rgba(184, 168, 212, 0.8);
+}

@@ -329,6 +329,14 @@ function migrate(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_moon_journal_user
       ON moon_journal(user_id, created_at);
 
+    CREATE TABLE IF NOT EXISTS moon_playlist_sounds (
+      playlist_id TEXT PRIMARY KEY,
+      filename TEXT NOT NULL,
+      original_name TEXT NOT NULL DEFAULT '',
+      uploaded_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
     CREATE TABLE IF NOT EXISTS garden_community (
       id TEXT PRIMARY KEY,
       blooms INTEGER NOT NULL DEFAULT 0,
