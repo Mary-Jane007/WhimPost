@@ -41,3 +41,6 @@ next-env.d.ts
 /data/*.db-*
 /data/uploads/**
 !/data/uploads/.gitkeep
+# Keep portable account snapshot (password hashes only) so logins
+# work on fresh servers. Do not commit plaintext passwords.
+!/data/persistent-accounts.json

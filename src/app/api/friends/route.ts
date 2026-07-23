@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError, mapUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { exportPersistentAccounts } from "@/lib/persistentAccounts";
 import { listFriends } from "@/lib/letters";
 
 export async function GET() {
@@ -108,6 +109,7 @@ export async function PATCH(req: NextRequest) {
   db.prepare(
     `UPDATE users SET display_name = ?, bio = ?, forest_name = ? WHERE id = ?`
   ).run(displayName, bio, forestName, user.id);
+  exportPersistentAccounts(db);
 
   return NextResponse.json({
     user: { ...user, displayName, bio, forestName },

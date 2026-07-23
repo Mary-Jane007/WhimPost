@@ -37,3 +37,7 @@ Create two accounts in separate browsers (or normal + private), add each other a
 ## Ownership
 
 The first account that **registers or signs in** when no owner exists yet is remembered as the **site owner** (stored in SQLite as `users.is_owner`). Later accounts stay regular members.
+
+## Persistent accounts
+
+Local SQLite (`data/whimpost.db`) stays gitignored, but account rows (including password hashes, never plaintext) are mirrored to `data/persistent-accounts.json`, which **is** tracked in git. On startup, WhimPost restores those accounts into an empty or fresh database so the same logins work on any server that has the repo.
