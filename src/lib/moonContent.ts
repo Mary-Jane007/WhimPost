@@ -192,14 +192,35 @@ export function dailyRituals(now = new Date()): NightRitual[] {
 
 /* ─── Moon phases ─── */
 
+export type MoonPhaseId =
+  | "new"
+  | "waxing-crescent"
+  | "first-quarter"
+  | "waxing-gibbous"
+  | "full"
+  | "waning-gibbous"
+  | "last-quarter"
+  | "waning-crescent";
+
 export type MoonPhase = {
-  id: string;
+  id: MoonPhaseId;
   name: string;
   emoji: string;
   detail: string;
+  /** Fraction of the Moon's face lit (0–1), from real lunar geometry. */
+  illumination: number;
+  /** Earth days since the last new moon. */
+  ageDays: number;
+  /** Progress through the synodic month (0 = new, 0.5 = full). */
+  cycle: number;
 };
 
-export const MOON_PHASES: MoonPhase[] = [
+type MoonPhaseBase = Omit<
+  MoonPhase,
+  "illumination" | "ageDays" | "cycle"
+>;
+
+export const MOON_PHASES: MoonPhaseBase[] = [
   {
     id: "new",
     name: "New Moon",
@@ -250,9 +271,58 @@ export const MOON_PHASES: MoonPhase[] = [
   },
 ];
 
+/** Mean synodic month (new moon → new moon), in Earth days. */
+const SYNODIC_MONTH = 29.530588853;
+/** Julian day of a known new moon near J2000 (2000-01-06). */
+const REF_NEW_MOON_JD = 2451550.1;
+/** Window around exact new/full/quarter (~18 hours). */
+const MAJOR_PHASE_WINDOW = 0.75 / SYNODIC_MONTH;
+
+function julianDay(date: Date): number {
+  return date.getTime() / 86_400_000 + 2_440_587.5;
+}
+
+function lunarCycleFraction(date: Date): number {
+  let phase = (julianDay(date) - REF_NEW_MOON_JD) / SYNODIC_MONTH;
+  phase = phase - Math.floor(phase);
+  if (phase < 0) phase += 1;
+  return phase;
+}
+
+function phaseDistance(cycle: number, target: number): number {
+  const d = Math.abs(cycle - target);
+  return Math.min(d, 1 - d);
+}
+
+function moonPhaseIdFromCycle(cycle: number): MoonPhaseId {
+  if (phaseDistance(cycle, 0) < MAJOR_PHASE_WINDOW) return "new";
+  if (phaseDistance(cycle, 0.25) < MAJOR_PHASE_WINDOW) return "first-quarter";
+  if (phaseDistance(cycle, 0.5) < MAJOR_PHASE_WINDOW) return "full";
+  if (phaseDistance(cycle, 0.75) < MAJOR_PHASE_WINDOW) return "last-quarter";
+  if (cycle < 0.25) return "waxing-crescent";
+  if (cycle < 0.5) return "waxing-gibbous";
+  if (cycle < 0.75) return "waning-gibbous";
+  return "waning-crescent";
+}
+
+/**
+ * Real lunar phase for a calendar moment — not a rotating pool.
+ * Uses Julian day + mean synodic month (same approach as common astronomy widgets).
+ */
 export function todaysMoonPhase(now = new Date()): MoonPhase {
-  const day = Math.floor(now.getTime() / 86_400_000);
-  return MOON_PHASES[day % MOON_PHASES.length];
+  const cycle = lunarCycleFraction(now);
+  const ageDays = cycle * SYNODIC_MONTH;
+  const illumination = (1 - Math.cos(2 * Math.PI * cycle)) / 2;
+  const id = moonPhaseIdFromCycle(cycle);
+  const base = MOON_PHASES.find((p) => p.id === id) || MOON_PHASES[0];
+  const lit = Math.round(illumination * 100);
+  return {
+    ...base,
+    illumination,
+    ageDays,
+    cycle,
+    detail: `${base.detail} Tonight the moon is about ${lit}% lit (${ageDays.toFixed(1)} days since new).`,
+  };
 }
 
 /* ─── Star Atlas ─── */
