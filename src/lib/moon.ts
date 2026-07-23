@@ -3,19 +3,12 @@ import { getDb } from "@/lib/db";
 import {
   MOON_XP,
   SAMPLE_DREAMS,
-  SAMPLE_WISHES,
   dailyRituals,
   titleForMoonXp,
   todaysInspiration,
   todaysJournalPrompt,
   type DreamTheme,
 } from "@/lib/moonContent";
-
-export type MoonWish = {
-  id: string;
-  body: string;
-  createdAt: string;
-};
 
 export type MoonDream = {
   id: string;
@@ -38,8 +31,6 @@ export type MoonProgress = {
   title: ReturnType<typeof titleForMoonXp>;
   badges: string[];
   ritualsDone: Record<string, boolean>;
-  stardust: Record<string, boolean>;
-  wishes: MoonWish[];
   dreams: MoonDream[];
   journal: MoonJournalEntry[];
   featured: {
@@ -53,7 +44,6 @@ type ProgressRow = {
   xp: number;
   badges_json: string;
   rituals_json: string;
-  stardust_json: string;
 };
 
 function parseJson<T>(raw: string | null | undefined, fallback: T): T {
@@ -76,20 +66,6 @@ function ensureProgressRow(userId: string) {
   );
 }
 
-function seedWishesIfEmpty() {
-  const db = getDb();
-  const count = db
-    .prepare(`SELECT COUNT(*) as c FROM moon_wishes`)
-    .get() as { c: number };
-  if (count.c > 0) return;
-  const insert = db.prepare(
-    `INSERT INTO moon_wishes (id, body, author_id) VALUES (?, ?, NULL)`
-  );
-  for (const body of SAMPLE_WISHES) {
-    insert.run(randomUUID(), body);
-  }
-}
-
 function seedDreamsIfEmpty() {
   const db = getDb();
   const count = db
@@ -102,22 +78,6 @@ function seedDreamsIfEmpty() {
   for (const dream of SAMPLE_DREAMS) {
     insert.run(randomUUID(), dream.body, dream.theme);
   }
-}
-
-function listWishes(): MoonWish[] {
-  seedWishesIfEmpty();
-  const db = getDb();
-  const rows = db
-    .prepare(
-      `SELECT id, body, created_at FROM moon_wishes
-       ORDER BY created_at DESC LIMIT 80`
-    )
-    .all() as Array<{ id: string; body: string; created_at: string }>;
-  return rows.map((r) => ({
-    id: r.id,
-    body: r.body,
-    createdAt: r.created_at,
-  }));
 }
 
 function listDreams(): MoonDream[] {
@@ -173,7 +133,7 @@ function readRow(userId: string): ProgressRow {
   const db = getDb();
   return db
     .prepare(
-      `SELECT user_id, xp, badges_json, rituals_json, stardust_json
+      `SELECT user_id, xp, badges_json, rituals_json
        FROM moon_progress WHERE user_id = ?`
     )
     .get(userId) as ProgressRow;
@@ -201,8 +161,6 @@ export function getMoonProgress(userId: string): MoonProgress {
     title: titleForMoonXp(Number(row.xp) || 0),
     badges: parseJson(row.badges_json, []),
     ritualsDone: todaysRituals,
-    stardust: parseJson(row.stardust_json, {}),
-    wishes: listWishes(),
     dreams: listDreams(),
     journal: listJournal(userId),
     featured: {
@@ -215,8 +173,7 @@ export function getMoonProgress(userId: string): MoonProgress {
 export type MoonAction =
   | { type: "completeRitual"; ritualId: string }
   | { type: "saveJournal"; body: string }
-  | { type: "submitDream"; body: string; theme: DreamTheme }
-  | { type: "toggleStardust"; wishId: string };
+  | { type: "submitDream"; body: string; theme: DreamTheme };
 
 export function applyMoonAction(
   userId: string,
@@ -228,7 +185,6 @@ export function applyMoonAction(
   let xp = Number(row.xp) || 0;
   let badges = parseJson<string[]>(row.badges_json, []);
   const ritualsDone = parseJson<Record<string, boolean>>(row.rituals_json, {});
-  const stardust = parseJson<Record<string, boolean>>(row.stardust_json, {});
 
   if (action.type === "completeRitual") {
     const todays = dailyRituals();
@@ -275,21 +231,6 @@ export function applyMoonAction(
       xp += MOON_XP.dream;
       badges = addBadge(badges, "Dream Bottler");
     }
-  } else if (action.type === "toggleStardust") {
-    const wish = db
-      .prepare(`SELECT id FROM moon_wishes WHERE id = ?`)
-      .get(action.wishId) as { id: string } | undefined;
-    if (wish) {
-      if (stardust[wish.id]) {
-        delete stardust[wish.id];
-      } else {
-        stardust[wish.id] = true;
-        xp += MOON_XP.stardust;
-        if (Object.keys(stardust).length >= 5) {
-          badges = addBadge(badges, "Stardust Keeper");
-        }
-      }
-    }
   }
 
   db.prepare(
@@ -297,16 +238,9 @@ export function applyMoonAction(
       xp = ?,
       badges_json = ?,
       rituals_json = ?,
-      stardust_json = ?,
       updated_at = datetime('now')
      WHERE user_id = ?`
-  ).run(
-    xp,
-    JSON.stringify(badges),
-    JSON.stringify(ritualsDone),
-    JSON.stringify(stardust),
-    userId
-  );
+  ).run(xp, JSON.stringify(badges), JSON.stringify(ritualsDone), userId);
 
   return getMoonProgress(userId);
 }

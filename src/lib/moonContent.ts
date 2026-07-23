@@ -5,7 +5,6 @@ export type MoonTabId =
   | "journal"
   | "dreams"
   | "facts"
-  | "wishes"
   | "creatures"
   | "playlists"
   | "inspiration";
@@ -18,7 +17,6 @@ export const MOON_TABS: Array<{ id: MoonTabId; label: string; emoji: string }> =
     { id: "journal", label: "Moon Journal", emoji: "📔" },
     { id: "dreams", label: "Dream Archive", emoji: "🫧" },
     { id: "facts", label: "Night Sky Facts", emoji: "🌌" },
-    { id: "wishes", label: "Shooting Stars", emoji: "💫" },
     { id: "creatures", label: "Night Creatures", emoji: "🦉" },
     { id: "playlists", label: "Celestial Sounds", emoji: "🎧" },
     { id: "inspiration", label: "Daily Inspiration", emoji: "✨" },
@@ -28,7 +26,6 @@ export const MOON_XP = {
   ritual: 25,
   journal: 20,
   dream: 20,
-  stardust: 5,
 } as const;
 
 export const MOON_TITLES = [
@@ -36,7 +33,7 @@ export const MOON_TITLES = [
   { minXp: 80, title: "Star Watcher", emoji: "✦" },
   { minXp: 200, title: "Dream Keeper", emoji: "🫧" },
   { minXp: 400, title: "Moon Scholar", emoji: "📔" },
-  { minXp: 700, title: "Wish Weaver", emoji: "💫" },
+  { minXp: 700, title: "Sky Listener", emoji: "🌌" },
   { minXp: 1100, title: "Observatory Elder", emoji: "🔭" },
 ] as const;
 
@@ -134,7 +131,7 @@ export const RITUAL_POOL: NightRitual[] = [
   {
     id: "hope-tomorrow",
     label: "Write one hope for tomorrow",
-    detail: "A small wish, not a plan.",
+    detail: "A small hope, not a plan.",
     emoji: "🌱",
   },
   {
@@ -492,8 +489,8 @@ export const JOURNAL_PROMPTS: JournalPrompt[] = [
   { id: "hope", prompt: "What gave you hope today?" },
   { id: "dream-remember", prompt: "What dream do you remember?" },
   {
-    id: "shooting-wish",
-    prompt: "What would you wish upon a shooting star?",
+    id: "starlight-thought",
+    prompt: "What thought feels lighter under the stars?",
   },
   {
     id: "night-color",
@@ -678,21 +675,6 @@ export function todaysSkyFact(now = new Date()): SkyFact {
   const day = Math.floor(now.getTime() / 86_400_000);
   return SKY_FACTS[day % SKY_FACTS.length];
 }
-
-/* ─── Shooting star wishes ─── */
-
-export const SAMPLE_WISHES = [
-  "I hope my family stays healthy.",
-  "I hope I become brave.",
-  "I hope tomorrow feels lighter.",
-  "I hope soft rain finds the dry places.",
-  "I hope I remember how to rest.",
-  "I hope someone I love sleeps well tonight.",
-  "I hope the quiet answers arrive gently.",
-  "I hope I keep my kindness even on hard days.",
-  "I hope the stars keep watching over the lonely.",
-  "I hope I wake with one clear hope.",
-];
 
 /* ─── Night creatures ─── */
 
