@@ -88,6 +88,8 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not save");
       setProgress(data.progress);
+      const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
+      emitChronicleUnlock(data.chronicleUnlock);
       return data.progress as MoonProgress;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

@@ -6,6 +6,8 @@ import {
   getHearthProgress,
   type HearthAction,
 } from "@/lib/hearth";
+import { chronicleAfterActivity } from "@/lib/chronicle";
+import type { ChronicleActivityKey } from "@/lib/chronicleContent";
 
 async function requireHearthUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
@@ -23,6 +25,13 @@ async function requireHearthUser(): Promise<
   return { user };
 }
 
+const HEARTH_KEYS: Partial<Record<HearthAction["type"], ChronicleActivityKey>> =
+  {
+    completeRitual: "hearth.completeRitual",
+    leaveNote: "hearth.leaveNote",
+    toggleRecipeFavorite: "hearth.toggleRecipeFavorite",
+  };
+
 export async function GET() {
   const gate = await requireHearthUser();
   if ("error" in gate) return gate.error;
@@ -39,5 +48,9 @@ export async function POST(req: NextRequest) {
   }
 
   const progress = applyHearthAction(gate.user.id, body);
-  return NextResponse.json({ progress });
+  const key = HEARTH_KEYS[body.type];
+  const chronicleUnlock = key
+    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    : null;
+  return NextResponse.json({ progress, chronicleUnlock });
 }

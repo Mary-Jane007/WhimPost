@@ -9,6 +9,8 @@ import {
   recipeCompletionPayload,
   type WorkshopAction,
 } from "@/lib/workshop";
+import { chronicleAfterActivity } from "@/lib/chronicle";
+import type { ChronicleActivityKey } from "@/lib/chronicleContent";
 
 async function requireWorkshopUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
@@ -66,5 +68,15 @@ export async function POST(req: NextRequest) {
   }
 
   const progress = applyWorkshopAction(gate.user.id, action);
-  return NextResponse.json({ progress });
+
+  let key: ChronicleActivityKey | null = null;
+  if (action.type === "complete") key = "workshop.complete";
+  else if (action.type === "journalEntry") key = "workshop.journalEntry";
+  else if (action.type === "bird") key = "workshop.bird";
+
+  const chronicleUnlock = key
+    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    : null;
+
+  return NextResponse.json({ progress, chronicleUnlock });
 }

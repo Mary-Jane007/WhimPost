@@ -337,6 +337,35 @@ function migrate(db: Database.Database) {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE INDEX IF NOT EXISTS idx_moon_playlist_sounds_filename
+      ON moon_playlist_sounds(filename);
+
+    CREATE TABLE IF NOT EXISTS chronicle_pages (
+      id TEXT PRIMARY KEY,
+      village_id TEXT NOT NULL,
+      page_number INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      illustration_url TEXT NOT NULL DEFAULT '',
+      unlock_key TEXT NOT NULL,
+      unlock_count INTEGER NOT NULL DEFAULT 1,
+      published INTEGER NOT NULL DEFAULT 1,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(village_id, page_number)
+    );
+    CREATE INDEX IF NOT EXISTS idx_chronicle_pages_village
+      ON chronicle_pages(village_id, page_number);
+
+    CREATE TABLE IF NOT EXISTS chronicle_progress (
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      village_id TEXT NOT NULL,
+      unlocked_json TEXT NOT NULL DEFAULT '{}',
+      activity_json TEXT NOT NULL DEFAULT '{}',
+      completed INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (user_id, village_id)
+    );
+
     CREATE TABLE IF NOT EXISTS garden_community (
       id TEXT PRIMARY KEY,
       blooms INTEGER NOT NULL DEFAULT 0,

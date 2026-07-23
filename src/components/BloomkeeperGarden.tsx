@@ -97,6 +97,8 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
         setProgress(data.progress);
         triggerBloom();
       }
+      const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
+      emitChronicleUnlock(data.chronicleUnlock);
       return data.progress as GardenProgress;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

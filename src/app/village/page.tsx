@@ -23,6 +23,8 @@ import { CollectibleIcon } from "@/components/CollectibleIcon";
 import { PageCrest } from "@/components/PageCrest";
 import { WelcomeLetterEditor } from "@/components/WelcomeLetterEditor";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
+import { LostChronicles } from "@/components/LostChronicles";
+import { ChronicleAdminEditor } from "@/components/ChronicleAdminEditor";
 import { VillageMascot } from "@/components/VillageMascot";
 import {
   deliverWelcomeLetter,
@@ -310,6 +312,8 @@ export default async function VillagePage() {
         </div>
       </section>
 
+      <LostChronicles villageId={village.id} />
+
       <NoticeBoard initialNotes={notes} />
 
       <section className="village-panel">
@@ -358,9 +362,16 @@ export default async function VillagePage() {
       </section>
 
       {user.isOwner ? (
-        <WelcomeLetterEditor
-          initialVillageId={stats.villageId as VillageId}
-        />
+        <>
+          <WelcomeLetterEditor
+            initialVillageId={stats.villageId as VillageId}
+          />
+          <div style={{ marginTop: "0.75rem" }}>
+            <ChronicleAdminEditor
+              initialVillageId={stats.villageId as VillageId}
+            />
+          </div>
+        </>
       ) : null}
 
       <VillageChangePanel
