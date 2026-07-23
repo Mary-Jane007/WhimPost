@@ -827,6 +827,43 @@ select {
   color: #f3e6d0;
 }
 
+/* Hearthwick cottage stationery — lined parchment with meadow hedgehog */
+.paper-hearthwick {
+  color: #3a2a1a;
+  background-color: #e6d7bc;
+  background-image: url("/villages/hearthwick/letter-paper.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  border-radius: 0.35rem 1.1rem 1.35rem 0.2rem / 1.25rem 0.45rem 0.85rem 1.7rem;
+  min-height: min(72vh, 46rem);
+  padding: 2.5rem 2rem 9.5rem 2.15rem;
+  box-shadow:
+    0 22px 48px rgba(40, 22, 10, 0.42),
+    inset 0 0 0 1px rgba(92, 58, 30, 0.12);
+}
+
+.paper-hearthwick .letter-subject-input,
+.paper-hearthwick .letter-subject-display {
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(92, 58, 30, 0.18);
+}
+
+.paper-hearthwick .letter-body-input,
+.paper-hearthwick .letter-body-display {
+  min-height: 26rem;
+  line-height: 1.75rem;
+  background: transparent;
+}
+
+.paper-hearthwick.font-typewriter .letter-body-input,
+.paper-hearthwick.font-typewriter .letter-body-display {
+  font-size: 1.05rem;
+  line-height: 1.75rem;
+  letter-spacing: 0.015em;
+}
+
 .paper-swatch.paper-parchment {
   background: #e8dcc8;
   color: #2f2418;
@@ -850,6 +887,13 @@ select {
 .paper-swatch.paper-night {
   background: #2a322a;
   color: #f3e6d0;
+}
+.paper-swatch.paper-hearthwick {
+  background:
+    linear-gradient(135deg, rgba(120, 78, 40, 0.18), transparent 45%),
+    #e8d7bc;
+  color: #3a2a1a;
+  background-size: cover;
 }
 
 .letter-subject-input,
@@ -1082,6 +1126,23 @@ select {
 .compose-studio {
   display: grid;
   gap: 1rem;
+}
+
+.compose-page-hearthwick .page-header h1 {
+  color: #f3e0c8;
+}
+
+.compose-hearthwick .compose-stage {
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(212, 140, 70, 0.18), transparent 45%),
+    radial-gradient(ellipse at 20% 90%, rgba(90, 50, 28, 0.28), transparent 50%),
+    rgba(48, 30, 20, 0.28);
+  border-radius: var(--frame-panel);
+  padding: 1.1rem 0.85rem 1.4rem;
+}
+
+.compose-hearthwick .letter-paper.paper-hearthwick {
+  width: min(100%, 34rem);
 }
 
 .compose-toolbar {
