@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import type { UserPublic } from "@/lib/types";
 import type { MoonProgress } from "@/lib/moon";
 import {
@@ -42,6 +48,8 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
   >(null);
   const [selectedCreature, setSelectedCreature] = useState<string | null>(null);
   const [listeningId, setListeningId] = useState<string | null>(null);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const rituals = dailyRituals();
   const moon = todaysMoonPhase();
@@ -57,6 +65,16 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
     const t = window.setTimeout(() => setToast(null), 4000);
     return () => window.clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    const audio = new Audio();
+    audio.loop = true;
+    audioRef.current = audio;
+    return () => {
+      audio.pause();
+      audioRef.current = null;
+    };
+  }, []);
 
   async function postAction(action: Record<string, unknown>) {
     setBusy(true);
@@ -118,6 +136,91 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
     if (next) {
       setDreamBody("");
       setToast("Dream sealed in a glass bottle.");
+    }
+  }
+
+  function stopListening() {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+    }
+    setListeningId(null);
+  }
+
+  function toggleListening(playlistId: string) {
+    const soundUrl = progress.playlistSounds[playlistId];
+    if (!soundUrl) {
+      setToast("No sound has been added to this playlist yet.");
+      return;
+    }
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (listeningId === playlistId) {
+      stopListening();
+      return;
+    }
+
+    audio.src = soundUrl;
+    void audio.play().then(
+      () => setListeningId(playlistId),
+      () => setError("Could not play that sound — try another file.")
+    );
+  }
+
+  async function uploadPlaylistSound(playlistId: string, file: File | null) {
+    if (!file || !user.isOwner) return;
+    setUploadingId(playlistId);
+    setBusy(true);
+    setError(null);
+    try {
+      const form = new FormData();
+      form.set("playlistId", playlistId);
+      form.set("audio", file);
+      const res = await fetch("/api/moon/playlist-sound", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not upload sound");
+      if (data.progress) setProgress(data.progress);
+      else if (data.playlistSounds) {
+        setProgress((p) => ({ ...p, playlistSounds: data.playlistSounds }));
+      }
+      if (listeningId === playlistId) stopListening();
+      setToast("Sound added to this celestial playlist.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setBusy(false);
+      setUploadingId(null);
+    }
+  }
+
+  async function removeSound(playlistId: string) {
+    if (!user.isOwner) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/moon/playlist-sound", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playlistId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not remove sound");
+      if (data.progress) setProgress(data.progress);
+      else if (data.playlistSounds) {
+        setProgress((p) => ({ ...p, playlistSounds: data.playlistSounds }));
+      }
+      if (listeningId === playlistId) stopListening();
+      setToast("Sound removed from this playlist.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not remove sound");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -542,11 +645,15 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
             <h2>Celestial Playlists</h2>
             <p className="mm-section-lead">
               Collections of relaxing ambient sounds for observatory evenings.
-              Choose one and listen along in your own space.
+              {user.isOwner
+                ? " As owner, you can add an audio file to each playlist."
+                : " Press play when a soft sound has been tucked into a card."}
             </p>
             <div className="mm-grid">
               {CELESTIAL_PLAYLISTS.map((pl) => {
                 const on = listeningId === pl.id;
+                const soundUrl = progress.playlistSounds[pl.id];
+                const hasSound = Boolean(soundUrl);
                 return (
                   <article
                     key={pl.id}
@@ -564,15 +671,60 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                         <li key={l}>{l}</li>
                       ))}
                     </ul>
+                    <p className="mm-meta">
+                      {hasSound ? "Sound ready" : "Waiting for a sound"}
+                    </p>
+                    {hasSound ? (
+                      // eslint-disable-next-line jsx-a11y/media-has-caption
+                      <audio
+                        className="mm-audio"
+                        controls
+                        loop
+                        preload="none"
+                        src={soundUrl}
+                      />
+                    ) : null}
                     <button
                       type="button"
                       className={on ? "btn-primary" : "btn-secondary"}
-                      onClick={() =>
-                        setListeningId(on ? null : pl.id)
-                      }
+                      disabled={!hasSound}
+                      onClick={() => toggleListening(pl.id)}
                     >
-                      {on ? "Listening…" : "Begin listening"}
+                      {on ? "Stop listening" : "Begin listening"}
                     </button>
+                    {user.isOwner ? (
+                      <div className="mm-owner-sound">
+                        <label className="mm-upload-label">
+                          <span>
+                            {uploadingId === pl.id
+                              ? "Uploading…"
+                              : hasSound
+                                ? "Replace sound"
+                                : "Add sound"}
+                          </span>
+                          <input
+                            type="file"
+                            accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/webm,audio/mp4,audio/x-m4a,audio/aac,.mp3,.wav,.ogg,.m4a,.aac,.webm"
+                            disabled={busy}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] || null;
+                              e.target.value = "";
+                              void uploadPlaylistSound(pl.id, file);
+                            }}
+                          />
+                        </label>
+                        {hasSound ? (
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            disabled={busy}
+                            onClick={() => void removeSound(pl.id)}
+                          >
+                            Remove sound
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </article>
                 );
               })}

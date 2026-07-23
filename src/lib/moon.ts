@@ -1,6 +1,9 @@
 import { randomUUID } from "crypto";
+import fs from "fs";
+import path from "path";
 import { getDb } from "@/lib/db";
 import {
+  CELESTIAL_PLAYLISTS,
   MOON_XP,
   SAMPLE_DREAMS,
   dailyRituals,
@@ -9,6 +12,27 @@ import {
   todaysJournalPrompt,
   type DreamTheme,
 } from "@/lib/moonContent";
+
+export const MOON_SOUND_DIR = path.join(
+  process.cwd(),
+  "data",
+  "uploads",
+  "moon-sounds"
+);
+
+export const MOON_SOUND_MAX_BYTES = 25 * 1024 * 1024;
+export const MOON_SOUND_TYPES: Record<string, string> = {
+  "audio/mpeg": "mp3",
+  "audio/mp3": "mp3",
+  "audio/wav": "wav",
+  "audio/x-wav": "wav",
+  "audio/wave": "wav",
+  "audio/ogg": "ogg",
+  "audio/webm": "webm",
+  "audio/mp4": "m4a",
+  "audio/x-m4a": "m4a",
+  "audio/aac": "aac",
+};
 
 export type MoonDream = {
   id: string;
@@ -33,6 +57,8 @@ export type MoonProgress = {
   ritualsDone: Record<string, boolean>;
   dreams: MoonDream[];
   journal: MoonJournalEntry[];
+  /** playlistId → playable sound URL */
+  playlistSounds: Record<string, string>;
   featured: {
     ritualIds: string[];
     inspiration: ReturnType<typeof todaysInspiration>;
@@ -128,6 +154,138 @@ function listJournal(userId: string): MoonJournalEntry[] {
   }));
 }
 
+export function listPlaylistSounds(): Record<string, string> {
+  const db = getDb();
+  const rows = db
+    .prepare(`SELECT playlist_id, filename FROM moon_playlist_sounds`)
+    .all() as Array<{ playlist_id: string; filename: string }>;
+  const map: Record<string, string> = {};
+  for (const row of rows) {
+    map[row.playlist_id] = `/api/moon/sounds/${row.filename}`;
+  }
+  return map;
+}
+
+function ensureSoundDir() {
+  if (!fs.existsSync(MOON_SOUND_DIR)) {
+    fs.mkdirSync(MOON_SOUND_DIR, { recursive: true });
+  }
+}
+
+function deleteSoundFile(filename: string) {
+  const filePath = path.join(MOON_SOUND_DIR, filename);
+  if (fs.existsSync(filePath)) {
+    try {
+      fs.unlinkSync(filePath);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+export function getPlaylistSoundRow(playlistId: string) {
+  const db = getDb();
+  return db
+    .prepare(
+      `SELECT playlist_id, filename, original_name, uploaded_by, updated_at
+       FROM moon_playlist_sounds WHERE playlist_id = ?`
+    )
+    .get(playlistId) as
+    | {
+        playlist_id: string;
+        filename: string;
+        original_name: string;
+        uploaded_by: string | null;
+        updated_at: string;
+      }
+    | undefined;
+}
+
+export function setPlaylistSound(input: {
+  playlistId: string;
+  filename: string;
+  originalName: string;
+  uploadedBy: string;
+}) {
+  const playlist = CELESTIAL_PLAYLISTS.find((p) => p.id === input.playlistId);
+  if (!playlist) return { ok: false as const, error: "Unknown playlist" };
+
+  const db = getDb();
+  const existing = getPlaylistSoundRow(input.playlistId);
+  if (existing) deleteSoundFile(existing.filename);
+
+  db.prepare(
+    `INSERT INTO moon_playlist_sounds (playlist_id, filename, original_name, uploaded_by, updated_at)
+     VALUES (?, ?, ?, ?, datetime('now'))
+     ON CONFLICT(playlist_id) DO UPDATE SET
+       filename = excluded.filename,
+       original_name = excluded.original_name,
+       uploaded_by = excluded.uploaded_by,
+       updated_at = datetime('now')`
+  ).run(
+    input.playlistId,
+    input.filename,
+    input.originalName.slice(0, 180),
+    input.uploadedBy
+  );
+
+  return {
+    ok: true as const,
+    url: `/api/moon/sounds/${input.filename}`,
+    playlistSounds: listPlaylistSounds(),
+  };
+}
+
+export function removePlaylistSound(playlistId: string) {
+  const playlist = CELESTIAL_PLAYLISTS.find((p) => p.id === playlistId);
+  if (!playlist) return { ok: false as const, error: "Unknown playlist" };
+
+  const existing = getPlaylistSoundRow(playlistId);
+  if (!existing) {
+    return { ok: true as const, playlistSounds: listPlaylistSounds() };
+  }
+
+  const db = getDb();
+  db.prepare(`DELETE FROM moon_playlist_sounds WHERE playlist_id = ?`).run(
+    playlistId
+  );
+  deleteSoundFile(existing.filename);
+  return { ok: true as const, playlistSounds: listPlaylistSounds() };
+}
+
+export function savePlaylistSoundFile(
+  playlistId: string,
+  file: File,
+  uploadedBy: string
+) {
+  const playlist = CELESTIAL_PLAYLISTS.find((p) => p.id === playlistId);
+  if (!playlist) return { ok: false as const, error: "Unknown playlist" };
+
+  const ext = MOON_SOUND_TYPES[file.type];
+  if (!ext) {
+    return {
+      ok: false as const,
+      error: "Use MP3, WAV, OGG, M4A, AAC, or WebM audio",
+    };
+  }
+  if (file.size <= 0 || file.size > MOON_SOUND_MAX_BYTES) {
+    return { ok: false as const, error: "Audio must be under 25MB" };
+  }
+
+  ensureSoundDir();
+  const filename = `${randomUUID()}.${ext}`;
+  return (async () => {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    fs.writeFileSync(path.join(MOON_SOUND_DIR, filename), buffer);
+    return setPlaylistSound({
+      playlistId,
+      filename,
+      originalName: file.name || `sound.${ext}`,
+      uploadedBy,
+    });
+  })();
+}
+
 function readRow(userId: string): ProgressRow {
   ensureProgressRow(userId);
   const db = getDb();
@@ -163,6 +321,7 @@ export function getMoonProgress(userId: string): MoonProgress {
     ritualsDone: todaysRituals,
     dreams: listDreams(),
     journal: listJournal(userId),
+    playlistSounds: listPlaylistSounds(),
     featured: {
       ritualIds: rituals.map((r) => r.id),
       inspiration,
