@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError, mapUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { exportPersistentAccounts } from "@/lib/persistentAccounts";
 import { isVillageId } from "@/lib/villages";
 import { deliverWelcomeLetter } from "@/lib/welcomeLetters";
 
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest) {
     user.id
   );
   deliverWelcomeLetter(db, user.id, villageId);
+  exportPersistentAccounts(db);
 
   const row = db
     .prepare(

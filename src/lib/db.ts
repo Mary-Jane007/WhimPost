@@ -2,6 +2,9 @@ import Database from "better-sqlite3";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
+import { importPersistentAccounts } from "@/lib/persistentAccounts";
+import { importPersistentTv } from "@/lib/persistentTv";
+import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -36,6 +39,12 @@ function migrate(db: Database.Database) {
     "collectibles_json",
     "collectibles_json TEXT NOT NULL DEFAULT '{}'"
   );
+  ensureColumn(
+    db,
+    "users",
+    "notifications_json",
+    "notifications_json TEXT NOT NULL DEFAULT '{}'"
+  );
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
   ensureColumn(
@@ -43,27 +52,6 @@ function migrate(db: Database.Database) {
     "letters",
     "font_style",
     "font_style TEXT NOT NULL DEFAULT 'quill'"
-  );
-  ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
-  ensureColumn(
-    db,
-    "tv_videos",
-    "duration_ms",
-    "duration_ms INTEGER NOT NULL DEFAULT 0"
-  );
-  ensureColumn(db, "tv_videos", "source_url", "source_url TEXT");
-  ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
-  ensureColumn(
-    db,
-    "tv_channels",
-    "schedule_epoch_ms",
-    "schedule_epoch_ms INTEGER"
-  );
-  ensureColumn(
-    db,
-    "tv_channels",
-    "schedule_order_json",
-    "schedule_order_json TEXT"
   );
 
   db.exec(`
@@ -374,6 +362,28 @@ function migrate(db: Database.Database) {
     );
   `);
 
+  // Column backfills must run after CREATE TABLE so fresh DBs don't fail.
+  ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
+  ensureColumn(
+    db,
+    "tv_videos",
+    "duration_ms",
+    "duration_ms INTEGER NOT NULL DEFAULT 0"
+  );
+  ensureColumn(db, "tv_videos", "source_url", "source_url TEXT");
+  ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
+  ensureColumn(
+    db,
+    "tv_channels",
+    "schedule_epoch_ms",
+    "schedule_epoch_ms INTEGER"
+  );
+  ensureColumn(
+    db,
+    "tv_channels",
+    "schedule_order_json",
+    "schedule_order_json TEXT"
+  );
   ensureColumn(
     db,
     "tv_channels",
@@ -438,6 +448,7 @@ function createDb() {
       village_id TEXT,
       reputation INTEGER NOT NULL DEFAULT 0,
       collectibles_json TEXT NOT NULL DEFAULT '{}',
+      notifications_json TEXT NOT NULL DEFAULT '{}',
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -477,6 +488,25 @@ function createDb() {
   `);
 
   migrate(db);
+  // Restore accounts saved in git so logins work on fresh servers.
+  // Never let a snapshot conflict brick auth / the whole app.
+  try {
+    importPersistentAccounts(db);
+  } catch (err) {
+    console.error("[persistent-accounts] import failed:", err);
+  }
+  // Restore TV Corner link catalog (YouTube / direct URLs).
+  try {
+    importPersistentTv(db);
+  } catch (err) {
+    console.error("[persistent-tv] import failed:", err);
+  }
+  // Restore uploaded file clips when Git LFS bytes are present.
+  try {
+    importPersistentTvMedia(db);
+  } catch (err) {
+    console.error("[persistent-tv-media] import failed:", err);
+  }
   return db;
 }
 
@@ -486,6 +516,16 @@ export function getDb() {
   } else {
     // Keep existing connections current when schema grows.
     migrate(globalForDb.whimpostDb);
+    try {
+      importPersistentTv(globalForDb.whimpostDb);
+    } catch (err) {
+      console.error("[persistent-tv] import failed:", err);
+    }
+    try {
+      importPersistentTvMedia(globalForDb.whimpostDb);
+    } catch (err) {
+      console.error("[persistent-tv-media] import failed:", err);
+    }
   }
   return globalForDb.whimpostDb;
 }
