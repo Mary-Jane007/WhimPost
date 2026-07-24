@@ -6825,6 +6825,7 @@ button.linkish:hover {
 }
 
 .mh-cover {
+  position: relative;
   display: grid;
   place-items: center;
   gap: 0.45rem;
@@ -6836,6 +6837,11 @@ button.linkish:hover {
   box-shadow: 8px 10px 0 rgba(0, 0, 0, 0.25);
   text-align: center;
   padding: 1rem;
+  overflow: hidden;
+}
+
+.mh-cover.has-image {
+  padding: 0;
 }
 
 .mh-cover span {
@@ -6848,6 +6854,76 @@ button.linkish:hover {
   object-fit: cover;
   border-radius: 0.35rem;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.mh-cover.has-image .mh-cover-img {
+  width: 100%;
+  height: 100%;
+  min-height: 16rem;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.mh-shelf-thumb {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 3.2rem;
+  flex: 0 0 auto;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  background: linear-gradient(160deg, #5c3b22, #2a1c12 70%);
+  border: 1px solid rgba(214, 178, 110, 0.4);
+  font-size: 1.05rem;
+}
+
+.mh-shelf-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mh-shelf-select {
+  display: inline-flex;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.mh-card-cover {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-width: 9.5rem;
+  margin: 0 auto 0.85rem;
+  border-radius: 0.55rem;
+  overflow: hidden;
+  background: linear-gradient(160deg, #5c3b22, #2a1c12 70%);
+  border: 1px solid rgba(214, 178, 110, 0.4);
+  box-shadow: 4px 6px 0 rgba(0, 0, 0, 0.2);
+  font-size: 2rem;
+}
+
+.mh-card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mh-owner-book-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: flex-start;
+  margin: 0.45rem 0 0.35rem;
+}
+
+.mh-admin-book {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1;
 }
 
 .mh-file-link {
@@ -6872,6 +6948,9 @@ button.linkish:hover {
   text-align: left;
   cursor: pointer;
   padding: 0;
+  display: inline-flex;
+  gap: 0.65rem;
+  align-items: center;
 }
 
 .mh-shelf-select:hover {

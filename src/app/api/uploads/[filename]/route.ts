@@ -112,16 +112,25 @@ export async function GET(
       return jsonError("Book not found", 404);
     }
   } else {
+    // Letter attachments, library covers, and other signed-in image assets.
     const imageUrl = `/api/uploads/${filename}`;
     const db = getDb();
-    const letter = db
+    const libraryCover = db
       .prepare(
-        `SELECT id FROM letters
-         WHERE image_url = ?
-           AND (sender_id = ? OR recipient_id = ?)`
+        `SELECT id FROM library_books
+         WHERE cover_url = ? AND published = 1`
       )
-      .get(imageUrl, user.id, user.id);
-    void letter;
+      .get(imageUrl);
+    if (!libraryCover) {
+      const letter = db
+        .prepare(
+          `SELECT id FROM letters
+           WHERE image_url = ?
+             AND (sender_id = ? OR recipient_id = ?)`
+        )
+        .get(imageUrl, user.id, user.id);
+      void letter;
+    }
   }
 
   const filePath = path.join(UPLOAD_DIR, filename);

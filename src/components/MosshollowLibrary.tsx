@@ -20,6 +20,7 @@ import {
 } from "@/lib/libraryContent";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { LibraryBookReader } from "@/components/LibraryBookReader";
+import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 
 type Props = {
@@ -227,14 +228,17 @@ export function MosshollowLibrary({
               Badge (+{LIBRARY_XP.reading} XP).
             </p>
             <article className="mh-book-feature">
-              <div className="mh-cover" aria-hidden>
+              <div
+                className={`mh-cover${book.coverUrl ? " has-image" : ""}`}
+                aria-hidden
+              >
                 {book.coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={book.coverUrl} alt="" className="mh-cover-img" />
                 ) : (
                   <span>{book.coverEmoji}</span>
                 )}
-                <strong>{book.title}</strong>
+                {!book.coverUrl ? <strong>{book.title}</strong> : null}
               </div>
               <div>
                 <h3>{book.title}</h3>
@@ -263,12 +267,20 @@ export function MosshollowLibrary({
                   </p>
                 ) : null}
                 {user.isOwner ? (
-                  <ShelfBookFileAttach
-                    bookId={book.id}
-                    bookTitle={book.title}
-                    hasFile={Boolean(book.fileUrl)}
-                    onAttached={() => void refreshShelves()}
-                  />
+                  <div className="mh-owner-book-tools">
+                    <ShelfBookCoverAttach
+                      bookId={book.id}
+                      bookTitle={book.title}
+                      hasCover={Boolean(book.coverUrl)}
+                      onAttached={() => void refreshShelves()}
+                    />
+                    <ShelfBookFileAttach
+                      bookId={book.id}
+                      bookTitle={book.title}
+                      hasFile={Boolean(book.fileUrl)}
+                      onAttached={() => void refreshShelves()}
+                    />
+                  </div>
                 ) : null}
                 <label className="mh-progress-label">
                   Reading progress · {bookPct}%
@@ -366,9 +378,19 @@ export function MosshollowLibrary({
                         className="mh-shelf-select"
                         onClick={() => setBook(b)}
                       >
-                        <span aria-hidden>{b.coverEmoji}</span> {b.title}
-                        {b.fileUrl ? " · 📄" : ""}
-                        {progress.finishedBooks[b.id] ? " · ✓" : ""}
+                        <span className="mh-shelf-thumb" aria-hidden>
+                          {b.coverUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={b.coverUrl} alt="" />
+                          ) : (
+                            <span>{b.coverEmoji}</span>
+                          )}
+                        </span>
+                        <span>
+                          {b.title}
+                          {b.fileUrl ? " · 📄" : ""}
+                          {progress.finishedBooks[b.id] ? " · ✓" : ""}
+                        </span>
                       </button>
                       <div className="mh-shelf-actions">
                         {b.fileUrl ? (
@@ -388,12 +410,20 @@ export function MosshollowLibrary({
                           </button>
                         ) : null}
                         {user.isOwner ? (
-                          <ShelfBookFileAttach
-                            bookId={b.id}
-                            bookTitle={b.title}
-                            hasFile={Boolean(b.fileUrl)}
-                            onAttached={() => void refreshShelves()}
-                          />
+                          <>
+                            <ShelfBookCoverAttach
+                              bookId={b.id}
+                              bookTitle={b.title}
+                              hasCover={Boolean(b.coverUrl)}
+                              onAttached={() => void refreshShelves()}
+                            />
+                            <ShelfBookFileAttach
+                              bookId={b.id}
+                              bookTitle={b.title}
+                              hasFile={Boolean(b.fileUrl)}
+                              onAttached={() => void refreshShelves()}
+                            />
+                          </>
                         ) : null}
                       </div>
                     </div>
@@ -435,6 +465,17 @@ export function MosshollowLibrary({
                 const wished = Boolean(progress.wishlist[b.id]);
                 return (
                   <article key={b.id} className="mh-card">
+                    <div
+                      className={`mh-card-cover${b.coverUrl ? " has-image" : ""}`}
+                      aria-hidden
+                    >
+                      {b.coverUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={b.coverUrl} alt="" />
+                      ) : (
+                        <span>{b.coverEmoji || "📖"}</span>
+                      )}
+                    </div>
                     <h3>{b.title}</h3>
                     <p className="muted">{b.author}</p>
                     <p className="mh-meta">
@@ -461,12 +502,20 @@ export function MosshollowLibrary({
                       </p>
                     ) : null}
                     {user.isOwner ? (
-                      <ShelfBookFileAttach
-                        bookId={b.id}
-                        bookTitle={b.title}
-                        hasFile={Boolean(b.fileUrl)}
-                        onAttached={() => void refreshShelves()}
-                      />
+                      <div className="mh-owner-book-tools">
+                        <ShelfBookCoverAttach
+                          bookId={b.id}
+                          bookTitle={b.title}
+                          hasCover={Boolean(b.coverUrl)}
+                          onAttached={() => void refreshShelves()}
+                        />
+                        <ShelfBookFileAttach
+                          bookId={b.id}
+                          bookTitle={b.title}
+                          hasFile={Boolean(b.fileUrl)}
+                          onAttached={() => void refreshShelves()}
+                        />
+                      </div>
                     ) : null}
                     <div className="mh-actions">
                       <button

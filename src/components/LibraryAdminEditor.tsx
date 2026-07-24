@@ -7,6 +7,7 @@ import type {
   ReadingCategory,
   ReadingListBook,
 } from "@/lib/libraryContent";
+import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 
 const CATEGORIES: ReadingCategory[] = [
@@ -34,6 +35,7 @@ type ShelfRow = {
   title: string;
   author: string;
   coverEmoji?: string;
+  coverUrl?: string | null;
   fileUrl?: string | null;
   fileName?: string | null;
 };
@@ -88,6 +90,7 @@ export function LibraryAdminEditor({
         title: b.title,
         author: b.author,
         coverEmoji: b.coverEmoji,
+        coverUrl: b.coverUrl,
         fileUrl: b.fileUrl,
         fileName: b.fileName,
       })),
@@ -97,6 +100,7 @@ export function LibraryAdminEditor({
         title: b.title,
         author: b.author,
         coverEmoji: b.coverEmoji,
+        coverUrl: b.coverUrl,
         fileUrl: b.fileUrl,
         fileName: b.fileName,
       })),
@@ -200,13 +204,13 @@ export function LibraryAdminEditor({
       {open ? (
         <div className="welcome-editor-body">
           <p className="lede">
-            Attach PDF or EPUB files to books already on the shelf, or add a
-            brand-new title. Villagers can open files from the Book Club and
-            Owl&apos;s Reading List.
+            Add cover images and PDF/EPUB files to books already on the shelf, or
+            add a brand-new title. Covers show on the Book Club and Owl&apos;s
+            Reading List.
           </p>
 
           <div className="mh-admin-list">
-            <h3>Attach EPUB to shelf books</h3>
+            <h3>Covers &amp; files on shelf books</h3>
             <div className="mh-chips mh-admin-filters">
               <button
                 type="button"
@@ -237,34 +241,55 @@ export function LibraryAdminEditor({
             <ul>
               {filteredShelf.map((b) => (
                 <li key={`${b.shelf}-${b.id}`}>
-                  <div>
-                    <strong>
-                      {b.coverEmoji || "📖"} {b.title}
-                    </strong>
-                    <span className="muted">
-                      {" "}
-                      · {b.author} ·{" "}
-                      {b.shelf === "club" ? "Book Club" : "Reading List"}
+                  <div className="mh-admin-book">
+                    <span className="mh-shelf-thumb" aria-hidden>
+                      {b.coverUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={b.coverUrl} alt="" />
+                      ) : (
+                        <span>{b.coverEmoji || "📖"}</span>
+                      )}
                     </span>
-                    {b.fileUrl ? (
-                      <div>
-                        <a href={b.fileUrl} target="_blank" rel="noreferrer">
-                          Open {b.fileName || "file"}
-                        </a>
+                    <div>
+                      <strong>{b.title}</strong>
+                      <span className="muted">
+                        {" "}
+                        · {b.author} ·{" "}
+                        {b.shelf === "club" ? "Book Club" : "Reading List"}
+                      </span>
+                      <div className="muted">
+                        {b.coverUrl ? "Cover set" : "No cover"}
+                        {" · "}
+                        {b.fileUrl ? (
+                          <a href={b.fileUrl} target="_blank" rel="noreferrer">
+                            Open {b.fileName || "file"}
+                          </a>
+                        ) : (
+                          "No file yet"
+                        )}
                       </div>
-                    ) : (
-                      <div className="muted">No file attached yet</div>
-                    )}
+                    </div>
                   </div>
-                  <ShelfBookFileAttach
-                    bookId={b.id}
-                    bookTitle={b.title}
-                    hasFile={Boolean(b.fileUrl)}
-                    onAttached={() => {
-                      void load();
-                      onChanged?.();
-                    }}
-                  />
+                  <div className="mh-owner-book-tools">
+                    <ShelfBookCoverAttach
+                      bookId={b.id}
+                      bookTitle={b.title}
+                      hasCover={Boolean(b.coverUrl)}
+                      onAttached={() => {
+                        void load();
+                        onChanged?.();
+                      }}
+                    />
+                    <ShelfBookFileAttach
+                      bookId={b.id}
+                      bookTitle={b.title}
+                      hasFile={Boolean(b.fileUrl)}
+                      onAttached={() => {
+                        void load();
+                        onChanged?.();
+                      }}
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
