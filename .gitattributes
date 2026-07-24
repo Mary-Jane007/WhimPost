@@ -1,1 +1,9 @@
+data/uploads/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.webm filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.mov filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.m4v filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.mkv filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.avi filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.mpeg filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.mpg filter=lfs diff=lfs merge=lfs -text
 data/uploads/*.mp4 filter=lfs diff=lfs merge=lfs -text

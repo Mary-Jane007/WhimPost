@@ -6,7 +6,8 @@
     "dev": "next dev -p 3333",
     "build": "next build",
     "start": "next start -p 3333",
-    "lint": "eslint src --max-warnings 0"
+    "lint": "eslint src --max-warnings 0",
+    "persist-tv": "node scripts/persist-tv.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
