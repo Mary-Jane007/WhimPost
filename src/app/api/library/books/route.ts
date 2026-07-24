@@ -6,7 +6,7 @@ import { getCurrentUser, jsonError } from "@/lib/auth";
 import { isSiteOwner } from "@/lib/owner";
 import { getDb } from "@/lib/db";
 import {
-  attachFileToShelfBook,
+  attachAssetsToShelfBook,
   deleteLibraryBook,
   listClubBooks,
   listLibraryBookRecords,
@@ -143,36 +143,47 @@ export async function POST(req: NextRequest) {
     String(form.get("attachOnly") || "") === "1" ||
     Boolean(form.get("attachTo"));
 
-  // Attach / replace EPUB|PDF on an existing shelf book (catalog or uploaded).
+  // Attach / replace EPUB|PDF and/or cover image on an existing shelf book.
   if (attachOnly && attachTo) {
     const bookFile = form.get("file");
-    if (!(bookFile instanceof File) || bookFile.size <= 0) {
-      return jsonError("Choose a PDF or EPUB to attach");
+    const cover = form.get("cover");
+    const hasBookFile = bookFile instanceof File && bookFile.size > 0;
+    const hasCover = cover instanceof File && cover.size > 0;
+    if (!hasBookFile && !hasCover) {
+      return jsonError("Choose a PDF/EPUB or a cover image to attach");
     }
-    const saved = await saveBookFile(bookFile);
-    if ("error" in saved) return jsonError(saved.error);
+
+    let fileUrl: string | undefined;
+    let fileName: string | undefined;
+    let fileMime: string | undefined;
+    if (hasBookFile) {
+      const saved = await saveBookFile(bookFile as File);
+      if ("error" in saved) return jsonError(saved.error);
+      fileUrl = saved.fileUrl;
+      fileName = saved.fileName;
+      fileMime = saved.fileMime;
+    }
 
     let coverUrl: string | null | undefined;
-    const cover = form.get("cover");
-    if (cover instanceof File && cover.size > 0) {
-      const coverSaved = await saveCoverFile(cover);
+    if (hasCover) {
+      const coverSaved = await saveCoverFile(cover as File);
       if ("error" in coverSaved) return jsonError(coverSaved.error);
       coverUrl = coverSaved.coverUrl;
     }
 
     try {
-      const book = attachFileToShelfBook({
+      const book = attachAssetsToShelfBook({
         bookId: attachTo,
-        fileUrl: saved.fileUrl!,
-        fileName: saved.fileName!,
-        fileMime: saved.fileMime!,
+        fileUrl,
+        fileName,
+        fileMime,
         coverUrl,
         createdBy: user.id,
       });
       return NextResponse.json({ book, attached: true });
     } catch (err) {
       return jsonError(
-        err instanceof Error ? err.message : "Could not attach book file",
+        err instanceof Error ? err.message : "Could not update shelf book",
         400
       );
     }

@@ -257,19 +257,25 @@ export function findCatalogShelfBook(bookId: string): {
 }
 
 /**
- * Attach / replace a book file on an existing shelf title (catalog or uploaded).
+ * Attach / replace a book file and/or cover image on an existing shelf title.
  * Preserves catalog metadata when creating the first DB overlay row.
  */
-export function attachFileToShelfBook(input: {
+export function attachAssetsToShelfBook(input: {
   bookId: string;
-  fileUrl: string;
-  fileName: string;
-  fileMime: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileMime?: string;
   coverUrl?: string | null;
   createdBy: string;
 }): LibraryBookRecord {
   const bookId = input.bookId.trim();
   if (!bookId) throw new Error("Book id required");
+
+  const hasFile = Boolean(input.fileUrl);
+  const hasCover = input.coverUrl !== undefined;
+  if (!hasFile && !hasCover) {
+    throw new Error("Attach a book file or a cover image");
+  }
 
   const existing = getLibraryBookRecord(bookId);
   const catalog = findCatalogShelfBook(bookId);
@@ -281,10 +287,10 @@ export function attachFileToShelfBook(input: {
 
   // Drop previous bytes when replacing the attached file/cover.
   for (const [prevUrl, nextUrl] of [
-    [existing?.fileUrl, input.fileUrl],
+    [existing?.fileUrl, hasFile ? input.fileUrl : existing?.fileUrl],
     [
       existing?.coverUrl,
-      input.coverUrl === undefined ? existing?.coverUrl : input.coverUrl,
+      hasCover ? input.coverUrl : existing?.coverUrl,
     ],
   ] as Array<[string | null | undefined, string | null | undefined]>) {
     if (!prevUrl || !nextUrl || prevUrl === nextUrl) continue;
@@ -348,13 +354,16 @@ export function attachFileToShelfBook(input: {
       clubMerged?.coverEmoji ||
       readingMerged?.coverEmoji ||
       "📖",
-    coverUrl:
-      input.coverUrl === undefined
-        ? existing?.coverUrl ?? clubMerged?.coverUrl ?? null
-        : input.coverUrl,
-    fileUrl: input.fileUrl,
-    fileName: input.fileName,
-    fileMime: input.fileMime,
+    coverUrl: hasCover
+      ? input.coverUrl
+      : existing?.coverUrl ?? clubMerged?.coverUrl ?? readingMerged?.coverUrl ?? null,
+    fileUrl: hasFile
+      ? input.fileUrl
+      : existing?.fileUrl ?? clubMerged?.fileUrl ?? readingMerged?.fileUrl ?? null,
+    fileName: hasFile
+      ? input.fileName
+      : existing?.fileName ?? clubMerged?.fileName ?? readingMerged?.fileName ?? null,
+    fileMime: hasFile ? input.fileMime : existing?.fileMime ?? null,
     quotes: existing?.quotes?.length
       ? existing.quotes
       : club?.quotes || clubMerged?.quotes || [],
@@ -381,6 +390,18 @@ export function attachFileToShelfBook(input: {
     published: true,
     createdBy: input.createdBy,
   });
+}
+
+/** @deprecated Prefer attachAssetsToShelfBook */
+export function attachFileToShelfBook(input: {
+  bookId: string;
+  fileUrl: string;
+  fileName: string;
+  fileMime: string;
+  coverUrl?: string | null;
+  createdBy: string;
+}): LibraryBookRecord {
+  return attachAssetsToShelfBook(input);
 }
 
 export function findLibraryBook(bookId: string): ClubBook | ReadingListBook | null {
