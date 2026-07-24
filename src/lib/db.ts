@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
+import { importPersistentAccounts } from "@/lib/persistentAccounts";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -43,27 +44,6 @@ function migrate(db: Database.Database) {
     "letters",
     "font_style",
     "font_style TEXT NOT NULL DEFAULT 'quill'"
-  );
-  ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
-  ensureColumn(
-    db,
-    "tv_videos",
-    "duration_ms",
-    "duration_ms INTEGER NOT NULL DEFAULT 0"
-  );
-  ensureColumn(db, "tv_videos", "source_url", "source_url TEXT");
-  ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
-  ensureColumn(
-    db,
-    "tv_channels",
-    "schedule_epoch_ms",
-    "schedule_epoch_ms INTEGER"
-  );
-  ensureColumn(
-    db,
-    "tv_channels",
-    "schedule_order_json",
-    "schedule_order_json TEXT"
   );
 
   db.exec(`
@@ -374,11 +354,33 @@ function migrate(db: Database.Database) {
     );
   `);
 
+  // TV tables are created above; add columns for older DBs that already had them.
+  ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
+  ensureColumn(
+    db,
+    "tv_videos",
+    "duration_ms",
+    "duration_ms INTEGER NOT NULL DEFAULT 0"
+  );
+  ensureColumn(db, "tv_videos", "source_url", "source_url TEXT");
+  ensureColumn(db, "tv_rooms", "current_channel_id", "current_channel_id TEXT");
   ensureColumn(
     db,
     "tv_channels",
     "is_global",
     "is_global INTEGER NOT NULL DEFAULT 0"
+  );
+  ensureColumn(
+    db,
+    "tv_channels",
+    "schedule_epoch_ms",
+    "schedule_epoch_ms INTEGER"
+  );
+  ensureColumn(
+    db,
+    "tv_channels",
+    "schedule_order_json",
+    "schedule_order_json TEXT"
   );
   ensureColumn(db, "village_notes", "image_url", "image_url TEXT");
   ensureColumn(
@@ -477,6 +479,12 @@ function createDb() {
   `);
 
   migrate(db);
+  try {
+    importPersistentAccounts(db);
+  } catch (err) {
+    // Never let a bad snapshot brick auth on a fresh environment.
+    console.error("[persistent-accounts] import failed:", err);
+  }
   return db;
 }
 
