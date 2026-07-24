@@ -388,9 +388,31 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_library_books_shelf
       ON library_books(shelf, published, created_at);
+
+    CREATE TABLE IF NOT EXISTS library_annotations (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      book_id TEXT NOT NULL,
+      cfi TEXT,
+      page_label TEXT NOT NULL DEFAULT '',
+      percent REAL NOT NULL DEFAULT 0,
+      selected_text TEXT NOT NULL DEFAULT '',
+      body TEXT NOT NULL,
+      ink TEXT NOT NULL DEFAULT 'moss',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_library_annotations_user_book
+      ON library_annotations(user_id, book_id, created_at);
   `);
 
   // Column backfills must run after CREATE TABLE so fresh DBs don't fail.
+  ensureColumn(
+    db,
+    "library_progress",
+    "reading_positions_json",
+    "reading_positions_json TEXT NOT NULL DEFAULT '{}'"
+  );
   ensureColumn(db, "tv_videos", "channel_id", "channel_id TEXT");
   ensureColumn(
     db,
