@@ -2,20 +2,23 @@ import { randomUUID } from "crypto";
 import { getDb } from "@/lib/db";
 import {
   ARCHIVE_CLIPS,
-  CLUB_BOOKS,
   CURIOSITY_FACTS,
   LIBRARY_COLLECTIONS,
   LIBRARY_XP,
   MYSTERIES,
-  READING_LIST,
   SECRET_REWARDS,
-  featuredClubBook,
   featuredCuriosity,
   featuredMystery,
   featuredThought,
   titleForLibraryXp,
   weeklyChallenges,
 } from "@/lib/libraryContent";
+import {
+  findLibraryBook,
+  featuredClubBookMerged,
+  listClubBooks,
+  listReadingListBooks,
+} from "@/lib/libraryBooks";
 
 export type LibraryJournalEntry = {
   id: string;
@@ -208,7 +211,10 @@ function addBadge(badges: string[], badge: string) {
 
 export function getLibraryProgress(userId: string): LibraryProgress {
   const row = readRow(userId);
-  const book = featuredClubBook();
+  const book = featuredClubBookMerged();
+  if (!book) {
+    throw new Error("No club books available");
+  }
   const curiosity = featuredCuriosity();
   const mystery = featuredMystery();
   const thought = featuredThought();
@@ -307,9 +313,7 @@ export function applyLibraryAction(
     bookProgress[action.bookId] = Math.max(bookProgress[action.bookId] || 0, pct);
     readingStatus[action.bookId] = pct >= 100 ? "finished" : "reading";
   } else if (action.type === "finishBook") {
-    const book =
-      CLUB_BOOKS.find((b) => b.id === action.bookId) ||
-      READING_LIST.find((b) => b.id === action.bookId);
+    const book = findLibraryBook(action.bookId);
     if (book && !finishedBooks[action.bookId]) {
       finishedBooks[action.bookId] = true;
       bookProgress[action.bookId] = 100;

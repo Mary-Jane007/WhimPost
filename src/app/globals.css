@@ -6842,6 +6842,51 @@ button.linkish:hover {
   font-size: 3rem;
 }
 
+.mh-cover-img {
+  width: 7.5rem;
+  height: 10rem;
+  object-fit: cover;
+  border-radius: 0.35rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.mh-file-link {
+  margin: 0.65rem 0 0.85rem;
+}
+
+.mh-file-link a {
+  text-decoration: none;
+}
+
+.mh-admin-row {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.mh-admin-list {
+  margin-top: 1.25rem;
+}
+
+.mh-admin-list ul {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.mh-admin-list li {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.85rem;
+  background: rgba(20, 26, 20, 0.45);
+  border: 1px solid rgba(196, 170, 120, 0.2);
+}
+
 .mh-cover strong {
   font-family: var(--font-display), Georgia, serif;
   font-size: 1.05rem;

@@ -25,6 +25,7 @@ import { WelcomeLetterEditor } from "@/components/WelcomeLetterEditor";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
 import { LostChronicles } from "@/components/LostChronicles";
 import { ChronicleAdminEditor } from "@/components/ChronicleAdminEditor";
+import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { VillageMascot } from "@/components/VillageMascot";
 import {
   deliverWelcomeLetter,
@@ -372,6 +373,9 @@ export default async function VillagePage() {
             <ChronicleAdminEditor
               initialVillageId={stats.villageId as VillageId}
             />
+          </div>
+          <div style={{ marginTop: "0.75rem" }}>
+            <LibraryAdminEditor />
           </div>
         </>
       ) : null}
