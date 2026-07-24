@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
+import { importPersistentTv } from "@/lib/persistentTv";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -493,6 +494,12 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-accounts] import failed:", err);
   }
+  // Restore TV Corner link catalog (YouTube / direct URLs).
+  try {
+    importPersistentTv(db);
+  } catch (err) {
+    console.error("[persistent-tv] import failed:", err);
+  }
   return db;
 }
 
@@ -502,6 +509,11 @@ export function getDb() {
   } else {
     // Keep existing connections current when schema grows.
     migrate(globalForDb.whimpostDb);
+    try {
+      importPersistentTv(globalForDb.whimpostDb);
+    } catch (err) {
+      console.error("[persistent-tv] import failed:", err);
+    }
   }
   return globalForDb.whimpostDb;
 }

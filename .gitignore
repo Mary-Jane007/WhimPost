@@ -44,3 +44,5 @@ next-env.d.ts
 # Keep portable account snapshot (password hashes only) so logins
 # work on fresh servers. Do not commit plaintext passwords.
 !/data/persistent-accounts.json
+# Keep TV Corner link catalog (YouTube / direct URLs) across fresh servers.
+!/data/persistent-tv.json
