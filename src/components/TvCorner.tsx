@@ -157,6 +157,12 @@ export function TvCorner({
   const lastAppliedSyncKey = useRef("");
   const lastProgressPush = useRef(0);
   const localControlRef = useRef(false);
+  // Lock YouTube embed URL per clip — live startSec in src reloads the iframe
+  // every poll and makes one scene play on repeat.
+  const youtubeEmbedRef = useRef<{ videoId: string; src: string }>({
+    videoId: "",
+    src: "",
+  });
   const uploadCancelRef = useRef(false);
   const activeXhrRef = useRef<XMLHttpRequest | null>(null);
 
@@ -1000,8 +1006,20 @@ export function TvCorner({
         const suppressing = now < suppressUntil.current;
 
         setRoom((prev) => {
-          // Village broadcast is server clock — always take the aired program.
+          // Village broadcast is server clock. When the same clip is still
+          // airing, keep the local currentVideo object so YouTube/file players
+          // are not remounted every poll — only refresh guide/chat metadata.
           if (isVillageBroadcast(remote)) {
+            if (
+              prev.currentVideoId &&
+              prev.currentVideoId === remote.currentVideoId &&
+              prev.currentVideo
+            ) {
+              return {
+                ...remote,
+                currentVideo: prev.currentVideo,
+              };
+            }
             return remote;
           }
           // Always refresh chat + watchers.
@@ -1057,10 +1075,12 @@ export function TvCorner({
     if (!el || !room.currentVideo) return;
     if (room.currentVideo.sourceKind === "youtube") return;
 
+    // Only treat channel/clip/play changes as a new program. Village polls
+    // refresh positionUpdatedAt every few seconds — including that here made
+    // the player seek the same scene over and over.
     const syncKey = [
       room.currentVideoId,
       room.isPlaying ? "1" : "0",
-      room.positionUpdatedAt,
     ].join("|");
 
     const now = Date.now();
@@ -1078,7 +1098,7 @@ export function TvCorner({
       return;
     }
 
-    const isNewSync = syncKey !== lastAppliedSyncKey.current;
+    const programChanged = syncKey !== lastAppliedSyncKey.current;
     const targetSec =
       estimatedPositionMs({
         positionMs: room.positionMs,
@@ -1088,7 +1108,7 @@ export function TvCorner({
     const drift = Math.abs(el.currentTime - targetSec) * 1000;
 
     applyingRemote.current = true;
-    if (isNewSync && drift > DRIFT_MS) {
+    if ((programChanged || villageBroadcast) && drift > DRIFT_MS) {
       try {
         el.currentTime = Math.max(0, targetSec);
       } catch {
@@ -1308,16 +1328,28 @@ export function TvCorner({
                       key={room.currentVideo.id}
                       className="tv-video tv-video-embed"
                       title={room.currentVideo.title}
-                      src={youtubeEmbedSrc(room.currentVideo.youtubeId, {
-                        startSec: Math.floor(
-                          estimatedPositionMs({
-                            positionMs: room.positionMs,
-                            isPlaying: room.isPlaying,
-                            positionUpdatedAt: room.positionUpdatedAt,
-                          }) / 1000
-                        ),
-                        autoplay: room.isPlaying,
-                      })}
+                      src={(() => {
+                        const video = room.currentVideo!;
+                        const id = video.id;
+                        if (youtubeEmbedRef.current.videoId !== id) {
+                          youtubeEmbedRef.current = {
+                            videoId: id,
+                            src: youtubeEmbedSrc(video.youtubeId!, {
+                              // Capture join-time offset once; never rewrite src
+                              // while this clip is still on air.
+                              startSec: Math.floor(
+                                estimatedPositionMs({
+                                  positionMs: room.positionMs,
+                                  isPlaying: room.isPlaying,
+                                  positionUpdatedAt: room.positionUpdatedAt,
+                                }) / 1000
+                              ),
+                              autoplay: true,
+                            }),
+                          };
+                        }
+                        return youtubeEmbedRef.current.src;
+                      })()}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
                       referrerPolicy="strict-origin-when-cross-origin"
