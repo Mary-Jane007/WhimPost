@@ -1,7 +1,29 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-24T04:05:03.092Z",
+  "updatedAt": "2026-07-24T04:10:22.335Z",
   "books": [
+    {
+      "id": "princess",
+      "shelf": "club",
+      "title": "A Little Princess",
+      "author": "Frances Hodgson Burnett",
+      "description": "Sara Crewe keeps her dignity and kindness even when fortune turns — proving imagination is a kind of wealth.",
+      "minutes": 240,
+      "coverEmoji": "👑",
+      "coverUrl": null,
+      "fileUrl": "/api/uploads/8f547d8c-1ccc-4e46-b170-745916f96b75.epub",
+      "fileName": "frances-hodgson-burnett_little-princess.epub",
+      "fileMime": "application/epub+zip",
+      "quotesJson": "[\"Whatever comes, cannot alter one thing. If I am a princess in rags and tatters, I can be a princess still.\"]",
+      "reflectionsJson": "[\"How do you stay kind when circumstances shrink?\",\"What story do you tell yourself to endure hard days?\"]",
+      "category": null,
+      "difficulty": null,
+      "length": null,
+      "mood": "",
+      "themesJson": "[]",
+      "rating": 4.5,
+      "published": true
+    },
     {
       "id": "anne",
       "shelf": "club",
