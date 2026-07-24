@@ -57,6 +57,7 @@ export function MosshollowLibrary({
   const [shelfList, setShelfList] = useState(readingList);
   const [book, setBook] = useState(featuredBook);
   const [reader, setReader] = useState<{
+    bookId: string;
     title: string;
     author?: string;
     fileUrl: string;
@@ -246,6 +247,11 @@ export function MosshollowLibrary({
                 <p>{book.description}</p>
                 <p className="mh-meta">
                   Estimated reading time · about {book.minutes} minutes
+                  {progress.readingPositions?.[book.id]?.label
+                    ? ` · Bookmark: ${progress.readingPositions[book.id].label}`
+                    : progress.bookProgress[book.id]
+                      ? ` · ${progress.bookProgress[book.id]}% read`
+                      : ""}
                 </p>
                 {book.fileUrl ? (
                   <p className="mh-file-link">
@@ -254,6 +260,7 @@ export function MosshollowLibrary({
                       className="btn-primary"
                       onClick={() =>
                         setReader({
+                          bookId: book.id,
                           title: book.title,
                           author: book.author,
                           fileUrl: book.fileUrl!,
@@ -389,6 +396,9 @@ export function MosshollowLibrary({
                         <span>
                           {b.title}
                           {b.fileUrl ? " · 📄" : ""}
+                          {progress.readingPositions?.[b.id]?.label
+                            ? ` · ${progress.readingPositions[b.id].label}`
+                            : ""}
                           {progress.finishedBooks[b.id] ? " · ✓" : ""}
                         </span>
                       </button>
@@ -399,6 +409,7 @@ export function MosshollowLibrary({
                             className="btn-secondary mh-attach-btn"
                             onClick={() =>
                               setReader({
+                                bookId: b.id,
                                 title: b.title,
                                 author: b.author,
                                 fileUrl: b.fileUrl!,
@@ -490,6 +501,7 @@ export function MosshollowLibrary({
                           className="btn-primary"
                           onClick={() =>
                             setReader({
+                              bookId: b.id,
                               title: b.title,
                               author: b.author,
                               fileUrl: b.fileUrl!,
@@ -956,11 +968,37 @@ export function MosshollowLibrary({
 
       {reader ? (
         <LibraryBookReader
+          bookId={reader.bookId}
           title={reader.title}
           author={reader.author}
           fileUrl={reader.fileUrl}
           fileName={reader.fileName}
+          initialPosition={
+            progress.readingPositions?.[reader.bookId] || null
+          }
           onClose={() => setReader(null)}
+          onProgressSaved={({ bookId, percent, position }) => {
+            setProgress((prev) => ({
+              ...prev,
+              bookProgress: {
+                ...prev.bookProgress,
+                [bookId]: Math.max(prev.bookProgress[bookId] || 0, percent),
+              },
+              readingStatus: {
+                ...prev.readingStatus,
+                [bookId]:
+                  percent >= 100
+                    ? "finished"
+                    : percent > 0
+                      ? "reading"
+                      : prev.readingStatus[bookId] || "none",
+              },
+              readingPositions: {
+                ...prev.readingPositions,
+                [bookId]: position,
+              },
+            }));
+          }}
         />
       ) : null}
     </div>
