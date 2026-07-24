@@ -167,14 +167,54 @@ export function listLibraryBookRecords(opts?: {
     .filter((b) => (opts?.includeUnpublished ? true : b.published));
 }
 
-/** Hardcoded club shelf + published owner uploads (DB overrides same id). */
+function mergeClubOverlay(seed: ClubBook, overlay: ClubBook): ClubBook {
+  return {
+    ...seed,
+    ...overlay,
+    description: overlay.description?.trim() || seed.description,
+    minutes: overlay.minutes || seed.minutes,
+    coverEmoji: overlay.coverEmoji || seed.coverEmoji,
+    quotes: overlay.quotes?.length ? overlay.quotes : seed.quotes,
+    reflections: overlay.reflections?.length
+      ? overlay.reflections
+      : seed.reflections,
+    coverUrl: overlay.coverUrl ?? seed.coverUrl ?? null,
+    fileUrl: overlay.fileUrl ?? seed.fileUrl ?? null,
+    fileName: overlay.fileName ?? seed.fileName ?? null,
+    uploaded: true,
+  };
+}
+
+function mergeReadingOverlay(
+  seed: ReadingListBook,
+  overlay: ReadingListBook
+): ReadingListBook {
+  return {
+    ...seed,
+    ...overlay,
+    category: overlay.category || seed.category,
+    difficulty: overlay.difficulty || seed.difficulty,
+    length: overlay.length || seed.length,
+    mood: overlay.mood?.trim() || seed.mood,
+    themes: overlay.themes?.length ? overlay.themes : seed.themes,
+    rating: overlay.rating || seed.rating,
+    coverEmoji: overlay.coverEmoji || seed.coverEmoji,
+    coverUrl: overlay.coverUrl ?? seed.coverUrl ?? null,
+    fileUrl: overlay.fileUrl ?? seed.fileUrl ?? null,
+    fileName: overlay.fileName ?? seed.fileName ?? null,
+    description: overlay.description?.trim() || seed.description,
+    uploaded: true,
+  };
+}
+
+/** Hardcoded club shelf + published owner uploads (DB overlays same id). */
 export function listClubBooks(): ClubBook[] {
   const uploaded = listLibraryBookRecords({ shelf: "club" }).map(toClubBook);
   const byId = new Map<string, ClubBook>();
   for (const book of CLUB_BOOKS) byId.set(book.id, book);
   for (const book of uploaded) {
     const prev = byId.get(book.id);
-    byId.set(book.id, prev ? { ...prev, ...book, uploaded: true } : book);
+    byId.set(book.id, prev ? mergeClubOverlay(prev, book) : book);
   }
   // Keep seed order, then append new upload-only ids.
   const seedIds = new Set(CLUB_BOOKS.map((b) => b.id));
@@ -193,7 +233,7 @@ export function listReadingListBooks(): ReadingListBook[] {
   for (const book of READING_LIST) byId.set(book.id, book);
   for (const book of uploaded) {
     const prev = byId.get(book.id);
-    byId.set(book.id, prev ? { ...prev, ...book, uploaded: true } : book);
+    byId.set(book.id, prev ? mergeReadingOverlay(prev, book) : book);
   }
   const seedIds = new Set(READING_LIST.map((b) => b.id));
   const merged = READING_LIST.map((b) => byId.get(b.id)!);
@@ -201,6 +241,146 @@ export function listReadingListBooks(): ReadingListBook[] {
     if (!seedIds.has(book.id)) merged.push(book);
   }
   return merged;
+}
+
+/** Look up a hardcoded catalog title (before DB overlay). */
+export function findCatalogShelfBook(bookId: string): {
+  shelf: LibraryShelf;
+  club?: ClubBook;
+  reading?: ReadingListBook;
+} | null {
+  const club = CLUB_BOOKS.find((b) => b.id === bookId);
+  if (club) return { shelf: "club", club };
+  const reading = READING_LIST.find((b) => b.id === bookId);
+  if (reading) return { shelf: "readinglist", reading };
+  return null;
+}
+
+/**
+ * Attach / replace a book file on an existing shelf title (catalog or uploaded).
+ * Preserves catalog metadata when creating the first DB overlay row.
+ */
+export function attachFileToShelfBook(input: {
+  bookId: string;
+  fileUrl: string;
+  fileName: string;
+  fileMime: string;
+  coverUrl?: string | null;
+  createdBy: string;
+}): LibraryBookRecord {
+  const bookId = input.bookId.trim();
+  if (!bookId) throw new Error("Book id required");
+
+  const existing = getLibraryBookRecord(bookId);
+  const catalog = findCatalogShelfBook(bookId);
+  const merged = findLibraryBook(bookId);
+
+  if (!existing && !catalog && !merged) {
+    throw new Error("That book is not on the library shelves");
+  }
+
+  // Drop previous bytes when replacing the attached file/cover.
+  for (const [prevUrl, nextUrl] of [
+    [existing?.fileUrl, input.fileUrl],
+    [
+      existing?.coverUrl,
+      input.coverUrl === undefined ? existing?.coverUrl : input.coverUrl,
+    ],
+  ] as Array<[string | null | undefined, string | null | undefined]>) {
+    if (!prevUrl || !nextUrl || prevUrl === nextUrl) continue;
+    const match = /\/api\/uploads\/([a-f0-9-]+\.[a-z0-9]+)$/i.exec(prevUrl);
+    if (!match) continue;
+    const filePath = path.join(LIBRARY_UPLOAD_DIR, match[1]);
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch {
+        // ignore cleanup errors
+      }
+    }
+  }
+
+  const shelf: LibraryShelf =
+    existing?.shelf ||
+    catalog?.shelf ||
+    (listReadingListBooks().some((b) => b.id === bookId)
+      ? "readinglist"
+      : "club");
+
+  const club = catalog?.club;
+  const reading = catalog?.reading;
+  const readingMerged =
+    shelf === "readinglist"
+      ? (merged as ReadingListBook | null)
+      : null;
+  const clubMerged =
+    shelf === "club" ? (merged as ClubBook | null) : null;
+
+  return upsertLibraryBook({
+    id: bookId,
+    shelf,
+    title:
+      existing?.title ||
+      club?.title ||
+      reading?.title ||
+      clubMerged?.title ||
+      readingMerged?.title ||
+      "Untitled",
+    author:
+      existing?.author ||
+      club?.author ||
+      reading?.author ||
+      clubMerged?.author ||
+      readingMerged?.author ||
+      "Unknown",
+    description:
+      existing?.description ||
+      club?.description ||
+      reading?.description ||
+      clubMerged?.description ||
+      readingMerged?.description ||
+      "",
+    minutes: existing?.minutes || club?.minutes || clubMerged?.minutes || 120,
+    coverEmoji:
+      existing?.coverEmoji ||
+      club?.coverEmoji ||
+      reading?.coverEmoji ||
+      clubMerged?.coverEmoji ||
+      readingMerged?.coverEmoji ||
+      "📖",
+    coverUrl:
+      input.coverUrl === undefined
+        ? existing?.coverUrl ?? clubMerged?.coverUrl ?? null
+        : input.coverUrl,
+    fileUrl: input.fileUrl,
+    fileName: input.fileName,
+    fileMime: input.fileMime,
+    quotes: existing?.quotes?.length
+      ? existing.quotes
+      : club?.quotes || clubMerged?.quotes || [],
+    reflections: existing?.reflections?.length
+      ? existing.reflections
+      : club?.reflections || clubMerged?.reflections || [],
+    category:
+      existing?.category ||
+      reading?.category ||
+      readingMerged?.category ||
+      null,
+    difficulty:
+      existing?.difficulty ||
+      reading?.difficulty ||
+      readingMerged?.difficulty ||
+      null,
+    length:
+      existing?.length || reading?.length || readingMerged?.length || null,
+    mood: existing?.mood || reading?.mood || readingMerged?.mood || "",
+    themes: existing?.themes?.length
+      ? existing.themes
+      : reading?.themes || readingMerged?.themes || [],
+    rating: existing?.rating || reading?.rating || readingMerged?.rating || 4.5,
+    published: true,
+    createdBy: input.createdBy,
+  });
 }
 
 export function findLibraryBook(bookId: string): ClubBook | ReadingListBook | null {

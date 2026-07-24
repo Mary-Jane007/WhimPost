@@ -6,6 +6,7 @@ import { getCurrentUser, jsonError } from "@/lib/auth";
 import { isSiteOwner } from "@/lib/owner";
 import { getDb } from "@/lib/db";
 import {
+  attachFileToShelfBook,
   deleteLibraryBook,
   listClubBooks,
   listLibraryBookRecords,
@@ -53,6 +54,49 @@ function splitLines(raw: FormDataEntryValue | null) {
     .slice(0, 12);
 }
 
+async function saveBookFile(bookFile: File) {
+  const ext = extFromBookFile(bookFile);
+  if (!ext) return { error: "Upload a PDF or EPUB book file" as const };
+  if (bookFile.size > MAX_BOOK_BYTES) {
+    return { error: "Book files must be under 40MB" as const };
+  }
+  ensureUploadDir();
+  const filename = `${randomUUID()}.${ext}`;
+  fs.writeFileSync(
+    path.join(UPLOAD_DIR, filename),
+    Buffer.from(await bookFile.arrayBuffer())
+  );
+  return {
+    fileUrl: `/api/uploads/${filename}`,
+    fileName: bookFile.name.slice(0, 180) || filename,
+    fileMime: ext === "pdf" ? "application/pdf" : "application/epub+zip",
+  };
+}
+
+async function saveCoverFile(cover: File) {
+  if (!COVER_MIME.has(cover.type)) {
+    return { error: "Cover must be a JPG, PNG, WebP, or GIF" as const };
+  }
+  if (cover.size > MAX_COVER_BYTES) {
+    return { error: "Cover images must be under 4MB" as const };
+  }
+  ensureUploadDir();
+  const ext =
+    cover.type === "image/png"
+      ? "png"
+      : cover.type === "image/webp"
+        ? "webp"
+        : cover.type === "image/gif"
+          ? "gif"
+          : "jpg";
+  const filename = `${randomUUID()}.${ext}`;
+  fs.writeFileSync(
+    path.join(UPLOAD_DIR, filename),
+    Buffer.from(await cover.arrayBuffer())
+  );
+  return { coverUrl: `/api/uploads/${filename}` };
+}
+
 async function requireOwner() {
   const user = await getCurrentUser();
   if (!user) return { error: jsonError("Not signed in", 401) };
@@ -74,6 +118,8 @@ export async function GET(req: NextRequest) {
     if ("error" in gate && gate.error) return gate.error;
     return NextResponse.json({
       books: listLibraryBookRecords({ includeUnpublished: true }),
+      clubBooks: listClubBooks(),
+      readingList: listReadingListBooks(),
     });
   }
 
@@ -83,7 +129,7 @@ export async function GET(req: NextRequest) {
   });
 }
 
-/** Owner creates/updates a library book, optionally with PDF/EPUB + cover. */
+/** Owner creates/updates a library book, or attaches a file to an existing shelf title. */
 export async function POST(req: NextRequest) {
   const gate = await requireOwner();
   if ("error" in gate && gate.error) return gate.error;
@@ -92,6 +138,46 @@ export async function POST(req: NextRequest) {
   const form = await req.formData().catch(() => null);
   if (!form) return jsonError("Expected multipart form data");
 
+  const attachTo = String(form.get("attachTo") || form.get("id") || "").trim();
+  const attachOnly =
+    String(form.get("attachOnly") || "") === "1" ||
+    Boolean(form.get("attachTo"));
+
+  // Attach / replace EPUB|PDF on an existing shelf book (catalog or uploaded).
+  if (attachOnly && attachTo) {
+    const bookFile = form.get("file");
+    if (!(bookFile instanceof File) || bookFile.size <= 0) {
+      return jsonError("Choose a PDF or EPUB to attach");
+    }
+    const saved = await saveBookFile(bookFile);
+    if ("error" in saved) return jsonError(saved.error);
+
+    let coverUrl: string | null | undefined;
+    const cover = form.get("cover");
+    if (cover instanceof File && cover.size > 0) {
+      const coverSaved = await saveCoverFile(cover);
+      if ("error" in coverSaved) return jsonError(coverSaved.error);
+      coverUrl = coverSaved.coverUrl;
+    }
+
+    try {
+      const book = attachFileToShelfBook({
+        bookId: attachTo,
+        fileUrl: saved.fileUrl!,
+        fileName: saved.fileName!,
+        fileMime: saved.fileMime!,
+        coverUrl,
+        createdBy: user.id,
+      });
+      return NextResponse.json({ book, attached: true });
+    } catch (err) {
+      return jsonError(
+        err instanceof Error ? err.message : "Could not attach book file",
+        400
+      );
+    }
+  }
+
   const shelfRaw = String(form.get("shelf") || "club");
   const shelf: LibraryShelf =
     shelfRaw === "readinglist" ? "readinglist" : "club";
@@ -99,52 +185,24 @@ export async function POST(req: NextRequest) {
   const author = String(form.get("author") || "").trim();
   if (!title || !author) return jsonError("Title and author are required");
 
-  ensureUploadDir();
-
   let fileUrl: string | null | undefined;
   let fileName: string | null | undefined;
   let fileMime: string | null | undefined;
   const bookFile = form.get("file");
   if (bookFile instanceof File && bookFile.size > 0) {
-    const ext = extFromBookFile(bookFile);
-    if (!ext) return jsonError("Upload a PDF or EPUB book file");
-    if (bookFile.size > MAX_BOOK_BYTES) {
-      return jsonError("Book files must be under 40MB");
-    }
-    const filename = `${randomUUID()}.${ext}`;
-    fs.writeFileSync(
-      path.join(UPLOAD_DIR, filename),
-      Buffer.from(await bookFile.arrayBuffer())
-    );
-    fileUrl = `/api/uploads/${filename}`;
-    fileName = bookFile.name.slice(0, 180) || filename;
-    fileMime =
-      ext === "pdf" ? "application/pdf" : "application/epub+zip";
+    const saved = await saveBookFile(bookFile);
+    if ("error" in saved) return jsonError(saved.error);
+    fileUrl = saved.fileUrl;
+    fileName = saved.fileName;
+    fileMime = saved.fileMime;
   }
 
   let coverUrl: string | null | undefined;
   const cover = form.get("cover");
   if (cover instanceof File && cover.size > 0) {
-    if (!COVER_MIME.has(cover.type)) {
-      return jsonError("Cover must be a JPG, PNG, WebP, or GIF");
-    }
-    if (cover.size > MAX_COVER_BYTES) {
-      return jsonError("Cover images must be under 4MB");
-    }
-    const ext =
-      cover.type === "image/png"
-        ? "png"
-        : cover.type === "image/webp"
-          ? "webp"
-          : cover.type === "image/gif"
-            ? "gif"
-            : "jpg";
-    const filename = `${randomUUID()}.${ext}`;
-    fs.writeFileSync(
-      path.join(UPLOAD_DIR, filename),
-      Buffer.from(await cover.arrayBuffer())
-    );
-    coverUrl = `/api/uploads/${filename}`;
+    const coverSaved = await saveCoverFile(cover);
+    if ("error" in coverSaved) return jsonError(coverSaved.error);
+    coverUrl = coverSaved.coverUrl;
   }
 
   const idRaw = String(form.get("id") || "").trim();

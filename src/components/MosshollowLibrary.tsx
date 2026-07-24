@@ -19,6 +19,7 @@ import {
   type ReadingListBook,
 } from "@/lib/libraryContent";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
+import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 
 type Props = {
   user: UserPublic;
@@ -248,6 +249,14 @@ export function MosshollowLibrary({
                     </a>
                   </p>
                 ) : null}
+                {user.isOwner ? (
+                  <ShelfBookFileAttach
+                    bookId={book.id}
+                    bookTitle={book.title}
+                    hasFile={Boolean(book.fileUrl)}
+                    onAttached={() => void refreshShelves()}
+                  />
+                ) : null}
                 <label className="mh-progress-label">
                   Reading progress · {bookPct}%
                   <input
@@ -338,9 +347,21 @@ export function MosshollowLibrary({
               <ul>
                 {shelfClub.map((b) => (
                   <li key={b.id} className={b.id === book.id ? "active" : ""}>
-                    <span aria-hidden>{b.coverEmoji}</span> {b.title}
-                    {b.fileUrl ? " · 📄" : ""}
-                    {progress.finishedBooks[b.id] ? " · ✓" : ""}
+                    <div className="mh-shelf-row">
+                      <span>
+                        <span aria-hidden>{b.coverEmoji}</span> {b.title}
+                        {b.fileUrl ? " · 📄" : ""}
+                        {progress.finishedBooks[b.id] ? " · ✓" : ""}
+                      </span>
+                      {user.isOwner ? (
+                        <ShelfBookFileAttach
+                          bookId={b.id}
+                          bookTitle={b.title}
+                          hasFile={Boolean(b.fileUrl)}
+                          onAttached={() => void refreshShelves()}
+                        />
+                      ) : null}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -392,6 +413,14 @@ export function MosshollowLibrary({
                           Open book file
                         </a>
                       </p>
+                    ) : null}
+                    {user.isOwner ? (
+                      <ShelfBookFileAttach
+                        bookId={b.id}
+                        bookTitle={b.title}
+                        hasFile={Boolean(b.fileUrl)}
+                        onAttached={() => void refreshShelves()}
+                      />
                     ) : null}
                     <div className="mh-actions">
                       <button

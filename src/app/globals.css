@@ -6858,6 +6858,38 @@ button.linkish:hover {
   text-decoration: none;
 }
 
+.mh-attach {
+  margin: 0.45rem 0 0.35rem;
+}
+
+.mh-attach-btn {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.7rem;
+}
+
+.mh-attach .form-error,
+.mh-attach .form-success {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+}
+
+.mh-shelf-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mh-admin-subhead {
+  margin: 1.5rem 0 0.75rem;
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.mh-admin-filters {
+  margin: 0.65rem 0 0.85rem;
+}
+
 .mh-admin-row {
   display: grid;
   gap: 0.75rem;
