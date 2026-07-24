@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
 import { importPersistentTv } from "@/lib/persistentTv";
+import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -500,6 +501,12 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-tv] import failed:", err);
   }
+  // Restore uploaded file clips when Git LFS bytes are present.
+  try {
+    importPersistentTvMedia(db);
+  } catch (err) {
+    console.error("[persistent-tv-media] import failed:", err);
+  }
   return db;
 }
 
@@ -513,6 +520,11 @@ export function getDb() {
       importPersistentTv(globalForDb.whimpostDb);
     } catch (err) {
       console.error("[persistent-tv] import failed:", err);
+    }
+    try {
+      importPersistentTvMedia(globalForDb.whimpostDb);
+    } catch (err) {
+      console.error("[persistent-tv-media] import failed:", err);
     }
   }
   return globalForDb.whimpostDb;

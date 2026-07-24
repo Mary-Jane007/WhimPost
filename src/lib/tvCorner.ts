@@ -20,6 +20,7 @@ import {
 } from "@/lib/tvLinks";
 import { probeRemoteDurationMs } from "@/lib/tvDuration";
 import { exportPersistentTv } from "@/lib/persistentTv";
+import { exportPersistentTvMedia } from "@/lib/persistentTvMedia";
 
 export type TvRoomScope = "village" | "friends";
 export type { TvScheduleSlot };
@@ -450,6 +451,13 @@ export function createVideo(input: {
   }
 
   ensureChannelSchedule(input.channelId);
+  if (!input.sourceUrl) {
+    try {
+      exportPersistentTvMedia(db);
+    } catch (err) {
+      console.error("[persistent-tv-media] export failed:", err);
+    }
+  }
   return getVideoById(id)!;
 }
 
@@ -524,6 +532,12 @@ export function deleteVideo(videoId: string, user: UserPublic) {
       exportPersistentTv(db);
     } catch (err) {
       console.error("[persistent-tv] export failed:", err);
+    }
+  } else {
+    try {
+      exportPersistentTvMedia(db);
+    } catch (err) {
+      console.error("[persistent-tv-media] export failed:", err);
     }
   }
   return {
