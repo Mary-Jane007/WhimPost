@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-24T04:13:13.834Z",
+  "updatedAt": "2026-07-24T04:23:14.264Z",
   "books": [
     {
       "id": "princess",
@@ -10,7 +10,7 @@
       "description": "Sara Crewe keeps her dignity and kindness even when fortune turns — proving imagination is a kind of wealth.",
       "minutes": 240,
       "coverEmoji": "👑",
-      "coverUrl": null,
+      "coverUrl": "/api/uploads/7cefd0b2-f92a-4366-9888-efa226ff9542.jpg",
       "fileUrl": "/api/uploads/8f547d8c-1ccc-4e46-b170-745916f96b75.epub",
       "fileName": "frances-hodgson-burnett_little-princess.epub",
       "fileMime": "application/epub+zip",
@@ -88,6 +88,28 @@
       "mood": "Whimsical",
       "themesJson": "[\"curiosity\",\"nonsense\",\"adventure\"]",
       "rating": 4.8,
+      "published": true
+    },
+    {
+      "id": "rl-austen",
+      "shelf": "readinglist",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "description": "",
+      "minutes": 120,
+      "coverEmoji": "📖",
+      "coverUrl": "/api/uploads/68144e71-2ff3-4824-bb65-02925fcde53d.jpg",
+      "fileUrl": "/api/uploads/a3f38167-610b-40f5-ade4-79dc4fe0044d.epub",
+      "fileName": "austen-pride-and-prejudice-illustrations.epub",
+      "fileMime": "application/epub+zip",
+      "quotesJson": "[]",
+      "reflectionsJson": "[]",
+      "category": "Classic Literature",
+      "difficulty": "Gentle",
+      "length": "Medium",
+      "mood": "Witty",
+      "themesJson": "[\"pride\",\"love\",\"society\"]",
+      "rating": 4.6,
       "published": true
     }
   ]
