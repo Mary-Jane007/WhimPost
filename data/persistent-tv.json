@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-24T02:50:00.000Z",
+  "channels": [
+    {
+      "title": "Cottage Cartoons",
+      "villageId": "mosshollow",
+      "isGlobal": true,
+      "videos": [
+        {
+          "title": "The World Of Peter Rabbit & Friends",
+          "sourceUrl": "https://www.youtube.com/watch?v=h4CN0t5c94o",
+          "durationMs": 3600000
+        },
+        {
+          "title": "Little Bear Top Episodes",
+          "sourceUrl": "https://www.youtube.com/watch?v=twuDOXgx5EY",
+          "durationMs": 3600000
+        }
+      ]
+    }
+  ]
+}
