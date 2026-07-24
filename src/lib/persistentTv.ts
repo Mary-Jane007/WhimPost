@@ -157,6 +157,11 @@ export function importPersistentTv(db: Database) {
       (id, title, filename, mime, size_bytes, duration_ms, uploader_id, village_id, channel_id, source_url)
      VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?)`
   );
+  const updateVideo = db.prepare(
+    `UPDATE tv_videos
+     SET title = ?, duration_ms = ?, channel_id = ?
+     WHERE id = ?`
+  );
 
   const sync = db.transaction((channels: PersistentTvChannel[]) => {
     for (const channel of channels) {
@@ -189,7 +194,6 @@ export function importPersistentTv(db: Database) {
       for (const clip of channel.videos) {
         const sourceUrl = String(clip.sourceUrl || "").trim();
         if (!sourceUrl) continue;
-        if (findVideoByUrl.get(sourceUrl)) continue;
 
         const parsed = parseTvLink(sourceUrl);
         if (!parsed.ok) continue;
@@ -202,6 +206,14 @@ export function importPersistentTv(db: Database) {
           String(clip.title || "").trim().slice(0, 80) ||
           parsed.titleHint.slice(0, 80) ||
           "Linked clip";
+
+        const existing = findVideoByUrl.get(sourceUrl) as
+          | { id: string }
+          | undefined;
+        if (existing) {
+          updateVideo.run(clipTitle, durationMs, channelId, existing.id);
+          continue;
+        }
 
         insertVideo.run(
           randomUUID(),
@@ -219,4 +231,25 @@ export function importPersistentTv(db: Database) {
   });
 
   sync(file.channels);
+
+  // Refresh airtime epoch so restored shelves start a clean loop from now.
+  for (const channel of file.channels) {
+    const title = String(channel.title || "").trim();
+    if (!title) continue;
+    const row = findChannel.get(title) as { id: string } | undefined;
+    if (!row) continue;
+    const ids = (
+      db
+        .prepare(
+          `SELECT id FROM tv_videos WHERE channel_id = ? ORDER BY created_at ASC`
+        )
+        .all(row.id) as Array<{ id: string }>
+    ).map((v) => v.id);
+    if (ids.length === 0) continue;
+    db.prepare(
+      `UPDATE tv_channels
+       SET schedule_epoch_ms = ?, schedule_order_json = ?
+       WHERE id = ?`
+    ).run(Date.now(), JSON.stringify(ids), row.id);
+  }
 }

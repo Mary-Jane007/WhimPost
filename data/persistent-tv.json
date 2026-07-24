@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-24T02:50:00.000Z",
+  "updatedAt": "2026-07-24T03:05:00.000Z",
   "channels": [
     {
       "title": "Cottage Cartoons",
@@ -8,14 +8,14 @@
       "isGlobal": true,
       "videos": [
         {
-          "title": "The World Of Peter Rabbit & Friends",
+          "title": "Peter Rabbit — The Tale of Samuel Whiskers",
           "sourceUrl": "https://www.youtube.com/watch?v=h4CN0t5c94o",
-          "durationMs": 3600000
+          "durationMs": 1800000
         },
         {
-          "title": "Little Bear Top Episodes",
+          "title": "Little Bear | TOP EPISODES! Part 1",
           "sourceUrl": "https://www.youtube.com/watch?v=twuDOXgx5EY",
-          "durationMs": 3600000
+          "durationMs": 4500000
         }
       ]
     }
