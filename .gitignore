@@ -39,5 +39,12 @@ next-env.d.ts
 # database
 /data/*.db
 /data/*.db-*
-/data/uploads/**
-!/data/uploads/.gitkeep
+# TV uploads are committed via Git LFS. Only ignore in-progress chunks.
+/data/uploads/.incoming/
+# Keep portable account snapshot (password hashes only) so logins
+# work on fresh servers. Do not commit plaintext passwords.
+!/data/persistent-accounts.json
+# Keep TV Corner link catalog (YouTube / direct URLs) across fresh servers.
+!/data/persistent-tv.json
+# Keep uploaded TV file catalog (pairs with Git LFS objects under data/uploads/).
+!/data/persistent-tv-media.json
