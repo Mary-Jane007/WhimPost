@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
+import { importPersistentAccounts } from "@/lib/persistentAccounts";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -478,6 +479,12 @@ function createDb() {
   `);
 
   migrate(db);
+  try {
+    importPersistentAccounts(db);
+  } catch (err) {
+    // Never let a bad snapshot brick auth on a fresh environment.
+    console.error("[persistent-accounts] import failed:", err);
+  }
   return db;
 }
 

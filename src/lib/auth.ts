@@ -1,10 +1,10 @@
 import { SignJWT, jwtVerify } from "jose";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { getDb } from "./db";
 import type { UserPublic } from "./types";
 
-const COOKIE_NAME = "whimpost_session";
+export const COOKIE_NAME = "whimpost_session";
 const secret = new TextEncoder().encode(
   process.env.WHIMPOST_SECRET || "whimpost-dev-secret-change-me-in-prod"
 );
@@ -34,23 +34,59 @@ export async function verifySessionToken(token: string) {
   }
 }
 
-export async function setSessionCookie(token: string) {
-  const cookieStore = await cookies();
-  // Only mark Secure on real HTTPS deploys. Production `next start` on
-  // http://localhost would otherwise drop the session in the browser.
-  const secure =
-    process.env.COOKIE_SECURE === "true" ||
-    process.env.VERCEL === "1" ||
-    (process.env.NODE_ENV === "production" &&
-      Boolean(process.env.WHIMPOST_HTTPS));
+/** True when the request reached us over HTTPS (direct or via preview proxy). */
+async function requestIsHttps() {
+  if (process.env.COOKIE_SECURE === "true") return true;
+  if (process.env.VERCEL === "1") return true;
+  if (process.env.WHIMPOST_HTTPS === "1" || process.env.WHIMPOST_HTTPS === "true") {
+    return true;
+  }
+  try {
+    const hdrs = await headers();
+    const proto = (
+      hdrs.get("x-forwarded-proto") ||
+      hdrs.get("x-forwarded-protocol") ||
+      ""
+    )
+      .split(",")[0]
+      ?.trim()
+      .toLowerCase();
+    if (proto === "https") return true;
+    const host = (hdrs.get("x-forwarded-host") || hdrs.get("host") || "").toLowerCase();
+    // Cloud agent preview hosts are always HTTPS in the browser.
+    if (host.includes(".agent.cvm.dev") || host.includes(".cursor.sh")) return true;
+  } catch {
+    // headers() unavailable outside a request — fall through
+  }
+  return false;
+}
 
-  cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
+async function sessionCookieOptions() {
+  // HTTP localhost must stay non-Secure + Lax or the browser drops the cookie.
+  // HTTPS preview hosts need Secure + SameSite=None so login survives redirects
+  // (including Cursor embedded browser / port-forward panels).
+  const secure = await requestIsHttps();
+  return {
+    httpOnly: true as const,
+    sameSite: (secure ? "none" : "lax") as "none" | "lax",
     secure,
     path: "/",
     maxAge: 60 * 60 * 24 * 14,
-  });
+  };
+}
+
+/** Attach the session cookie directly on a response (most reliable in Route Handlers). */
+export async function attachSessionCookie(
+  res: NextResponse,
+  token: string
+): Promise<NextResponse> {
+  res.cookies.set(COOKIE_NAME, token, await sessionCookieOptions());
+  return res;
+}
+
+export async function setSessionCookie(token: string) {
+  const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, token, await sessionCookieOptions());
 }
 
 export async function clearSessionCookie() {
