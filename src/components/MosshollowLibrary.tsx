@@ -19,6 +19,7 @@ import {
   type ReadingListBook,
 } from "@/lib/libraryContent";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
+import { LibraryBookReader } from "@/components/LibraryBookReader";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 
 type Props = {
@@ -54,6 +55,12 @@ export function MosshollowLibrary({
   const [shelfClub, setShelfClub] = useState(clubBooks);
   const [shelfList, setShelfList] = useState(readingList);
   const [book, setBook] = useState(featuredBook);
+  const [reader, setReader] = useState<{
+    title: string;
+    author?: string;
+    fileUrl: string;
+    fileName?: string | null;
+  } | null>(null);
 
   const curiosity = featuredCuriosity();
   const mystery = featuredMystery();
@@ -238,15 +245,21 @@ export function MosshollowLibrary({
                 </p>
                 {book.fileUrl ? (
                   <p className="mh-file-link">
-                    <a
-                      className="btn-secondary"
-                      href={book.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={() =>
+                        setReader({
+                          title: book.title,
+                          author: book.author,
+                          fileUrl: book.fileUrl!,
+                          fileName: book.fileName,
+                        })
+                      }
                     >
-                      Open book file
+                      Read in the library
                       {book.fileName ? ` · ${book.fileName}` : ""}
-                    </a>
+                    </button>
                   </p>
                 ) : null}
                 {user.isOwner ? (
@@ -348,19 +361,41 @@ export function MosshollowLibrary({
                 {shelfClub.map((b) => (
                   <li key={b.id} className={b.id === book.id ? "active" : ""}>
                     <div className="mh-shelf-row">
-                      <span>
+                      <button
+                        type="button"
+                        className="mh-shelf-select"
+                        onClick={() => setBook(b)}
+                      >
                         <span aria-hidden>{b.coverEmoji}</span> {b.title}
                         {b.fileUrl ? " · 📄" : ""}
                         {progress.finishedBooks[b.id] ? " · ✓" : ""}
-                      </span>
-                      {user.isOwner ? (
-                        <ShelfBookFileAttach
-                          bookId={b.id}
-                          bookTitle={b.title}
-                          hasFile={Boolean(b.fileUrl)}
-                          onAttached={() => void refreshShelves()}
-                        />
-                      ) : null}
+                      </button>
+                      <div className="mh-shelf-actions">
+                        {b.fileUrl ? (
+                          <button
+                            type="button"
+                            className="btn-secondary mh-attach-btn"
+                            onClick={() =>
+                              setReader({
+                                title: b.title,
+                                author: b.author,
+                                fileUrl: b.fileUrl!,
+                                fileName: b.fileName,
+                              })
+                            }
+                          >
+                            Read
+                          </button>
+                        ) : null}
+                        {user.isOwner ? (
+                          <ShelfBookFileAttach
+                            bookId={b.id}
+                            bookTitle={b.title}
+                            hasFile={Boolean(b.fileUrl)}
+                            onAttached={() => void refreshShelves()}
+                          />
+                        ) : null}
+                      </div>
                     </div>
                   </li>
                 ))}
@@ -409,9 +444,20 @@ export function MosshollowLibrary({
                     <p className="mh-rating">★ {b.rating.toFixed(1)} community</p>
                     {b.fileUrl ? (
                       <p className="mh-file-link">
-                        <a href={b.fileUrl} target="_blank" rel="noreferrer">
-                          Open book file
-                        </a>
+                        <button
+                          type="button"
+                          className="btn-primary"
+                          onClick={() =>
+                            setReader({
+                              title: b.title,
+                              author: b.author,
+                              fileUrl: b.fileUrl!,
+                              fileName: b.fileName,
+                            })
+                          }
+                        >
+                          Read in the library
+                        </button>
                       </p>
                     ) : null}
                     {user.isOwner ? (
@@ -857,6 +903,16 @@ export function MosshollowLibrary({
         <div style={{ marginTop: "1rem" }}>
           <LibraryAdminEditor onChanged={() => void refreshShelves()} />
         </div>
+      ) : null}
+
+      {reader ? (
+        <LibraryBookReader
+          title={reader.title}
+          author={reader.author}
+          fileUrl={reader.fileUrl}
+          fileName={reader.fileName}
+          onClose={() => setReader(null)}
+        />
       ) : null}
     </div>
   );
