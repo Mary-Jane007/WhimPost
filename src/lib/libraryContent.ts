@@ -62,6 +62,12 @@ export type ClubBook = {
   coverEmoji: string;
   quotes: string[];
   reflections: string[];
+  /** Optional uploaded cover image URL (`/api/uploads/...`). */
+  coverUrl?: string | null;
+  /** Optional readable file (PDF/EPUB) URL. */
+  fileUrl?: string | null;
+  fileName?: string | null;
+  uploaded?: boolean;
 };
 
 export const CLUB_BOOKS: ClubBook[] = [
@@ -261,6 +267,12 @@ export type ReadingListBook = {
   mood: string;
   themes: string[];
   rating: number;
+  coverEmoji?: string;
+  coverUrl?: string | null;
+  fileUrl?: string | null;
+  fileName?: string | null;
+  description?: string;
+  uploaded?: boolean;
 };
 
 export const READING_LIST: ReadingListBook[] = [

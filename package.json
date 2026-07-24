@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start -p 3333",
     "lint": "eslint src --max-warnings 0",
-    "persist-tv": "node scripts/persist-tv.mjs"
+    "persist-tv": "node scripts/persist-tv.mjs",
+    "seed-library-books": "node scripts/seed-library-books.mjs",
+    "persist-library-books": "node scripts/persist-library-books.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

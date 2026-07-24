@@ -6,4 +6,6 @@ data/uploads/**/*.mkv filter=lfs diff=lfs merge=lfs -text
 data/uploads/**/*.avi filter=lfs diff=lfs merge=lfs -text
 data/uploads/**/*.mpeg filter=lfs diff=lfs merge=lfs -text
 data/uploads/**/*.mpg filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.pdf filter=lfs diff=lfs merge=lfs -text
+data/uploads/**/*.epub filter=lfs diff=lfs merge=lfs -text
 data/uploads/*.mp4 filter=lfs diff=lfs merge=lfs -text

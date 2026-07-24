@@ -2,6 +2,11 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getLibraryProgress } from "@/lib/library";
+import {
+  featuredClubBookMerged,
+  listClubBooks,
+  listReadingListBooks,
+} from "@/lib/libraryBooks";
 import { MosshollowLibrary } from "@/components/MosshollowLibrary";
 import { PageCrest } from "@/components/PageCrest";
 
@@ -48,6 +53,9 @@ export default async function LibraryPage() {
   }
 
   const progress = getLibraryProgress(user.id);
+  const clubBooks = listClubBooks();
+  const readingList = listReadingListBooks();
+  const featuredBook = featuredClubBookMerged() || clubBooks[0];
 
   return (
     <main className="app-main forest-panel mh-library-page village-mosshollow">
@@ -59,7 +67,17 @@ export default async function LibraryPage() {
           "candle-jar",
         ]}
       />
-      <MosshollowLibrary user={user} initialProgress={progress} />
+      {featuredBook ? (
+        <MosshollowLibrary
+          user={user}
+          initialProgress={progress}
+          clubBooks={clubBooks}
+          readingList={readingList}
+          featuredBook={featuredBook}
+        />
+      ) : (
+        <p className="muted">The shelves are empty for now.</p>
+      )}
     </main>
   );
 }

@@ -23,6 +23,8 @@ const MIME: Record<string, string> = {
   mpg: "video/mpeg",
   mpeg: "video/mpeg",
   mkv: "video/x-matroska",
+  pdf: "application/pdf",
+  epub: "application/epub+zip",
 };
 
 const RANGE_CHUNK = 5 * 1024 * 1024; // 5MB preferred range slices for smooth movie start
@@ -75,7 +77,7 @@ export async function GET(
   if (!user) return jsonError("Not signed in", 401);
 
   const { filename } = await context.params;
-  if (!/^[a-f0-9-]+\.(jpg|jpeg|png|webp|gif|mp4|webm|mov|m4v|avi|mpg|mpeg|mkv)$/i.test(filename)) {
+  if (!/^[a-f0-9-]+\.(jpg|jpeg|png|webp|gif|mp4|webm|mov|m4v|avi|mpg|mpeg|mkv|pdf|epub)$/i.test(filename)) {
     return jsonError("Invalid file", 400);
   }
 
@@ -90,11 +92,24 @@ export async function GET(
     "mpeg",
     "mkv",
   ].includes(ext);
+  const isBook = ext === "pdf" || ext === "epub";
 
   if (isVideo) {
     const video = getVideoByFilename(filename);
     if (!video || !canAccessVideo(user, video)) {
       return jsonError("Clip not found", 404);
+    }
+  } else if (isBook) {
+    const db = getDb();
+    const bookUrl = `/api/uploads/${filename}`;
+    const book = db
+      .prepare(
+        `SELECT id FROM library_books
+         WHERE file_url = ? AND published = 1`
+      )
+      .get(bookUrl);
+    if (!book && !user.isOwner) {
+      return jsonError("Book not found", 404);
     }
   } else {
     const imageUrl = `/api/uploads/${filename}`;
@@ -111,7 +126,10 @@ export async function GET(
 
   const filePath = path.join(UPLOAD_DIR, filename);
   if (!fs.existsSync(filePath)) {
-    return jsonError(isVideo ? "Clip not found" : "Image not found", 404);
+    return jsonError(
+      isVideo ? "Clip not found" : isBook ? "Book not found" : "Image not found",
+      404
+    );
   }
 
   const stat = fs.statSync(filePath);
@@ -123,6 +141,11 @@ export async function GET(
       headers: {
         "Content-Type": contentType,
         "Cache-Control": "private, max-age=86400",
+        ...(isBook
+          ? {
+              "Content-Disposition": `inline; filename="${filename}"`,
+            }
+          : {}),
       },
     });
   }

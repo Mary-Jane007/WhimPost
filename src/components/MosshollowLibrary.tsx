@@ -5,27 +5,36 @@ import type { UserPublic } from "@/lib/types";
 import type { LibraryProgress } from "@/lib/library";
 import {
   ARCHIVE_CLIPS,
-  CLUB_BOOKS,
   LIBRARY_COLLECTIONS,
   LIBRARY_TABS,
   LIBRARY_XP,
   READING_CATEGORIES,
-  READING_LIST,
-  featuredClubBook,
   featuredCuriosity,
   featuredMystery,
   featuredThought,
   weeklyChallenges,
+  type ClubBook,
   type LibraryTabId,
   type ReadingCategory,
+  type ReadingListBook,
 } from "@/lib/libraryContent";
+import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 
 type Props = {
   user: UserPublic;
   initialProgress: LibraryProgress;
+  clubBooks: ClubBook[];
+  readingList: ReadingListBook[];
+  featuredBook: ClubBook;
 };
 
-export function MosshollowLibrary({ user, initialProgress }: Props) {
+export function MosshollowLibrary({
+  user,
+  initialProgress,
+  clubBooks,
+  readingList,
+  featuredBook,
+}: Props) {
   const [tab, setTab] = useState<LibraryTabId>("bookclub");
   const [progress, setProgress] = useState(initialProgress);
   const [busy, setBusy] = useState(false);
@@ -41,13 +50,26 @@ export function MosshollowLibrary({ user, initialProgress }: Props) {
   const [journalQuote, setJournalQuote] = useState("");
   const [quizChoice, setQuizChoice] = useState<number | null>(null);
   const [secretVisible, setSecretVisible] = useState(false);
+  const [shelfClub, setShelfClub] = useState(clubBooks);
+  const [shelfList, setShelfList] = useState(readingList);
+  const [book, setBook] = useState(featuredBook);
 
-  const book = featuredClubBook();
   const curiosity = featuredCuriosity();
   const mystery = featuredMystery();
   const thought = featuredThought();
   const challenges = weeklyChallenges();
 
+  async function refreshShelves() {
+    const res = await fetch("/api/library/books");
+    if (!res.ok) return;
+    const data = await res.json();
+    if (Array.isArray(data.clubBooks) && data.clubBooks.length) {
+      setShelfClub(data.clubBooks);
+      const monthIdx = new Date().getUTCMonth() % data.clubBooks.length;
+      setBook(data.clubBooks[monthIdx]);
+    }
+    if (Array.isArray(data.readingList)) setShelfList(data.readingList);
+  }
   const bookPct = progress.bookProgress[book.id] || 0;
   const bookFinished = Boolean(progress.finishedBooks[book.id]);
 
@@ -86,9 +108,9 @@ export function MosshollowLibrary({ user, initialProgress }: Props) {
   }
 
   const filteredList = useMemo(() => {
-    if (listCategory === "All") return READING_LIST;
-    return READING_LIST.filter((b) => b.category === listCategory);
-  }, [listCategory]);
+    if (listCategory === "All") return shelfList;
+    return shelfList.filter((b) => b.category === listCategory);
+  }, [listCategory, shelfList]);
 
   return (
     <div className="mh-library">
@@ -198,7 +220,12 @@ export function MosshollowLibrary({ user, initialProgress }: Props) {
             </p>
             <article className="mh-book-feature">
               <div className="mh-cover" aria-hidden>
-                <span>{book.coverEmoji}</span>
+                {book.coverUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={book.coverUrl} alt="" className="mh-cover-img" />
+                ) : (
+                  <span>{book.coverEmoji}</span>
+                )}
                 <strong>{book.title}</strong>
               </div>
               <div>
@@ -208,6 +235,19 @@ export function MosshollowLibrary({ user, initialProgress }: Props) {
                 <p className="mh-meta">
                   Estimated reading time · about {book.minutes} minutes
                 </p>
+                {book.fileUrl ? (
+                  <p className="mh-file-link">
+                    <a
+                      className="btn-secondary"
+                      href={book.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open book file
+                      {book.fileName ? ` · ${book.fileName}` : ""}
+                    </a>
+                  </p>
+                ) : null}
                 <label className="mh-progress-label">
                   Reading progress · {bookPct}%
                   <input
@@ -296,9 +336,10 @@ export function MosshollowLibrary({ user, initialProgress }: Props) {
             <div className="mh-club-shelf">
               <h3>This season&apos;s shelf</h3>
               <ul>
-                {CLUB_BOOKS.map((b) => (
+                {shelfClub.map((b) => (
                   <li key={b.id} className={b.id === book.id ? "active" : ""}>
                     <span aria-hidden>{b.coverEmoji}</span> {b.title}
+                    {b.fileUrl ? " · 📄" : ""}
                     {progress.finishedBooks[b.id] ? " · ✓" : ""}
                   </li>
                 ))}
@@ -345,6 +386,13 @@ export function MosshollowLibrary({ user, initialProgress }: Props) {
                     </p>
                     <p className="mh-themes">{b.themes.join(" · ")}</p>
                     <p className="mh-rating">★ {b.rating.toFixed(1)} community</p>
+                    {b.fileUrl ? (
+                      <p className="mh-file-link">
+                        <a href={b.fileUrl} target="_blank" rel="noreferrer">
+                          Open book file
+                        </a>
+                      </p>
+                    ) : null}
                     <div className="mh-actions">
                       <button
                         type="button"
@@ -775,6 +823,12 @@ export function MosshollowLibrary({ user, initialProgress }: Props) {
           </section>
         )}
       </div>
+
+      {user.isOwner ? (
+        <div style={{ marginTop: "1rem" }}>
+          <LibraryAdminEditor onChanged={() => void refreshShelves()} />
+        </div>
+      ) : null}
     </div>
   );
 }

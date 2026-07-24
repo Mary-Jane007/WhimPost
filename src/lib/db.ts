@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
+import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { importPersistentTv } from "@/lib/persistentTv";
 import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
 
@@ -360,6 +361,33 @@ function migrate(db: Database.Database) {
       kindness INTEGER NOT NULL DEFAULT 0,
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS library_books (
+      id TEXT PRIMARY KEY,
+      shelf TEXT NOT NULL CHECK(shelf IN ('club', 'readinglist')),
+      title TEXT NOT NULL,
+      author TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      minutes INTEGER NOT NULL DEFAULT 120,
+      cover_emoji TEXT NOT NULL DEFAULT '📖',
+      cover_url TEXT,
+      file_url TEXT,
+      file_name TEXT,
+      file_mime TEXT,
+      quotes_json TEXT NOT NULL DEFAULT '[]',
+      reflections_json TEXT NOT NULL DEFAULT '[]',
+      category TEXT,
+      difficulty TEXT,
+      length TEXT,
+      mood TEXT NOT NULL DEFAULT '',
+      themes_json TEXT NOT NULL DEFAULT '[]',
+      rating REAL NOT NULL DEFAULT 4.5,
+      published INTEGER NOT NULL DEFAULT 1,
+      created_by TEXT REFERENCES users(id) ON DELETE SET NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_library_books_shelf
+      ON library_books(shelf, published, created_at);
   `);
 
   // Column backfills must run after CREATE TABLE so fresh DBs don't fail.
@@ -507,6 +535,12 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-tv-media] import failed:", err);
   }
+  // Restore owner-uploaded library books when Git LFS bytes are present.
+  try {
+    importPersistentLibraryBooks(db);
+  } catch (err) {
+    console.error("[persistent-library-books] import failed:", err);
+  }
   return db;
 }
 
@@ -525,6 +559,11 @@ export function getDb() {
       importPersistentTvMedia(globalForDb.whimpostDb);
     } catch (err) {
       console.error("[persistent-tv-media] import failed:", err);
+    }
+    try {
+      importPersistentLibraryBooks(globalForDb.whimpostDb);
+    } catch (err) {
+      console.error("[persistent-library-books] import failed:", err);
     }
   }
   return globalForDb.whimpostDb;
