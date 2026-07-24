@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import type { LibraryBookRecord, LibraryShelf } from "@/lib/libraryBooks";
-import type { ReadingCategory, ReadingListBook } from "@/lib/libraryContent";
+import type {
+  ClubBook,
+  ReadingCategory,
+  ReadingListBook,
+} from "@/lib/libraryContent";
+import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 
 const CATEGORIES: ReadingCategory[] = [
   "Fantasy",
@@ -23,6 +28,16 @@ const DIFFICULTIES: ReadingListBook["difficulty"][] = [
 ];
 const LENGTHS: ReadingListBook["length"][] = ["Short", "Medium", "Long"];
 
+type ShelfRow = {
+  id: string;
+  shelf: LibraryShelf;
+  title: string;
+  author: string;
+  coverEmoji?: string;
+  fileUrl?: string | null;
+  fileName?: string | null;
+};
+
 export function LibraryAdminEditor({
   onChanged,
 }: {
@@ -30,6 +45,7 @@ export function LibraryAdminEditor({
 }) {
   const [open, setOpen] = useState(false);
   const [books, setBooks] = useState<LibraryBookRecord[]>([]);
+  const [shelfRows, setShelfRows] = useState<ShelfRow[]>([]);
   const [shelf, setShelf] = useState<LibraryShelf>("club");
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -50,6 +66,7 @@ export function LibraryAdminEditor({
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [filter, setFilter] = useState<"all" | "missing" | "ready">("all");
 
   async function load() {
     setLoading(true);
@@ -62,6 +79,28 @@ export function LibraryAdminEditor({
       return;
     }
     setBooks(data.books || []);
+    const club = (data.clubBooks || []) as ClubBook[];
+    const reading = (data.readingList || []) as ReadingListBook[];
+    setShelfRows([
+      ...club.map((b) => ({
+        id: b.id,
+        shelf: "club" as const,
+        title: b.title,
+        author: b.author,
+        coverEmoji: b.coverEmoji,
+        fileUrl: b.fileUrl,
+        fileName: b.fileName,
+      })),
+      ...reading.map((b) => ({
+        id: b.id,
+        shelf: "readinglist" as const,
+        title: b.title,
+        author: b.author,
+        coverEmoji: b.coverEmoji,
+        fileUrl: b.fileUrl,
+        fileName: b.fileName,
+      })),
+    ]);
   }
 
   function toggleOpen() {
@@ -143,6 +182,12 @@ export function LibraryAdminEditor({
     onChanged?.();
   }
 
+  const filteredShelf = shelfRows.filter((b) => {
+    if (filter === "missing") return !b.fileUrl;
+    if (filter === "ready") return Boolean(b.fileUrl);
+    return true;
+  });
+
   return (
     <section className="welcome-editor forest-panel">
       <button
@@ -155,9 +200,77 @@ export function LibraryAdminEditor({
       {open ? (
         <div className="welcome-editor-body">
           <p className="lede">
-            Add PDF or EPUB files to the Mosshollow Grand Library. Villagers can
-            open them from the Book Club or Owl&apos;s Reading List.
+            Attach PDF or EPUB files to books already on the shelf, or add a
+            brand-new title. Villagers can open files from the Book Club and
+            Owl&apos;s Reading List.
           </p>
+
+          <div className="mh-admin-list">
+            <h3>Attach EPUB to shelf books</h3>
+            <div className="mh-chips mh-admin-filters">
+              <button
+                type="button"
+                className={filter === "all" ? "active" : ""}
+                onClick={() => setFilter("all")}
+              >
+                All
+              </button>
+              <button
+                type="button"
+                className={filter === "missing" ? "active" : ""}
+                onClick={() => setFilter("missing")}
+              >
+                Need a file
+              </button>
+              <button
+                type="button"
+                className={filter === "ready" ? "active" : ""}
+                onClick={() => setFilter("ready")}
+              >
+                Have a file
+              </button>
+            </div>
+            {loading ? <p className="muted">Loading shelves…</p> : null}
+            {!loading && filteredShelf.length === 0 ? (
+              <p className="muted">No books match this filter.</p>
+            ) : null}
+            <ul>
+              {filteredShelf.map((b) => (
+                <li key={`${b.shelf}-${b.id}`}>
+                  <div>
+                    <strong>
+                      {b.coverEmoji || "📖"} {b.title}
+                    </strong>
+                    <span className="muted">
+                      {" "}
+                      · {b.author} ·{" "}
+                      {b.shelf === "club" ? "Book Club" : "Reading List"}
+                    </span>
+                    {b.fileUrl ? (
+                      <div>
+                        <a href={b.fileUrl} target="_blank" rel="noreferrer">
+                          Open {b.fileName || "file"}
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="muted">No file attached yet</div>
+                    )}
+                  </div>
+                  <ShelfBookFileAttach
+                    bookId={b.id}
+                    bookTitle={b.title}
+                    hasFile={Boolean(b.fileUrl)}
+                    onAttached={() => {
+                      void load();
+                      onChanged?.();
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <h3 className="mh-admin-subhead">Add a new book</h3>
           <form className="auth-form" onSubmit={onSave}>
             <label>
               Shelf
@@ -327,10 +440,9 @@ export function LibraryAdminEditor({
           </form>
 
           <div className="mh-admin-list">
-            <h3>Uploaded books</h3>
-            {loading ? <p className="muted">Loading shelves…</p> : null}
+            <h3>Uploaded / attached records</h3>
             {!loading && books.length === 0 ? (
-              <p className="muted">No owner uploads yet.</p>
+              <p className="muted">No owner file records yet.</p>
             ) : null}
             <ul>
               {books.map((b) => (
@@ -341,7 +453,8 @@ export function LibraryAdminEditor({
                     </strong>
                     <span className="muted">
                       {" "}
-                      · {b.author} · {b.shelf === "club" ? "Book Club" : "Reading List"}
+                      · {b.author} ·{" "}
+                      {b.shelf === "club" ? "Book Club" : "Reading List"}
                     </span>
                     {b.fileUrl ? (
                       <div>
@@ -358,7 +471,7 @@ export function LibraryAdminEditor({
                     className="btn-secondary"
                     onClick={() => void onDelete(b.id, b.title)}
                   >
-                    Remove
+                    Remove file
                   </button>
                 </li>
               ))}
