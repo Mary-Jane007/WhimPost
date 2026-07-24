@@ -33,6 +33,28 @@ type LivePlace = {
   label: string;
 };
 
+type EpubBookApi = {
+  destroy: () => void;
+  ready: Promise<unknown>;
+  locations: {
+    generate: (chars: number) => Promise<unknown>;
+    percentageFromCfi: (cfi: string) => number;
+    locationFromCfi: (cfi: string) => number;
+    length: () => number;
+  };
+  renderTo: (
+    el: HTMLElement,
+    opts: Record<string, unknown>
+  ) => {
+    display: (target?: string) => Promise<unknown>;
+    next: () => void;
+    prev: () => void;
+    resize: (width: number, height: number) => void;
+    themes: { default: (rules: Record<string, unknown>) => void };
+    on: (event: string, cb: (loc: unknown) => void) => void;
+  };
+};
+
 function kindFromUrl(url: string, fileName?: string | null): BookKind {
   const s = `${fileName || ""} ${url}`.toLowerCase();
   if (/\.pdf(\?|#|$)/.test(s) || s.includes("application/pdf")) return "pdf";
@@ -40,7 +62,10 @@ function kindFromUrl(url: string, fileName?: string | null): BookKind {
   return "unknown";
 }
 
-function placeFromLocation(location: unknown): LivePlace {
+function placeFromLocation(
+  location: unknown,
+  book: EpubBookApi | null
+): LivePlace {
   const loc = location as {
     start?: {
       cfi?: string;
@@ -48,28 +73,56 @@ function placeFromLocation(location: unknown): LivePlace {
       displayed?: { page?: number; total?: number };
     };
   };
-  const page = loc?.start?.displayed?.page ?? null;
-  const total = loc?.start?.displayed?.total ?? null;
-  const percentage = Number(loc?.start?.percentage);
-  let percent = Number.isFinite(percentage)
-    ? Math.round(Math.max(0, Math.min(1, percentage)) * 100)
-    : 0;
-  if ((!percent || percent < 1) && page && total && total > 0) {
-    percent = Math.round((page / total) * 100);
+  const cfi = loc?.start?.cfi || null;
+  let percent = 0;
+  let page: number | null = null;
+  let total: number | null = null;
+
+  // Whole-book progress from generated locations (accurate).
+  if (cfi && book) {
+    try {
+      const locLen = book.locations.length();
+      if (locLen > 0) {
+        const pct = book.locations.percentageFromCfi(cfi);
+        if (Number.isFinite(pct)) {
+          percent = Math.round(Math.max(0, Math.min(1, pct)) * 100);
+        }
+        const idx = book.locations.locationFromCfi(cfi);
+        if (typeof idx === "number" && idx >= 0) {
+          page = idx + 1;
+          total = locLen;
+        }
+      }
+    } catch {
+      // fall through
+    }
   }
+
+  // Fallback: section percentage / displayed pages (less accurate).
+  if (!percent) {
+    const percentage = Number(loc?.start?.percentage);
+    if (Number.isFinite(percentage)) {
+      percent = Math.round(Math.max(0, Math.min(1, percentage)) * 100);
+    }
+  }
+  if (!page || !total) {
+    const dPage = loc?.start?.displayed?.page ?? null;
+    const dTotal = loc?.start?.displayed?.total ?? null;
+    if (dPage && dTotal && dTotal > 1) {
+      page = dPage;
+      total = dTotal;
+      if (!percent) percent = Math.round((dPage / dTotal) * 100);
+    }
+  }
+
   const label =
-    page && total
-      ? `Page ${page} of ${total}`
+    total && page
+      ? `${percent}% · place ${page} of ${total}`
       : percent
         ? `${percent}% through`
         : "Beginning";
-  return {
-    cfi: loc?.start?.cfi || null,
-    percent,
-    page,
-    total,
-    label,
-  };
+
+  return { cfi, percent, page, total, label };
 }
 
 export function LibraryBookReader({
@@ -84,10 +137,12 @@ export function LibraryBookReader({
 }: Props) {
   const kind = kindFromUrl(fileUrl, fileName);
   const viewerRef = useRef<HTMLDivElement>(null);
+  const bookApiRef = useRef<EpubBookApi | null>(null);
   const navRef = useRef<{
     next: () => void;
     prev: () => void;
     display: (cfi: string) => void;
+    resize: () => void;
   } | null>(null);
   const placeRef = useRef<LivePlace>({
     cfi: initialPosition?.cfi || null,
@@ -126,7 +181,6 @@ export function LibraryBookReader({
         }),
       });
       if (!res.ok) return;
-      const data = await res.json().catch(() => ({}));
       const position: ReadingPosition = {
         cfi: place.cfi,
         percent: place.percent,
@@ -140,9 +194,8 @@ export function LibraryBookReader({
         percent: place.percent,
         position,
       });
-      setSaveHint("Bookmark pressed into the page");
-      window.setTimeout(() => setSaveHint(""), 1800);
-      void data;
+      setSaveHint("Place saved");
+      window.setTimeout(() => setSaveHint(""), 1200);
     };
 
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
@@ -152,7 +205,7 @@ export function LibraryBookReader({
     }
     saveTimer.current = window.setTimeout(() => {
       void run();
-    }, 700);
+    }, 900);
   }
 
   async function loadAnnotations() {
@@ -164,12 +217,15 @@ export function LibraryBookReader({
     setAnnotations(data.annotations || []);
   }
 
-  function toggleNotes() {
-    setNotesOpen((wasOpen) => {
-      const next = !wasOpen;
-      if (next) void loadAnnotations();
-      return next;
-    });
+  function openNotes() {
+    setNotesOpen(true);
+    void loadAnnotations();
+  }
+
+  function closeNotes() {
+    setNotesOpen(false);
+    // Keep the page area full — resize after overlay closes.
+    window.requestAnimationFrame(() => navRef.current?.resize());
   }
 
   useEffect(() => {
@@ -190,11 +246,16 @@ export function LibraryBookReader({
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         e.preventDefault();
+        if (notesOpen) {
+          closeNotes();
+          return;
+        }
         onClose();
         return;
       }
+      if (notesOpen) return;
       if (kind !== "epub") return;
-      if (e.key === "ArrowRight" || e.key === "PageDown") {
+      if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
         e.preventDefault();
         navRef.current?.next();
       } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
@@ -204,7 +265,7 @@ export function LibraryBookReader({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [kind, onClose]);
+  }, [kind, onClose, notesOpen]);
 
   useEffect(() => {
     if (kind !== "epub") return;
@@ -213,7 +274,8 @@ export function LibraryBookReader({
     const host: HTMLDivElement = mount;
 
     let cancelled = false;
-    let book: { destroy: () => void } | null = null;
+    let book: EpubBookApi | null = null;
+    let observer: ResizeObserver | null = null;
 
     async function openEpub() {
       setLoading(true);
@@ -224,19 +286,8 @@ export function LibraryBookReader({
           "default" in mod && typeof mod.default === "function"
             ? mod.default
             : (mod as unknown as (data: ArrayBuffer) => unknown)
-        ) as (data: ArrayBuffer) => {
-          destroy: () => void;
-          renderTo: (
-            el: HTMLElement,
-            opts: Record<string, unknown>
-          ) => {
-            display: (target?: string) => Promise<unknown>;
-            next: () => void;
-            prev: () => void;
-            themes: { default: (rules: Record<string, unknown>) => void };
-            on: (event: string, cb: (loc: unknown) => void) => void;
-          };
-        };
+        ) as (data: ArrayBuffer) => EpubBookApi;
+
         const res = await fetch(fileUrl, { credentials: "include" });
         if (!res.ok) {
           throw new Error(
@@ -249,9 +300,36 @@ export function LibraryBookReader({
         if (cancelled) return;
 
         book = ePub(buffer);
+        bookApiRef.current = book;
+        await book.ready;
+        if (cancelled) return;
+
+        // Build whole-book location index for accurate % progress.
+        try {
+          await book.locations.generate(1200);
+        } catch {
+          // Some EPUBs still work without locations; fall back later.
+        }
+        if (cancelled) return;
+
+        const measure = () => {
+          const rect = host.getBoundingClientRect();
+          return {
+            width: Math.max(280, Math.floor(rect.width)),
+            height: Math.max(320, Math.floor(rect.height)),
+          };
+        };
+
+        // Wait a frame so the flex layout has real pixel size.
+        await new Promise<void>((resolve) =>
+          window.requestAnimationFrame(() => resolve())
+        );
+        if (cancelled) return;
+
+        let { width, height } = measure();
         const rendition = book.renderTo(host, {
-          width: "100%",
-          height: "100%",
+          width,
+          height,
           flow: "paginated",
           spread: "none",
           allowScriptedContent: true,
@@ -262,12 +340,32 @@ export function LibraryBookReader({
             color: "#2c2418 !important",
             background: "#f6edd9 !important",
             "font-family": "Georgia, 'Times New Roman', serif !important",
-            "line-height": "1.65 !important",
-            padding: "0.5rem !important",
+            "line-height": "1.7 !important",
+            "font-size": "1.05em !important",
+            padding: "1.1rem 1.25rem !important",
+            margin: "0 !important",
+          },
+          p: {
+            "margin-top": "0.65em !important",
+            "margin-bottom": "0.65em !important",
           },
           a: { color: "#5c3a1e !important" },
-          img: { "max-width": "100% !important" },
+          img: { "max-width": "100% !important", height: "auto !important" },
         });
+
+        const doResize = () => {
+          const size = measure();
+          if (size.width > 0 && size.height > 0) {
+            rendition.resize(size.width, size.height);
+          }
+        };
+
+        navRef.current = {
+          next: () => void rendition.next(),
+          prev: () => void rendition.prev(),
+          display: (cfi: string) => void rendition.display(cfi),
+          resize: doResize,
+        };
 
         const resumeCfi = initialPosition?.cfi || undefined;
         await rendition.display(resumeCfi);
@@ -276,14 +374,16 @@ export function LibraryBookReader({
           return;
         }
 
-        navRef.current = {
-          next: () => void rendition.next(),
-          prev: () => void rendition.prev(),
-          display: (cfi: string) => void rendition.display(cfi),
-        };
+        // Ensure full page after first paint.
+        doResize();
+        window.setTimeout(doResize, 80);
+        window.setTimeout(doResize, 280);
+
+        observer = new ResizeObserver(() => doResize());
+        observer.observe(host);
 
         rendition.on("relocated", (location: unknown) => {
-          const place = placeFromLocation(location);
+          const place = placeFromLocation(location, bookApiRef.current);
           placeRef.current = place;
           setLocationLabel(place.label);
           void persistPlace(place);
@@ -304,6 +404,12 @@ export function LibraryBookReader({
     return () => {
       cancelled = true;
       navRef.current = null;
+      bookApiRef.current = null;
+      try {
+        observer?.disconnect();
+      } catch {
+        // ignore
+      }
       try {
         book?.destroy();
       } catch {
@@ -339,7 +445,6 @@ export function LibraryBookReader({
     }
     setAnnotations(data.annotations || []);
     setNoteBody("");
-    setNotesOpen(true);
   }
 
   async function onDeleteNote(id: string) {
@@ -366,7 +471,7 @@ export function LibraryBookReader({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className={`mh-reader${notesOpen ? " notes-open" : ""}`}>
+      <div className="mh-reader">
         <header className="mh-reader-header">
           <div>
             <p className="mh-reader-kicker">Mosshollow reading room</p>
@@ -385,9 +490,9 @@ export function LibraryBookReader({
             <button
               type="button"
               className="btn-secondary"
-              onClick={toggleNotes}
+              onClick={openNotes}
             >
-              {notesOpen ? "Hide margin notes" : "Margin notes"}
+              Annotations
             </button>
             <a
               className="btn-secondary"
@@ -414,7 +519,7 @@ export function LibraryBookReader({
               ← Previous
             </button>
             <span className="muted">
-              Arrow keys turn pages · last page is always kept
+              Arrow keys or space turn the page
             </span>
             <button
               type="button"
@@ -453,105 +558,138 @@ export function LibraryBookReader({
                 .
               </p>
             ) : null}
-          </div>
 
-          {notesOpen ? (
-            <aside className="mh-margin-notes" aria-label="Margin notes">
-              <div className="mh-margin-header">
-                <p className="mh-reader-kicker">Pressed leaf notes</p>
-                <h3>Whispers in the margin</h3>
-                <p className="muted">
-                  Tuck a thought beside this page — moss ink, rosehip, or candle
-                  gold.
-                </p>
-              </div>
-
-              <form className="mh-margin-compose" onSubmit={onSaveNote}>
-                <label>
-                  Your note
-                  <textarea
-                    value={noteBody}
-                    onChange={(e) => setNoteBody(e.target.value)}
-                    rows={3}
-                    maxLength={1200}
-                    placeholder="A soft observation, a favorite line, a question for later…"
-                    required
-                  />
-                </label>
-                <div className="mh-ink-pots" role="radiogroup" aria-label="Ink">
-                  {ANNOTATION_INKS.map((ink) => (
-                    <button
-                      key={ink.id}
-                      type="button"
-                      className={`mh-ink-pot${noteInk === ink.id ? " active" : ""}`}
-                      style={{ ["--ink" as string]: ink.swatch }}
-                      aria-pressed={noteInk === ink.id}
-                      title={ink.label}
-                      onClick={() => setNoteInk(ink.id)}
-                    >
-                      <span className="mh-ink-drop" />
-                      <span className="mh-ink-name">{ink.label}</span>
-                    </button>
-                  ))}
-                </div>
-                {noteError ? <p className="form-error">{noteError}</p> : null}
+            {/* Annotations open only on demand — overlay, never shrinks the page. */}
+            {notesOpen ? (
+              <div
+                className="mh-margin-overlay"
+                role="dialog"
+                aria-label="Annotations"
+              >
                 <button
-                  type="submit"
-                  className="btn-primary"
-                  disabled={noteBusy || !noteBody.trim()}
-                >
-                  {noteBusy ? "Tucking away…" : "Press into the margin"}
-                </button>
-              </form>
-
-              <ul className="mh-margin-list">
-                {annotations.length === 0 ? (
-                  <li className="mh-margin-empty">
-                    No notes yet — the margins are blank as fresh parchment.
-                  </li>
-                ) : null}
-                {annotations.map((note) => (
-                  <li
-                    key={note.id}
-                    className={`mh-margin-card ink-${note.ink}`}
-                  >
-                    <div className="mh-margin-card-top">
-                      <span className="mh-margin-seal" aria-hidden>
-                        ✦
-                      </span>
-                      <span className="mh-margin-place">
-                        {note.pageLabel || `${Math.round(note.percent)}%`}
-                      </span>
-                    </div>
-                    {note.selectedText ? (
-                      <p className="mh-margin-quote">
-                        “{note.selectedText}”
-                      </p>
-                    ) : null}
-                    <p className="mh-margin-body">{note.body}</p>
-                    <div className="mh-margin-card-actions">
-                      {note.cfi && kind === "epub" ? (
-                        <button
-                          type="button"
-                          className="btn-secondary mh-attach-btn"
-                          onClick={() => navRef.current?.display(note.cfi!)}
-                        >
-                          Flip to page
-                        </button>
-                      ) : null}
+                  type="button"
+                  className="mh-margin-scrim"
+                  aria-label="Close annotations"
+                  onClick={closeNotes}
+                />
+                <aside className="mh-margin-notes">
+                  <div className="mh-margin-header">
+                    <div className="mh-margin-header-row">
+                      <div>
+                        <p className="mh-reader-kicker">Pressed leaf notes</p>
+                        <h3>Whispers in the margin</h3>
+                      </div>
                       <button
                         type="button"
                         className="btn-secondary mh-attach-btn"
-                        onClick={() => void onDeleteNote(note.id)}
+                        onClick={closeNotes}
                       >
-                        Release note
+                        Close
                       </button>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </aside>
-          ) : null}
+                    <p className="muted">
+                      Notes stay tucked away until you open Annotations — the
+                      page stays full while you read.
+                    </p>
+                  </div>
+
+                  <form className="mh-margin-compose" onSubmit={onSaveNote}>
+                    <label>
+                      Your note
+                      <textarea
+                        value={noteBody}
+                        onChange={(e) => setNoteBody(e.target.value)}
+                        rows={3}
+                        maxLength={1200}
+                        placeholder="A soft observation, a favorite line, a question for later…"
+                        required
+                      />
+                    </label>
+                    <div
+                      className="mh-ink-pots"
+                      role="radiogroup"
+                      aria-label="Ink"
+                    >
+                      {ANNOTATION_INKS.map((ink) => (
+                        <button
+                          key={ink.id}
+                          type="button"
+                          className={`mh-ink-pot${noteInk === ink.id ? " active" : ""}`}
+                          style={{ ["--ink" as string]: ink.swatch }}
+                          aria-pressed={noteInk === ink.id}
+                          title={ink.label}
+                          onClick={() => setNoteInk(ink.id)}
+                        >
+                          <span className="mh-ink-drop" />
+                          <span className="mh-ink-name">{ink.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {noteError ? (
+                      <p className="form-error">{noteError}</p>
+                    ) : null}
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      disabled={noteBusy || !noteBody.trim()}
+                    >
+                      {noteBusy ? "Tucking away…" : "Press into the margin"}
+                    </button>
+                  </form>
+
+                  <ul className="mh-margin-list">
+                    {annotations.length === 0 ? (
+                      <li className="mh-margin-empty">
+                        No notes yet — the margins are blank as fresh parchment.
+                      </li>
+                    ) : null}
+                    {annotations.map((note) => (
+                      <li
+                        key={note.id}
+                        className={`mh-margin-card ink-${note.ink}`}
+                      >
+                        <div className="mh-margin-card-top">
+                          <span className="mh-margin-seal" aria-hidden>
+                            ✦
+                          </span>
+                          <span className="mh-margin-place">
+                            {note.pageLabel || `${Math.round(note.percent)}%`}
+                          </span>
+                        </div>
+                        {note.selectedText ? (
+                          <p className="mh-margin-quote">
+                            “{note.selectedText}”
+                          </p>
+                        ) : null}
+                        <p className="mh-margin-body">{note.body}</p>
+                        <div className="mh-margin-card-actions">
+                          {note.cfi && kind === "epub" ? (
+                            <button
+                              type="button"
+                              className="btn-secondary mh-attach-btn"
+                              onClick={() => {
+                                navRef.current?.display(note.cfi!);
+                                closeNotes();
+                              }}
+                            >
+                              Flip to page
+                            </button>
+                          ) : null}
+                          <button
+                            type="button"
+                            className="btn-secondary mh-attach-btn"
+                            onClick={() => void onDeleteNote(note.id)}
+                          >
+                            Release note
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </aside>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
