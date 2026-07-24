@@ -3,9 +3,9 @@
  * Refresh git-tracked TV catalogs from the local SQLite DB.
  * Run after uploading clips, then commit data/uploads + catalogs.
  */
-const fs = require("fs");
-const path = require("path");
-const Database = require("better-sqlite3");
+import fs from "fs";
+import path from "path";
+import Database from "better-sqlite3";
 
 const root = process.cwd();
 const dbPath = path.join(root, "data", "whimpost.db");
