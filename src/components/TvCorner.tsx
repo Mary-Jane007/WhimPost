@@ -218,8 +218,13 @@ export function TvCorner({
     message: string;
   } | null>(null);
   const [powerOn, setPowerOn] = useState(true);
-  /** Village sound — start muted so autoplay works, then unmute when allowed. */
+  /**
+   * Start muted so the picture always autoplays, then unmute on a real tap
+   * (browsers block unmuted autoplay). Ref keeps poll/canplay handlers from
+   * remuting after the user turns sound on.
+   */
   const [villageMuted, setVillageMuted] = useState(true);
+  const villageMutedRef = useRef(true);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   // State twin of the video node so sync effects re-run when the element mounts
@@ -234,8 +239,6 @@ export function TvCorner({
   const pendingVillageSeekSec = useRef<number | null>(null);
   /** One successful airtime lock per airing — stops canplay/poll from replaying scenes. */
   const villageLockedAiringRef = useRef("");
-  /** Try lifting the autoplay mute once; never fight the user's Mute knob after that. */
-  const villageAutoUnmuteTriedRef = useRef(false);
   const lastProgressPush = useRef(0);
   const localControlRef = useRef(false);
   const uploadCancelRef = useRef(false);
@@ -250,28 +253,56 @@ export function TvCorner({
     return airingKey(room.currentVideoId, room.airStartsAt);
   }
 
+  function applyVillageMute(el: HTMLVideoElement, muted: boolean) {
+    villageMutedRef.current = muted;
+    setVillageMuted(muted);
+    el.muted = muted;
+    if (!muted) {
+      try {
+        el.volume = 1;
+      } catch {
+        // ignore
+      }
+    }
+  }
+
   function tryPlayVillage(el: HTMLVideoElement) {
     if (!powerOn || !room.isPlaying) return;
     if (!isVillageBroadcast(room)) return;
-    el.muted = villageMuted;
+    // Always honor the latest preference from the ref (avoids stale closures
+    // from poll/canplay handlers remuting after the user turns sound on).
+    el.muted = villageMutedRef.current;
+    if (!el.muted) {
+      try {
+        el.volume = 1;
+      } catch {
+        // ignore
+      }
+    }
     void el.play().catch(() => {
-      // Unmuted play blocked — fall back to muted so the picture still runs.
-      if (!el.muted) {
-        el.muted = true;
-        setVillageMuted(true);
+      // Unmuted play blocked — keep the picture going muted and prompt to tap.
+      if (!villageMutedRef.current) {
+        applyVillageMute(el, true);
         void el.play().catch(() => undefined);
       }
     });
   }
 
   function setVillageSound(on: boolean) {
-    setVillageMuted(!on);
-    villageAutoUnmuteTriedRef.current = true;
     const el = videoRef.current;
-    if (!el) return;
-    el.muted = !on;
-    if (on && room.isPlaying && powerOn) {
-      void el.play().catch(() => undefined);
+    if (!el) {
+      villageMutedRef.current = !on;
+      setVillageMuted(!on);
+      return;
+    }
+    applyVillageMute(el, !on);
+    if (room.isPlaying && powerOn) {
+      void el.play().catch(() => {
+        if (on) {
+          // Gesture unmute failed oddly — stay unmuted visually but ensure play.
+          void el.play().catch(() => undefined);
+        }
+      });
     }
   }
 
@@ -1622,11 +1653,10 @@ export function TvCorner({
                     controlsList="nodownload noplaybackrate noremoteplayback"
                     onPlay={() => {
                       if (isVillageBroadcast(room)) {
-                        // Keep React muted state aligned with the element.
+                        // Keep element mute flag aligned with user preference —
+                        // never copy a transient muted=true back into state.
                         const el = videoRef.current;
-                        if (el && villageMuted !== el.muted) {
-                          setVillageMuted(el.muted);
-                        }
+                        if (el) el.muted = villageMutedRef.current;
                         return;
                       }
                       if (applyingRemote.current) return;
@@ -1740,7 +1770,7 @@ export function TvCorner({
                 {/* Village tube glass: blocks hover chrome; tap to unmute. */}
                 {isVillageBroadcast(room) ? (
                   <div
-                    className="tv-screen-shield"
+                    className={`tv-screen-shield${villageMuted ? " tv-screen-shield-muted" : ""}`}
                     role={villageMuted ? "button" : undefined}
                     tabIndex={villageMuted ? 0 : undefined}
                     aria-label={villageMuted ? "Turn sound on" : undefined}
@@ -1754,7 +1784,13 @@ export function TvCorner({
                         setVillageSound(true);
                       }
                     }}
-                  />
+                  >
+                    {villageMuted && powerOn && room.currentVideo ? (
+                      <span className="tv-sound-prompt">
+                        Tap for sound
+                      </span>
+                    ) : null}
+                  </div>
                 ) : null}
                 <div className="tv-scanlines" aria-hidden />
                 <div className="tv-vignette" aria-hidden />

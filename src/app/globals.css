@@ -4581,18 +4581,40 @@ button.linkish:hover {
 }
 
 /* Invisible glass over the tube: swallows hover so nothing YouTube-like can pop up.
-   Also receives a tap to unmute the village broadcast (browsers require a gesture). */
+   Also receives a tap to unmute the village broadcast (browsers require a gesture).
+   Sit above scanlines/vignette so the tap target actually receives clicks. */
 .tv-screen-shield {
   position: absolute;
   inset: 0;
-  z-index: 4;
+  z-index: 8;
   pointer-events: auto;
   background: transparent;
   cursor: pointer;
+  display: grid;
+  place-items: center;
 }
 
 .tv-screen-shield:not([role="button"]) {
   cursor: default;
+}
+
+.tv-sound-prompt {
+  pointer-events: none;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #1a1410 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cream, #f3e6d0) 35%, transparent);
+  color: var(--cream, #f3e6d0);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  animation: tvSoundPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes tvSoundPulse {
+  0%, 100% { opacity: 0.82; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
 }
 
 .tv-scanlines {
