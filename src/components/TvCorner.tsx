@@ -697,8 +697,8 @@ export function TvCorner({
         kind: "success",
         message:
           data.video?.sourceKind === "youtube"
-            ? "YouTube link added to the channel"
-            : "Video link added to the channel",
+            ? "YouTube link saved to the durable shelf"
+            : "Video link saved to the durable shelf",
       });
     } catch (err) {
       notifyIssue(
@@ -773,8 +773,8 @@ export function TvCorner({
       if (uploaded > 0 && failures.length === 0) {
         const successMsg =
           uploaded === 1
-            ? "Upload complete — your video is on the channel"
-            : `${uploaded} videos uploaded to the channel`;
+            ? "Upload complete — saved so it won’t be lost on reset"
+            : `${uploaded} videos saved so they won’t be lost on reset`;
         reportUploadProgress(successMsg, 100);
         notifySuccess(successMsg);
         window.setTimeout(() => {
@@ -1772,8 +1772,9 @@ export function TvCorner({
               </button>
 
               <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
-                <strong>2.</strong> Add videos — upload a file, or paste a
-                Prefer uploading a file so the set never shows YouTube chrome.
+                <strong>2.</strong> Add videos — upload a file (preferred), or
+                paste a link. Uploads are saved to the durable shelf so they
+                survive server resets.
               </p>
               <label className="tv-upload">
                 <span>Channel</span>

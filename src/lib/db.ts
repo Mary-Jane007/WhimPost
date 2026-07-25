@@ -6,6 +6,7 @@ import { importPersistentAccounts } from "@/lib/persistentAccounts";
 import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { importPersistentTv } from "@/lib/persistentTv";
 import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
+import { ensureTvUploadBytes } from "@/lib/tvPersist";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -552,6 +553,12 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-accounts] import failed:", err);
   }
+  // Pull Git LFS upload bytes before restoring the TV shelf.
+  try {
+    ensureTvUploadBytes();
+  } catch (err) {
+    console.error("[persistent-tv] lfs pull failed:", err);
+  }
   // Restore TV Corner link catalog (YouTube / direct URLs).
   try {
     importPersistentTv(db);
@@ -583,6 +590,11 @@ export function getDb() {
     // Re-import catalog at most once per module evaluation (boot / HMR),
     // never on every request — that used to reset the TV airtime epoch.
     if (globalForDb.whimpostImportSession !== IMPORT_SESSION) {
+      try {
+        ensureTvUploadBytes();
+      } catch (err) {
+        console.error("[persistent-tv] lfs pull failed:", err);
+      }
       try {
         importPersistentTv(globalForDb.whimpostDb);
       } catch (err) {

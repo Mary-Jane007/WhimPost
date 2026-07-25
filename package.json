@@ -8,6 +8,7 @@
     "start": "next start -p 3333",
     "lint": "eslint src --max-warnings 0",
     "persist-tv": "node scripts/persist-tv.mjs",
+    "persist-tv:push": "node scripts/persist-tv.mjs --push",
     "seed-library-books": "node scripts/seed-library-books.mjs",
     "persist-library-books": "node scripts/persist-library-books.mjs"
   },

@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 /**
  * Refresh git-tracked TV catalogs from the local SQLite DB.
- * Run after uploading clips, then commit data/uploads + catalogs.
+ * Run after uploading clips. With --push, also commit + push to origin
+ * so the shelf survives fresh servers / resets.
  */
 import fs from "fs";
 import path from "path";
+import { execFileSync } from "child_process";
 import Database from "better-sqlite3";
 
 const root = process.cwd();
@@ -12,6 +14,7 @@ const dbPath = path.join(root, "data", "whimpost.db");
 const uploadDir = path.join(root, "data", "uploads");
 const linksPath = path.join(root, "data", "persistent-tv.json");
 const mediaPath = path.join(root, "data", "persistent-tv-media.json");
+const wantPush = process.argv.includes("--push");
 
 if (!fs.existsSync(dbPath)) {
   console.error("No data/whimpost.db yet — start the app once first.");
@@ -59,6 +62,7 @@ fs.writeFileSync(
 );
 
 const mediaClips = [];
+let missingFiles = 0;
 for (const ch of channels) {
   const rows = db
     .prepare(
@@ -72,7 +76,11 @@ for (const ch of channels) {
   for (const row of rows) {
     if (String(row.filename).startsWith("link-")) continue;
     const filePath = path.join(uploadDir, row.filename);
-    if (!fs.existsSync(filePath)) continue;
+    if (!fs.existsSync(filePath)) {
+      missingFiles += 1;
+      console.warn(`Missing upload bytes: ${row.filename} (${row.title})`);
+      continue;
+    }
     mediaClips.push({
       title: row.title,
       filename: row.filename,
@@ -102,6 +110,56 @@ console.log(
 console.log(
   `Wrote ${mediaClips.length} file clip(s) → data/persistent-tv-media.json`
 );
-console.log(
-  "Next: git add data/uploads data/persistent-tv.json data/persistent-tv-media.json && git commit && git push"
-);
+if (missingFiles > 0) {
+  console.warn(
+    `${missingFiles} file clip(s) skipped — bytes missing under data/uploads/`
+  );
+}
+
+if (!wantPush) {
+  console.log(
+    "Next: npm run persist-tv -- --push   (or git add data/uploads data/persistent-tv.json data/persistent-tv-media.json && git commit && git push)"
+  );
+  process.exit(0);
+}
+
+function git(args, timeout = 60_000) {
+  return execFileSync("git", args, {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+    timeout,
+  }).trim();
+}
+
+try {
+  git([
+    "add",
+    "--",
+    "data/persistent-tv.json",
+    "data/persistent-tv-media.json",
+    "data/uploads",
+  ]);
+  const staged = git(["diff", "--cached", "--name-only"]);
+  if (!staged) {
+    console.log("Nothing new to commit — shelf already durable on this branch.");
+    process.exit(0);
+  }
+  console.log("Staging:\n" + staged);
+  git([
+    "commit",
+    "-m",
+    "Persist TV Corner uploads so clips survive resets",
+  ]);
+  const branch = git(["rev-parse", "--abbrev-ref", "HEAD"]);
+  if (!branch || branch === "HEAD") {
+    console.warn("Committed locally but HEAD is detached — not pushing.");
+    process.exit(0);
+  }
+  console.log(`Pushing to origin (${branch})…`);
+  git(["push", "-u", "origin", "HEAD"], 20 * 60_000);
+  console.log("Durable TV shelf pushed.");
+} catch (err) {
+  console.error("git persist failed:", err instanceof Error ? err.message : err);
+  process.exit(1);
+}

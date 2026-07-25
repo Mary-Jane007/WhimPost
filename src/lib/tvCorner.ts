@@ -19,8 +19,7 @@ import {
   type TvSourceKind,
 } from "@/lib/tvLinks";
 import { probeRemoteDurationMs } from "@/lib/tvDuration";
-import { exportPersistentTv } from "@/lib/persistentTv";
-import { exportPersistentTvMedia } from "@/lib/persistentTvMedia";
+import { persistTvCatalogs } from "@/lib/tvPersist";
 
 export type TvRoomScope = "village" | "friends";
 export type { TvScheduleSlot };
@@ -415,6 +414,11 @@ export function deleteChannel(channelId: string, user: UserPublic) {
   ).run(channelId);
   db.prepare(`DELETE FROM tv_videos WHERE channel_id = ?`).run(channelId);
   db.prepare(`DELETE FROM tv_channels WHERE id = ?`).run(channelId);
+  try {
+    persistTvCatalogs(db);
+  } catch (err) {
+    console.error("[persistent-tv] catalog export failed:", err);
+  }
   return { ok: true as const, filenames };
 }
 
@@ -453,12 +457,10 @@ export function createVideo(input: {
   }
 
   ensureChannelSchedule(input.channelId);
-  if (!input.sourceUrl) {
-    try {
-      exportPersistentTvMedia(db);
-    } catch (err) {
-      console.error("[persistent-tv-media] export failed:", err);
-    }
+  try {
+    persistTvCatalogs(db);
+  } catch (err) {
+    console.error("[persistent-tv] catalog export failed:", err);
   }
   return getVideoById(id)!;
 }
@@ -507,10 +509,11 @@ export function createVideoFromLink(input: {
   // Persist duration explicitly for schedule (createVideo skipped file probe).
   setVideoDurationMs(video.id, durationMs);
   ensureChannelSchedule(input.channelId);
+  // createVideo already exported catalogs; refresh again with the final duration.
   try {
-    exportPersistentTv(getDb());
+    persistTvCatalogs(getDb());
   } catch (err) {
-    console.error("[persistent-tv] export failed:", err);
+    console.error("[persistent-tv] catalog export failed:", err);
   }
   return { ok: true, video: getVideoById(video.id)! };
 }
@@ -529,18 +532,10 @@ export function deleteVideo(videoId: string, user: UserPublic) {
     videoId
   );
   db.prepare(`DELETE FROM tv_videos WHERE id = ?`).run(videoId);
-  if (video.sourceKind !== "file") {
-    try {
-      exportPersistentTv(db);
-    } catch (err) {
-      console.error("[persistent-tv] export failed:", err);
-    }
-  } else {
-    try {
-      exportPersistentTvMedia(db);
-    } catch (err) {
-      console.error("[persistent-tv-media] export failed:", err);
-    }
+  try {
+    persistTvCatalogs(db);
+  } catch (err) {
+    console.error("[persistent-tv] catalog export failed:", err);
   }
   return {
     ok: true as const,
@@ -567,6 +562,11 @@ export function renameVideo(
   db.prepare(`UPDATE tv_videos SET title = ? WHERE id = ?`).run(title, videoId);
   const updated = getVideoById(videoId);
   if (!updated) return { ok: false as const, error: "Clip not found" };
+  try {
+    persistTvCatalogs(db);
+  } catch (err) {
+    console.error("[persistent-tv] catalog export failed:", err);
+  }
   return {
     ok: true as const,
     video: updated,

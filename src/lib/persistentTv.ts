@@ -66,8 +66,8 @@ function writeFile(channels: PersistentTvChannel[]) {
 }
 
 /**
- * Snapshot link-based TV clips (not uploaded files — those stay local-only).
- * Keeps the cozy shelf alive across fresh cloud environments.
+ * Snapshot link-based TV clips (YouTube / direct URLs).
+ * Uploaded file clips are snapshotted separately in persistent-tv-media.json.
  */
 export function exportPersistentTv(db: Database) {
   const channels = db

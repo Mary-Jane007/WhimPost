@@ -155,6 +155,10 @@ export function importPersistentTvMedia(db: Database) {
      WHERE id = ?`
   );
 
+  const touchedChannelIds = new Set<string>();
+  let restored = 0;
+  let skippedMissing = 0;
+
   const sync = db.transaction((clips: PersistentTvMediaClip[]) => {
     for (const clip of clips) {
       const filename = String(clip.filename || "").trim();
@@ -164,7 +168,10 @@ export function importPersistentTvMedia(db: Database) {
       if (filename.startsWith("link-") || filename.includes("..")) continue;
 
       const filePath = path.join(UPLOAD_DIR, filename);
-      if (!fs.existsSync(filePath)) continue;
+      if (!fs.existsSync(filePath)) {
+        skippedMissing += 1;
+        continue;
+      }
 
       const sizeBytes =
         clip.sizeBytes > 0 ? clip.sizeBytes : fs.statSync(filePath).size;
@@ -214,8 +221,78 @@ export function importPersistentTvMedia(db: Database) {
           channelId
         );
       }
+      touchedChannelIds.add(channelId);
+      restored += 1;
     }
   });
 
   sync(file.clips);
+
+  // Seed or repair airtime without resetting a healthy epoch.
+  for (const channelId of touchedChannelIds) {
+    const ids = (
+      db
+        .prepare(
+          `SELECT id FROM tv_videos WHERE channel_id = ? ORDER BY created_at ASC`
+        )
+        .all(channelId) as Array<{ id: string }>
+    ).map((v) => v.id);
+    if (ids.length === 0) continue;
+
+    const existing = db
+      .prepare(
+        `SELECT schedule_epoch_ms, schedule_order_json
+         FROM tv_channels WHERE id = ?`
+      )
+      .get(channelId) as
+      | { schedule_epoch_ms: number | null; schedule_order_json: string | null }
+      | undefined;
+
+    let order: string[] = [];
+    try {
+      const parsed = existing?.schedule_order_json
+        ? (JSON.parse(existing.schedule_order_json) as unknown)
+        : [];
+      if (Array.isArray(parsed)) {
+        order = parsed.filter((id): id is string => typeof id === "string");
+      }
+    } catch {
+      order = [];
+    }
+
+    const known = new Set(ids);
+    const previousOrder = order;
+    order = order.filter((id) => known.has(id));
+    const missing = ids.filter((id) => !order.includes(id));
+    if (missing.length > 0) order = [...order, ...missing];
+    if (order.length === 0) order = [...ids];
+
+    const epochMs = Number(existing?.schedule_epoch_ms);
+    const hasEpoch = Number.isFinite(epochMs) && epochMs > 0;
+    const orderChanged =
+      order.length !== previousOrder.length ||
+      order.some((id, index) => id !== previousOrder[index]);
+
+    if (!hasEpoch) {
+      db.prepare(
+        `UPDATE tv_channels
+         SET schedule_epoch_ms = ?, schedule_order_json = ?
+         WHERE id = ?`
+      ).run(Date.now(), JSON.stringify(order), channelId);
+    } else if (orderChanged) {
+      db.prepare(
+        `UPDATE tv_channels
+         SET schedule_order_json = ?
+         WHERE id = ?`
+      ).run(JSON.stringify(order), channelId);
+    }
+  }
+
+  if (skippedMissing > 0) {
+    console.warn(
+      `[persistent-tv-media] restored ${restored} clip(s); skipped ${skippedMissing} missing upload file(s)`
+    );
+  } else if (restored > 0) {
+    console.info(`[persistent-tv-media] restored ${restored} uploaded clip(s)`);
+  }
 }
