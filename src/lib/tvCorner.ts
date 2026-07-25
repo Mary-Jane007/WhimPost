@@ -86,6 +86,8 @@ export type TvRoomState = {
   messages: TvChatMessage[];
   /** Village lounge only — wall-clock channel guide. */
   schedule: TvScheduleSlot[];
+  /** Village lounge only — stable start of the clip currently on air. */
+  airStartsAt: string | null;
   broadcastMode: "schedule" | "interactive";
 };
 
@@ -506,7 +508,7 @@ export function createVideoFromLink(input: {
   setVideoDurationMs(video.id, durationMs);
   ensureChannelSchedule(input.channelId);
   try {
-    exportPersistentTv(db);
+    exportPersistentTv(getDb());
   } catch (err) {
     console.error("[persistent-tv] export failed:", err);
   }
@@ -712,6 +714,7 @@ function mapRoom(
     watchers: listWatchers(row.id),
     messages: includeMessages ? listChatMessages(row.id) : [],
     schedule: [],
+    airStartsAt: null,
     broadcastMode: row.scope === "village" ? "schedule" : "interactive",
   };
 
@@ -730,6 +733,7 @@ function mapRoom(
     base.isPlaying = false;
     base.positionMs = 0;
     base.schedule = [];
+    base.airStartsAt = null;
     return base;
   }
 
@@ -741,6 +745,7 @@ function mapRoom(
     base.isPlaying = false;
     base.positionMs = 0;
     base.schedule = [];
+    base.airStartsAt = null;
     return base;
   }
 
@@ -751,6 +756,7 @@ function mapRoom(
   base.positionMs = broadcast.positionMs;
   base.positionUpdatedAt = broadcast.positionUpdatedAt;
   base.schedule = broadcast.schedule;
+  base.airStartsAt = broadcast.airStartsAt;
   return base;
 }
 

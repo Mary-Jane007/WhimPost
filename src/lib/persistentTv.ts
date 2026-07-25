@@ -232,7 +232,8 @@ export function importPersistentTv(db: Database) {
 
   sync(file.channels);
 
-  // Refresh airtime epoch so restored shelves start a clean loop from now.
+  // Seed or repair the lineup without resetting a healthy airtime epoch.
+  // (Resetting Date.now() on every import pinned the playhead at 0 forever.)
   for (const channel of file.channels) {
     const title = String(channel.title || "").trim();
     if (!title) continue;
@@ -246,10 +247,57 @@ export function importPersistentTv(db: Database) {
         .all(row.id) as Array<{ id: string }>
     ).map((v) => v.id);
     if (ids.length === 0) continue;
-    db.prepare(
-      `UPDATE tv_channels
-       SET schedule_epoch_ms = ?, schedule_order_json = ?
-       WHERE id = ?`
-    ).run(Date.now(), JSON.stringify(ids), row.id);
+
+    const existing = db
+      .prepare(
+        `SELECT schedule_epoch_ms, schedule_order_json
+         FROM tv_channels WHERE id = ?`
+      )
+      .get(row.id) as
+      | { schedule_epoch_ms: number | null; schedule_order_json: string | null }
+      | undefined;
+
+    let order: string[] = [];
+    try {
+      const parsed = existing?.schedule_order_json
+        ? (JSON.parse(existing.schedule_order_json) as unknown)
+        : [];
+      if (Array.isArray(parsed)) {
+        order = parsed.filter((id): id is string => typeof id === "string");
+      }
+    } catch {
+      order = [];
+    }
+
+    const known = new Set(ids);
+    const previousOrder = order;
+    order = order.filter((id) => known.has(id));
+    const missing = ids.filter((id) => !order.includes(id));
+    if (missing.length > 0) {
+      order = [...order, ...missing];
+    }
+    if (order.length === 0) {
+      order = [...ids];
+    }
+
+    const epochMs = Number(existing?.schedule_epoch_ms);
+    const hasEpoch = Number.isFinite(epochMs) && epochMs > 0;
+    const orderChanged =
+      order.length !== previousOrder.length ||
+      order.some((id, index) => id !== previousOrder[index]);
+
+    if (!hasEpoch) {
+      db.prepare(
+        `UPDATE tv_channels
+         SET schedule_epoch_ms = ?, schedule_order_json = ?
+         WHERE id = ?`
+      ).run(Date.now(), JSON.stringify(order), row.id);
+    } else if (orderChanged) {
+      db.prepare(
+        `UPDATE tv_channels
+         SET schedule_order_json = ?
+         WHERE id = ?`
+      ).run(JSON.stringify(order), row.id);
+    }
   }
 }

@@ -25,9 +25,19 @@ type Props = {
 type ScopeTab = "village" | "friends";
 
 const POLL_MS = 2000;
-const DRIFT_MS = 2500;
+/** Seek threshold when the program (clip / play state / airing) changes. */
+const PROGRAM_SEEK_MS = 400;
+/** Only hard-resync village playheads after long drift (tab sleep / stall). */
+const VILLAGE_RESYNC_MS = 20_000;
 const LOCAL_SUPPRESS_MS = 4000;
 const PROGRESS_HEARTBEAT_MS = 5000;
+
+function airingKey(
+  videoId: string | null | undefined,
+  airStartsAt: string | null | undefined
+) {
+  return `${videoId || ""}|${airStartsAt || ""}`;
+}
 
 function estimatedPositionMs(room: {
   positionMs: number;
@@ -157,10 +167,11 @@ export function TvCorner({
   const lastAppliedSyncKey = useRef("");
   const lastProgressPush = useRef(0);
   const localControlRef = useRef(false);
-  // Lock YouTube embed URL per clip — live startSec in src reloads the iframe
-  // every poll and makes one scene play on repeat.
-  const youtubeEmbedRef = useRef<{ videoId: string; src: string }>({
-    videoId: "",
+  // Lock YouTube embed URL per airing slot — live startSec in src reloads the
+  // iframe every poll and makes one scene play on repeat. Key includes the
+  // schedule slot start so the same clip can remount when the loop wraps.
+  const youtubeEmbedRef = useRef<{ airKey: string; src: string }>({
+    airKey: "",
     src: "",
   });
   const uploadCancelRef = useRef(false);
@@ -1069,25 +1080,26 @@ export function TvCorner({
     };
   }, [room.id]);
 
-  // Apply remote playback only when the sync key changes (channel/video/play/seek).
+  // Apply remote playback when the program changes — never seek on every
+  // village poll tick (that rewound the same scene again and again).
   useEffect(() => {
     const el = videoRef.current;
     if (!el || !room.currentVideo) return;
     if (room.currentVideo.sourceKind === "youtube") return;
 
-    // Only treat channel/clip/play changes as a new program. Village polls
-    // refresh positionUpdatedAt every few seconds — including that here made
-    // the player seek the same scene over and over.
-    const syncKey = [
-      room.currentVideoId,
-      room.isPlaying ? "1" : "0",
-    ].join("|");
-
-    const now = Date.now();
     const villageBroadcast = isVillageBroadcast({
       scope: room.scope,
       broadcastMode: room.broadcastMode,
     });
+    // Village: include airStartsAt so a looping single-clip channel remounts
+    // when the airtime wraps. Friends: channel/clip/play only.
+    const syncKey = [
+      room.currentVideoId,
+      room.isPlaying ? "1" : "0",
+      villageBroadcast ? room.airStartsAt || "" : "",
+    ].join("|");
+
+    const now = Date.now();
     if (
       !villageBroadcast &&
       now < suppressUntil.current &&
@@ -1108,7 +1120,11 @@ export function TvCorner({
     const drift = Math.abs(el.currentTime - targetSec) * 1000;
 
     applyingRemote.current = true;
-    if ((programChanged || villageBroadcast) && drift > DRIFT_MS) {
+    // Never seek on ordinary village poll ticks — that rewound the same scene.
+    const shouldSeek =
+      (programChanged && drift > PROGRAM_SEEK_MS) ||
+      (villageBroadcast && !programChanged && drift > VILLAGE_RESYNC_MS);
+    if (shouldSeek) {
       try {
         el.currentTime = Math.max(0, targetSec);
       } catch {
@@ -1134,8 +1150,16 @@ export function TvCorner({
     room.positionUpdatedAt,
     room.scope,
     room.broadcastMode,
+    room.airStartsAt,
     powerOn,
   ]);
+
+  // Power-off destroys the iframe — clear the embed lock so power-on rejoins
+  // at the live air position instead of replaying the old start offset.
+  useEffect(() => {
+    if (powerOn) return;
+    youtubeEmbedRef.current = { airKey: "", src: "" };
+  }, [powerOn]);
 
   useEffect(() => {
     // Clear leftover cancel flags if the page remounts mid-upload.
@@ -1325,18 +1349,22 @@ export function TvCorner({
                   room.currentVideo.sourceKind === "youtube" &&
                   room.currentVideo.youtubeId ? (
                     <iframe
-                      key={room.currentVideo.id}
+                      key={airingKey(
+                        room.currentVideo.id,
+                        room.airStartsAt
+                      )}
                       className="tv-video tv-video-embed"
                       title={room.currentVideo.title}
                       src={(() => {
                         const video = room.currentVideo!;
-                        const id = video.id;
-                        if (youtubeEmbedRef.current.videoId !== id) {
+                        const key = airingKey(video.id, room.airStartsAt);
+                        if (youtubeEmbedRef.current.airKey !== key) {
                           youtubeEmbedRef.current = {
-                            videoId: id,
+                            airKey: key,
                             src: youtubeEmbedSrc(video.youtubeId!, {
-                              // Capture join-time offset once; never rewrite src
-                              // while this clip is still on air.
+                              // Capture join-time offset once per airing.
+                              // Never rewrite src on poll ticks — that reloads
+                              // the iframe and repeats one scene forever.
                               startSec: Math.floor(
                                 estimatedPositionMs({
                                   positionMs: room.positionMs,
@@ -1357,7 +1385,10 @@ export function TvCorner({
                   ) : (
                   <video
                     ref={videoRef}
-                    key={room.currentVideo.id}
+                    key={airingKey(
+                      room.currentVideo.id,
+                      isVillageBroadcast(room) ? room.airStartsAt : null
+                    )}
                     className="tv-video"
                     src={room.currentVideo.url}
                     playsInline
