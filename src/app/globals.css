@@ -4580,13 +4580,19 @@ button.linkish:hover {
   pointer-events: auto;
 }
 
-/* Invisible glass over the tube: swallows hover so nothing YouTube-like can pop up. */
+/* Invisible glass over the tube: swallows hover so nothing YouTube-like can pop up.
+   Also receives a tap to unmute the village broadcast (browsers require a gesture). */
 .tv-screen-shield {
   position: absolute;
   inset: 0;
   z-index: 4;
   pointer-events: auto;
   background: transparent;
+  cursor: pointer;
+}
+
+.tv-screen-shield:not([role="button"]) {
+  cursor: default;
 }
 
 .tv-scanlines {
@@ -4723,6 +4729,13 @@ button.linkish:hover {
 .tv-knob:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.tv-knob-lit span {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 210, 0.45),
+    0 0 10px color-mix(in srgb, var(--village-soft, #c4a574) 55%, transparent),
+    0 2px 4px rgba(0, 0, 0, 0.35);
 }
 
 .tv-speaker {
