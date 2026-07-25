@@ -218,39 +218,6 @@ export function TvCorner({
     message: string;
   } | null>(null);
   const [powerOn, setPowerOn] = useState(true);
-  /**
-   * Start muted so the picture always autoplays, then unmute on a real tap
-   * (browsers block unmuted autoplay). Preference is shared with
-   * /tv-sound-boot.js via window.__whimTvWantSound + sessionStorage so native
-   * taps and React stay in sync (and poll handlers cannot remute).
-   */
-  const [villageMuted, setVillageMuted] = useState(true);
-  const villageMutedRef = useRef(true);
-
-  function readSharedVillageMuted() {
-    if (typeof window === "undefined") return villageMutedRef.current;
-    const w = window as Window & { __whimTvWantSound?: boolean };
-    if (w.__whimTvWantSound === true) return false;
-    if (w.__whimTvWantSound === false) return true;
-    try {
-      if (sessionStorage.getItem("whim-tv-sound") === "on") return false;
-    } catch {
-      // ignore
-    }
-    return villageMutedRef.current;
-  }
-
-  function writeSharedVillageMuted(muted: boolean) {
-    if (typeof window === "undefined") return;
-    const w = window as Window & { __whimTvWantSound?: boolean };
-    w.__whimTvWantSound = !muted;
-    try {
-      if (muted) sessionStorage.removeItem("whim-tv-sound");
-      else sessionStorage.setItem("whim-tv-sound", "on");
-    } catch {
-      // ignore
-    }
-  }
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   // State twin of the video node so sync effects re-run when the element mounts
@@ -279,60 +246,22 @@ export function TvCorner({
     return airingKey(room.currentVideoId, room.airStartsAt);
   }
 
-  function applyVillageMute(el: HTMLVideoElement, muted: boolean) {
-    villageMutedRef.current = muted;
-    setVillageMuted(muted);
-    writeSharedVillageMuted(muted);
-    el.muted = muted;
-    if (!muted) {
-      try {
-        el.volume = 1;
-      } catch {
-        // ignore
-      }
-    }
-  }
-
   function tryPlayVillage(el: HTMLVideoElement) {
     if (!powerOn || !room.isPlaying) return;
     if (!isVillageBroadcast(room)) return;
-    // Shared pref wins — native boot script may have unmuted before React knew.
-    const muted = readSharedVillageMuted();
-    villageMutedRef.current = muted;
-    el.muted = muted;
-    if (!muted) {
-      try {
-        el.volume = 1;
-      } catch {
-        // ignore
-      }
+    // Sound stays on — no mute UI. If the browser blocks unmuted autoplay,
+    // fall back to muted picture; /tv-sound-boot.js unlocks audio on the
+    // next real user gesture (any click/key) without a prompt.
+    el.muted = false;
+    try {
+      el.volume = 1;
+    } catch {
+      // ignore
     }
     void el.play().catch(() => {
-      // Unmuted play blocked — keep the picture going muted and prompt to tap.
-      if (!readSharedVillageMuted()) {
-        applyVillageMute(el, true);
-        void el.play().catch(() => undefined);
-      }
+      el.muted = true;
+      void el.play().catch(() => undefined);
     });
-  }
-
-  function setVillageSound(on: boolean) {
-    const el = videoRef.current;
-    if (!el) {
-      villageMutedRef.current = !on;
-      setVillageMuted(!on);
-      writeSharedVillageMuted(!on);
-      return;
-    }
-    applyVillageMute(el, !on);
-    if (room.isPlaying && powerOn) {
-      void el.play().catch(() => {
-        if (on) {
-          // Gesture unmute failed oddly — stay unmuted visually but ensure play.
-          void el.play().catch(() => undefined);
-        }
-      });
-    }
   }
 
   function applyVillageSeek(el: HTMLVideoElement, targetSec: number) {
@@ -1478,29 +1407,6 @@ export function TvCorner({
     uploadCancelRef.current = false;
   }, []);
 
-  // Keep React mute state aligned with the native boot script (and session).
-  useEffect(() => {
-    const sync = () => {
-      const muted = readSharedVillageMuted();
-      villageMutedRef.current = muted;
-      setVillageMuted(muted);
-      const el = videoRef.current;
-      if (el) {
-        el.muted = muted;
-        if (!muted) {
-          try {
-            el.volume = 1;
-          } catch {
-            // ignore
-          }
-        }
-      }
-    };
-    sync();
-    window.addEventListener("whim-tv-sound", sync);
-    return () => window.removeEventListener("whim-tv-sound", sync);
-  }, []);
-
   useEffect(() => {
     if (!toast || toast.kind === "error") return;
     const timer = window.setTimeout(() => setToast(null), 6000);
@@ -1698,28 +1604,19 @@ export function TvCorner({
                     }
                     playsInline
                     preload="auto"
-                    // Bound to villageMuted, which stays synced with the native boot
-                    // script via the whim-tv-sound event + shared session pref.
-                    muted={isVillageBroadcast(room) ? villageMuted : false}
                     autoPlay={isVillageBroadcast(room)}
                     disablePictureInPicture
                     controlsList="nodownload noplaybackrate noremoteplayback"
                     onPlay={() => {
                       if (isVillageBroadcast(room)) {
-                        // Keep element mute flag aligned with shared preference —
-                        // never force muted=true after a native unmute tap.
+                        // Prefer sound on while playing; boot script also holds this.
                         const el = videoRef.current;
-                        if (el) {
-                          const muted = readSharedVillageMuted();
-                          villageMutedRef.current = muted;
-                          if (villageMuted !== muted) setVillageMuted(muted);
-                          el.muted = muted;
-                          if (!muted) {
-                            try {
-                              el.volume = 1;
-                            } catch {
-                              // ignore
-                            }
+                        if (el && el.muted) {
+                          el.muted = false;
+                          try {
+                            el.volume = 1;
+                          } catch {
+                            // ignore
                           }
                         }
                         return;
@@ -1832,29 +1729,9 @@ export function TvCorner({
                     </p>
                   </div>
                 )}
-                {/* Village tube glass: blocks hover chrome; tap to unmute. */}
+                {/* Village tube glass: blocks hover chrome on the broadcast. */}
                 {isVillageBroadcast(room) ? (
-                  <div
-                    className={`tv-screen-shield${villageMuted ? " tv-screen-shield-muted" : ""}`}
-                    role={villageMuted ? "button" : undefined}
-                    tabIndex={villageMuted ? 0 : undefined}
-                    aria-label={villageMuted ? "Turn sound on" : undefined}
-                    // Clicks are handled by /tv-sound-boot.js (capture phase) so a
-                    // stale React muted flag cannot immediately remute the set.
-                    onKeyDown={(e) => {
-                      if (!villageMuted) return;
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setVillageSound(true);
-                      }
-                    }}
-                  >
-                    {villageMuted && powerOn && room.currentVideo ? (
-                      <span className="tv-sound-prompt">
-                        Tap for sound
-                      </span>
-                    ) : null}
-                  </div>
+                  <div className="tv-screen-shield" aria-hidden />
                 ) : null}
                 <div className="tv-scanlines" aria-hidden />
                 <div className="tv-vignette" aria-hidden />
@@ -1870,29 +1747,12 @@ export function TvCorner({
                 <span />
                 Power
               </button>
-              {isVillageBroadcast(room) ? (
-                <button
-                  type="button"
-                  className={`tv-knob${villageMuted ? "" : " tv-knob-lit"}`}
-                  data-tv-sound-toggle=""
-                  // Native boot script owns the tap — avoids React stale-state remute.
-                  disabled={!powerOn || !room.currentVideo}
-                  aria-label={villageMuted ? "Turn sound on" : "Turn sound off"}
-                  aria-pressed={!villageMuted}
-                >
-                  <span />
-                  <span data-tv-sound-label="">
-                    {villageMuted ? "Sound" : "Mute"}
-                  </span>
-                </button>
-              ) : (
-                <div className="tv-speaker" aria-hidden>
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                </div>
-              )}
+              <div className="tv-speaker" aria-hidden>
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
               <button
                 type="button"
                 className="tv-knob"
