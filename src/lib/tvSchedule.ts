@@ -74,11 +74,21 @@ function parseOrderJson(raw: string | null | undefined): string[] {
 
 function listChannelVideoRows(channelId: string): ScheduleVideoRow[] {
   const db = getDb();
+  // Only air real files / direct media — never YouTube embeds on the set.
   return db
     .prepare(
       `SELECT id, title, filename, duration_ms
        FROM tv_videos
        WHERE channel_id = ?
+         AND lower(coalesce(mime, '')) != 'video/youtube'
+         AND (
+           source_url IS NULL
+           OR trim(source_url) = ''
+           OR (
+             lower(source_url) NOT LIKE '%youtube.com%'
+             AND lower(source_url) NOT LIKE '%youtu.be%'
+           )
+         )
        ORDER BY created_at ASC`
     )
     .all(channelId) as ScheduleVideoRow[];

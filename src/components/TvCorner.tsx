@@ -5,8 +5,6 @@ import { createPortal } from "react-dom";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import type { TvChannel, TvRoomState, TvScheduleSlot, TvVideo } from "@/lib/tvCorner";
-import { youtubeEmbedSrc } from "@/lib/tvLinks";
-
 type VillageOption = { id: VillageId; name: string };
 
 type Props = {
@@ -167,13 +165,6 @@ export function TvCorner({
   const lastAppliedSyncKey = useRef("");
   const lastProgressPush = useRef(0);
   const localControlRef = useRef(false);
-  // Lock YouTube embed URL per airing slot — live startSec in src reloads the
-  // iframe every poll and makes one scene play on repeat. Key includes the
-  // schedule slot start so the same clip can remount when the loop wraps.
-  const youtubeEmbedRef = useRef<{ airKey: string; src: string }>({
-    airKey: "",
-    src: "",
-  });
   const uploadCancelRef = useRef(false);
   const activeXhrRef = useRef<XMLHttpRequest | null>(null);
 
@@ -667,7 +658,7 @@ export function TvCorner({
     }
     const url = linkUrl.trim();
     if (!url) {
-      notifyIssue("Paste a YouTube or direct video link first");
+      notifyIssue("Paste a direct .mp4 / .webm link, or upload a file");
       return;
     }
     setAddingLink(true);
@@ -695,10 +686,7 @@ export function TvCorner({
       setSelectedChannelId(targetChannelId);
       setToast({
         kind: "success",
-        message:
-          data.video?.sourceKind === "youtube"
-            ? "YouTube link saved to the durable shelf"
-            : "Video link saved to the durable shelf",
+        message: "Video link saved to the durable shelf",
       });
     } catch (err) {
       notifyIssue(
@@ -1018,7 +1006,7 @@ export function TvCorner({
 
         setRoom((prev) => {
           // Village broadcast is server clock. When the same clip is still
-          // airing, keep the local currentVideo object so YouTube/file players
+          // airing, keep the local currentVideo object so file players
           // are not remounted every poll — only refresh guide/chat metadata.
           if (isVillageBroadcast(remote)) {
             if (
@@ -1153,13 +1141,6 @@ export function TvCorner({
     room.airStartsAt,
     powerOn,
   ]);
-
-  // Power-off destroys the iframe — clear the embed lock so power-on rejoins
-  // at the live air position instead of replaying the old start offset.
-  useEffect(() => {
-    if (powerOn) return;
-    youtubeEmbedRef.current = { airKey: "", src: "" };
-  }, [powerOn]);
 
   useEffect(() => {
     // Clear leftover cancel flags if the page remounts mid-upload.
@@ -1346,44 +1327,9 @@ export function TvCorner({
             </div>
             <div className="tv-bezel">
               <div className={`tv-screen ${powerOn ? "on" : "off"}`}>
-                {powerOn && room.currentVideo ? (
-                  room.currentVideo.sourceKind === "youtube" &&
-                  room.currentVideo.youtubeId ? (
-                    <iframe
-                      key={airingKey(
-                        room.currentVideo.id,
-                        room.airStartsAt
-                      )}
-                      className="tv-video tv-video-embed"
-                      title={room.currentVideo.title}
-                      src={(() => {
-                        const video = room.currentVideo!;
-                        const key = airingKey(video.id, room.airStartsAt);
-                        if (youtubeEmbedRef.current.airKey !== key) {
-                          youtubeEmbedRef.current = {
-                            airKey: key,
-                            src: youtubeEmbedSrc(video.youtubeId!, {
-                              // Capture join-time offset once per airing.
-                              // Never rewrite src on poll ticks — that reloads
-                              // the iframe and repeats one scene forever.
-                              startSec: Math.floor(
-                                estimatedPositionMs({
-                                  positionMs: room.positionMs,
-                                  isPlaying: room.isPlaying,
-                                  positionUpdatedAt: room.positionUpdatedAt,
-                                }) / 1000
-                              ),
-                              autoplay: true,
-                            }),
-                          };
-                        }
-                        return youtubeEmbedRef.current.src;
-                      })()}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
-                      referrerPolicy="strict-origin-when-cross-origin"
-                    />
-                  ) : (
+                {powerOn &&
+                room.currentVideo &&
+                room.currentVideo.sourceKind !== "youtube" ? (
                   <video
                     ref={videoRef}
                     key={airingKey(
@@ -1394,6 +1340,8 @@ export function TvCorner({
                     src={room.currentVideo.url}
                     playsInline
                     preload="auto"
+                    disablePictureInPicture
+                    controlsList="nodownload noplaybackrate noremoteplayback"
                     onPlay={() => {
                       if (isVillageBroadcast(room)) return;
                       if (applyingRemote.current) return;
@@ -1432,7 +1380,6 @@ export function TvCorner({
                     }}
                     controls={!isVillageBroadcast(room)}
                   />
-                  )
                 ) : (
                   <div className="tv-idle">
                     <div className="tv-idle-glow" />
@@ -1442,9 +1389,19 @@ export function TvCorner({
                         ? channelLabel(activeChannelIndex)
                         : "—"}
                     </p>
-                    <p>{powerOn ? decor.idle : "The set is sleeping."}</p>
+                    <p>
+                      {powerOn
+                        ? room.currentVideo?.sourceKind === "youtube"
+                          ? "Upload that clip as a file to air it — the set never shows YouTube."
+                          : decor.idle
+                        : "The set is sleeping."}
+                    </p>
                   </div>
                 )}
+                {/* Village tube glass: swallows hover so no player chrome appears. */}
+                {isVillageBroadcast(room) ? (
+                  <div className="tv-screen-shield" aria-hidden />
+                ) : null}
                 <div className="tv-scanlines" aria-hidden />
                 <div className="tv-vignette" aria-hidden />
               </div>
@@ -1798,8 +1755,8 @@ export function TvCorner({
               </label>
 
               <p className="tv-shelf-copy tv-shelf-hint">
-                <strong>Add by link</strong> — YouTube, or a direct .mp4 / .webm
-                URL. Optional length helps the village schedule stay accurate
+                <strong>Add by link</strong> — direct .mp4 / .webm URL only
+                (no YouTube on the set). Optional length helps the village schedule stay accurate
                 (defaults to 10 minutes).
               </p>
               <label className="tv-upload">
@@ -2002,10 +1959,10 @@ export function TvCorner({
                                     onClick={() => tuneToVideo(video)}
                                   >
                                     {video.title}
-                                    {video.sourceKind === "youtube" ? (
-                                      <span className="tv-clip-kind">· YouTube</span>
-                                    ) : video.sourceKind === "direct" ? (
+                                    {video.sourceKind === "direct" ? (
                                       <span className="tv-clip-kind">· link</span>
+                                    ) : video.sourceKind === "file" ? (
+                                      <span className="tv-clip-kind">· file</span>
                                     ) : null}
                                   </button>
                                   {user.isOwner ? (
@@ -2050,7 +2007,7 @@ export function TvCorner({
                               setLinkUrl(e.target.value);
                             }}
                             onFocus={() => setSelectedChannelId(channel.id)}
-                            placeholder="Paste YouTube or video link…"
+                            placeholder="Paste a direct .mp4 / .webm link…"
                             disabled={addingLink || uploading}
                             aria-label={`Video link for ${channel.title}`}
                           />

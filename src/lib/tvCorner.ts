@@ -468,7 +468,7 @@ export function createVideo(input: {
   return getVideoById(id)!;
 }
 
-/** Add a channel clip from a YouTube or direct video URL (no file upload). */
+/** Add a channel clip from a direct video URL (file uploads preferred). */
 export function createVideoFromLink(input: {
   sourceUrl: string;
   title?: string;
@@ -479,6 +479,13 @@ export function createVideoFromLink(input: {
 }): { ok: true; video: TvVideo } | { ok: false; error: string } {
   const parsed = parseTvLink(input.sourceUrl);
   if (!parsed.ok) return parsed;
+  if (parsed.kind === "youtube") {
+    return {
+      ok: false,
+      error:
+        "YouTube links stay off the vintage set — download the clip and upload the file instead",
+    };
+  }
 
   let durationMs =
     input.durationMs && input.durationMs > 0

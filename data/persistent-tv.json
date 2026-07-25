@@ -1,18 +1,5 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-25T03:11:17.150Z",
-  "channels": [
-    {
-      "title": "Cottage Cartoons",
-      "villageId": "mosshollow",
-      "isGlobal": true,
-      "videos": [
-        {
-          "title": "Little Bear | TOP EPISODES! Part 1",
-          "sourceUrl": "https://www.youtube.com/watch?v=twuDOXgx5EY",
-          "durationMs": 4500000
-        }
-      ]
-    }
-  ]
+  "updatedAt": "2026-07-25T03:13:43.919Z",
+  "channels": []
 }

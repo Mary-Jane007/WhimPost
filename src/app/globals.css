@@ -4571,20 +4571,30 @@ button.linkish:hover {
   display: block;
 }
 
-.tv-video-embed {
-  border: 0;
-  object-fit: unset;
-  /* Block YouTube hover chrome / title overlays on the vintage set. */
-  pointer-events: none;
-}
-
 .tv-screen .tv-video {
-  /* Village broadcast: the knobs own the set — no browser video chrome on hover. */
+  /* Knobs own the set — never show browser / embed chrome on hover. */
   pointer-events: none;
 }
 
 .tv-screen .tv-video[controls] {
   pointer-events: auto;
+}
+
+/* Invisible glass over the tube: swallows hover so nothing YouTube-like can pop up. */
+.tv-screen-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: auto;
+  background: transparent;
+}
+
+.tv-scanlines {
+  z-index: 5;
+}
+
+.tv-vignette {
+  z-index: 6;
 }
 
 .tv-clip-kind {
