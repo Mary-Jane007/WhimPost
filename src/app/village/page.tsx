@@ -32,6 +32,7 @@ import {
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
 import { markUnlocksSeen } from "@/lib/notifications";
+import { getChronicleProgress } from "@/lib/chronicle";
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -59,6 +60,10 @@ export default async function VillagePage() {
   const unlock = villageUnlockLevel(villageRep);
   const nextRank =
     RANK_LADDER.find((r) => r.minRep > liveStats.reputation) || null;
+  const chronicleProgress = getChronicleProgress(
+    user.id,
+    stats.villageId as VillageId
+  );
 
   const neighbors = db
     .prepare(
@@ -273,6 +278,11 @@ export default async function VillagePage() {
         ) : null}
       </section>
 
+      <LostChronicles
+        villageId={village.id}
+        initialProgress={chronicleProgress}
+      />
+
       <section className="village-panel">
         <h2>Who belongs here</h2>
         <ul className="belong-list">
@@ -314,8 +324,6 @@ export default async function VillagePage() {
           })}
         </div>
       </section>
-
-      <LostChronicles villageId={village.id} />
 
       <NoticeBoard initialNotes={notes} />
 

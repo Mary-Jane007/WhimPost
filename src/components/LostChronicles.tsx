@@ -7,19 +7,24 @@ import { ROMAN_PAGES, type ChroniclePageNumber } from "@/lib/chronicleContent";
 
 type Props = {
   villageId: VillageId;
+  /** Server-rendered progress so the book shows even before hydration. */
+  initialProgress?: ChronicleProgressView | null;
 };
 
-export function LostChronicles({ villageId }: Props) {
-  const [progress, setProgress] = useState<ChronicleProgressView | null>(null);
+export function LostChronicles({ villageId, initialProgress = null }: Props) {
+  const [progress, setProgress] = useState<ChronicleProgressView | null>(
+    initialProgress
+  );
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialProgress);
   const [opened, setOpened] = useState(false);
   const [opening, setOpening] = useState(false);
   /** Which leaf is face-up inside the open book (1–4). */
   const [leaf, setLeaf] = useState<ChroniclePageNumber>(1);
 
   const load = useCallback(async () => {
-    setLoading(true);
+    // Soft refresh — keep the SSR book visible while we update.
+    if (!initialProgress) setLoading(true);
     setError(null);
     try {
       const res = await fetch(
@@ -29,11 +34,13 @@ export function LostChronicles({ villageId }: Props) {
       if (!res.ok) throw new Error(data.error || "Could not open the Chronicle");
       setProgress(data.progress);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not load");
+      if (!initialProgress) {
+        setError(err instanceof Error ? err.message : "Could not load");
+      }
     } finally {
       setLoading(false);
     }
-  }, [villageId]);
+  }, [villageId, initialProgress]);
 
   useEffect(() => {
     void load();
