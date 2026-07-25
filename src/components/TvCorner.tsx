@@ -1543,9 +1543,10 @@ export function TvCorner({
                   schedule
                 </h2>
                 <p>
-                  Every clip joins the lineup. After all videos play, the order
-                  reshuffles. Join mid-show — the broadcast does not restart for
-                  you.
+                  Every clip joins the lineup. Air times follow each file&apos;s
+                  real length (and flex if a clip ends early). After all videos
+                  play, the order reshuffles. Join mid-show — the broadcast does
+                  not restart for you.
                 </p>
               </div>
               <ol className="tv-guide-list">
