@@ -138,10 +138,19 @@ function channelLabel(index: number) {
   return String(index + 1).padStart(2, "0");
 }
 
+/**
+ * Guide clock in fixed UTC + en-US so server HTML and the browser always match.
+ * Locale-default formatting was crashing TV Corner with a hydration mismatch
+ * (e.g. "3:57 AM" vs "12:57 AM") and blocking the set from playing.
+ */
 function formatGuideClock(iso: string) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  return d.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+  });
 }
 
 function formatDurationShort(ms: number) {
