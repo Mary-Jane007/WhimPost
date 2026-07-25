@@ -107,6 +107,57 @@ function ensureVideoDuration(row: ScheduleVideoRow): number {
   return probed;
 }
 
+const DURATION_DRIFT_MS = 1500;
+
+/**
+ * Correct a clip's scheduled runtime from the real media length.
+ * Used when a file ends sooner (or later) than the catalog estimate so the
+ * wall-clock guide stays accurate and the next clip can start on time.
+ */
+export function correctVideoDurationMs(
+  videoId: string,
+  actualMs: number,
+  opts?: { currentPositionMs?: number }
+): {
+  ok: true;
+  durationMs: number;
+  changed: boolean;
+} | { ok: false; error: string } {
+  const videoRow = getDb()
+    .prepare(
+      `SELECT id, duration_ms, filename, source_url, channel_id
+       FROM tv_videos WHERE id = ?`
+    )
+    .get(videoId) as
+    | {
+        id: string;
+        duration_ms: number;
+        filename: string;
+        source_url: string | null;
+        channel_id: string | null;
+      }
+    | undefined;
+  if (!videoRow) return { ok: false, error: "Clip not found" };
+
+  let next = Math.max(1000, Math.floor(actualMs));
+  const position = Math.max(0, Math.floor(opts?.currentPositionMs || 0));
+  // If the playhead is already past the reported end, close the slot now
+  // instead of jumping the whole village backward.
+  if (position > next) {
+    next = position;
+  }
+
+  const existing = Number(videoRow.duration_ms) || 0;
+  if (existing > 0 && Math.abs(existing - next) < DURATION_DRIFT_MS) {
+    return { ok: true, durationMs: existing, changed: false };
+  }
+
+  // Prefer shortening an overstated runtime (video done sooner). Still allow
+  // modest lengthening when metadata was wrong the other way.
+  setVideoDurationMs(videoId, next);
+  return { ok: true, durationMs: next, changed: true };
+}
+
 function writeChannelSchedule(
   channelId: string,
   epochMs: number,
@@ -394,6 +445,14 @@ export function setVideoDurationMs(videoId: string, durationMs: number) {
     Math.max(1000, Math.floor(durationMs)),
     videoId
   );
+}
+
+/** Re-probe a file clip and store the accurate runtime. */
+export function refreshProbedDurationMs(videoId: string, filename: string) {
+  if (!filename || filename.startsWith("link-")) return null;
+  const probed = probeUploadDurationMs(filename);
+  setVideoDurationMs(videoId, probed);
+  return probed;
 }
 
 export function probeAndStoreDuration(videoId: string, filename: string) {

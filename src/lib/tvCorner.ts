@@ -453,7 +453,9 @@ export function createVideo(input: {
     input.sourceUrl?.trim() || null
   );
 
-  if (!(input.durationMs && input.durationMs > 0) && !input.sourceUrl) {
+  // File uploads: always trust ffprobe over any client estimate so air times
+  // match the real runtime (and the next clip can start when this one ends).
+  if (!input.sourceUrl) {
     probeAndStoreDuration(id, input.filename);
   }
 

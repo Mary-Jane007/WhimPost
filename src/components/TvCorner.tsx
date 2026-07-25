@@ -167,6 +167,43 @@ export function TvCorner({
   const localControlRef = useRef(false);
   const uploadCancelRef = useRef(false);
   const activeXhrRef = useRef<XMLHttpRequest | null>(null);
+  const lastDurationReport = useRef<{ id: string; ms: number; at: number }>({
+    id: "",
+    ms: 0,
+    at: 0,
+  });
+
+  /** Tell the server the real clip length so air times can flex when it ends early. */
+  function reportActualDuration(actualMs: number, positionMs?: number) {
+    const video = room.currentVideo;
+    if (!video || video.sourceKind === "youtube") return;
+    const durationMs = Math.max(1000, Math.floor(actualMs));
+    if (!Number.isFinite(durationMs)) return;
+    const stored = Number(video.durationMs) || 0;
+    if (stored > 0 && Math.abs(stored - durationMs) < 1500) return;
+
+    const now = Date.now();
+    const prev = lastDurationReport.current;
+    if (
+      prev.id === video.id &&
+      Math.abs(prev.ms - durationMs) < 1500 &&
+      now - prev.at < 8000
+    ) {
+      return;
+    }
+    lastDurationReport.current = { id: video.id, ms: durationMs, at: now };
+
+    void fetch("/api/tv/videos", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: video.id,
+        durationMs,
+        currentPositionMs:
+          positionMs != null ? Math.max(0, Math.floor(positionMs)) : undefined,
+      }),
+    }).catch(() => undefined);
+  }
 
   const effectiveChannelId = channels.some((c) => c.id === selectedChannelId)
     ? selectedChannelId
@@ -1374,8 +1411,28 @@ export function TvCorner({
                         isPlaying: !(videoRef.current?.paused ?? true),
                       });
                     }}
+                    onLoadedMetadata={() => {
+                      const el = videoRef.current;
+                      if (!el || !Number.isFinite(el.duration) || el.duration <= 0) {
+                        return;
+                      }
+                      // Align catalog runtime with the real file as soon as we know it.
+                      reportActualDuration(
+                        el.duration * 1000,
+                        el.currentTime * 1000
+                      );
+                    }}
                     onEnded={() => {
-                      if (isVillageBroadcast(room)) return;
+                      const el = videoRef.current;
+                      if (isVillageBroadcast(room)) {
+                        // Clip finished sooner than the guide — shrink the slot
+                        // so the next air time starts now for the whole village.
+                        const endedMs = el
+                          ? Math.max(el.duration, el.currentTime) * 1000
+                          : room.currentVideo?.durationMs || 0;
+                        reportActualDuration(endedMs, endedMs);
+                        return;
+                      }
                       playNextInChannel();
                     }}
                     controls={!isVillageBroadcast(room)}

@@ -10,11 +10,13 @@ import {
   createVideoFromLink,
   deleteVideo,
   getChannelById,
+  getVideoById,
   listVideosForChannel,
   renameVideo,
   resolveTvUpload,
 } from "@/lib/tvCorner";
 import { parseDurationMinutesInput } from "@/lib/tvLinks";
+import { correctVideoDurationMs } from "@/lib/tvSchedule";
 
 export const runtime = "nodejs";
 export const maxDuration = 1800; // long movie uploads
@@ -302,15 +304,40 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return jsonError("Not signed in", 401);
-  if (!user.isOwner) {
-    return jsonError("Only the site owner can rename clips", 403);
-  }
 
   const body = (await req.json().catch(() => null)) as {
     id?: string;
     title?: string;
+    durationMs?: number;
+    currentPositionMs?: number;
   } | null;
   if (!body?.id) return jsonError("Missing clip id");
+
+  // Any signed-in villager can report the real runtime so the guide can
+  // advance when a clip finishes sooner than its catalog estimate.
+  if (body.durationMs != null) {
+    const durationMs = Number(body.durationMs);
+    if (!Number.isFinite(durationMs) || durationMs < 1000) {
+      return jsonError("That runtime does not look valid");
+    }
+    const result = correctVideoDurationMs(body.id, durationMs, {
+      currentPositionMs:
+        body.currentPositionMs != null
+          ? Number(body.currentPositionMs)
+          : undefined,
+    });
+    if (!result.ok) return jsonError(result.error, 404);
+    return NextResponse.json({
+      ok: true,
+      changed: result.changed,
+      durationMs: result.durationMs,
+      video: getVideoById(body.id),
+    });
+  }
+
+  if (!user.isOwner) {
+    return jsonError("Only the site owner can rename clips", 403);
+  }
   if (typeof body.title !== "string") return jsonError("Missing new title");
 
   const result = renameVideo(body.id, body.title, user);
