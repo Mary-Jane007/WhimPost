@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteForestStickers } from "@/components/SiteForestStickers";
@@ -45,6 +46,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        {/* beforeInteractive only works from the root layout (not page.tsx). */}
+        <Script src="/tv-sound-boot.js" strategy="beforeInteractive" />
+      </head>
       <body className={themeClass} style={themeStyle}>
         <div className="forest-backdrop" aria-hidden />
         <div className="page-shell">
