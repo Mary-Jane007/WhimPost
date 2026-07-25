@@ -1227,7 +1227,8 @@ export function TvCorner({
           <h1>TV Corner</h1>
           <p>
             Gather round the vintage set. The village lounge runs like a real
-            channel — shuffled schedule, wall-clock air times. Friends couches
+            channel — every clip joins the lineup, reshuffled after each full
+            playthrough. Friends couches
             stay pause-and-scrub watch parties.
           </p>
         </div>
@@ -1528,8 +1529,9 @@ export function TvCorner({
                   schedule
                 </h2>
                 <p>
-                  Clips air on a shuffled wall-clock lineup. Join mid-show — the
-                  broadcast does not restart for you.
+                  Every clip joins the lineup. After all videos play, the order
+                  reshuffles. Join mid-show — the broadcast does not restart for
+                  you.
                 </p>
               </div>
               <ol className="tv-guide-list">

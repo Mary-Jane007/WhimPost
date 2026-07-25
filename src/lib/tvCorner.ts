@@ -6,6 +6,7 @@ import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import { getVillage } from "@/lib/villages";
 import {
+  addVideoToChannelSchedule,
   ensureChannelSchedule,
   probeAndStoreDuration,
   removeVideoFromChannelSchedule,
@@ -456,7 +457,9 @@ export function createVideo(input: {
     probeAndStoreDuration(id, input.filename);
   }
 
+  // Every new clip joins the wall-clock lineup immediately.
   ensureChannelSchedule(input.channelId);
+  addVideoToChannelSchedule(input.channelId, id);
   try {
     persistTvCatalogs(db);
   } catch (err) {

@@ -29,6 +29,28 @@ function shuffleIds(ids: string[]): string[] {
   return next;
 }
 
+/** Deterministic shuffle so every playthrough order is stable across polls. */
+function seededShuffle(ids: string[], seed: number): string[] {
+  const next = [...ids].sort(); // stable starting point
+  let state = Math.floor(seed) >>> 0;
+  const rand = () => {
+    // Numerical Recipes LCG
+    state = (Math.imul(1664525, state) + 1013904223) >>> 0;
+    return state / 0x100000000;
+  };
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rand() * (i + 1));
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+}
+
+function sameIdOrder(a: string[], b: string[]) {
+  return (
+    a.length === b.length && a.every((id, index) => id === b[index])
+  );
+}
+
 function toIsoFromMs(ms: number) {
   return new Date(ms).toISOString();
 }
@@ -88,7 +110,11 @@ function writeChannelSchedule(
   ).run(epochMs, JSON.stringify(order), channelId);
 }
 
-/** Build or repair a shuffled looping schedule for a channel. */
+/**
+ * Build or repair the channel lineup.
+ * Every clip on the channel is always in the schedule; brand-new clips are
+ * spliced into a random upcoming slot without resetting the current airtime.
+ */
 export function ensureChannelSchedule(channelId: string): {
   epochMs: number;
   order: string[];
@@ -121,26 +147,38 @@ export function ensureChannelSchedule(channelId: string): {
     });
   }
 
-  const knownIds = new Set(videos.keys());
+  const knownIds = [...videos.keys()];
+  const knownSet = new Set(knownIds);
   let order = parseOrderJson(channel.schedule_order_json).filter((id) =>
-    knownIds.has(id)
+    knownSet.has(id)
   );
-  const missing = [...knownIds].filter((id) => !order.includes(id));
+  const missing = knownIds.filter((id) => !order.includes(id));
 
   let epochMs = parseEpoch(channel.schedule_epoch_ms);
+  let dirty = false;
 
-  if (order.length === 0 && knownIds.size > 0) {
-    order = shuffleIds([...knownIds]);
+  if (order.length === 0 && knownIds.length > 0) {
     epochMs = Date.now();
-    writeChannelSchedule(channelId, epochMs, order);
+    order = seededShuffle(knownIds, epochMs);
+    dirty = true;
   } else if (missing.length > 0) {
-    // New clips join the lineup without reshuffling existing air times.
-    order = [...order, ...shuffleIds(missing)];
+    // Fold every new clip into the lineup at random positions.
+    for (const id of shuffleIds(missing)) {
+      const insertAt = Math.floor(Math.random() * (order.length + 1));
+      order.splice(insertAt, 0, id);
+    }
     if (!channel.schedule_epoch_ms) epochMs = Date.now();
-    writeChannelSchedule(channelId, epochMs, order);
-  } else if (
-    order.length !== parseOrderJson(channel.schedule_order_json).length ||
-    !channel.schedule_epoch_ms
+    dirty = true;
+  }
+
+  if (!channel.schedule_epoch_ms) {
+    epochMs = Date.now();
+    dirty = true;
+  }
+
+  if (
+    dirty ||
+    !sameIdOrder(order, parseOrderJson(channel.schedule_order_json))
   ) {
     writeChannelSchedule(channelId, epochMs, order);
   }
@@ -148,26 +186,47 @@ export function ensureChannelSchedule(channelId: string): {
   return { epochMs, order, videos };
 }
 
-/** Append a freshly uploaded clip into the channel schedule (shuffled among new). */
+/** Put a freshly uploaded clip into the channel schedule right away. */
 export function addVideoToChannelSchedule(channelId: string, videoId: string) {
-  ensureChannelSchedule(channelId);
-  const db = getDb();
-  const channel = db
-    .prepare(
-      `SELECT schedule_epoch_ms, schedule_order_json FROM tv_channels WHERE id = ?`
-    )
-    .get(channelId) as
-    | { schedule_epoch_ms: number | null; schedule_order_json: string | null }
-    | undefined;
-  if (!channel) return;
-
-  const order = parseOrderJson(channel.schedule_order_json);
+  const { epochMs, order } = ensureChannelSchedule(channelId);
   if (order.includes(videoId)) return;
-  // Insert at a random index so new clips are shuffled into the lineup.
-  const insertAt = Math.floor(Math.random() * (order.length + 1));
-  order.splice(insertAt, 0, videoId);
-  const epochMs = parseEpoch(channel.schedule_epoch_ms) || Date.now();
-  writeChannelSchedule(channelId, epochMs || Date.now(), order);
+
+  const next = [...order];
+  const insertAt = Math.floor(Math.random() * (next.length + 1));
+  next.splice(insertAt, 0, videoId);
+  writeChannelSchedule(channelId, epochMs || Date.now(), next);
+}
+
+/**
+ * After every full playthrough, reshuffle all clips and advance the epoch to
+ * the start of the new cycle so air times stay continuous.
+ */
+function reshuffleCompletedCycles(
+  channelId: string,
+  epochMs: number,
+  order: string[],
+  videos: Map<string, { title: string; durationMs: number; filename: string }>,
+  nowMs: number
+): { epochMs: number; order: string[] } {
+  if (order.length === 0) return { epochMs, order };
+
+  const durations = order.map(
+    (id) => videos.get(id)?.durationMs || DEFAULT_TV_DURATION_MS
+  );
+  const loopMs = durations.reduce((sum, d) => sum + d, 0);
+  if (loopMs <= 0) return { epochMs, order };
+
+  let elapsed = nowMs - epochMs;
+  if (elapsed < 0) elapsed = 0;
+  const loopsCompleted = Math.floor(elapsed / loopMs);
+  if (loopsCompleted <= 0) return { epochMs, order };
+
+  // Include every clip currently on the channel, not just the old order.
+  const allIds = [...videos.keys()];
+  const nextEpoch = epochMs + loopsCompleted * loopMs;
+  const nextOrder = seededShuffle(allIds, nextEpoch);
+  writeChannelSchedule(channelId, nextEpoch, nextOrder);
+  return { epochMs: nextEpoch, order: nextOrder };
 }
 
 export function removeVideoFromChannelSchedule(
@@ -207,15 +266,26 @@ export type ChannelBroadcast = {
 
 /**
  * Resolve what a village lounge channel is airing right now from wall clock.
- * Playlist loops forever; late joiners land mid-clip.
+ * Every full playthrough reshuffles the lineup; late joiners land mid-clip.
  */
 export function resolveChannelBroadcast(
   channelId: string,
   nowMs = Date.now(),
   scheduleHorizonMs = 3 * 60 * 60 * 1000
 ): ChannelBroadcast | null {
-  const { epochMs, order, videos } = ensureChannelSchedule(channelId);
-  if (order.length === 0) return null;
+  const ensured = ensureChannelSchedule(channelId);
+  if (ensured.order.length === 0) return null;
+
+  const rolled = reshuffleCompletedCycles(
+    channelId,
+    ensured.epochMs,
+    ensured.order,
+    ensured.videos,
+    nowMs
+  );
+  const epochMs = rolled.epochMs;
+  const order = rolled.order;
+  const videos = ensured.videos;
 
   const durations = order.map(
     (id) => videos.get(id)?.durationMs || DEFAULT_TV_DURATION_MS
@@ -250,13 +320,22 @@ export function resolveChannelBroadcast(
   const airStartsAt = toIsoFromMs(airStartsAtMs);
 
   // Build upcoming schedule window from the start of the current clip.
+  // Later playthroughs use the same seeded shuffle the rollover will persist.
   let slotStart = airStartsAtMs;
   const schedule: TvScheduleSlot[] = [];
   const horizonEnd = nowMs + scheduleHorizonMs;
-  let idx = currentIndex;
+  const allIds = [...videos.keys()];
+  let cycleOrder = [...order];
+  let posInCycle = currentIndex;
+  let cycleIdx = 0;
   let guard = 0;
-  while (slotStart < horizonEnd && guard < order.length * 40) {
-    const videoId = order[idx % order.length];
+  while (slotStart < horizonEnd && guard < Math.max(order.length, 1) * 40) {
+    if (posInCycle >= cycleOrder.length) {
+      cycleIdx += 1;
+      cycleOrder = seededShuffle(allIds, epochMs + cycleIdx * loopMs);
+      posInCycle = 0;
+    }
+    const videoId = cycleOrder[posInCycle];
     const meta = videos.get(videoId);
     const durationMs = meta?.durationMs || DEFAULT_TV_DURATION_MS;
     const startsAtMs = slotStart;
@@ -276,7 +355,7 @@ export function resolveChannelBroadcast(
       });
     }
     slotStart = endsAtMs;
-    idx += 1;
+    posInCycle += 1;
     guard += 1;
   }
 
