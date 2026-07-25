@@ -14,7 +14,14 @@ if (!fs.existsSync(dataDir)) {
 
 const dbPath = path.join(dataDir, "whimpost.db");
 
-const globalForDb = globalThis as unknown as { whimpostDb?: Database.Database };
+const globalForDb = globalThis as unknown as {
+  whimpostDb?: Database.Database;
+  /** Tracks which module evaluation last applied persistent imports. */
+  whimpostImportSession?: symbol;
+};
+
+/** New symbol each time this module evaluates (fresh boot or HMR). */
+const IMPORT_SESSION = Symbol("whimpost-import-session");
 
 function ensureColumn(
   db: Database.Database,
@@ -569,23 +576,29 @@ function createDb() {
 export function getDb() {
   if (!globalForDb.whimpostDb) {
     globalForDb.whimpostDb = createDb();
+    globalForDb.whimpostImportSession = IMPORT_SESSION;
   } else {
     // Keep existing connections current when schema grows.
     migrate(globalForDb.whimpostDb);
-    try {
-      importPersistentTv(globalForDb.whimpostDb);
-    } catch (err) {
-      console.error("[persistent-tv] import failed:", err);
-    }
-    try {
-      importPersistentTvMedia(globalForDb.whimpostDb);
-    } catch (err) {
-      console.error("[persistent-tv-media] import failed:", err);
-    }
-    try {
-      importPersistentLibraryBooks(globalForDb.whimpostDb);
-    } catch (err) {
-      console.error("[persistent-library-books] import failed:", err);
+    // Re-import catalog at most once per module evaluation (boot / HMR),
+    // never on every request — that used to reset the TV airtime epoch.
+    if (globalForDb.whimpostImportSession !== IMPORT_SESSION) {
+      try {
+        importPersistentTv(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-tv] import failed:", err);
+      }
+      try {
+        importPersistentTvMedia(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-tv-media] import failed:", err);
+      }
+      try {
+        importPersistentLibraryBooks(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-library-books] import failed:", err);
+      }
+      globalForDb.whimpostImportSession = IMPORT_SESSION;
     }
   }
   return globalForDb.whimpostDb;

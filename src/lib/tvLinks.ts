@@ -80,15 +80,23 @@ export function youtubeEmbedSrc(
   youtubeId: string,
   opts?: { startSec?: number; autoplay?: boolean }
 ) {
+  // Prefer a quiet "set" look: no related videos, no keyboard, no chrome on hover.
+  // Prefer uploading a real file when possible — embeds still show YouTube branding
+  // in some browsers even with these flags.
   const params = new URLSearchParams({
     rel: "0",
     modestbranding: "1",
     playsinline: "1",
+    controls: "0",
+    disablekb: "1",
+    fs: "0",
+    iv_load_policy: "3",
+    cc_load_policy: "0",
   });
   if (opts?.autoplay) params.set("autoplay", "1");
   const start = Math.max(0, Math.floor(opts?.startSec || 0));
   if (start > 0) params.set("start", String(start));
-  return `https://www.youtube.com/embed/${encodeURIComponent(youtubeId)}?${params}`;
+  return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(youtubeId)}?${params}`;
 }
 
 function titleFromUrl(url: URL) {

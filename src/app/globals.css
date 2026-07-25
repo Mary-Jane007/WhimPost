@@ -4574,6 +4574,17 @@ button.linkish:hover {
 .tv-video-embed {
   border: 0;
   object-fit: unset;
+  /* Block YouTube hover chrome / title overlays on the vintage set. */
+  pointer-events: none;
+}
+
+.tv-screen .tv-video {
+  /* Village broadcast: the knobs own the set — no browser video chrome on hover. */
+  pointer-events: none;
+}
+
+.tv-screen .tv-video[controls] {
+  pointer-events: auto;
 }
 
 .tv-clip-kind {

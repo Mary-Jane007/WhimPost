@@ -198,6 +198,8 @@ export type ChannelBroadcast = {
   title: string;
   durationMs: number;
   positionMs: number;
+  /** Stable wall-clock start of this airing (ISO). Survives poll jitter. */
+  airStartsAt: string;
   isPlaying: boolean;
   positionUpdatedAt: string;
   schedule: TvScheduleSlot[];
@@ -242,10 +244,13 @@ export function resolveChannelBroadcast(
   const current = videos.get(currentId);
   if (!current) return null;
 
+  // Derive air start from the schedule epoch so it never jitters between polls.
+  const loopsCompleted = Math.floor(elapsed / loopMs);
+  const airStartsAtMs = epochMs + loopsCompleted * loopMs + cursor;
+  const airStartsAt = toIsoFromMs(airStartsAtMs);
+
   // Build upcoming schedule window from the start of the current clip.
-  let slotStart =
-    nowMs - positionMs;
-  // Align slotStart to absolute timeline for display of past/current/future.
+  let slotStart = airStartsAtMs;
   const schedule: TvScheduleSlot[] = [];
   const horizonEnd = nowMs + scheduleHorizonMs;
   let idx = currentIndex;
@@ -263,7 +268,11 @@ export function resolveChannelBroadcast(
         durationMs,
         startsAt: toIsoFromMs(startsAtMs),
         endsAt: toIsoFromMs(endsAtMs),
-        isCurrent: videoId === currentId && startsAtMs <= nowMs && nowMs < endsAtMs,
+        isCurrent:
+          videoId === currentId &&
+          startsAtMs === airStartsAtMs &&
+          startsAtMs <= nowMs &&
+          nowMs < endsAtMs,
       });
     }
     slotStart = endsAtMs;
@@ -271,25 +280,20 @@ export function resolveChannelBroadcast(
     guard += 1;
   }
 
-  // Ensure the now-playing row is marked current.
-  for (const slot of schedule) {
-    slot.isCurrent =
-      slot.videoId === currentId &&
-      Date.parse(slot.startsAt) <= nowMs &&
-      nowMs < Date.parse(slot.endsAt);
-  }
+  // Keep milliseconds so late joiners don't overshoot start by a full second.
+  const positionUpdatedAt = new Date(nowMs)
+    .toISOString()
+    .replace("T", " ")
+    .replace("Z", "");
 
   return {
     videoId: currentId,
     title: current.title,
     durationMs: current.durationMs,
     positionMs: Math.min(positionMs, Math.max(0, current.durationMs - 250)),
+    airStartsAt,
     isPlaying: true,
-    // Match SQLite UTC datetime so clients can treat it as Zulu.
-    positionUpdatedAt: new Date(nowMs)
-      .toISOString()
-      .replace("T", " ")
-      .replace(/\.\d{3}Z$/, ""),
+    positionUpdatedAt,
     schedule: schedule.slice(0, 24),
   };
 }
