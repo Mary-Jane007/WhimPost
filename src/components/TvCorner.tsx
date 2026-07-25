@@ -1773,7 +1773,7 @@ export function TvCorner({
 
               <p className="tv-shelf-copy" style={{ marginTop: "1rem" }}>
                 <strong>2.</strong> Add videos — upload a file, or paste a
-                YouTube / direct video link (no download needed).
+                Prefer uploading a file so the set never shows YouTube chrome.
               </p>
               <label className="tv-upload">
                 <span>Channel</span>

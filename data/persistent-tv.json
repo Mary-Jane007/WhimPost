@@ -1,23 +1,5 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-24T03:14:10.036Z",
-  "channels": [
-    {
-      "title": "Cottage Cartoons",
-      "villageId": "mosshollow",
-      "isGlobal": true,
-      "videos": [
-        {
-          "title": "Peter Rabbit — The Tale of Samuel Whiskers",
-          "sourceUrl": "https://www.youtube.com/watch?v=h4CN0t5c94o",
-          "durationMs": 1800000
-        },
-        {
-          "title": "Little Bear | TOP EPISODES! Part 1",
-          "sourceUrl": "https://www.youtube.com/watch?v=twuDOXgx5EY",
-          "durationMs": 4500000
-        }
-      ]
-    }
-  ]
+  "updatedAt": "2026-07-25T02:58:08.806Z",
+  "channels": []
 }
