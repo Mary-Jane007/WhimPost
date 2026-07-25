@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
@@ -46,6 +53,49 @@ function estimatedPositionMs(room: {
   const started = Date.parse(room.positionUpdatedAt.replace(" ", "T") + "Z");
   if (Number.isNaN(started)) return room.positionMs;
   return room.positionMs + Math.max(0, Date.now() - started);
+}
+
+/** Village air time from the stable wall-clock slot start (preferred). */
+function villagePositionMs(room: {
+  airStartsAt: string | null;
+  positionMs: number;
+  isPlaying: boolean;
+  positionUpdatedAt: string;
+  currentVideo?: { durationMs?: number } | null;
+}) {
+  const airStart = Date.parse(room.airStartsAt || "");
+  if (Number.isFinite(airStart)) {
+    const raw = Math.max(0, Date.now() - airStart);
+    const dur = Number(room.currentVideo?.durationMs) || 0;
+    if (dur > 0) return Math.min(raw, Math.max(0, dur - 250));
+    return raw;
+  }
+  return estimatedPositionMs(room);
+}
+
+/**
+ * Native media-fragment start time so the village set can join mid-airing even
+ * before client JS hydrates (muted autoplay + #t=seconds).
+ * Frozen per airing identity — do not recompute from live position every poll.
+ */
+function villageMediaSrc(
+  room: Pick<
+    TvRoomState,
+    | "scope"
+    | "broadcastMode"
+    | "airStartsAt"
+    | "positionMs"
+    | "currentVideo"
+    | "currentVideoId"
+  >
+) {
+  const url = room.currentVideo?.url || "";
+  if (!url) return "";
+  if (!isVillageBroadcast(room)) return url;
+  // Prefer the server guide offset so SSR HTML and the first client paint match.
+  const sec = Math.max(0, Math.floor((Number(room.positionMs) || 0) / 1000));
+  if (sec <= 2) return url;
+  return `${url}#t=${sec}`;
 }
 
 const DECOR: Record<
@@ -158,11 +208,16 @@ export function TvCorner({
   const [powerOn, setPowerOn] = useState(true);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  // State twin of the video node so sync effects re-run when the element mounts
+  // (refs alone do not trigger renders — that left the set stuck at t=0).
+  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const suppressUntil = useRef(0);
   const roomIdRef = useRef(room.id);
   const applyingRemote = useRef(false);
   const lastAppliedSyncKey = useRef("");
+  /** Village seek that must wait until the file has metadata. */
+  const pendingVillageSeekSec = useRef<number | null>(null);
   const lastProgressPush = useRef(0);
   const localControlRef = useRef(false);
   const uploadCancelRef = useRef(false);
@@ -172,6 +227,83 @@ export function TvCorner({
     ms: 0,
     at: 0,
   });
+
+  function tryPlayVillage(el: HTMLVideoElement) {
+    if (!powerOn || !room.isPlaying) return;
+    if (!isVillageBroadcast(room)) return;
+    el.muted = true;
+    void el.play().catch(() => undefined);
+  }
+
+  function applyVillageSeek(el: HTMLVideoElement, targetSec: number) {
+    if (!Number.isFinite(targetSec) || targetSec < 0) return false;
+    if (el.readyState < 1) return false;
+    const driftMs = Math.abs(el.currentTime - targetSec) * 1000;
+    if (driftMs <= PROGRAM_SEEK_MS) return true;
+    applyingRemote.current = true;
+    try {
+      el.currentTime = targetSec;
+    } catch {
+      applyingRemote.current = false;
+      return false;
+    }
+    window.setTimeout(() => {
+      applyingRemote.current = false;
+    }, 200);
+    return true;
+  }
+
+  function syncVillageToAirtime(el: HTMLVideoElement) {
+    if (!isVillageBroadcast(room) || !room.currentVideo) return;
+    const targetSec =
+      villagePositionMs({
+        airStartsAt: room.airStartsAt,
+        positionMs: room.positionMs,
+        isPlaying: room.isPlaying,
+        positionUpdatedAt: room.positionUpdatedAt,
+        currentVideo: room.currentVideo,
+      }) / 1000;
+    pendingVillageSeekSec.current = targetSec;
+    if (applyVillageSeek(el, targetSec)) {
+      pendingVillageSeekSec.current = null;
+      lastAppliedSyncKey.current = [
+        room.currentVideoId,
+        room.isPlaying ? "1" : "0",
+        room.airStartsAt || "",
+      ].join("|");
+    }
+    if (room.isPlaying) tryPlayVillage(el);
+  }
+
+  // Native #t= fragment — frozen per airing so poll ticks don't reload the file.
+  const villageVideoSrc = useMemo(
+    () => villageMediaSrc(room),
+    // positionMs intentionally read once per airing identity (not every poll).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      room.currentVideoId,
+      room.airStartsAt,
+      room.currentVideo?.url,
+      room.scope,
+      room.broadcastMode,
+    ]
+  );
+
+  // Keep a state handle for the <video> node so sync re-runs after mount.
+  useLayoutEffect(() => {
+    const el = videoRef.current;
+    setVideoEl((prev) => (prev === el ? prev : el));
+    if (el && isVillageBroadcast(room) && room.currentVideo) {
+      syncVillageToAirtime(el);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    powerOn,
+    room.currentVideoId,
+    room.airStartsAt,
+    room.currentVideo?.url,
+    villageVideoSrc,
+  ]);
 
   /** Tell the server the real clip length so air times can flex when it ends early. */
   function reportActualDuration(
@@ -1114,7 +1246,7 @@ export function TvCorner({
   // Apply remote playback when the program changes — never seek on every
   // village poll tick (that rewound the same scene again and again).
   useEffect(() => {
-    const el = videoRef.current;
+    const el = videoEl;
     if (!el || !room.currentVideo) return;
     if (room.currentVideo.sourceKind === "youtube") return;
 
@@ -1143,19 +1275,56 @@ export function TvCorner({
 
     const programChanged = syncKey !== lastAppliedSyncKey.current;
     const targetSec =
-      estimatedPositionMs({
-        positionMs: room.positionMs,
-        isPlaying: room.isPlaying,
-        positionUpdatedAt: room.positionUpdatedAt,
-      }) / 1000;
+      (villageBroadcast
+        ? villagePositionMs({
+            airStartsAt: room.airStartsAt,
+            positionMs: room.positionMs,
+            isPlaying: room.isPlaying,
+            positionUpdatedAt: room.positionUpdatedAt,
+            currentVideo: room.currentVideo,
+          })
+        : estimatedPositionMs({
+            positionMs: room.positionMs,
+            isPlaying: room.isPlaying,
+            positionUpdatedAt: room.positionUpdatedAt,
+          })) / 1000;
     const drift = Math.abs(el.currentTime - targetSec) * 1000;
+    const hasMeta = el.readyState >= 1;
+
+    if (villageBroadcast) {
+      // Seek once per airing, and only after metadata exists. Early seeks are
+      // ignored by the browser, and marking sync "applied" left the set stuck
+      // fighting mid-file resyncs while still buffering from 0.
+      if (programChanged) {
+        pendingVillageSeekSec.current = targetSec;
+        if (hasMeta && applyVillageSeek(el, targetSec)) {
+          pendingVillageSeekSec.current = null;
+          lastAppliedSyncKey.current = syncKey;
+        }
+      } else if (
+        pendingVillageSeekSec.current != null &&
+        hasMeta &&
+        applyVillageSeek(el, pendingVillageSeekSec.current)
+      ) {
+        pendingVillageSeekSec.current = null;
+        lastAppliedSyncKey.current = syncKey;
+      } else if (
+        hasMeta &&
+        !el.seeking &&
+        el.readyState >= 3 &&
+        drift > VILLAGE_RESYNC_MS
+      ) {
+        // Soft catch-up only when we already have future frames buffered.
+        applyVillageSeek(el, targetSec);
+      }
+
+      if (room.isPlaying && powerOn) tryPlayVillage(el);
+      else if (!room.isPlaying && !el.paused) el.pause();
+      return;
+    }
 
     applyingRemote.current = true;
-    // Never seek on ordinary village poll ticks — that rewound the same scene.
-    const shouldSeek =
-      (programChanged && drift > PROGRAM_SEEK_MS) ||
-      (villageBroadcast && !programChanged && drift > VILLAGE_RESYNC_MS);
-    if (shouldSeek) {
+    if (programChanged && drift > PROGRAM_SEEK_MS) {
       try {
         el.currentTime = Math.max(0, targetSec);
       } catch {
@@ -1164,7 +1333,6 @@ export function TvCorner({
     }
 
     if (room.isPlaying && el.paused && powerOn) {
-      if (villageBroadcast) el.muted = true;
       void el.play().catch(() => undefined);
     } else if (!room.isPlaying && !el.paused) {
       el.pause();
@@ -1175,6 +1343,7 @@ export function TvCorner({
       applyingRemote.current = false;
     }, 120);
   }, [
+    videoEl,
     room.currentVideo,
     room.currentVideoId,
     room.isPlaying,
@@ -1381,7 +1550,11 @@ export function TvCorner({
                       isVillageBroadcast(room) ? room.airStartsAt : null
                     )}
                     className="tv-video"
-                    src={room.currentVideo.url}
+                    src={
+                      isVillageBroadcast(room)
+                        ? villageVideoSrc || room.currentVideo.url
+                        : room.currentVideo.url
+                    }
                     playsInline
                     preload="auto"
                     // Village autoplay is blocked by browsers unless muted.
@@ -1409,18 +1582,6 @@ export function TvCorner({
                         ),
                       });
                     }}
-                    onSeeked={() => {
-                      if (isVillageBroadcast(room)) return;
-                      // Ignore programmatic seeks and tiny scrub noise from sync.
-                      if (applyingRemote.current || localControlRef.current) return;
-                      if (Date.now() < suppressUntil.current) return;
-                      void patchRoom({
-                        positionMs: Math.floor(
-                          (videoRef.current?.currentTime || 0) * 1000
-                        ),
-                        isPlaying: !(videoRef.current?.paused ?? true),
-                      });
-                    }}
                     onLoadedMetadata={() => {
                       const el = videoRef.current;
                       if (!el || !Number.isFinite(el.duration) || el.duration <= 0) {
@@ -1431,28 +1592,44 @@ export function TvCorner({
                         el.duration * 1000,
                         el.currentTime * 1000
                       );
-                      if (
-                        isVillageBroadcast(room) &&
-                        room.isPlaying &&
-                        el.paused &&
-                        powerOn
-                      ) {
-                        void el.play().catch(() => undefined);
+                      if (isVillageBroadcast(room)) {
+                        syncVillageToAirtime(el);
                       }
                     }}
                     onCanPlay={() => {
                       const el = videoRef.current;
-                      if (
-                        !el ||
-                        !isVillageBroadcast(room) ||
-                        !room.isPlaying ||
-                        !powerOn
-                      ) {
+                      if (!el || !isVillageBroadcast(room) || !powerOn) return;
+                      // Always re-check airtime here — loadedmetadata is easy to
+                      // miss when the browser already has the file cached.
+                      syncVillageToAirtime(el);
+                    }}
+                    onSeeked={() => {
+                      if (isVillageBroadcast(room)) {
+                        // After catching the airtime, keep the muted broadcast going.
+                        const el = videoRef.current;
+                        if (el && room.isPlaying) tryPlayVillage(el);
                         return;
                       }
-                      if (el.paused) {
-                        void el.play().catch(() => undefined);
-                      }
+                      // Ignore programmatic seeks and tiny scrub noise from sync.
+                      if (applyingRemote.current || localControlRef.current) return;
+                      if (Date.now() < suppressUntil.current) return;
+                      void patchRoom({
+                        positionMs: Math.floor(
+                          (videoRef.current?.currentTime || 0) * 1000
+                        ),
+                        isPlaying: !(videoRef.current?.paused ?? true),
+                      });
+                    }}
+                    onWaiting={() => {
+                      // Stalled mid-seek / buffer — nudge play once data returns.
+                      if (!isVillageBroadcast(room)) return;
+                      const el = videoRef.current;
+                      if (!el) return;
+                      const resume = () => {
+                        el.removeEventListener("canplay", resume);
+                        if (room.isPlaying) tryPlayVillage(el);
+                      };
+                      el.addEventListener("canplay", resume, { once: true });
                     }}
                     onEnded={() => {
                       if (isVillageBroadcast(room)) {

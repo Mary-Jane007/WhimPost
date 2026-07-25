@@ -27,7 +27,8 @@ const MIME: Record<string, string> = {
   epub: "application/epub+zip",
 };
 
-const RANGE_CHUNK = 5 * 1024 * 1024; // 5MB preferred range slices for smooth movie start
+// Larger slices cut down on stalled mid-file seeks for long cottage cartoons.
+const RANGE_CHUNK = 16 * 1024 * 1024;
 
 function fileStreamResponse(
   filePath: string,
