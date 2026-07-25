@@ -1810,13 +1810,16 @@ export function TvCorner({
                 <button
                   type="button"
                   className={`tv-knob${villageMuted ? "" : " tv-knob-lit"}`}
+                  data-tv-sound-toggle=""
                   onClick={() => setVillageSound(villageMuted)}
                   disabled={!powerOn || !room.currentVideo}
                   aria-label={villageMuted ? "Turn sound on" : "Turn sound off"}
                   aria-pressed={!villageMuted}
                 >
                   <span />
-                  {villageMuted ? "Sound" : "Mute"}
+                  <span data-tv-sound-label="">
+                    {villageMuted ? "Sound" : "Mute"}
+                  </span>
                 </button>
               ) : (
                 <div className="tv-speaker" aria-hidden>

@@ -40,6 +40,14 @@ function fileStreamResponse(
   const from = start ?? 0;
   const to = end ?? stat.size - 1;
   const stream = fs.createReadStream(filePath, { start: from, end: to });
+  // Client aborts (seek / tab close) must not crash the process.
+  stream.on("error", () => {
+    try {
+      stream.destroy();
+    } catch {
+      // ignore
+    }
+  });
   const webStream = Readable.toWeb(stream) as unknown as ReadableStream;
 
   const common = {
