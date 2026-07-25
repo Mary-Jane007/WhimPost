@@ -310,6 +310,7 @@ export async function PATCH(req: NextRequest) {
     title?: string;
     durationMs?: number;
     currentPositionMs?: number;
+    force?: boolean;
   } | null;
   if (!body?.id) return jsonError("Missing clip id");
 
@@ -325,6 +326,7 @@ export async function PATCH(req: NextRequest) {
         body.currentPositionMs != null
           ? Number(body.currentPositionMs)
           : undefined,
+      force: Boolean(body.force),
     });
     if (!result.ok) return jsonError(result.error, 404);
     return NextResponse.json({

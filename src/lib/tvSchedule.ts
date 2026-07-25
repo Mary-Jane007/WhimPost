@@ -117,7 +117,7 @@ const DURATION_DRIFT_MS = 1500;
 export function correctVideoDurationMs(
   videoId: string,
   actualMs: number,
-  opts?: { currentPositionMs?: number }
+  opts?: { currentPositionMs?: number; force?: boolean }
 ): {
   ok: true;
   durationMs: number;
@@ -148,7 +148,11 @@ export function correctVideoDurationMs(
   }
 
   const existing = Number(videoRow.duration_ms) || 0;
-  if (existing > 0 && Math.abs(existing - next) < DURATION_DRIFT_MS) {
+  if (
+    !opts?.force &&
+    existing > 0 &&
+    Math.abs(existing - next) < DURATION_DRIFT_MS
+  ) {
     return { ok: true, durationMs: existing, changed: false };
   }
 

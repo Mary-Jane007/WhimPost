@@ -174,17 +174,22 @@ export function TvCorner({
   });
 
   /** Tell the server the real clip length so air times can flex when it ends early. */
-  function reportActualDuration(actualMs: number, positionMs?: number) {
+  function reportActualDuration(
+    actualMs: number,
+    positionMs?: number,
+    force = false
+  ) {
     const video = room.currentVideo;
     if (!video || video.sourceKind === "youtube") return;
     const durationMs = Math.max(1000, Math.floor(actualMs));
     if (!Number.isFinite(durationMs)) return;
     const stored = Number(video.durationMs) || 0;
-    if (stored > 0 && Math.abs(stored - durationMs) < 1500) return;
+    if (!force && stored > 0 && Math.abs(stored - durationMs) < 1500) return;
 
     const now = Date.now();
     const prev = lastDurationReport.current;
     if (
+      !force &&
       prev.id === video.id &&
       Math.abs(prev.ms - durationMs) < 1500 &&
       now - prev.at < 8000
@@ -201,6 +206,7 @@ export function TvCorner({
         durationMs,
         currentPositionMs:
           positionMs != null ? Math.max(0, Math.floor(positionMs)) : undefined,
+        force,
       }),
     }).catch(() => undefined);
   }
@@ -1158,6 +1164,7 @@ export function TvCorner({
     }
 
     if (room.isPlaying && el.paused && powerOn) {
+      if (villageBroadcast) el.muted = true;
       void el.play().catch(() => undefined);
     } else if (!room.isPlaying && !el.paused) {
       el.pause();
@@ -1377,6 +1384,9 @@ export function TvCorner({
                     src={room.currentVideo.url}
                     playsInline
                     preload="auto"
+                    // Village autoplay is blocked by browsers unless muted.
+                    muted={isVillageBroadcast(room)}
+                    autoPlay={isVillageBroadcast(room)}
                     disablePictureInPicture
                     controlsList="nodownload noplaybackrate noremoteplayback"
                     onPlay={() => {
@@ -1421,16 +1431,43 @@ export function TvCorner({
                         el.duration * 1000,
                         el.currentTime * 1000
                       );
+                      if (
+                        isVillageBroadcast(room) &&
+                        room.isPlaying &&
+                        el.paused &&
+                        powerOn
+                      ) {
+                        void el.play().catch(() => undefined);
+                      }
+                    }}
+                    onCanPlay={() => {
+                      const el = videoRef.current;
+                      if (
+                        !el ||
+                        !isVillageBroadcast(room) ||
+                        !room.isPlaying ||
+                        !powerOn
+                      ) {
+                        return;
+                      }
+                      if (el.paused) {
+                        void el.play().catch(() => undefined);
+                      }
                     }}
                     onEnded={() => {
-                      const el = videoRef.current;
                       if (isVillageBroadcast(room)) {
-                        // Clip finished sooner than the guide — shrink the slot
-                        // so the next air time starts now for the whole village.
-                        const endedMs = el
-                          ? Math.max(el.duration, el.currentTime) * 1000
-                          : room.currentVideo?.durationMs || 0;
-                        reportActualDuration(endedMs, endedMs);
+                        // End the air slot now so we never sit on a frozen
+                        // last frame waiting for an overstated guide time.
+                        const airStart = Date.parse(room.airStartsAt || "");
+                        const airedMs = Number.isFinite(airStart)
+                          ? Math.max(1000, Date.now() - airStart)
+                          : Math.max(
+                              1000,
+                              Math.floor(
+                                (videoRef.current?.duration || 0) * 1000
+                              )
+                            );
+                        reportActualDuration(airedMs, airedMs, true);
                         return;
                       }
                       playNextInChannel();
