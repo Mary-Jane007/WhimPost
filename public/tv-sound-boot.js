@@ -14,6 +14,9 @@
   function applySound() {
     var v = videoEl();
     if (!v) return false;
+    // Do not restart a finished clip — that loops one video while the guide
+    // advances to the next airing.
+    if (v.ended) return false;
     v.muted = false;
     try {
       v.volume = 1;
