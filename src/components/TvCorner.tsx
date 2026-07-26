@@ -142,18 +142,29 @@ function channelLabel(index: number) {
 }
 
 /**
- * Guide clock in fixed UTC + en-US so server HTML and the browser always match.
- * Locale-default formatting was crashing TV Corner with a hydration mismatch
- * (e.g. "3:57 AM" vs "12:57 AM") and blocking the set from playing.
+ * Format an air time in the viewer's local (laptop) timezone.
+ * SSR may render a UTC placeholder; /tv-guide-local.js and GuideClock both
+ * rewrite to local time without causing a hydration crash.
  */
-function formatGuideClock(iso: string) {
+function formatGuideClockLocal(iso: string) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleTimeString("en-US", {
+  return d.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
-    timeZone: "UTC",
   });
+}
+
+function GuideClock({ iso }: { iso: string }) {
+  const [label, setLabel] = useState(() => formatGuideClockLocal(iso));
+  useEffect(() => {
+    setLabel(formatGuideClockLocal(iso));
+  }, [iso]);
+  return (
+    <time dateTime={iso} data-tv-guide-time="" suppressHydrationWarning>
+      {label}
+    </time>
+  );
 }
 
 function formatDurationShort(ms: number) {
@@ -1817,10 +1828,10 @@ export function TvCorner({
                   schedule
                 </h2>
                 <p>
-                  Every clip joins the lineup. Air times follow each file&apos;s
-                  real length (and flex if a clip ends early). After all videos
-                  play, the order reshuffles. Join mid-show — the broadcast does
-                  not restart for you.
+                  Every clip joins the lineup. Air times are in your local time
+                  and follow each file&apos;s real length (and flex if a clip
+                  ends early). After all videos play, the order reshuffles. Join
+                  mid-show — the broadcast does not restart for you.
                 </p>
               </div>
               <ol className="tv-guide-list">
@@ -1829,9 +1840,7 @@ export function TvCorner({
                     key={`${slot.videoId}-${slot.startsAt}`}
                     className={slot.isCurrent ? "now" : undefined}
                   >
-                    <time dateTime={slot.startsAt}>
-                      {formatGuideClock(slot.startsAt)}
-                    </time>
+                    <GuideClock iso={slot.startsAt} />
                     <div>
                       <strong>
                         {slot.isCurrent ? "Now · " : ""}
@@ -1840,7 +1849,7 @@ export function TvCorner({
                       <span>
                         {formatDurationShort(slot.durationMs)}
                         {" · until "}
-                        {formatGuideClock(slot.endsAt)}
+                        <GuideClock iso={slot.endsAt} />
                       </span>
                     </div>
                   </li>

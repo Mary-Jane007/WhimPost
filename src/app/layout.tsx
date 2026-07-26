@@ -49,6 +49,7 @@ export default async function RootLayout({
       <head>
         {/* beforeInteractive only works from the root layout (not page.tsx). */}
         <Script src="/tv-sound-boot.js" strategy="beforeInteractive" />
+        <Script src="/tv-guide-local.js" strategy="beforeInteractive" />
       </head>
       <body className={themeClass} style={themeStyle}>
         <div className="forest-backdrop" aria-hidden />
