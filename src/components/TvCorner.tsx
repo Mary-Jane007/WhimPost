@@ -142,18 +142,29 @@ function channelLabel(index: number) {
 }
 
 /**
- * Guide clock in fixed UTC + en-US so server HTML and the browser always match.
- * Locale-default formatting was crashing TV Corner with a hydration mismatch
- * (e.g. "3:57 AM" vs "12:57 AM") and blocking the set from playing.
+ * Format an air time in the viewer's local (laptop) timezone.
+ * SSR may render a UTC placeholder; /tv-guide-local.js and GuideClock both
+ * rewrite to local time without causing a hydration crash.
  */
-function formatGuideClock(iso: string) {
+function formatGuideClockLocal(iso: string) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleTimeString("en-US", {
+  return d.toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
-    timeZone: "UTC",
   });
+}
+
+function GuideClock({ iso }: { iso: string }) {
+  const [label, setLabel] = useState(() => formatGuideClockLocal(iso));
+  useEffect(() => {
+    setLabel(formatGuideClockLocal(iso));
+  }, [iso]);
+  return (
+    <time dateTime={iso} data-tv-guide-time="" suppressHydrationWarning>
+      {label}
+    </time>
+  );
 }
 
 function formatDurationShort(ms: number) {
@@ -232,6 +243,11 @@ export function TvCorner({
   const pendingVillageSeekSec = useRef<number | null>(null);
   /** One successful airtime lock per airing — stops canplay/poll from replaying scenes. */
   const villageLockedAiringRef = useRef("");
+  /**
+   * After a clip finishes, play() would restart it from 0 and look like a
+   * loop. Hold off until the schedule advances to the next airing.
+   */
+  const villageEndedAiringRef = useRef("");
   const lastProgressPush = useRef(0);
   const localControlRef = useRef(false);
   const uploadCancelRef = useRef(false);
@@ -249,6 +265,10 @@ export function TvCorner({
   function tryPlayVillage(el: HTMLVideoElement) {
     if (!powerOn || !room.isPlaying) return;
     if (!isVillageBroadcast(room)) return;
+    const airing = villageAiringId();
+    // Never restart a finished clip — that loops one video forever while the
+    // guide is still catching up / waiting for the next poll.
+    if (el.ended || villageEndedAiringRef.current === airing) return;
     // Sound stays on — no mute UI. If the browser blocks unmuted autoplay,
     // fall back to muted picture; /tv-sound-boot.js unlocks audio on the
     // next real user gesture (any click/key) without a prompt.
@@ -353,17 +373,19 @@ export function TvCorner({
   ]);
 
   /** Tell the server the real clip length so air times can flex when it ends early. */
-  function reportActualDuration(
+  async function reportActualDuration(
     actualMs: number,
     positionMs?: number,
     force = false
   ) {
     const video = room.currentVideo;
-    if (!video || video.sourceKind === "youtube") return;
+    if (!video || video.sourceKind === "youtube") return false;
     const durationMs = Math.max(1000, Math.floor(actualMs));
-    if (!Number.isFinite(durationMs)) return;
+    if (!Number.isFinite(durationMs)) return false;
     const stored = Number(video.durationMs) || 0;
-    if (!force && stored > 0 && Math.abs(stored - durationMs) < 1500) return;
+    if (!force && stored > 0 && Math.abs(stored - durationMs) < 1500) {
+      return false;
+    }
 
     const now = Date.now();
     const prev = lastDurationReport.current;
@@ -373,21 +395,41 @@ export function TvCorner({
       Math.abs(prev.ms - durationMs) < 1500 &&
       now - prev.at < 8000
     ) {
-      return;
+      return false;
     }
     lastDurationReport.current = { id: video.id, ms: durationMs, at: now };
 
-    void fetch("/api/tv/videos", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: video.id,
-        durationMs,
-        currentPositionMs:
-          positionMs != null ? Math.max(0, Math.floor(positionMs)) : undefined,
-        force,
-      }),
-    }).catch(() => undefined);
+    try {
+      const res = await fetch("/api/tv/videos", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: video.id,
+          durationMs,
+          currentPositionMs:
+            positionMs != null ? Math.max(0, Math.floor(positionMs)) : undefined,
+          force,
+        }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Pull fresh village broadcast state (next clip after an early end). */
+  async function refreshVillageRoom() {
+    if (!roomIdRef.current) return;
+    try {
+      const res = await fetch(`/api/tv/room/${roomIdRef.current}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.room || data.room.id !== roomIdRef.current) return;
+      setRoom(data.room as TvRoomState);
+      if (data.channels) setChannels(data.channels);
+    } catch {
+      // ignore transient refresh errors
+    }
   }
 
   const effectiveChannelId = channels.some((c) => c.id === selectedChannelId)
@@ -397,6 +439,17 @@ export function TvCorner({
   useEffect(() => {
     roomIdRef.current = room.id;
   }, [room.id]);
+
+  // New airing → allow playback again after a prior clip's ended hold.
+  useEffect(() => {
+    const airing = airingKey(room.currentVideoId, room.airStartsAt);
+    if (
+      villageEndedAiringRef.current &&
+      villageEndedAiringRef.current !== airing
+    ) {
+      villageEndedAiringRef.current = "";
+    }
+  }, [room.currentVideoId, room.airStartsAt]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1227,20 +1280,10 @@ export function TvCorner({
         const suppressing = now < suppressUntil.current;
 
         setRoom((prev) => {
-          // Village broadcast is server clock. When the same clip is still
-          // airing, keep the local currentVideo object so file players
-          // are not remounted every poll — only refresh guide/chat metadata.
+          // Village broadcast is server clock. Always take the remote room —
+          // the <video> remount key is airing identity, not object identity,
+          // and we need fresh durationMs / next-clip advances after a finish.
           if (isVillageBroadcast(remote)) {
-            if (
-              prev.currentVideoId &&
-              prev.currentVideoId === remote.currentVideoId &&
-              prev.currentVideo
-            ) {
-              return {
-                ...remote,
-                currentVideo: prev.currentVideo,
-              };
-            }
             return remote;
           }
           // Always refresh chat + watchers.
@@ -1693,18 +1736,27 @@ export function TvCorner({
                     }}
                     onEnded={() => {
                       if (isVillageBroadcast(room)) {
-                        // End the air slot now so we never sit on a frozen
-                        // last frame waiting for an overstated guide time.
+                        // Mark this airing finished so sync/play cannot restart
+                        // the same file (that looked like one video on a loop).
+                        villageEndedAiringRef.current = villageAiringId();
                         const airStart = Date.parse(room.airStartsAt || "");
+                        const mediaMs = Math.floor(
+                          (videoRef.current?.duration || 0) * 1000
+                        );
+                        // Prefer the real file length; fall back to aired wall time.
                         const airedMs = Number.isFinite(airStart)
                           ? Math.max(1000, Date.now() - airStart)
-                          : Math.max(
-                              1000,
-                              Math.floor(
-                                (videoRef.current?.duration || 0) * 1000
-                              )
-                            );
-                        reportActualDuration(airedMs, airedMs, true);
+                          : Math.max(1000, mediaMs);
+                        const durationMs =
+                          mediaMs > 1000 ? mediaMs : airedMs;
+                        void (async () => {
+                          await reportActualDuration(
+                            durationMs,
+                            durationMs,
+                            true
+                          );
+                          await refreshVillageRoom();
+                        })();
                         return;
                       }
                       playNextInChannel();
@@ -1817,10 +1869,10 @@ export function TvCorner({
                   schedule
                 </h2>
                 <p>
-                  Every clip joins the lineup. Air times follow each file&apos;s
-                  real length (and flex if a clip ends early). After all videos
-                  play, the order reshuffles. Join mid-show — the broadcast does
-                  not restart for you.
+                  Every clip joins the lineup. Air times are in your local time
+                  and follow each file&apos;s real length (and flex if a clip
+                  ends early). After all videos play, the order reshuffles. Join
+                  mid-show — the broadcast does not restart for you.
                 </p>
               </div>
               <ol className="tv-guide-list">
@@ -1829,9 +1881,7 @@ export function TvCorner({
                     key={`${slot.videoId}-${slot.startsAt}`}
                     className={slot.isCurrent ? "now" : undefined}
                   >
-                    <time dateTime={slot.startsAt}>
-                      {formatGuideClock(slot.startsAt)}
-                    </time>
+                    <GuideClock iso={slot.startsAt} />
                     <div>
                       <strong>
                         {slot.isCurrent ? "Now · " : ""}
@@ -1840,7 +1890,7 @@ export function TvCorner({
                       <span>
                         {formatDurationShort(slot.durationMs)}
                         {" · until "}
-                        {formatGuideClock(slot.endsAt)}
+                        <GuideClock iso={slot.endsAt} />
                       </span>
                     </div>
                   </li>
