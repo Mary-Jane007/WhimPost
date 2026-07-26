@@ -64,6 +64,50 @@ function kindFromUrl(url: string, fileName?: string | null): BookKind {
   return "unknown";
 }
 
+function resolveEpubFactory(
+  mod: unknown
+): (data: ArrayBuffer) => EpubBookApi {
+  const m = mod as {
+    default?: unknown;
+    Book?: new (data: ArrayBuffer) => EpubBookApi;
+  };
+  if (typeof mod === "function") {
+    return mod as (data: ArrayBuffer) => EpubBookApi;
+  }
+  if (typeof m.default === "function") {
+    return m.default as (data: ArrayBuffer) => EpubBookApi;
+  }
+  if (
+    m.default &&
+    typeof m.default === "object" &&
+    typeof (m.default as { default?: unknown }).default === "function"
+  ) {
+    return (m.default as { default: (data: ArrayBuffer) => EpubBookApi })
+      .default;
+  }
+  if (typeof m.Book === "function") {
+    return (data) => new m.Book!(data);
+  }
+  throw new Error("Could not load the EPUB reader");
+}
+
+/** Skip old chapter-local bookmarks that break resume on re-open. */
+function usableResumeCfi(
+  pos?: ReadingPosition | null
+): string | undefined {
+  if (!pos?.cfi) return undefined;
+  const label = (pos.label || "").trim();
+  if (
+    typeof pos.total === "number" &&
+    pos.total > 0 &&
+    pos.total <= 12 &&
+    /^page\s+\d+\s+of\s+\d+$/i.test(label)
+  ) {
+    return undefined;
+  }
+  return pos.cfi;
+}
+
 function placeFromLocation(
   location: unknown,
   book: EpubBookApi | null
@@ -157,19 +201,20 @@ export function LibraryBookReader({
     display: (cfi: string) => void;
     resize: () => void;
   } | null>(null);
+  const resumeCfi = usableResumeCfi(initialPosition);
   const placeRef = useRef<LivePlace>({
-    cfi: initialPosition?.cfi || null,
-    percent: initialPosition?.percent || 0,
-    page: initialPosition?.page ?? null,
-    total: initialPosition?.total ?? null,
-    label: initialPosition?.label || "",
-    reliable: Boolean(initialPosition?.cfi || (initialPosition?.percent || 0) > 0),
+    cfi: resumeCfi || null,
+    percent: resumeCfi ? initialPosition?.percent || 0 : 0,
+    page: resumeCfi ? initialPosition?.page ?? null : null,
+    total: resumeCfi ? initialPosition?.total ?? null : null,
+    label: resumeCfi ? initialPosition?.label || "" : "",
+    reliable: Boolean(resumeCfi && (initialPosition?.percent || 0) > 0),
   });
   const saveTimer = useRef<number | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(kind === "epub");
   const [locationLabel, setLocationLabel] = useState(
-    initialPosition?.label || ""
+    resumeCfi ? initialPosition?.label || "" : ""
   );
   const [saveHint, setSaveHint] = useState("");
   const [notesOpen, setNotesOpen] = useState(false);
@@ -303,11 +348,7 @@ export function LibraryBookReader({
       setError("");
       try {
         const mod = await import("epubjs");
-        const ePub = (
-          "default" in mod && typeof mod.default === "function"
-            ? mod.default
-            : (mod as unknown as (data: ArrayBuffer) => unknown)
-        ) as (data: ArrayBuffer) => EpubBookApi;
+        const ePub = resolveEpubFactory(mod);
 
         const res = await fetch(fileUrl, { credentials: "include" });
         if (!res.ok) {
@@ -325,14 +366,6 @@ export function LibraryBookReader({
         await book.ready;
         if (cancelled) return;
 
-        // Finer location grid → smoother, more accurate whole-book %.
-        try {
-          await book.locations.generate(480);
-        } catch {
-          // Some EPUBs still work without locations; don't invent a %.
-        }
-        if (cancelled) return;
-
         const measure = () => {
           const rect = host.getBoundingClientRect();
           return {
@@ -347,7 +380,7 @@ export function LibraryBookReader({
         );
         if (cancelled) return;
 
-        let { width, height } = measure();
+        const { width, height } = measure();
         const rendition = book.renderTo(host, {
           width,
           height,
@@ -388,8 +421,14 @@ export function LibraryBookReader({
           resize: doResize,
         };
 
-        const resumeCfi = initialPosition?.cfi || undefined;
-        await rendition.display(resumeCfi);
+        // Show pages first — locations.generate on long/illustrated EPUBs
+        // (e.g. Pride and Prejudice) can take a long time and used to block open.
+        const resumeCfi = usableResumeCfi(initialPosition);
+        try {
+          await rendition.display(resumeCfi);
+        } catch {
+          await rendition.display();
+        }
         if (cancelled) {
           book.destroy();
           return;
@@ -418,6 +457,28 @@ export function LibraryBookReader({
         });
 
         setLoading(false);
+
+        // Whole-book % in the background after the reader is already usable.
+        const bookForLocations = book;
+        void (async () => {
+          try {
+            await bookForLocations.locations.generate(1000);
+            if (cancelled) return;
+            // Refresh label/% from the current place now that locations exist.
+            const cfi = placeRef.current.cfi;
+            if (!cfi) return;
+            const place = placeFromLocation(
+              { start: { cfi } },
+              bookApiRef.current
+            );
+            if (!place.reliable) return;
+            placeRef.current = place;
+            setLocationLabel(place.label);
+            void persistPlace(place, true);
+          } catch {
+            // Some EPUBs still work without locations; don't invent a %.
+          }
+        })();
       } catch (err) {
         if (cancelled) return;
         setLoading(false);
