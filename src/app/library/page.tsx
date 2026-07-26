@@ -9,11 +9,25 @@ import {
 } from "@/lib/libraryBooks";
 import { MosshollowLibrary } from "@/components/MosshollowLibrary";
 import { PageCrest } from "@/components/PageCrest";
+import {
+  LIBRARY_TABS,
+  type LibraryTabId,
+} from "@/lib/libraryContent";
 
-export default async function LibraryPage() {
+type Props = {
+  searchParams?: Promise<{ tab?: string }>;
+};
+
+function parseTab(raw: string | undefined): LibraryTabId {
+  const id = (raw || "bookclub") as LibraryTabId;
+  return LIBRARY_TABS.some((t) => t.id === id) ? id : "bookclub";
+}
+
+export default async function LibraryPage({ searchParams }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-
+  const sp = (await searchParams) || {};
+  const initialTab = parseTab(sp.tab);
   if (!user.villageId) {
     return (
       <main className="app-main forest-panel">
@@ -74,6 +88,7 @@ export default async function LibraryPage() {
           clubBooks={clubBooks}
           readingList={readingList}
           featuredBook={featuredBook}
+          initialTab={initialTab}
         />
       ) : (
         <p className="muted">The shelves are empty for now.</p>

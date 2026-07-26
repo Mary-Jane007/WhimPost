@@ -46,11 +46,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        {/* beforeInteractive only works from the root layout (not page.tsx). */}
-        <Script src="/tv-sound-boot.js" strategy="beforeInteractive" />
-      </head>
       <body className={themeClass} style={themeStyle}>
+        {/*
+          Do NOT wrap Script in a manual <head> or use beforeInteractive here —
+          that breaks App Router hydration site-wide (buttons stop working).
+          afterInteractive keeps TV unmute working without killing React.
+        */}
+        <Script src="/tv-sound-boot.js" strategy="afterInteractive" />
         <div className="forest-backdrop" aria-hidden />
         <div className="page-shell">
           <SiteForestStickers villageId={villageId} />

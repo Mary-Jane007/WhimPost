@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { UserPublic } from "@/lib/types";
 import type { LibraryProgress } from "@/lib/library";
@@ -19,7 +20,6 @@ import {
   type ReadingListBook,
 } from "@/lib/libraryContent";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
-import { LibraryBookReader } from "@/components/LibraryBookReader";
 import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 
@@ -29,6 +29,8 @@ type Props = {
   clubBooks: ClubBook[];
   readingList: ReadingListBook[];
   featuredBook: ClubBook;
+  /** From ?tab= so sections work even if the client fails to hydrate. */
+  initialTab?: LibraryTabId;
 };
 
 export function MosshollowLibrary({
@@ -37,8 +39,9 @@ export function MosshollowLibrary({
   clubBooks,
   readingList,
   featuredBook,
+  initialTab = "bookclub",
 }: Props) {
-  const [tab, setTab] = useState<LibraryTabId>("bookclub");
+  const [tab, setTab] = useState<LibraryTabId>(initialTab);
   const [progress, setProgress] = useState(initialProgress);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,13 +59,6 @@ export function MosshollowLibrary({
   const [shelfClub, setShelfClub] = useState(clubBooks);
   const [shelfList, setShelfList] = useState(readingList);
   const [book, setBook] = useState(featuredBook);
-  const [reader, setReader] = useState<{
-    bookId: string;
-    title: string;
-    author?: string;
-    fileUrl: string;
-    fileName?: string | null;
-  } | null>(null);
 
   const curiosity = featuredCuriosity();
   const mystery = featuredMystery();
@@ -86,6 +82,10 @@ export function MosshollowLibrary({
     progress.bookProgress[book.id] ??
     0;
   const bookFinished = Boolean(progress.finishedBooks[book.id]);
+
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setSecretVisible(true), 4000);
@@ -193,14 +193,14 @@ export function MosshollowLibrary({
 
       <nav className="mh-tabs" aria-label="Library sections">
         {LIBRARY_TABS.map((t) => (
-          <button
+          <Link
             key={t.id}
-            type="button"
+            href={`/library?tab=${t.id}`}
+            scroll={false}
             className={tab === t.id ? "active" : ""}
-            onClick={() => setTab(t.id)}
           >
             <span aria-hidden>{t.emoji}</span> {t.label}
-          </button>
+          </Link>
         ))}
       </nav>
 
@@ -259,22 +259,13 @@ export function MosshollowLibrary({
                 </p>
                 {book.fileUrl ? (
                   <p className="mh-file-link">
-                    <button
-                      type="button"
+                    <Link
+                      href={`/library/read/${encodeURIComponent(book.id)}`}
                       className="btn-primary"
-                      onClick={() =>
-                        setReader({
-                          bookId: book.id,
-                          title: book.title,
-                          author: book.author,
-                          fileUrl: book.fileUrl!,
-                          fileName: book.fileName,
-                        })
-                      }
                     >
                       Read in the library
                       {book.fileName ? ` · ${book.fileName}` : ""}
-                    </button>
+                    </Link>
                   </p>
                 ) : null}
                 {user.isOwner ? (
@@ -408,21 +399,12 @@ export function MosshollowLibrary({
                       </button>
                       <div className="mh-shelf-actions">
                         {b.fileUrl ? (
-                          <button
-                            type="button"
+                          <Link
+                            href={`/library/read/${encodeURIComponent(b.id)}`}
                             className="btn-secondary mh-attach-btn"
-                            onClick={() =>
-                              setReader({
-                                bookId: b.id,
-                                title: b.title,
-                                author: b.author,
-                                fileUrl: b.fileUrl!,
-                                fileName: b.fileName,
-                              })
-                            }
                           >
                             Read
-                          </button>
+                          </Link>
                         ) : null}
                         {user.isOwner ? (
                           <>
@@ -500,21 +482,12 @@ export function MosshollowLibrary({
                     <p className="mh-rating">★ {b.rating.toFixed(1)} community</p>
                     {b.fileUrl ? (
                       <p className="mh-file-link">
-                        <button
-                          type="button"
+                        <Link
+                          href={`/library/read/${encodeURIComponent(b.id)}`}
                           className="btn-primary"
-                          onClick={() =>
-                            setReader({
-                              bookId: b.id,
-                              title: b.title,
-                              author: b.author,
-                              fileUrl: b.fileUrl!,
-                              fileName: b.fileName,
-                            })
-                          }
                         >
                           Read in the library
-                        </button>
+                        </Link>
                       </p>
                     ) : null}
                     {user.isOwner ? (
@@ -968,43 +941,6 @@ export function MosshollowLibrary({
         <div style={{ marginTop: "1rem" }}>
           <LibraryAdminEditor onChanged={() => void refreshShelves()} />
         </div>
-      ) : null}
-
-      {reader ? (
-        <LibraryBookReader
-          bookId={reader.bookId}
-          title={reader.title}
-          author={reader.author}
-          fileUrl={reader.fileUrl}
-          fileName={reader.fileName}
-          initialPosition={
-            progress.readingPositions?.[reader.bookId] || null
-          }
-          onClose={() => setReader(null)}
-          onProgressSaved={({ bookId, percent, position }) => {
-            setProgress((prev) => ({
-              ...prev,
-              bookProgress: {
-                ...prev.bookProgress,
-                // Exact place — never keep an inflated high-water %.
-                [bookId]: percent,
-              },
-              readingStatus: {
-                ...prev.readingStatus,
-                [bookId]:
-                  percent >= 100
-                    ? "finished"
-                    : percent > 0
-                      ? "reading"
-                      : prev.readingStatus[bookId] || "none",
-              },
-              readingPositions: {
-                ...prev.readingPositions,
-                [bookId]: position,
-              },
-            }));
-          }}
-        />
       ) : null}
     </div>
   );
