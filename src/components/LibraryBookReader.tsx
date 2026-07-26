@@ -31,6 +31,8 @@ type LivePlace = {
   page: number | null;
   total: number | null;
   label: string;
+  /** True when percent came from whole-book locations (safe to persist). */
+  reliable: boolean;
 };
 
 type EpubBookApi = {
@@ -77,52 +79,63 @@ function placeFromLocation(
   let percent = 0;
   let page: number | null = null;
   let total: number | null = null;
+  let reliable = false;
 
   // Whole-book progress from generated locations (accurate).
+  // Do NOT use chapter `displayed.page/total` for percent — that is local to
+  // the current spine item and was inflating progress (e.g. mid-chapter-1 → 50%+).
   if (cfi && book) {
     try {
       const locLen = book.locations.length();
       if (locLen > 0) {
-        const pct = book.locations.percentageFromCfi(cfi);
-        if (Number.isFinite(pct)) {
-          percent = Math.round(Math.max(0, Math.min(1, pct)) * 100);
-        }
-        const idx = book.locations.locationFromCfi(cfi);
-        if (typeof idx === "number" && idx >= 0) {
+        const idxRaw = book.locations.locationFromCfi(cfi);
+        if (typeof idxRaw === "number" && idxRaw >= 0) {
+          const idx = Math.min(idxRaw, Math.max(0, locLen - 1));
           page = idx + 1;
           total = locLen;
+          // Map first location → 0%, last → 100% (epubjs uses loc/total and
+          // also treats loc=0 as falsy, which under-reports the start).
+          percent =
+            locLen <= 1
+              ? idx > 0
+                ? 100
+                : 0
+              : Math.round((idx / (locLen - 1)) * 100);
+          percent = Math.max(0, Math.min(100, percent));
+          reliable = true;
+        } else {
+          const pct = book.locations.percentageFromCfi(cfi);
+          if (typeof pct === "number" && Number.isFinite(pct)) {
+            percent = Math.round(Math.max(0, Math.min(1, pct)) * 100);
+            reliable = true;
+          }
         }
       }
     } catch {
-      // fall through
+      // fall through — keep prior percent at 0 until locations exist
     }
   }
 
-  // Fallback: section percentage / displayed pages (less accurate).
-  if (!percent) {
-    const percentage = Number(loc?.start?.percentage);
-    if (Number.isFinite(percentage)) {
-      percent = Math.round(Math.max(0, Math.min(1, percentage)) * 100);
-    }
-  }
+  // Soft chapter label only (never drives whole-book %).
   if (!page || !total) {
     const dPage = loc?.start?.displayed?.page ?? null;
     const dTotal = loc?.start?.displayed?.total ?? null;
-    if (dPage && dTotal && dTotal > 1) {
+    if (dPage && dTotal && dTotal > 1 && !reliable) {
       page = dPage;
       total = dTotal;
-      if (!percent) percent = Math.round((dPage / dTotal) * 100);
     }
   }
 
   const label =
-    total && page
+    reliable && total && page
       ? `${percent}% · place ${page} of ${total}`
-      : percent
+      : reliable && percent > 0
         ? `${percent}% through`
-        : "Beginning";
+        : !reliable && page && total
+          ? `Chapter place ${page} of ${total}`
+          : "Beginning";
 
-  return { cfi, percent, page, total, label };
+  return { cfi, percent, page, total, label, reliable };
 }
 
 export function LibraryBookReader({
@@ -150,6 +163,7 @@ export function LibraryBookReader({
     page: initialPosition?.page ?? null,
     total: initialPosition?.total ?? null,
     label: initialPosition?.label || "",
+    reliable: Boolean(initialPosition?.cfi || (initialPosition?.percent || 0) > 0),
   });
   const saveTimer = useRef<number | null>(null);
   const [error, setError] = useState("");
@@ -166,6 +180,10 @@ export function LibraryBookReader({
   const [noteError, setNoteError] = useState("");
 
   async function persistPlace(place: LivePlace, immediate = false) {
+    // Only persist whole-book % once locations are ready — otherwise we would
+    // overwrite a good bookmark with a chapter-local guess (or 0%).
+    if (!place.reliable && !place.cfi) return;
+
     const run = async () => {
       const res = await fetch("/api/library/progress", {
         method: "POST",
@@ -173,11 +191,12 @@ export function LibraryBookReader({
         body: JSON.stringify({
           type: "saveReadingPosition",
           bookId,
-          percent: place.percent,
+          percent: place.reliable ? place.percent : undefined,
           cfi: place.cfi,
           page: place.page,
           total: place.total,
           label: place.label,
+          reliable: place.reliable,
         }),
       });
       if (!res.ok) return;
@@ -189,11 +208,13 @@ export function LibraryBookReader({
         label: place.label,
         updatedAt: new Date().toISOString(),
       };
-      onProgressSaved?.({
-        bookId,
-        percent: place.percent,
-        position,
-      });
+      if (place.reliable) {
+        onProgressSaved?.({
+          bookId,
+          percent: place.percent,
+          position,
+        });
+      }
       setSaveHint("Place saved");
       window.setTimeout(() => setSaveHint(""), 1200);
     };
@@ -235,7 +256,7 @@ export function LibraryBookReader({
       document.body.style.overflow = prev;
       if (saveTimer.current) window.clearTimeout(saveTimer.current);
       const place = placeRef.current;
-      if (place.cfi || place.percent > 0 || place.page) {
+      if (place.reliable && (place.cfi || place.percent > 0 || place.page)) {
         void persistPlace(place, true);
       }
     };
@@ -304,11 +325,11 @@ export function LibraryBookReader({
         await book.ready;
         if (cancelled) return;
 
-        // Build whole-book location index for accurate % progress.
+        // Finer location grid → smoother, more accurate whole-book %.
         try {
-          await book.locations.generate(1200);
+          await book.locations.generate(480);
         } catch {
-          // Some EPUBs still work without locations; fall back later.
+          // Some EPUBs still work without locations; don't invent a %.
         }
         if (cancelled) return;
 
@@ -384,6 +405,13 @@ export function LibraryBookReader({
 
         rendition.on("relocated", (location: unknown) => {
           const place = placeFromLocation(location, bookApiRef.current);
+          if (!place.reliable) {
+            // Keep the last reliable percent so the header doesn't jump to 0.
+            place.percent = placeRef.current.percent;
+            if (!place.label || place.label === "Beginning") {
+              place.label = placeRef.current.label || place.label;
+            }
+          }
           placeRef.current = place;
           setLocationLabel(place.label);
           void persistPlace(place);

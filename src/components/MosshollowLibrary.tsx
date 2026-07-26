@@ -80,7 +80,11 @@ export function MosshollowLibrary({
     }
     if (Array.isArray(data.readingList)) setShelfList(data.readingList);
   }
-  const bookPct = progress.bookProgress[book.id] || 0;
+  // Prefer the live bookmark % (CFI-based) over any older sticky shelf value.
+  const bookPct =
+    progress.readingPositions?.[book.id]?.percent ??
+    progress.bookProgress[book.id] ??
+    0;
   const bookFinished = Boolean(progress.finishedBooks[book.id]);
 
   useEffect(() => {
@@ -982,7 +986,8 @@ export function MosshollowLibrary({
               ...prev,
               bookProgress: {
                 ...prev.bookProgress,
-                [bookId]: Math.max(prev.bookProgress[bookId] || 0, percent),
+                // Exact place — never keep an inflated high-water %.
+                [bookId]: percent,
               },
               readingStatus: {
                 ...prev.readingStatus,

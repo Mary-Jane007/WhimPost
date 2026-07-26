@@ -227,16 +227,28 @@ export function getLibraryProgress(userId: string): LibraryProgress {
   const thought = featuredThought();
   const challenges = weeklyChallenges();
 
+  const readingPositions = getReadingPositions(userId);
+  const bookProgress = parseJson<Record<string, number>>(
+    row.book_progress_json,
+    {}
+  );
+  // Prefer CFI bookmark % over any older sticky/inflated shelf value.
+  for (const [id, pos] of Object.entries(readingPositions)) {
+    if (pos && Number.isFinite(pos.percent)) {
+      bookProgress[id] = Math.max(0, Math.min(100, Math.round(pos.percent)));
+    }
+  }
+
   return {
     xp: Number(row.xp) || 0,
     title: titleForLibraryXp(Number(row.xp) || 0),
     badges: parseJson(row.badges_json, []),
     stamps: parseJson(row.stamps_json, []),
-    bookProgress: parseJson(row.book_progress_json, {}),
+    bookProgress,
     finishedBooks: parseJson(row.finished_json, {}),
     wishlist: parseJson(row.wishlist_json, {}),
     readingStatus: parseJson(row.reading_status_json, {}),
-    readingPositions: getReadingPositions(userId),
+    readingPositions,
     curiosityDone: parseJson(row.curiosity_json, {}),
     mysteryDone: parseJson(row.mystery_json, {}),
     challenges: parseJson(row.challenges_json, {}),
@@ -260,11 +272,12 @@ export type LibraryAction =
   | {
       type: "saveReadingPosition";
       bookId: string;
-      percent: number;
+      percent?: number;
       cfi?: string | null;
       page?: number | null;
       total?: number | null;
       label?: string;
+      reliable?: boolean;
     }
   | { type: "finishBook"; bookId: string; reflection?: string; quote?: string }
   | { type: "wishlist"; bookId: string; on: boolean }
@@ -327,8 +340,10 @@ export function applyLibraryAction(
 
   if (action.type === "bookProgress") {
     const pct = Math.max(0, Math.min(100, Math.floor(action.percent)));
-    bookProgress[action.bookId] = Math.max(bookProgress[action.bookId] || 0, pct);
-    readingStatus[action.bookId] = pct >= 100 ? "finished" : "reading";
+    // Manual slider sets the exact value (no sticky high-water).
+    bookProgress[action.bookId] = pct;
+    readingStatus[action.bookId] =
+      pct >= 100 ? "finished" : pct > 0 ? "reading" : "none";
   } else if (action.type === "saveReadingPosition") {
     const saved = saveReadingPosition(userId, action.bookId, {
       cfi: action.cfi,
@@ -338,7 +353,10 @@ export function applyLibraryAction(
       label: action.label,
     });
     Object.assign(bookProgress, saved.bookProgress);
-    const pct = Math.max(0, Math.min(100, Math.round(action.percent) || 0));
+    const pct = Math.max(
+      0,
+      Math.min(100, Math.round(Number(saved.bookProgress[action.bookId]) || 0))
+    );
     readingStatus[action.bookId] =
       pct >= 100 ? "finished" : pct > 0 ? "reading" : readingStatus[action.bookId] || "none";
     // Early return — saveReadingPosition already wrote progress columns.

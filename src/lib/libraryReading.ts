@@ -75,13 +75,13 @@ export function getReadingPosition(
   return all[bookId] || null;
 }
 
-/** Always overwrite last-page position; bump high-water progress percent. */
+/** Overwrite last-page position and sync shelf % to the real place. */
 export function saveReadingPosition(
   userId: string,
   bookId: string,
   position: {
     cfi?: string | null;
-    percent: number;
+    percent?: number | null;
     page?: number | null;
     total?: number | null;
     label?: string;
@@ -133,19 +133,23 @@ export function saveReadingPosition(
     }
   })();
 
-  const pct = Math.max(
-    0,
-    Math.min(100, Math.round(Number(position.percent) || 0))
-  );
+  const hasPercent = position.percent != null && Number.isFinite(Number(position.percent));
+  const pct = hasPercent
+    ? Math.max(0, Math.min(100, Math.round(Number(position.percent))))
+    : Math.max(0, Math.min(100, Math.round(Number(positions[id]?.percent) || 0)));
   positions[id] = {
-    cfi: position.cfi || null,
+    cfi: position.cfi || positions[id]?.cfi || null,
     percent: pct,
-    page: position.page ?? null,
-    total: position.total ?? null,
-    label: (position.label || "").slice(0, 80),
+    page: position.page ?? positions[id]?.page ?? null,
+    total: position.total ?? positions[id]?.total ?? null,
+    label: (position.label || positions[id]?.label || "").slice(0, 80),
     updatedAt: new Date().toISOString(),
   };
-  bookProgress[id] = Math.max(bookProgress[id] || 0, pct);
+  // Sync shelf % to the real place — do not keep a sticky high-water mark from
+  // older (inflated chapter-page) estimates.
+  if (hasPercent) {
+    bookProgress[id] = pct;
+  }
   if (pct >= 100) readingStatus[id] = "finished";
   else if (pct > 0) readingStatus[id] = "reading";
 
