@@ -57,21 +57,34 @@ export function ProfileActions({
   return (
     <div className="profile-actions">
       {status.status === "friends" && (
-        <Link className="cottage-tool cottage-tool-primary" href={`/compose?to=${username}`}>
+        <Link
+          className="cottage-tool cottage-tool-primary"
+          href={`/compose?to=${username}`}
+        >
           <span aria-hidden>✉</span>
           Write
         </Link>
       )}
       {status.status === "none" && (
-        <button
-          type="button"
-          className="cottage-tool cottage-tool-primary"
-          onClick={sendRequest}
-          disabled={busy}
+        <form
+          action="/api/friends/request"
+          method="post"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void sendRequest();
+          }}
         >
-          <span aria-hidden>🌼</span>
-          {busy ? "Sending…" : "Add friend"}
-        </button>
+          <input type="hidden" name="username" value={username} />
+          <input type="hidden" name="next" value={`/profile/${username}`} />
+          <button
+            type="submit"
+            className="cottage-tool cottage-tool-primary"
+            disabled={busy}
+          >
+            <span aria-hidden>🌼</span>
+            {busy ? "Sending…" : "Add friend"}
+          </button>
+        </form>
       )}
       {status.status === "pending_out" && (
         <span className="cottage-tool is-disabled">
@@ -81,23 +94,41 @@ export function ProfileActions({
       )}
       {status.status === "pending_in" && (
         <>
-          <button
-            type="button"
-            className="cottage-tool cottage-tool-primary"
-            onClick={() => respond("accept")}
-            disabled={busy}
+          <form
+            action="/api/friends/respond"
+            method="post"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void respond("accept");
+            }}
           >
-            <span aria-hidden>✓</span>
-            Accept
-          </button>
-          <button
-            type="button"
-            className="cottage-tool"
-            onClick={() => respond("decline")}
-            disabled={busy}
+            <input type="hidden" name="requestId" value={status.requestId} />
+            <input type="hidden" name="action" value="accept" />
+            <input type="hidden" name="next" value={`/profile/${username}`} />
+            <button
+              type="submit"
+              className="cottage-tool cottage-tool-primary"
+              disabled={busy}
+            >
+              <span aria-hidden>✓</span>
+              Accept
+            </button>
+          </form>
+          <form
+            action="/api/friends/respond"
+            method="post"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void respond("decline");
+            }}
           >
-            Decline
-          </button>
+            <input type="hidden" name="requestId" value={status.requestId} />
+            <input type="hidden" name="action" value="decline" />
+            <input type="hidden" name="next" value={`/profile/${username}`} />
+            <button type="submit" className="cottage-tool" disabled={busy}>
+              Decline
+            </button>
+          </form>
         </>
       )}
       {error && <p className="form-error">{error}</p>}

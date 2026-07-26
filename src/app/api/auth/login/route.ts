@@ -9,13 +9,16 @@ import {
 import { getDb } from "@/lib/db";
 import { claimOwnerIfUnset } from "@/lib/owner";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
+import {
+  readRequestFields,
+  redirectSameHost,
+  wantsHtmlRedirect,
+} from "@/lib/requestBody";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null);
-  if (!body) return jsonError("Invalid request body");
-
-  const login = String(body.login || "").trim();
-  const password = String(body.password || "");
+  const fields = await readRequestFields(req);
+  const login = String(fields.login || "").trim();
+  const password = String(fields.password || "");
   if (!login || !password) return jsonError("Login and password are required");
 
   const db = getDb();
@@ -77,6 +80,17 @@ export async function POST(req: NextRequest) {
     userId: refreshed.id,
     username: refreshed.username,
   });
+
+  if (wantsHtmlRedirect(req)) {
+    const nextRaw = fields.next || "/village";
+    const next =
+      nextRaw.startsWith("/") && !nextRaw.startsWith("//")
+        ? nextRaw
+        : "/village";
+    const res = redirectSameHost(req, next);
+    await attachSessionCookie(res, token);
+    return res;
+  }
 
   // Set-Cookie on the response itself — more reliable than cookies().set() alone
   // when the browser immediately navigates after fetch().

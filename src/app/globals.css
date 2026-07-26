@@ -1631,6 +1631,24 @@ body.theme-clovermeadow .village-sticker-pack {
   display: grid;
   gap: 0.75rem;
   justify-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.letter-open-details {
+  border: none;
+}
+
+.letter-open-details > summary {
+  list-style: none;
+}
+
+.letter-open-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.letter-open-details[open] > summary .open-cue {
+  opacity: 0.55;
 }
 
 .open-cue {
@@ -2164,6 +2182,36 @@ body.theme-clovermeadow .village-sticker-pack {
   color: var(--cream);
   cursor: pointer;
   transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.village-card-radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-logout {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+.village-change-details {
+  border: none;
+}
+
+.village-change-details > summary {
+  list-style: none;
+  display: inline-flex;
+  width: fit-content;
+}
+
+.village-change-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.village-change-details[open] > summary {
+  margin-bottom: 0.85rem;
 }
 
 .village-card:hover {
@@ -4411,7 +4459,8 @@ button.linkish:hover {
   flex-wrap: wrap;
 }
 
-.tv-scope-tabs button {
+.tv-scope-tabs button,
+.tv-scope-tabs a {
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 45%, transparent);
   background: color-mix(in srgb, var(--village-color, #2a3548) 35%, rgba(0, 0, 0, 0.25));
   color: var(--cream, #f3e6d0);
@@ -4419,14 +4468,19 @@ button.linkish:hover {
   padding: 0.45rem 1rem;
   font-size: 0.92rem;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.tv-scope-tabs button:hover {
+.tv-scope-tabs button:hover,
+.tv-scope-tabs a:hover {
   transform: translateY(-1px);
 }
 
-.tv-scope-tabs button.active {
+.tv-scope-tabs button.active,
+.tv-scope-tabs a.active {
   background: color-mix(in srgb, var(--village-soft, #c4a574) 55%, var(--village-color, #2a3548));
   border-color: color-mix(in srgb, var(--gold, #c9a227) 55%, transparent);
   color: var(--ink, #1f2a1e);

@@ -2,17 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError, mapUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
+import {
+  readRequestFields,
+  redirectSameHost,
+  wantsHtmlRedirect,
+} from "@/lib/requestBody";
 import { isVillageId } from "@/lib/villages";
 import { deliverWelcomeLetter } from "@/lib/welcomeLetters";
 
 /** Join or switch village (for accounts created before villages existed). */
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
-  if (!user) return jsonError("Not signed in", 401);
+  if (!user) {
+    if (wantsHtmlRedirect(req)) return redirectSameHost(req, "/login");
+    return jsonError("Not signed in", 401);
+  }
 
-  const body = await req.json().catch(() => null);
-  if (!body) return jsonError("Invalid request body");
-  const villageId = String(body.villageId || "");
+  const fields = await readRequestFields(req);
+  const villageId = String(fields.villageId || "");
   if (!isVillageId(villageId)) return jsonError("Unknown village");
 
   const db = getDb();
@@ -44,5 +51,6 @@ export async function POST(req: NextRequest) {
     reputation: number;
   };
 
+  if (wantsHtmlRedirect(req)) return redirectSameHost(req, "/village");
   return NextResponse.json({ user: mapUser(row) });
 }

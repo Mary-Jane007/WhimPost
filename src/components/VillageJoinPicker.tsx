@@ -18,7 +18,10 @@ export function VillageJoinPicker({
   const [loading, setLoading] = useState(false);
   const changing = mode === "change";
 
-  async function join() {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    // Progressive enhancement: without JS the form POSTs and redirects.
+    if (typeof window === "undefined") return;
+    e.preventDefault();
     if (!villageId) {
       setError("Pick a village first");
       return;
@@ -34,7 +37,7 @@ export function VillageJoinPicker({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ villageId }),
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     setLoading(false);
     if (!res.ok) {
       setError(data.error || "Could not join village");
@@ -44,7 +47,12 @@ export function VillageJoinPicker({
   }
 
   return (
-    <div className={`village-join ${changing ? "village-join-change" : ""}`}>
+    <form
+      className={`village-join ${changing ? "village-join-change" : ""}`}
+      action="/api/village/join"
+      method="post"
+      onSubmit={onSubmit}
+    >
       {!changing ? (
         <>
           <h1>Choose your village</h1>
@@ -63,9 +71,8 @@ export function VillageJoinPicker({
         {VILLAGES.map((v) => {
           const isCurrent = currentVillageId === v.id;
           return (
-            <button
+            <label
               key={v.id}
-              type="button"
               className={`village-card ${villageId === v.id ? "selected" : ""} ${
                 isCurrent ? "current" : ""
               }`}
@@ -75,26 +82,34 @@ export function VillageJoinPicker({
                   "--village-soft": v.colorSoft,
                 } as React.CSSProperties
               }
-              onClick={() => setVillageId(v.id)}
             >
+              <input
+                type="radio"
+                name="villageId"
+                value={v.id}
+                checked={villageId === v.id}
+                onChange={() => setVillageId(v.id)}
+                className="village-card-radio"
+              />
               <VillageMascot village={v} size="md" />
               <strong>{v.name}</strong>
               <em>{v.motto}</em>
-              {isCurrent ? <span className="village-current-tag">Home</span> : null}
-            </button>
+              {isCurrent ? (
+                <span className="village-current-tag">Home</span>
+              ) : null}
+            </label>
           );
         })}
       </div>
       {error && <p className="form-error">{error}</p>}
       <button
-        type="button"
+        type="submit"
         className="btn-primary"
         disabled={
           !villageId ||
           loading ||
           (changing && villageId === currentVillageId)
         }
-        onClick={join}
       >
         {loading
           ? changing
@@ -104,6 +119,6 @@ export function VillageJoinPicker({
             ? "Move to this village"
             : "Enter the village"}
       </button>
-    </div>
+    </form>
   );
 }

@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import {
+  readRequestFields,
+  redirectSameHost,
+  wantsHtmlRedirect,
+} from "@/lib/requestBody";
 import { rewardWelcome } from "@/lib/villageProgress";
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
-  if (!user) return jsonError("Not signed in", 401);
+  if (!user) {
+    if (wantsHtmlRedirect(req)) return redirectSameHost(req, "/login");
+    return jsonError("Not signed in", 401);
+  }
 
-  const body = await req.json().catch(() => null);
-  if (!body) return jsonError("Invalid request body");
-
-  const requestId = String(body.requestId || "");
-  const action = String(body.action || "");
+  const fields = await readRequestFields(req);
+  const requestId = String(fields.requestId || "");
+  const action = String(fields.action || "");
   if (!requestId || !["accept", "decline"].includes(action)) {
     return jsonError("requestId and action (accept|decline) are required");
   }
@@ -46,5 +52,13 @@ export async function POST(req: NextRequest) {
     rewardWelcome(db, user.id);
   }
 
+  if (wantsHtmlRedirect(req)) {
+    const nextRaw = fields.next || "/friends";
+    const next =
+      nextRaw.startsWith("/") && !nextRaw.startsWith("//")
+        ? nextRaw
+        : "/friends";
+    return redirectSameHost(req, next);
+  }
   return NextResponse.json({ ok: true });
 }

@@ -16,9 +16,8 @@ export function LetterReader({
   perspective: "inbox" | "sent";
   startClosed?: boolean;
 }) {
-  const [opened, setOpened] = useState(
-    perspective === "sent" ? true : !startClosed
-  );
+  const initiallyOpen = perspective === "sent" ? true : !startClosed;
+  const [opened, setOpened] = useState(initiallyOpen);
 
   const counterpart =
     perspective === "inbox" ? letter.sender : letter.recipient;
@@ -46,48 +45,49 @@ export function LetterReader({
         )}
       </div>
 
-      <AnimatePresence mode="wait">
-        {!opened ? (
-          <motion.button
-            key="envelope"
-            type="button"
-            className="open-envelope-btn"
-            onClick={() => setOpened(true)}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, rotate: -2 }}
-            transition={{ duration: 0.45 }}
-          >
-            <EnvelopeFace
-              style={letter.envelopeStyle}
-              toName={letter.recipient.displayName}
-              fromName={letter.sender.displayName}
-              stampStyle={letter.stampStyle}
-              waxSeal={letter.waxSeal}
-            />
-            <span className="open-cue">Tap to open</span>
-          </motion.button>
-        ) : (
-          <motion.div
-            key="letter"
-            initial={{ opacity: 0, y: 24, rotate: 1 }}
-            animate={{ opacity: 1, y: 0, rotate: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <LetterPaper
-              className={letter.mascot ? "welcome-typewriter" : ""}
-              paperStyle={letter.paperStyle}
-              fontStyle={letter.fontStyle}
-              body={letter.body}
-              subject={letter.subject}
-              stickers={letter.stickers}
-              scraps={letter.scraps}
-              image={letter.image}
-              mascot={letter.mascot}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Native <details> so Tap to open works even if React never hydrates. */}
+      <details
+        className="letter-open-details"
+        open={opened}
+        onToggle={(e) => {
+          setOpened((e.target as HTMLDetailsElement).open);
+        }}
+      >
+        <summary className="open-envelope-btn">
+          <EnvelopeFace
+            style={letter.envelopeStyle}
+            toName={letter.recipient.displayName}
+            fromName={letter.sender.displayName}
+            stampStyle={letter.stampStyle}
+            waxSeal={letter.waxSeal}
+          />
+          <span className="open-cue">
+            {opened ? "Letter open" : "Tap to open"}
+          </span>
+        </summary>
+        <AnimatePresence mode="wait">
+          {opened ? (
+            <motion.div
+              key="letter"
+              initial={{ opacity: 0, y: 24, rotate: 1 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <LetterPaper
+                className={letter.mascot ? "welcome-typewriter" : ""}
+                paperStyle={letter.paperStyle}
+                fontStyle={letter.fontStyle}
+                body={letter.body}
+                subject={letter.subject}
+                stickers={letter.stickers}
+                scraps={letter.scraps}
+                image={letter.image}
+                mascot={letter.mascot}
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </details>
     </div>
   );
 }

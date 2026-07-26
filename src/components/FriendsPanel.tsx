@@ -102,21 +102,30 @@ export function FriendsPanel({
           Search for someone who already has a WhimPost mailbox, or send a request
           by username.
         </p>
-        <div className="friend-invite-row">
+        <form
+          className="friend-invite-row"
+          action="/api/friends/request"
+          method="post"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void sendRequest(username.trim());
+          }}
+        >
+          <input type="hidden" name="next" value="/friends" />
           <input
+            name="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Exact username"
           />
           <button
-            type="button"
+            type="submit"
             className="btn-primary"
-            onClick={() => sendRequest(username.trim())}
             disabled={!username.trim()}
           >
             Send request
           </button>
-        </div>
+        </form>
         <input
           className="search-input"
           value={query}
@@ -136,9 +145,18 @@ export function FriendsPanel({
                     <span>@{u.username}</span>
                     {u.forestName && <em>{u.forestName}</em>}
                   </div>
-                  <button type="button" onClick={() => sendRequest(u.username)}>
-                    Add
-                  </button>
+                  <form
+                    action="/api/friends/request"
+                    method="post"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      void sendRequest(u.username);
+                    }}
+                  >
+                    <input type="hidden" name="username" value={u.username} />
+                    <input type="hidden" name="next" value="/friends" />
+                    <button type="submit">Add</button>
+                  </form>
                 </li>
               ))}
           </ul>
@@ -163,16 +181,34 @@ export function FriendsPanel({
                   <span>@{req.user.username}</span>
                 </div>
                 <div className="row-actions">
-                  <button type="button" onClick={() => respond(req.id, "accept")}>
-                    Accept
-                  </button>
-                  <button
-                    type="button"
-                    className="ghost"
-                    onClick={() => respond(req.id, "decline")}
+                  <form
+                    action="/api/friends/respond"
+                    method="post"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      void respond(req.id, "accept");
+                    }}
                   >
-                    Decline
-                  </button>
+                    <input type="hidden" name="requestId" value={req.id} />
+                    <input type="hidden" name="action" value="accept" />
+                    <input type="hidden" name="next" value="/friends" />
+                    <button type="submit">Accept</button>
+                  </form>
+                  <form
+                    action="/api/friends/respond"
+                    method="post"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      void respond(req.id, "decline");
+                    }}
+                  >
+                    <input type="hidden" name="requestId" value={req.id} />
+                    <input type="hidden" name="action" value="decline" />
+                    <input type="hidden" name="next" value="/friends" />
+                    <button type="submit" className="ghost">
+                      Decline
+                    </button>
+                  </form>
                 </div>
               </li>
             ))}

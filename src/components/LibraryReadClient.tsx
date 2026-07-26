@@ -31,6 +31,7 @@ export function LibraryReadClient({
       fileUrl={fileUrl}
       fileName={fileName}
       initialPosition={initialPosition}
+      closeHref="/library"
       onClose={() => router.push("/library")}
     />
   );

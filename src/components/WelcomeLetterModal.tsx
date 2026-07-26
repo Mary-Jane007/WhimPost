@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { EnvelopeFace } from "@/components/EnvelopeFace";
@@ -13,7 +14,10 @@ export function WelcomeLetterModal({ letter }: { letter: LetterView }) {
 
   if (dismissed) return null;
 
-  async function openEnvelope() {
+  async function openEnvelope(e?: React.MouseEvent) {
+    // Without hydration, the Link navigates to /letter/[id].
+    // With hydration, open in-place and mark read.
+    if (e) e.preventDefault();
     if (opened || saving) return;
     setOpened(true);
     setSaving(true);
@@ -36,7 +40,9 @@ export function WelcomeLetterModal({ letter }: { letter: LetterView }) {
       >
         <p className="welcome-modal-kicker">A letter has arrived</p>
         <h2 className="welcome-modal-title">
-          {opened ? letter.subject : `Your welcome from ${letter.sender.displayName}`}
+          {opened
+            ? letter.subject
+            : `Your welcome from ${letter.sender.displayName}`}
         </h2>
         <p className="welcome-modal-lead">
           {opened
@@ -46,25 +52,28 @@ export function WelcomeLetterModal({ letter }: { letter: LetterView }) {
 
         <AnimatePresence mode="wait">
           {!opened ? (
-            <motion.button
+            <motion.div
               key="envelope"
-              type="button"
-              className="open-envelope-btn welcome-open-btn"
-              onClick={openEnvelope}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, rotate: -2 }}
               transition={{ duration: 0.4 }}
             >
-              <EnvelopeFace
-                style={letter.envelopeStyle}
-                toName={letter.recipient.displayName}
-                fromName={letter.sender.displayName}
-                stampStyle={letter.stampStyle}
-                waxSeal={letter.waxSeal}
-              />
-              <span className="open-cue">Tap to open</span>
-            </motion.button>
+              <Link
+                href={`/letter/${letter.id}`}
+                className="open-envelope-btn welcome-open-btn"
+                onClick={openEnvelope}
+              >
+                <EnvelopeFace
+                  style={letter.envelopeStyle}
+                  toName={letter.recipient.displayName}
+                  fromName={letter.sender.displayName}
+                  stampStyle={letter.stampStyle}
+                  waxSeal={letter.waxSeal}
+                />
+                <span className="open-cue">Tap to open</span>
+              </Link>
+            </motion.div>
           ) : (
             <motion.div
               key="letter"
@@ -84,13 +93,21 @@ export function WelcomeLetterModal({ letter }: { letter: LetterView }) {
                 image={letter.image}
                 mascot={letter.mascot}
               />
-              <button
-                type="button"
-                className="btn-primary welcome-dismiss"
-                onClick={() => setDismissed(true)}
+              <form
+                action={`/api/letters/${letter.id}`}
+                method="post"
+                className="welcome-dismiss-form"
+                onSubmit={(e) => {
+                  // Soft dismiss when JS is alive; form POST still works without it.
+                  e.preventDefault();
+                  setDismissed(true);
+                }}
               >
-                Tuck into my inbox
-              </button>
+                <input type="hidden" name="next" value="/village" />
+                <button type="submit" className="btn-primary welcome-dismiss">
+                  Tuck into my inbox
+                </button>
+              </form>
             </motion.div>
           )}
         </AnimatePresence>

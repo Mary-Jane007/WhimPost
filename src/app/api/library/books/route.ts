@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
     let fileMime: string | undefined;
     if (hasBookFile) {
       const saved = await saveBookFile(bookFile as File);
-      if ("error" in saved) return jsonError(saved.error);
+      if ("error" in saved) return jsonError(saved.error || "Could not save book file");
       fileUrl = saved.fileUrl;
       fileName = saved.fileName;
       fileMime = saved.fileMime;
@@ -167,7 +167,9 @@ export async function POST(req: NextRequest) {
     let coverUrl: string | null | undefined;
     if (hasCover) {
       const coverSaved = await saveCoverFile(cover as File);
-      if ("error" in coverSaved) return jsonError(coverSaved.error);
+      if ("error" in coverSaved) {
+        return jsonError(coverSaved.error || "Could not save cover");
+      }
       coverUrl = coverSaved.coverUrl;
     }
 
@@ -202,7 +204,7 @@ export async function POST(req: NextRequest) {
   const bookFile = form.get("file");
   if (bookFile instanceof File && bookFile.size > 0) {
     const saved = await saveBookFile(bookFile);
-    if ("error" in saved) return jsonError(saved.error);
+    if ("error" in saved) return jsonError(saved.error || "Could not save book file");
     fileUrl = saved.fileUrl;
     fileName = saved.fileName;
     fileMime = saved.fileMime;
@@ -212,7 +214,9 @@ export async function POST(req: NextRequest) {
   const cover = form.get("cover");
   if (cover instanceof File && cover.size > 0) {
     const coverSaved = await saveCoverFile(cover);
-    if ("error" in coverSaved) return jsonError(coverSaved.error);
+    if ("error" in coverSaved) {
+      return jsonError(coverSaved.error || "Could not save cover");
+    }
     coverUrl = coverSaved.coverUrl;
   }
 

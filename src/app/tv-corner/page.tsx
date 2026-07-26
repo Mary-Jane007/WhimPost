@@ -11,7 +11,11 @@ import { getVillage, VILLAGES, type VillageId } from "@/lib/villages";
 import { TvCorner } from "@/components/TvCorner";
 import { PageCrest } from "@/components/PageCrest";
 
-export default async function TvCornerPage() {
+type Props = {
+  searchParams?: Promise<{ scope?: string }>;
+};
+
+export default async function TvCornerPage({ searchParams }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
@@ -31,10 +35,31 @@ export default async function TvCornerPage() {
     );
   }
 
+  const sp = (await searchParams) || {};
+  const initialScope = sp.scope === "friends" ? "friends" : "village";
   const village = getVillage(user.villageId as VillageId)!;
-  const room = getOrCreateVillageRoom(user, user.villageId as VillageId);
-  const channels = listChannelsForUser(user, room);
+  const villageRoom = getOrCreateVillageRoom(user, user.villageId as VillageId);
   const friendRooms = listFriendRooms(user);
+  const room =
+    initialScope === "friends"
+      ? friendRooms[0] || {
+          ...villageRoom,
+          id: "",
+          scope: "friends" as const,
+          currentVideo: null,
+          currentVideoId: null,
+          currentChannelId: null,
+          isPlaying: false,
+          positionMs: 0,
+          watchers: [],
+          messages: [],
+          schedule: [],
+          airStartsAt: null,
+          broadcastMode: "interactive" as const,
+          title: "Friends couch",
+        }
+      : villageRoom;
+  const channels = listChannelsForUser(user, room);
   const friends = listFriends(user.id);
   const villageOptions = VILLAGES.map((v) => ({ id: v.id, name: v.name }));
 
@@ -51,6 +76,7 @@ export default async function TvCornerPage() {
         initialChannels={channels}
         initialFriendRooms={friendRooms}
         friendCount={friends.length}
+        initialScope={initialScope}
       />
     </main>
   );

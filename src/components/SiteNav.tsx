@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import type { UserPublic } from "@/lib/types";
 import type { NavBadges } from "@/lib/notifications";
 
@@ -18,7 +18,6 @@ export function SiteNav({
   badges?: NavBadges;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
 
   const links: Array<{
     href: string;
@@ -48,12 +47,6 @@ export function SiteNav({
     { href: "/friends", label: "Friends", badgeKey: "friends" },
     { href: "/profile", label: "Profile" },
   ];
-
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
-  }
 
   return (
     <header className="site-nav">
@@ -104,9 +97,11 @@ export function SiteNav({
               </Link>
             );
           })}
-          <button type="button" className="nav-ghost" onClick={logout}>
-            Sign out
-          </button>
+          <form action="/api/auth/logout" method="post" className="nav-logout">
+            <button type="submit" className="nav-ghost">
+              Sign out
+            </button>
+          </form>
           <Link
             href={`/profile/${user.username}`}
             className={

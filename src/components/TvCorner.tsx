@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   useEffect,
   useLayoutEffect,
@@ -14,6 +15,8 @@ import type { VillageId } from "@/lib/villages";
 import type { TvChannel, TvRoomState, TvScheduleSlot, TvVideo } from "@/lib/tvCorner";
 type VillageOption = { id: VillageId; name: string };
 
+type ScopeTab = "village" | "friends";
+
 type Props = {
   user: UserPublic;
   villageId: VillageId;
@@ -25,9 +28,8 @@ type Props = {
   initialChannels: TvChannel[];
   initialFriendRooms: TvRoomState[];
   friendCount: number;
+  initialScope?: ScopeTab;
 };
-
-type ScopeTab = "village" | "friends";
 
 const POLL_MS = 2000;
 /** Seek threshold when the program (clip / play state / airing) changes. */
@@ -183,8 +185,9 @@ export function TvCorner({
   initialChannels,
   initialFriendRooms,
   friendCount,
+  initialScope = "village",
 }: Props) {
-  const [scope, setScope] = useState<ScopeTab>("village");
+  const [scope, setScope] = useState<ScopeTab>(initialScope);
   const [room, setRoom] = useState<TvRoomState>(initialRoom);
   const [channels, setChannels] = useState<TvChannel[]>(initialChannels);
   const [friendRooms, setFriendRooms] = useState<TvRoomState[]>(
@@ -1483,26 +1486,38 @@ export function TvCorner({
       </header>
 
       <div className="tv-scope-tabs" role="tablist" aria-label="Lounge">
-        <button
-          type="button"
+        <Link
+          href="/tv-corner?scope=village"
           role="tab"
           aria-selected={scope === "village"}
           className={scope === "village" ? "active" : ""}
-          onClick={() => fetchScope("village")}
-          disabled={busy}
+          onClick={(e) => {
+            if (busy) {
+              e.preventDefault();
+              return;
+            }
+            e.preventDefault();
+            void fetchScope("village");
+          }}
         >
           Village lounge
-        </button>
-        <button
-          type="button"
+        </Link>
+        <Link
+          href="/tv-corner?scope=friends"
           role="tab"
           aria-selected={scope === "friends"}
           className={scope === "friends" ? "active" : ""}
-          onClick={() => fetchScope("friends")}
-          disabled={busy}
+          onClick={(e) => {
+            if (busy) {
+              e.preventDefault();
+              return;
+            }
+            e.preventDefault();
+            void fetchScope("friends");
+          }}
         >
           Friends couch
-        </button>
+        </Link>
       </div>
 
       {error ? <p className="tv-error">{error}</p> : null}

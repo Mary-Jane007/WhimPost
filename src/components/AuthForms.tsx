@@ -59,10 +59,17 @@ export function LoginForm() {
   }
 
   return (
-    <form className="auth-form" onSubmit={onSubmit}>
+    <form
+      className="auth-form"
+      action="/api/auth/login"
+      method="post"
+      onSubmit={onSubmit}
+    >
+      <input type="hidden" name="next" value="/village" />
       <label>
         Username, display name, or email
         <input
+          name="login"
           value={login}
           onChange={(e) => setLogin(e.target.value)}
           autoComplete="username"
@@ -73,6 +80,7 @@ export function LoginForm() {
       <label>
         Password
         <input
+          name="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

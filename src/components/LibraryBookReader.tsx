@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   ANNOTATION_INKS,
@@ -16,6 +17,8 @@ type Props = {
   fileName?: string | null;
   initialPosition?: ReadingPosition | null;
   onClose: () => void;
+  /** Real href so Close works even if React never hydrates. */
+  closeHref?: string;
   onProgressSaved?: (payload: {
     bookId: string;
     percent: number;
@@ -190,6 +193,7 @@ export function LibraryBookReader({
   fileName,
   initialPosition,
   onClose,
+  closeHref = "/library",
   onProgressSaved,
 }: Props) {
   const kind = kindFromUrl(fileUrl, fileName);
@@ -591,9 +595,16 @@ export function LibraryBookReader({
             >
               Download
             </a>
-            <button type="button" className="btn-primary" onClick={onClose}>
+            <Link
+              href={closeHref}
+              className="btn-primary"
+              onClick={(e) => {
+                e.preventDefault();
+                onClose();
+              }}
+            >
               Close
-            </button>
+            </Link>
           </div>
         </header>
 
