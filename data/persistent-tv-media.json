@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-25T04:05:44.581Z",
+  "updatedAt": "2026-07-27T02:08:33.356Z",
   "clips": [
     {
       "title": "Tulip",
@@ -28,16 +28,6 @@
       "mime": "video/mp4",
       "sizeBytes": 262121167,
       "durationMs": 2712368,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "Peter Rabbit — The Tale of Samuel Whiskers",
-      "filename": "a7f0d2ba-0baf-4b2b-a0dd-ce60f63c2c77.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 208374134,
-      "durationMs": 2032432,
       "channelTitle": "Cottage Cartoons",
       "villageId": null,
       "isGlobal": true
