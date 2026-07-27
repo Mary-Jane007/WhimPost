@@ -51,9 +51,12 @@ export function ShelfBookCoverAttach({
       method="post"
       encType="multipart/form-data"
       onSubmit={(e) => {
-        // Progressive enhancement: fetch when JS is alive.
         const file = inputRef.current?.files?.[0];
-        if (!file) return;
+        if (!file) {
+          e.preventDefault();
+          return;
+        }
+        // Progressive enhancement: fetch when JS is alive.
         e.preventDefault();
         void upload(file);
       }}
@@ -76,17 +79,14 @@ export function ShelfBookCoverAttach({
           name="cover"
           accept="image/jpeg,image/png,image/webp,image/gif"
           disabled={busy}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            // Auto-upload once a file is chosen when JS works.
-            e.currentTarget.form?.requestSubmit();
+          // Native attribute: opens via the label, then uploads on pick
+          // even if React never hydrates.
+          {...{
+            onchange:
+              "if(this.files&&this.files.length)this.form.requestSubmit()",
           }}
         />
       </label>
-      <button type="submit" className="mh-attach-upload">
-        Upload
-      </button>
       {error ? <p className="form-error">{error}</p> : null}
       {status ? <p className="form-success">{status}</p> : null}
     </form>

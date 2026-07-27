@@ -52,7 +52,10 @@ export function ShelfBookFileAttach({
       encType="multipart/form-data"
       onSubmit={(e) => {
         const file = inputRef.current?.files?.[0];
-        if (!file) return;
+        if (!file) {
+          e.preventDefault();
+          return;
+        }
         e.preventDefault();
         void upload(file);
       }}
@@ -79,16 +82,16 @@ export function ShelfBookFileAttach({
           name="file"
           accept=".pdf,.epub,application/pdf,application/epub+zip"
           disabled={busy}
+          // Native attribute so picking a file uploads even if React never hydrates.
+          {...{
+            onchange:
+              "if(this.files&&this.files.length)this.form.requestSubmit()",
+          }}
           onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            e.currentTarget.form?.requestSubmit();
+            if (e.target.files?.[0]) e.currentTarget.form?.requestSubmit();
           }}
         />
       </label>
-      <button type="submit" className="mh-attach-upload">
-        Upload
-      </button>
       {error ? <p className="form-error">{error}</p> : null}
       {status ? <p className="form-success">{status}</p> : null}
     </form>

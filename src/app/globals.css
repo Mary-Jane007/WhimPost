@@ -7073,16 +7073,6 @@ button.linkish:hover {
   cursor: wait;
 }
 
-.mh-attach-upload {
-  font-size: 0.78rem;
-  padding: 0.35rem 0.65rem;
-  border: 1px solid rgba(196, 170, 120, 0.35);
-  background: rgba(24, 30, 24, 0.55);
-  color: #e8dcc4;
-  border-radius: var(--frame-button);
-  cursor: pointer;
-}
-
 .mh-visually-hidden {
   position: absolute;
   width: 1px;
