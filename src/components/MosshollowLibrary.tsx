@@ -27,9 +27,13 @@ import { ShelfBookRemove } from "@/components/ShelfBookRemove";
 type Props = {
   user: UserPublic;
   initialProgress: LibraryProgress;
+  /** Current Book Club rotation shelf (shuffled from the whole library). */
   clubBooks: ClubBook[];
+  /** Owner membership list for the club shelf (edit/move targets). */
+  membershipClubBooks?: ClubBook[];
   readingList: ReadingListBook[];
   featuredBook: ClubBook | null;
+  daysUntilShuffle?: number;
   /** From ?tab= so sections work even if the client fails to hydrate. */
   initialTab?: LibraryTabId;
 };
@@ -38,8 +42,10 @@ export function MosshollowLibrary({
   user,
   initialProgress,
   clubBooks,
+  membershipClubBooks,
   readingList,
   featuredBook,
+  daysUntilShuffle = 14,
   initialTab = "bookclub",
 }: Props) {
   const [tab, setTab] = useState<LibraryTabId>(initialTab);
@@ -59,7 +65,11 @@ export function MosshollowLibrary({
   const [secretVisible, setSecretVisible] = useState(false);
   const [shelfClub, setShelfClub] = useState(clubBooks);
   const [shelfList, setShelfList] = useState(readingList);
+  const [memberClub, setMemberClub] = useState(
+    membershipClubBooks || clubBooks
+  );
   const [book, setBook] = useState<ClubBook | null>(featuredBook);
+  const [shuffleDays, setShuffleDays] = useState(daysUntilShuffle);
 
   const curiosity = featuredCuriosity();
   const mystery = featuredMystery();
@@ -68,22 +78,32 @@ export function MosshollowLibrary({
   const returnTo = `/library?tab=${tab}`;
 
   async function refreshShelves() {
-    const res = await fetch("/api/library/books");
+    const res = await fetch(
+      user.isOwner ? "/api/library/books?admin=1" : "/api/library/books"
+    );
     if (!res.ok) return;
     const data = await res.json();
     if (Array.isArray(data.clubBooks)) {
       setShelfClub(data.clubBooks);
-      if (data.clubBooks.length) {
+      const featured = data.featuredBook as ClubBook | null | undefined;
+      if (featured?.id) {
+        setBook(featured);
+      } else if (data.clubBooks.length) {
         const stillThere = data.clubBooks.find(
           (b: ClubBook) => b.id === book?.id
         );
-        const monthIdx = new Date().getUTCMonth() % data.clubBooks.length;
-        setBook(stillThere || data.clubBooks[monthIdx]);
+        setBook(stillThere || data.clubBooks[0]);
       } else {
         setBook(null);
       }
     }
+    if (Array.isArray(data.membershipClubBooks)) {
+      setMemberClub(data.membershipClubBooks);
+    }
     if (Array.isArray(data.readingList)) setShelfList(data.readingList);
+    if (typeof data.daysUntilShuffle === "number") {
+      setShuffleDays(data.daysUntilShuffle);
+    }
   }
   // Prefer the live bookmark % (CFI-based) over any older sticky shelf value.
   const bookPct = book
@@ -239,8 +259,13 @@ export function MosshollowLibrary({
           <section className="mh-section">
             <h2>Monthly Book Club</h2>
             <p className="mh-section-lead">
-              One featured book each month. Finish it to earn the Bookworm
-              Badge (+{LIBRARY_XP.reading} XP).
+              The club shuffles titles from the whole library every couple of
+              weeks
+              {shuffleDays
+                ? ` (about ${shuffleDays} day${shuffleDays === 1 ? "" : "s"} until the next shuffle)`
+                : ""}
+              . Finish the featured book to earn the Bookworm Badge (+
+              {LIBRARY_XP.reading} XP).
             </p>
             {book ? (
             <article className="mh-book-feature">
@@ -1013,7 +1038,13 @@ export function MosshollowLibrary({
 
       {user.isOwner ? (
         <div style={{ marginTop: "1rem" }}>
-          <LibraryAdminEditor onChanged={() => void refreshShelves()} />
+          <LibraryAdminEditor
+            clubBooks={memberClub}
+            readingList={shelfList}
+            daysUntilShuffle={shuffleDays}
+            returnTo={returnTo}
+            onChanged={() => void refreshShelves()}
+          />
         </div>
       ) : null}
     </div>

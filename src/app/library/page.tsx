@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getLibraryProgress } from "@/lib/library";
 import {
-  featuredClubBookMerged,
+  getBookClubRotation,
   listClubBooks,
   listReadingListBooks,
 } from "@/lib/libraryBooks";
@@ -67,9 +67,11 @@ export default async function LibraryPage({ searchParams }: Props) {
   }
 
   const progress = getLibraryProgress(user.id);
-  const clubBooks = listClubBooks();
+  const rotation = getBookClubRotation();
+  const membershipClubBooks = listClubBooks();
   const readingList = listReadingListBooks();
-  const featuredBook = featuredClubBookMerged() || clubBooks[0] || null;
+  const featuredBook =
+    rotation.featured || membershipClubBooks[0] || null;
 
   return (
     <main className="app-main forest-panel mh-library-page village-mosshollow">
@@ -89,9 +91,11 @@ export default async function LibraryPage({ searchParams }: Props) {
       <MosshollowLibrary
         user={user}
         initialProgress={progress}
-        clubBooks={clubBooks}
+        clubBooks={rotation.shelf}
+        membershipClubBooks={membershipClubBooks}
         readingList={readingList}
         featuredBook={featuredBook}
+        daysUntilShuffle={rotation.daysUntilShuffle}
         initialTab={initialTab}
       />
     </main>

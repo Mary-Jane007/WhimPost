@@ -7078,6 +7078,47 @@ button.linkish:hover {
   border-color: rgba(107, 47, 47, 0.35);
 }
 
+.mh-admin-details {
+  padding: 0.85rem 1rem 1rem;
+}
+
+.mh-admin-summary {
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mh-admin-summary::-webkit-details-marker {
+  display: none;
+}
+
+.mh-admin-details[open] .mh-admin-summary {
+  margin-bottom: 0.75rem;
+}
+
+.mh-admin-reshuffle {
+  margin: 0 0 1rem;
+}
+
+.mh-admin-edit {
+  margin-top: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.65rem;
+  border: 1px dashed rgba(196, 170, 120, 0.35);
+  background: rgba(12, 18, 14, 0.22);
+}
+
+.mh-admin-edit summary {
+  cursor: pointer;
+  color: #e8dcc8;
+  font-size: 0.92rem;
+}
+
+.mh-admin-edit[open] summary {
+  margin-bottom: 0.65rem;
+}
+
 .mh-visually-hidden {
   position: absolute;
   width: 1px;

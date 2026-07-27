@@ -402,6 +402,13 @@ function migrate(db: Database.Database) {
       removed_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS library_club_state (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      shuffle_salt INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    INSERT OR IGNORE INTO library_club_state (id, shuffle_salt) VALUES (1, 0);
+
     CREATE TABLE IF NOT EXISTS library_annotations (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,

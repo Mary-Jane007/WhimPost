@@ -7,10 +7,13 @@ import { isSiteOwner } from "@/lib/owner";
 import { getDb } from "@/lib/db";
 import {
   attachAssetsToShelfBook,
+  bumpClubShuffleSalt,
   deleteLibraryBook,
+  getBookClubRotation,
   listClubBooks,
   listLibraryBookRecords,
   listReadingListBooks,
+  moveLibraryBookToShelf,
   upsertLibraryBook,
   type LibraryShelf,
 } from "@/lib/libraryBooks";
@@ -125,20 +128,29 @@ export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return jsonError("Not signed in", 401);
 
+  const rotation = getBookClubRotation();
+  const readingList = listReadingListBooks();
+  const membershipClubBooks = listClubBooks();
   const admin = req.nextUrl.searchParams.get("admin") === "1";
   if (admin) {
     const gate = await requireOwner();
     if ("error" in gate && gate.error) return gate.error;
     return NextResponse.json({
       books: listLibraryBookRecords({ includeUnpublished: true }),
-      clubBooks: listClubBooks(),
-      readingList: listReadingListBooks(),
+      clubBooks: rotation.shelf,
+      membershipClubBooks,
+      readingList,
+      featuredBook: rotation.featured,
+      daysUntilShuffle: rotation.daysUntilShuffle,
     });
   }
 
   return NextResponse.json({
-    clubBooks: listClubBooks(),
-    readingList: listReadingListBooks(),
+    clubBooks: rotation.shelf,
+    membershipClubBooks,
+    readingList,
+    featuredBook: rotation.featured,
+    daysUntilShuffle: rotation.daysUntilShuffle,
   });
 }
 
@@ -163,6 +175,37 @@ export async function POST(req: NextRequest) {
     if (!result.ok) return jsonError(result.error, 404);
     if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
     return NextResponse.json({ ok: true, removed: id });
+  }
+
+  if (intent === "reshuffle") {
+    const salt = bumpClubShuffleSalt();
+    const rotation = getBookClubRotation();
+    if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
+    return NextResponse.json({
+      ok: true,
+      shuffleSalt: salt,
+      featuredBook: rotation.featured,
+      clubBooks: rotation.shelf,
+      daysUntilShuffle: rotation.daysUntilShuffle,
+    });
+  }
+
+  if (intent === "set-shelf") {
+    const id = String(form.get("bookId") || form.get("id") || "").trim();
+    const shelfRaw = String(form.get("shelf") || "").trim();
+    const shelf: LibraryShelf =
+      shelfRaw === "readinglist" ? "readinglist" : "club";
+    if (!id) return jsonError("Book id required");
+    try {
+      const book = moveLibraryBookToShelf(id, shelf, user.id);
+      if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
+      return NextResponse.json({ book, moved: true });
+    } catch (err) {
+      return jsonError(
+        err instanceof Error ? err.message : "Could not move book",
+        400
+      );
+    }
   }
 
   const attachTo = String(form.get("attachTo") || form.get("id") || "").trim();

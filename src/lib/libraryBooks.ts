@@ -238,10 +238,18 @@ function mergeReadingOverlay(
 /** Hardcoded club shelf + published owner uploads (DB overlays same id). */
 export function listClubBooks(): ClubBook[] {
   const removed = getRemovedBookIds();
-  const uploaded = listLibraryBookRecords({ shelf: "club" }).map(toClubBook);
+  const allRecords = listLibraryBookRecords();
+  // Owner can move a seed off the club by saving it onto the reading list.
+  const movedToReading = new Set(
+    allRecords.filter((r) => r.shelf === "readinglist").map((r) => r.id)
+  );
+  const uploaded = allRecords
+    .filter((r) => r.shelf === "club")
+    .map(toClubBook);
   const byId = new Map<string, ClubBook>();
   for (const book of CLUB_BOOKS) {
-    if (!removed.has(book.id)) byId.set(book.id, book);
+    if (removed.has(book.id) || movedToReading.has(book.id)) continue;
+    byId.set(book.id, book);
   }
   for (const book of uploaded) {
     if (removed.has(book.id)) continue;
@@ -262,12 +270,17 @@ export function listClubBooks(): ClubBook[] {
 
 export function listReadingListBooks(): ReadingListBook[] {
   const removed = getRemovedBookIds();
-  const uploaded = listLibraryBookRecords({ shelf: "readinglist" }).map(
-    toReadingListBook
+  const allRecords = listLibraryBookRecords();
+  const movedToClub = new Set(
+    allRecords.filter((r) => r.shelf === "club").map((r) => r.id)
   );
+  const uploaded = allRecords
+    .filter((r) => r.shelf === "readinglist")
+    .map(toReadingListBook);
   const byId = new Map<string, ReadingListBook>();
   for (const book of READING_LIST) {
-    if (!removed.has(book.id)) byId.set(book.id, book);
+    if (removed.has(book.id) || movedToClub.has(book.id)) continue;
+    byId.set(book.id, book);
   }
   for (const book of uploaded) {
     if (removed.has(book.id)) continue;
@@ -454,10 +467,206 @@ export function findLibraryBook(bookId: string): ClubBook | ReadingListBook | nu
   );
 }
 
+/** How often the Book Club reshuffles titles from the full library. */
+export const CLUB_ROTATION_DAYS = 14;
+
+function readingListToClubBook(book: ReadingListBook): ClubBook {
+  return {
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    description:
+      book.description?.trim() ||
+      `${book.mood} · ${book.category} · ${book.length}`,
+    minutes:
+      book.length === "Short" ? 120 : book.length === "Long" ? 360 : 220,
+    coverEmoji: book.coverEmoji || "📖",
+    quotes: [],
+    reflections: [],
+    coverUrl: book.coverUrl,
+    fileUrl: book.fileUrl,
+    fileName: book.fileName,
+    uploaded: book.uploaded,
+  };
+}
+
+/** Every library title (club + reading list), unique by id. */
+export function listLibraryPoolAsClubBooks(): ClubBook[] {
+  const byId = new Map<string, ClubBook>();
+  for (const book of listClubBooks()) byId.set(book.id, book);
+  for (const book of listReadingListBooks()) {
+    if (!byId.has(book.id)) byId.set(book.id, readingListToClubBook(book));
+  }
+  return [...byId.values()];
+}
+
+export function clubRotationPeriodKey(now = new Date()): number {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const utcDay = Math.floor(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / dayMs
+  );
+  return Math.floor(utcDay / CLUB_ROTATION_DAYS);
+}
+
+function getClubShuffleSalt(): number {
+  const row = getDb()
+    .prepare(`SELECT shuffle_salt AS salt FROM library_club_state WHERE id = 1`)
+    .get() as { salt: number } | undefined;
+  return Number(row?.salt) || 0;
+}
+
+/** Owner can force a fresh shuffle before the next automatic rotation. */
+export function bumpClubShuffleSalt(): number {
+  const db = getDb();
+  db.prepare(
+    `INSERT INTO library_club_state (id, shuffle_salt, updated_at)
+     VALUES (1, 1, datetime('now'))
+     ON CONFLICT(id) DO UPDATE SET
+       shuffle_salt = shuffle_salt + 1,
+       updated_at = datetime('now')`
+  ).run();
+  return getClubShuffleSalt();
+}
+
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  const arr = [...items];
+  let s = (Math.imul(seed + 1, 2654435761) >>> 0) || 1;
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+    const j = s % (i + 1);
+    const tmp = arr[i];
+    arr[i] = arr[j]!;
+    arr[j] = tmp!;
+  }
+  return arr;
+}
+
+export type BookClubRotation = {
+  featured: ClubBook | null;
+  shelf: ClubBook[];
+  periodKey: number;
+  daysUntilShuffle: number;
+  shuffleSalt: number;
+};
+
+/**
+ * Book Club picks from the whole library and reshuffles every
+ * {@link CLUB_ROTATION_DAYS} days (plus any owner-triggered salt bumps).
+ */
+export function getBookClubRotation(now = new Date()): BookClubRotation {
+  const pool = listLibraryPoolAsClubBooks();
+  const periodKey = clubRotationPeriodKey(now);
+  const shuffleSalt = getClubShuffleSalt();
+  if (!pool.length) {
+    return {
+      featured: null,
+      shelf: [],
+      periodKey,
+      daysUntilShuffle: CLUB_ROTATION_DAYS,
+      shuffleSalt,
+    };
+  }
+
+  const shuffled = seededShuffle(pool, periodKey + shuffleSalt * 10_000);
+  // Prefer a readable file for the featured pick when possible.
+  const featured =
+    shuffled.find((b) => Boolean(b.fileUrl)) || shuffled[0] || null;
+
+  const dayMs = 24 * 60 * 60 * 1000;
+  const utcDay = Math.floor(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / dayMs
+  );
+  const daysIntoPeriod = utcDay % CLUB_ROTATION_DAYS;
+  const daysUntilShuffle = CLUB_ROTATION_DAYS - daysIntoPeriod;
+
+  return {
+    featured,
+    shelf: shuffled,
+    periodKey,
+    daysUntilShuffle,
+    shuffleSalt,
+  };
+}
+
 export function featuredClubBookMerged(now = new Date()) {
-  const books = listClubBooks();
-  if (!books.length) return null;
-  return books[now.getUTCMonth() % books.length];
+  return getBookClubRotation(now).featured;
+}
+
+/** Move a catalog/uploaded title between Book Club and Reading List. */
+export function moveLibraryBookToShelf(
+  bookId: string,
+  shelf: LibraryShelf,
+  createdBy: string
+): LibraryBookRecord {
+  const id = bookId.trim();
+  if (!id) throw new Error("Book id required");
+  if (shelf !== "club" && shelf !== "readinglist") {
+    throw new Error("Shelf must be club or reading list");
+  }
+
+  const existing = getLibraryBookRecord(id);
+  const live = findLibraryBook(id);
+  const catalog = findCatalogShelfBook(id);
+  if (!existing && !live && !catalog) {
+    throw new Error("That book is not on the library shelves");
+  }
+
+  const asClub =
+    live && "quotes" in live
+      ? (live as ClubBook)
+      : catalog?.club || null;
+  const asReading =
+    live && "category" in live
+      ? (live as ReadingListBook)
+      : catalog?.reading || null;
+
+  return upsertLibraryBook({
+    id,
+    shelf,
+    title:
+      existing?.title ||
+      asClub?.title ||
+      asReading?.title ||
+      "Untitled",
+    author:
+      existing?.author ||
+      asClub?.author ||
+      asReading?.author ||
+      "Unknown",
+    description:
+      existing?.description ||
+      asClub?.description ||
+      asReading?.description ||
+      "",
+    minutes: existing?.minutes || asClub?.minutes || 180,
+    coverEmoji:
+      existing?.coverEmoji ||
+      asClub?.coverEmoji ||
+      asReading?.coverEmoji ||
+      "📖",
+    coverUrl:
+      existing?.coverUrl ?? asClub?.coverUrl ?? asReading?.coverUrl ?? null,
+    fileUrl: existing?.fileUrl ?? asClub?.fileUrl ?? asReading?.fileUrl ?? null,
+    fileName:
+      existing?.fileName ?? asClub?.fileName ?? asReading?.fileName ?? null,
+    fileMime: existing?.fileMime ?? null,
+    quotes: existing?.quotes?.length
+      ? existing.quotes
+      : asClub?.quotes || [],
+    reflections: existing?.reflections?.length
+      ? existing.reflections
+      : asClub?.reflections || [],
+    category: existing?.category || asReading?.category || null,
+    difficulty: existing?.difficulty || asReading?.difficulty || null,
+    length: existing?.length || asReading?.length || null,
+    mood: existing?.mood || asReading?.mood || "",
+    themes: existing?.themes?.length
+      ? existing.themes
+      : asReading?.themes || [],
+    rating: existing?.rating || asReading?.rating || 4.5,
+    published: true,
+    createdBy,
+  });
 }
 
 export function getLibraryBookRecord(id: string): LibraryBookRecord | null {

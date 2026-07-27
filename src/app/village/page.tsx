@@ -33,6 +33,11 @@ import {
 } from "@/lib/welcomeLetters";
 import { markUnlocksSeen } from "@/lib/notifications";
 import { getChronicleProgress } from "@/lib/chronicle";
+import {
+  getBookClubRotation,
+  listClubBooks,
+  listReadingListBooks,
+} from "@/lib/libraryBooks";
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -383,7 +388,12 @@ export default async function VillagePage() {
             />
           </div>
           <div style={{ marginTop: "0.75rem" }}>
-            <LibraryAdminEditor />
+            <LibraryAdminEditor
+              clubBooks={listClubBooks()}
+              readingList={listReadingListBooks()}
+              daysUntilShuffle={getBookClubRotation().daysUntilShuffle}
+              returnTo="/village"
+            />
           </div>
         </>
       ) : null}
