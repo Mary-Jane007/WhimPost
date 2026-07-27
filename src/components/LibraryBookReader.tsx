@@ -398,25 +398,49 @@ export function LibraryBookReader({
           height,
           flow: "paginated",
           spread: "none",
+          // Keep a single page on screen; never open a two-page spread.
+          minSpreadWidth: 100000,
           allowScriptedContent: true,
         });
 
         rendition.themes.default({
+          html: {
+            width: "100% !important",
+            height: "100% !important",
+            overflow: "hidden !important",
+            margin: "0 !important",
+            padding: "0 !important",
+          },
           body: {
             color: "#2c2418 !important",
             background: "#f6edd9 !important",
             "font-family": "Georgia, 'Times New Roman', serif !important",
-            "line-height": "1.7 !important",
-            "font-size": "1.05em !important",
-            padding: "1.1rem 1.25rem !important",
+            "line-height": "1.65 !important",
+            "font-size": "1em !important",
+            padding: "0.85rem 1rem !important",
             margin: "0 !important",
+            width: "100% !important",
+            height: "100% !important",
+            "max-height": "100% !important",
+            "box-sizing": "border-box !important",
+            overflow: "hidden !important",
           },
           p: {
-            "margin-top": "0.65em !important",
-            "margin-bottom": "0.65em !important",
+            "margin-top": "0.55em !important",
+            "margin-bottom": "0.55em !important",
           },
           a: { color: "#5c3a1e !important" },
-          img: { "max-width": "100% !important", height: "auto !important" },
+          img: {
+            "max-width": "100% !important",
+            "max-height": "100% !important",
+            width: "auto !important",
+            height: "auto !important",
+            "object-fit": "contain !important",
+          },
+          svg: {
+            "max-width": "100% !important",
+            "max-height": "100% !important",
+          },
         });
 
         const doResize = () => {
@@ -652,7 +676,12 @@ export function LibraryBookReader({
             ) : null}
 
             {kind === "pdf" ? (
-              <iframe className="mh-reader-frame" title={title} src={fileUrl} />
+              <iframe
+                className="mh-reader-frame"
+                title={title}
+                // Ask the browser PDF viewer to fit one full page on screen.
+                src={`${fileUrl}#toolbar=1&navpanes=0&view=Fit`}
+              />
             ) : null}
 
             {kind === "epub" ? (

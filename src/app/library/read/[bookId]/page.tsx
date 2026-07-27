@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getLibraryProgress } from "@/lib/library";
@@ -28,9 +27,6 @@ export default async function LibraryReadPage({ params }: Props) {
         React fails to hydrate, which left books stuck on “Opening…”.
       */}
       <script src="/library-reader-boot.js" defer />
-      <p className="muted" style={{ padding: "0.75rem 1rem 0" }}>
-        <Link href="/library">← Back to the library</Link>
-      </p>
       <LibraryReadClient
         bookId={book.id}
         title={book.title}

@@ -97,20 +97,43 @@
       height: height,
       flow: "paginated",
       spread: "none",
+      minSpreadWidth: 100000,
       allowScriptedContent: true,
     });
 
     rendition.themes.default({
+      html: {
+        width: "100% !important",
+        height: "100% !important",
+        overflow: "hidden !important",
+        margin: "0 !important",
+        padding: "0 !important",
+      },
       body: {
         color: "#2c2418 !important",
         background: "#f6edd9 !important",
         "font-family": "Georgia, 'Times New Roman', serif !important",
-        "line-height": "1.7 !important",
-        "font-size": "1.05em !important",
-        padding: "1.1rem 1.25rem !important",
+        "line-height": "1.65 !important",
+        "font-size": "1em !important",
+        padding: "0.85rem 1rem !important",
         margin: "0 !important",
+        width: "100% !important",
+        height: "100% !important",
+        "max-height": "100% !important",
+        "box-sizing": "border-box !important",
+        overflow: "hidden !important",
       },
-      img: { "max-width": "100% !important", height: "auto !important" },
+      img: {
+        "max-width": "100% !important",
+        "max-height": "100% !important",
+        width: "auto !important",
+        height: "auto !important",
+        "object-fit": "contain !important",
+      },
+      svg: {
+        "max-width": "100% !important",
+        "max-height": "100% !important",
+      },
     });
 
     try {
