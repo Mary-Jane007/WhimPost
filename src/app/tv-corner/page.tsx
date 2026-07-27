@@ -65,6 +65,12 @@ export default async function TvCornerPage({ searchParams }: Props) {
 
   return (
     <main className={`app-main forest-panel tv-corner-page village-${village.id}`}>
+      {/*
+        Classic defer script so guide air times show in the laptop timezone
+        even when React fails to hydrate (next/script beforeInteractive breaks
+        App Router; afterInteractive may never run without client React).
+      */}
+      <script src="/tv-guide-local.js" defer />
       <TvCorner
         user={user}
         villageId={village.id}
