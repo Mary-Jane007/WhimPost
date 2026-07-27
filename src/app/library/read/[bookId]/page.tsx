@@ -23,6 +23,11 @@ export default async function LibraryReadPage({ params }: Props) {
 
   return (
     <>
+      {/*
+        Classic defer script — next/script afterInteractive never runs when
+        React fails to hydrate, which left books stuck on “Opening…”.
+      */}
+      <script src="/library-reader-boot.js" defer />
       <p className="muted" style={{ padding: "0.75rem 1rem 0" }}>
         <Link href="/library">← Back to the library</Link>
       </p>

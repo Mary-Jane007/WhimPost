@@ -351,6 +351,14 @@ export function LibraryBookReader({
       setLoading(true);
       setError("");
       try {
+        // Plain boot script may already own the mount when React fails to hydrate.
+        if (host.dataset.owned === "boot" || host.querySelector("iframe")) {
+          host.dataset.owned = host.dataset.owned || "boot";
+          setLoading(false);
+          return;
+        }
+        host.dataset.owned = "react";
+
         const mod = await import("epubjs");
         const ePub = resolveEpubFactory(mod);
 
@@ -613,6 +621,7 @@ export function LibraryBookReader({
             <button
               type="button"
               className="btn-secondary"
+              data-reader-nav="prev"
               onClick={() => navRef.current?.prev()}
               disabled={loading || Boolean(error)}
             >
@@ -624,6 +633,7 @@ export function LibraryBookReader({
             <button
               type="button"
               className="btn-secondary"
+              data-reader-nav="next"
               onClick={() => navRef.current?.next()}
               disabled={loading || Boolean(error)}
             >
@@ -646,7 +656,13 @@ export function LibraryBookReader({
             ) : null}
 
             {kind === "epub" ? (
-              <div ref={viewerRef} className="mh-reader-epub" />
+              <div
+                ref={viewerRef}
+                className="mh-reader-epub"
+                data-file-url={fileUrl}
+                data-book-id={bookId}
+                data-resume-cfi={usableResumeCfi(initialPosition) || ""}
+              />
             ) : null}
 
             {kind === "unknown" ? (

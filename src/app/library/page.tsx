@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import Script from "next/script";
 import { getCurrentUser } from "@/lib/auth";
 import { getLibraryProgress } from "@/lib/library";
 import {
@@ -75,10 +74,10 @@ export default async function LibraryPage({ searchParams }: Props) {
   return (
     <main className="app-main forest-panel mh-library-page village-mosshollow">
       {/*
-        Plain script (not React) so Replace cover/EPUB auto-upload on file pick
+        Classic defer script so Replace cover/EPUB auto-upload on file pick
         even when the library client fails to hydrate.
       */}
-      <Script src="/library-attach-boot.js" strategy="afterInteractive" />
+      <script src="/library-attach-boot.js" defer />
       <PageCrest
         kinds={[
           "moss-books-stack",
