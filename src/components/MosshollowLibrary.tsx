@@ -22,13 +22,14 @@ import {
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
+import { ShelfBookRemove } from "@/components/ShelfBookRemove";
 
 type Props = {
   user: UserPublic;
   initialProgress: LibraryProgress;
   clubBooks: ClubBook[];
   readingList: ReadingListBook[];
-  featuredBook: ClubBook;
+  featuredBook: ClubBook | null;
   /** From ?tab= so sections work even if the client fails to hydrate. */
   initialTab?: LibraryTabId;
 };
@@ -58,7 +59,7 @@ export function MosshollowLibrary({
   const [secretVisible, setSecretVisible] = useState(false);
   const [shelfClub, setShelfClub] = useState(clubBooks);
   const [shelfList, setShelfList] = useState(readingList);
-  const [book, setBook] = useState(featuredBook);
+  const [book, setBook] = useState<ClubBook | null>(featuredBook);
 
   const curiosity = featuredCuriosity();
   const mystery = featuredMystery();
@@ -70,19 +71,27 @@ export function MosshollowLibrary({
     const res = await fetch("/api/library/books");
     if (!res.ok) return;
     const data = await res.json();
-    if (Array.isArray(data.clubBooks) && data.clubBooks.length) {
+    if (Array.isArray(data.clubBooks)) {
       setShelfClub(data.clubBooks);
-      const monthIdx = new Date().getUTCMonth() % data.clubBooks.length;
-      setBook(data.clubBooks[monthIdx]);
+      if (data.clubBooks.length) {
+        const stillThere = data.clubBooks.find(
+          (b: ClubBook) => b.id === book?.id
+        );
+        const monthIdx = new Date().getUTCMonth() % data.clubBooks.length;
+        setBook(stillThere || data.clubBooks[monthIdx]);
+      } else {
+        setBook(null);
+      }
     }
     if (Array.isArray(data.readingList)) setShelfList(data.readingList);
   }
   // Prefer the live bookmark % (CFI-based) over any older sticky shelf value.
-  const bookPct =
-    progress.readingPositions?.[book.id]?.percent ??
-    progress.bookProgress[book.id] ??
-    0;
-  const bookFinished = Boolean(progress.finishedBooks[book.id]);
+  const bookPct = book
+    ? progress.readingPositions?.[book.id]?.percent ??
+      progress.bookProgress[book.id] ??
+      0
+    : 0;
+  const bookFinished = Boolean(book && progress.finishedBooks[book.id]);
 
   useEffect(() => {
     setTab(initialTab);
@@ -233,6 +242,7 @@ export function MosshollowLibrary({
               One featured book each month. Finish it to earn the Bookworm
               Badge (+{LIBRARY_XP.reading} XP).
             </p>
+            {book ? (
             <article className="mh-book-feature">
               <div
                 className={`mh-cover${book.coverUrl ? " has-image" : ""}`}
@@ -284,6 +294,12 @@ export function MosshollowLibrary({
                       hasFile={Boolean(book.fileUrl)}
                       returnTo={returnTo}
                       onAttached={() => void refreshShelves()}
+                    />
+                    <ShelfBookRemove
+                      bookId={book.id}
+                      bookTitle={book.title}
+                      returnTo={returnTo}
+                      onRemoved={() => void refreshShelves()}
                     />
                   </div>
                 ) : null}
@@ -372,6 +388,11 @@ export function MosshollowLibrary({
                 </button>
               </div>
             </article>
+            ) : (
+              <p className="muted">
+                The Book Club shelf is empty. Owner can add a new title below.
+              </p>
+            )}
             <div className="mh-club-shelf">
               <h3>This season&apos;s shelf</h3>
               <ul>
@@ -424,6 +445,12 @@ export function MosshollowLibrary({
                               hasFile={Boolean(b.fileUrl)}
                               returnTo={returnTo}
                               onAttached={() => void refreshShelves()}
+                            />
+                            <ShelfBookRemove
+                              bookId={b.id}
+                              bookTitle={b.title}
+                              returnTo={returnTo}
+                              onRemoved={() => void refreshShelves()}
                             />
                           </>
                         ) : null}
@@ -510,6 +537,12 @@ export function MosshollowLibrary({
                           hasFile={Boolean(b.fileUrl)}
                           returnTo={returnTo}
                           onAttached={() => void refreshShelves()}
+                        />
+                        <ShelfBookRemove
+                          bookId={b.id}
+                          bookTitle={b.title}
+                          returnTo={returnTo}
+                          onRemoved={() => void refreshShelves()}
                         />
                       </div>
                     ) : null}

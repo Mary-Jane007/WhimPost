@@ -43,10 +43,33 @@ const books = rows
     `${a.shelf}:${a.title}`.localeCompare(`${b.shelf}:${b.title}`)
   );
 
+let removedIds = [];
+try {
+  removedIds = db
+    .prepare(`SELECT book_id AS id FROM library_removed_books`)
+    .all()
+    .map((r) => r.id)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+} catch {
+  // Table may not exist on older DBs until the app boots once.
+}
+
 fs.writeFileSync(
   catalogPath,
-  `${JSON.stringify({ version: 1, updatedAt: new Date().toISOString(), books }, null, 2)}\n`,
+  `${JSON.stringify(
+    {
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      books,
+      removedIds,
+    },
+    null,
+    2
+  )}\n`,
   "utf8"
 );
-console.log(`Wrote ${catalogPath} (${books.length} books).`);
+console.log(
+  `Wrote ${catalogPath} (${books.length} books, ${removedIds.length} removed).`
+);
 db.close();

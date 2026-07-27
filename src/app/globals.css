@@ -7073,6 +7073,11 @@ button.linkish:hover {
   cursor: wait;
 }
 
+.mh-remove-btn {
+  color: #6b2f2f;
+  border-color: rgba(107, 47, 47, 0.35);
+}
+
 .mh-visually-hidden {
   position: absolute;
   width: 1px;

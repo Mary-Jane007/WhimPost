@@ -9,6 +9,7 @@ import type {
 } from "@/lib/libraryContent";
 import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
+import { ShelfBookRemove } from "@/components/ShelfBookRemove";
 
 const CATEGORIES: ReadingCategory[] = [
   "Fantasy",
@@ -168,24 +169,6 @@ export function LibraryAdminEditor({
     onChanged?.();
   }
 
-  async function onDelete(id: string, bookTitle: string) {
-    if (!window.confirm(`Remove “${bookTitle}” from the Grand Library?`)) return;
-    setError("");
-    const res = await fetch("/api/library/books", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Could not remove book");
-      return;
-    }
-    setStatus(`Removed “${bookTitle}”.`);
-    void load();
-    onChanged?.();
-  }
-
   const filteredShelf = shelfRows.filter((b) => {
     if (filter === "missing") return !b.fileUrl;
     if (filter === "ready") return Boolean(b.fileUrl);
@@ -285,6 +268,15 @@ export function LibraryAdminEditor({
                       bookTitle={b.title}
                       hasFile={Boolean(b.fileUrl)}
                       onAttached={() => {
+                        void load();
+                        onChanged?.();
+                      }}
+                    />
+                    <ShelfBookRemove
+                      bookId={b.id}
+                      bookTitle={b.title}
+                      onRemoved={() => {
+                        setStatus(`Removed “${b.title}”.`);
                         void load();
                         onChanged?.();
                       }}
@@ -491,13 +483,15 @@ export function LibraryAdminEditor({
                       <div className="muted">No file attached</div>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={() => void onDelete(b.id, b.title)}
-                  >
-                    Remove file
-                  </button>
+                  <ShelfBookRemove
+                    bookId={b.id}
+                    bookTitle={b.title}
+                    onRemoved={() => {
+                      setStatus(`Removed “${b.title}”.`);
+                      void load();
+                      onChanged?.();
+                    }}
+                  />
                 </li>
               ))}
             </ul>

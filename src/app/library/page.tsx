@@ -69,7 +69,7 @@ export default async function LibraryPage({ searchParams }: Props) {
   const progress = getLibraryProgress(user.id);
   const clubBooks = listClubBooks();
   const readingList = listReadingListBooks();
-  const featuredBook = featuredClubBookMerged() || clubBooks[0];
+  const featuredBook = featuredClubBookMerged() || clubBooks[0] || null;
 
   return (
     <main className="app-main forest-panel mh-library-page village-mosshollow">
@@ -86,18 +86,14 @@ export default async function LibraryPage({ searchParams }: Props) {
           "candle-jar",
         ]}
       />
-      {featuredBook ? (
-        <MosshollowLibrary
-          user={user}
-          initialProgress={progress}
-          clubBooks={clubBooks}
-          readingList={readingList}
-          featuredBook={featuredBook}
-          initialTab={initialTab}
-        />
-      ) : (
-        <p className="muted">The shelves are empty for now.</p>
-      )}
+      <MosshollowLibrary
+        user={user}
+        initialProgress={progress}
+        clubBooks={clubBooks}
+        readingList={readingList}
+        featuredBook={featuredBook}
+        initialTab={initialTab}
+      />
     </main>
   );
 }

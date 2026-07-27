@@ -76,6 +76,34 @@ function parseJsonArray(raw: string | null | undefined): string[] {
   }
 }
 
+function isSeedBookId(id: string) {
+  return (
+    CLUB_BOOKS.some((b) => b.id === id) || READING_LIST.some((b) => b.id === id)
+  );
+}
+
+export function getRemovedBookIds(): Set<string> {
+  const db = getDb();
+  const rows = db
+    .prepare(`SELECT book_id AS id FROM library_removed_books`)
+    .all() as Array<{ id: string }>;
+  return new Set(rows.map((r) => r.id));
+}
+
+function markBookRemoved(id: string) {
+  getDb()
+    .prepare(
+      `INSERT OR IGNORE INTO library_removed_books (book_id) VALUES (?)`
+    )
+    .run(id);
+}
+
+function clearBookRemoved(id: string) {
+  getDb()
+    .prepare(`DELETE FROM library_removed_books WHERE book_id = ?`)
+    .run(id);
+}
+
 function mapRow(row: BookRow): LibraryBookRecord {
   return {
     id: row.id,
@@ -209,35 +237,49 @@ function mergeReadingOverlay(
 
 /** Hardcoded club shelf + published owner uploads (DB overlays same id). */
 export function listClubBooks(): ClubBook[] {
+  const removed = getRemovedBookIds();
   const uploaded = listLibraryBookRecords({ shelf: "club" }).map(toClubBook);
   const byId = new Map<string, ClubBook>();
-  for (const book of CLUB_BOOKS) byId.set(book.id, book);
+  for (const book of CLUB_BOOKS) {
+    if (!removed.has(book.id)) byId.set(book.id, book);
+  }
   for (const book of uploaded) {
+    if (removed.has(book.id)) continue;
     const prev = byId.get(book.id);
     byId.set(book.id, prev ? mergeClubOverlay(prev, book) : book);
   }
   // Keep seed order, then append new upload-only ids.
   const seedIds = new Set(CLUB_BOOKS.map((b) => b.id));
-  const merged = CLUB_BOOKS.map((b) => byId.get(b.id)!);
+  const merged = CLUB_BOOKS.filter((b) => byId.has(b.id)).map(
+    (b) => byId.get(b.id)!
+  );
   for (const book of uploaded) {
+    if (removed.has(book.id)) continue;
     if (!seedIds.has(book.id)) merged.push(book);
   }
   return merged;
 }
 
 export function listReadingListBooks(): ReadingListBook[] {
+  const removed = getRemovedBookIds();
   const uploaded = listLibraryBookRecords({ shelf: "readinglist" }).map(
     toReadingListBook
   );
   const byId = new Map<string, ReadingListBook>();
-  for (const book of READING_LIST) byId.set(book.id, book);
+  for (const book of READING_LIST) {
+    if (!removed.has(book.id)) byId.set(book.id, book);
+  }
   for (const book of uploaded) {
+    if (removed.has(book.id)) continue;
     const prev = byId.get(book.id);
     byId.set(book.id, prev ? mergeReadingOverlay(prev, book) : book);
   }
   const seedIds = new Set(READING_LIST.map((b) => b.id));
-  const merged = READING_LIST.map((b) => byId.get(b.id)!);
+  const merged = READING_LIST.filter((b) => byId.has(b.id)).map(
+    (b) => byId.get(b.id)!
+  );
   for (const book of uploaded) {
+    if (removed.has(book.id)) continue;
     if (!seedIds.has(book.id)) merged.push(book);
   }
   return merged;
@@ -462,6 +504,8 @@ export function upsertLibraryBook(
   }
 
   const existing = getLibraryBookRecord(id);
+  // Re-shelving a removed (including built-in) title brings it back.
+  clearBookRemoved(id);
   const payload = {
     id,
     shelf: input.shelf,
@@ -546,25 +590,38 @@ export function upsertLibraryBook(
 
 export function deleteLibraryBook(id: string) {
   const db = getDb();
-  const existing = getLibraryBookRecord(id);
-  if (!existing) return { ok: false as const, error: "Book not found" };
+  const bookId = id.trim();
+  if (!bookId) return { ok: false as const, error: "Book id required" };
 
-  db.prepare(`DELETE FROM library_books WHERE id = ?`).run(id);
+  const existing = getLibraryBookRecord(bookId);
+  const seed = isSeedBookId(bookId);
+  const alreadyRemoved = getRemovedBookIds().has(bookId);
 
-  // Remove uploaded bytes when this book owned the files.
-  for (const url of [existing.fileUrl, existing.coverUrl]) {
-    if (!url) continue;
-    const match = /\/api\/uploads\/([a-f0-9-]+\.[a-z0-9]+)$/i.exec(url);
-    if (!match) continue;
-    const filePath = path.join(LIBRARY_UPLOAD_DIR, match[1]);
-    if (fs.existsSync(filePath)) {
-      try {
-        fs.unlinkSync(filePath);
-      } catch {
-        // ignore cleanup errors
+  if (!existing && !seed && !alreadyRemoved) {
+    return { ok: false as const, error: "Book not found" };
+  }
+
+  if (existing) {
+    db.prepare(`DELETE FROM library_books WHERE id = ?`).run(bookId);
+
+    // Remove uploaded bytes when this book owned the files.
+    for (const url of [existing.fileUrl, existing.coverUrl]) {
+      if (!url) continue;
+      const match = /\/api\/uploads\/([a-f0-9-]+\.[a-z0-9]+)$/i.exec(url);
+      if (!match) continue;
+      const filePath = path.join(LIBRARY_UPLOAD_DIR, match[1]);
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch {
+          // ignore cleanup errors
+        }
       }
     }
   }
+
+  // Tombstone so hardcoded catalog titles do not reappear on the next merge.
+  markBookRemoved(bookId);
 
   try {
     exportPersistentLibraryBooks(db);

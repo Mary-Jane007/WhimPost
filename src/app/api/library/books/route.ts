@@ -155,6 +155,16 @@ export async function POST(req: NextRequest) {
   if (!form) return jsonError("Expected multipart form data");
   const nextPath = nextFromForm(form);
 
+  const intent = String(form.get("intent") || "").trim();
+  if (intent === "remove") {
+    const id = String(form.get("bookId") || form.get("id") || "").trim();
+    if (!id) return jsonError("Book id required");
+    const result = deleteLibraryBook(id);
+    if (!result.ok) return jsonError(result.error, 404);
+    if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
+    return NextResponse.json({ ok: true, removed: id });
+  }
+
   const attachTo = String(form.get("attachTo") || form.get("id") || "").trim();
   const attachOnly =
     String(form.get("attachOnly") || "") === "1" ||

@@ -41,6 +41,8 @@ type PersistentLibraryBooksFile = {
   version: 1;
   updatedAt: string;
   books: PersistentLibraryBook[];
+  /** Catalog / seed ids the owner removed — keeps built-ins from reappearing. */
+  removedIds?: string[];
 };
 
 function readFile(): PersistentLibraryBooksFile | null {
@@ -56,7 +58,7 @@ function readFile(): PersistentLibraryBooksFile | null {
   }
 }
 
-function writeFile(books: PersistentLibraryBook[]) {
+function writeFile(books: PersistentLibraryBook[], removedIds: string[]) {
   const dir = path.dirname(PERSISTENT_LIBRARY_BOOKS_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
@@ -65,6 +67,9 @@ function writeFile(books: PersistentLibraryBook[]) {
     updatedAt: new Date().toISOString(),
     books: books.sort((a, b) =>
       `${a.shelf}:${a.title}`.localeCompare(`${b.shelf}:${b.title}`)
+    ),
+    removedIds: [...new Set(removedIds.map((id) => id.trim()).filter(Boolean))].sort(
+      (a, b) => a.localeCompare(b)
     ),
   };
 
@@ -94,6 +99,12 @@ export function exportPersistentLibraryBooks(db: Database) {
     .all() as Array<
     PersistentLibraryBook & { published: number | boolean }
   >;
+
+  const removedIds = (
+    db.prepare(`SELECT book_id AS id FROM library_removed_books`).all() as Array<{
+      id: string;
+    }>
+  ).map((r) => r.id);
 
   const books: PersistentLibraryBook[] = [];
   for (const row of rows) {
@@ -133,14 +144,14 @@ export function exportPersistentLibraryBooks(db: Database) {
     });
   }
 
-  writeFile(books);
+  writeFile(books, removedIds);
   return books.length;
 }
 
 /** Restore owner-uploaded library books when DB rows are missing. */
 export function importPersistentLibraryBooks(db: Database) {
   const file = readFile();
-  if (!file?.books.length) return 0;
+  if (!file) return 0;
 
   const owner =
     (db
@@ -166,10 +177,18 @@ export function importPersistentLibraryBooks(db: Database) {
       @difficulty, @length, @mood, @themes_json, @rating, @published, @created_by
     )
   `);
+  const markRemoved = db.prepare(
+    `INSERT OR IGNORE INTO library_removed_books (book_id) VALUES (?)`
+  );
 
   let restored = 0;
   const tx = db.transaction(() => {
-    for (const book of file.books) {
+    for (const id of file.removedIds || []) {
+      if (!id?.trim()) continue;
+      markRemoved.run(id.trim());
+    }
+
+    for (const book of file.books || []) {
       if (!book?.id || !book.title || !book.author) continue;
       if (existing.get(book.id)) continue;
 

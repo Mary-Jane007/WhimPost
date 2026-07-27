@@ -397,6 +397,11 @@ function migrate(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_library_books_shelf
       ON library_books(shelf, published, created_at);
 
+    CREATE TABLE IF NOT EXISTS library_removed_books (
+      book_id TEXT PRIMARY KEY,
+      removed_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
     CREATE TABLE IF NOT EXISTS library_annotations (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
