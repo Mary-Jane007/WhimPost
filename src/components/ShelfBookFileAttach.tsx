@@ -82,12 +82,6 @@ export function ShelfBookFileAttach({
           name="file"
           accept=".pdf,.epub,application/pdf,application/epub+zip"
           disabled={busy}
-          // Native attribute: opens via the label, then uploads on pick
-          // even if React never hydrates.
-          {...{
-            onchange:
-              "if(this.files&&this.files.length)this.form.requestSubmit()",
-          }}
         />
       </label>
       {error ? <p className="form-error">{error}</p> : null}
