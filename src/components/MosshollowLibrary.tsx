@@ -20,9 +20,11 @@ import {
   type ReadingListBook,
 } from "@/lib/libraryContent";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
+import { BookReadingProgress } from "@/components/BookReadingProgress";
 import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 import { ShelfBookRemove } from "@/components/ShelfBookRemove";
+import { getBookProgressView } from "@/lib/libraryProgressView";
 
 type Props = {
   user: UserPublic;
@@ -293,6 +295,7 @@ export function MosshollowLibrary({
                       ? ` · ${progress.bookProgress[book.id]}% read`
                       : ""}
                 </p>
+                <BookReadingProgress progress={progress} bookId={book.id} />
                 {book.fileUrl ? (
                   <p className="mh-file-link">
                     <Link
@@ -421,8 +424,10 @@ export function MosshollowLibrary({
             <div className="mh-club-shelf">
               <h3>This season&apos;s shelf</h3>
               <ul>
-                {shelfClub.map((b) => (
-                  <li key={b.id} className={b.id === book.id ? "active" : ""}>
+                {shelfClub.map((b) => {
+                  const view = getBookProgressView(progress, b.id);
+                  return (
+                  <li key={b.id} className={b.id === book?.id ? "active" : ""}>
                     <div className="mh-shelf-row">
                       <button
                         type="button"
@@ -437,13 +442,17 @@ export function MosshollowLibrary({
                             <span>{b.coverEmoji}</span>
                           )}
                         </span>
-                        <span>
-                          {b.title}
-                          {b.fileUrl ? " · 📄" : ""}
-                          {progress.readingPositions?.[b.id]?.label
-                            ? ` · ${progress.readingPositions[b.id].label}`
-                            : ""}
-                          {progress.finishedBooks[b.id] ? " · ✓" : ""}
+                        <span className="mh-shelf-copy">
+                          <span className="mh-shelf-title">
+                            {b.title}
+                            {b.fileUrl ? " · 📄" : ""}
+                            {view.finished ? " · ✓" : ""}
+                          </span>
+                          <BookReadingProgress
+                            progress={progress}
+                            bookId={b.id}
+                            compact
+                          />
                         </span>
                       </button>
                       <div className="mh-shelf-actions">
@@ -452,7 +461,7 @@ export function MosshollowLibrary({
                             href={`/library/read/${encodeURIComponent(b.id)}`}
                             className="btn-secondary mh-attach-btn"
                           >
-                            Read
+                            {view.started && !view.finished ? "Continue" : "Read"}
                           </Link>
                         ) : null}
                         {user.isOwner ? (
@@ -482,7 +491,8 @@ export function MosshollowLibrary({
                       </div>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </div>
           </section>
@@ -517,6 +527,7 @@ export function MosshollowLibrary({
               {filteredList.map((b) => {
                 const status = progress.readingStatus[b.id] || "none";
                 const wished = Boolean(progress.wishlist[b.id]);
+                const view = getBookProgressView(progress, b.id);
                 return (
                   <article key={b.id} className="mh-card">
                     <div
@@ -537,13 +548,16 @@ export function MosshollowLibrary({
                     </p>
                     <p className="mh-themes">{b.themes.join(" · ")}</p>
                     <p className="mh-rating">★ {b.rating.toFixed(1)} community</p>
+                    <BookReadingProgress progress={progress} bookId={b.id} />
                     {b.fileUrl ? (
                       <p className="mh-file-link">
                         <Link
                           href={`/library/read/${encodeURIComponent(b.id)}`}
                           className="btn-primary"
                         >
-                          Read in the library
+                          {view.started && !view.finished
+                            ? "Continue reading"
+                            : "Read in the library"}
                         </Link>
                       </p>
                     ) : null}

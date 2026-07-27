@@ -151,7 +151,9 @@ export function saveReadingPosition(
     bookProgress[id] = pct;
   }
   if (pct >= 100) readingStatus[id] = "finished";
-  else if (pct > 0) readingStatus[id] = "reading";
+  else if (pct > 0 || positions[id]?.cfi || (position.label || "").trim()) {
+    readingStatus[id] = "reading";
+  }
 
   db.prepare(
     `UPDATE library_progress SET

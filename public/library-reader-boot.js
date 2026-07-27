@@ -65,7 +65,82 @@
     });
   }
 
-  async function openWithEpubJs(mount, fileUrl, resumeCfi) {
+  function savePosition(payload) {
+    var body = JSON.stringify(
+      Object.assign({ type: "saveReadingPosition" }, payload)
+    );
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(
+          "/api/library/progress",
+          new Blob([body], { type: "application/json" })
+        );
+        return;
+      }
+    } catch (_) {}
+    fetch("/api/library/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: body,
+      keepalive: true,
+      credentials: "include",
+    }).catch(function () {});
+  }
+
+  function placeFromLocation(location, book) {
+    var start = location && location.start ? location.start : {};
+    var cfi = start.cfi || null;
+    var percent = 0;
+    var page = null;
+    var total = null;
+    var reliable = false;
+    if (cfi && book && book.locations && typeof book.locations.length === "function") {
+      try {
+        var locLen = book.locations.length();
+        if (locLen > 0 && typeof book.locations.locationFromCfi === "function") {
+          var idxRaw = book.locations.locationFromCfi(cfi);
+          if (typeof idxRaw === "number" && idxRaw >= 0) {
+            var idx = Math.min(idxRaw, Math.max(0, locLen - 1));
+            page = idx + 1;
+            total = locLen;
+            percent =
+              locLen <= 1 ? (idx > 0 ? 100 : 0) : Math.round((idx / (locLen - 1)) * 100);
+            percent = Math.max(0, Math.min(100, percent));
+            reliable = true;
+          }
+        } else if (typeof book.locations.percentageFromCfi === "function") {
+          var pct = book.locations.percentageFromCfi(cfi);
+          if (typeof pct === "number" && !Number.isNaN(pct)) {
+            percent = Math.round(Math.max(0, Math.min(1, pct)) * 100);
+            reliable = true;
+          }
+        }
+      } catch (_) {}
+    }
+    var label =
+      reliable && page && total
+        ? percent + "% · place " + page + " of " + total
+        : reliable && percent > 0
+          ? percent + "% through"
+          : cfi
+            ? "Reading"
+            : "Beginning";
+    return {
+      cfi: cfi,
+      percent: percent,
+      page: page,
+      total: total,
+      label: label,
+      reliable: reliable,
+    };
+  }
+
+  function updateLocLabel(label) {
+    var el = document.querySelector(".mh-reader-loc");
+    if (el) el.textContent = label || "";
+  }
+
+  async function openWithEpubJs(mount, fileUrl, resumeCfi, bookId) {
     setStatus("Opening the book…");
     await loadScript("/vendor/jszip.min.js");
     await loadScript("/vendor/epub.min.js");
@@ -154,10 +229,90 @@
     setTimeout(resize, 280);
     wireNav(rendition);
 
-    // Locations in background — don't block first page.
-    try {
-      book.locations.generate(1000);
-    } catch (_) {}
+    var lastPlace = {
+      cfi: resumeCfi || null,
+      percent: 0,
+      page: null,
+      total: null,
+      label: "Reading",
+      reliable: false,
+    };
+    var saveTimer = null;
+
+    function persist(place, immediate) {
+      lastPlace = place;
+      updateLocLabel(place.label);
+      if (!bookId) return;
+      if (!place.cfi && !(place.reliable && place.percent > 0)) return;
+      var payload = {
+        bookId: bookId,
+        cfi: place.cfi,
+        page: place.page,
+        total: place.total,
+        label: place.label,
+      };
+      if (place.reliable) payload.percent = place.percent;
+      if (saveTimer) clearTimeout(saveTimer);
+      if (immediate) {
+        savePosition(payload);
+        return;
+      }
+      saveTimer = setTimeout(function () {
+        savePosition(payload);
+      }, 700);
+    }
+
+    rendition.on("relocated", function (location) {
+      var place = placeFromLocation(location, book);
+      if (!place.reliable) {
+        place.percent = lastPlace.percent || 0;
+        if (!place.label || place.label === "Beginning") {
+          place.label = lastPlace.label || place.label;
+        }
+      }
+      persist(place, false);
+    });
+
+    function flush() {
+      if (saveTimer) clearTimeout(saveTimer);
+      if (!bookId) return;
+      if (!lastPlace.cfi && !(lastPlace.reliable && lastPlace.percent > 0)) return;
+      var payload = {
+        bookId: bookId,
+        cfi: lastPlace.cfi,
+        page: lastPlace.page,
+        total: lastPlace.total,
+        label: lastPlace.label,
+      };
+      if (lastPlace.reliable) payload.percent = lastPlace.percent;
+      savePosition(payload);
+    }
+    window.addEventListener("pagehide", flush);
+    window.addEventListener("beforeunload", flush);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") flush();
+    });
+
+    // Mark opened immediately so shelves show progress even before a page turn.
+    if (bookId) {
+      savePosition({
+        bookId: bookId,
+        cfi: resumeCfi || undefined,
+        label: "Reading",
+      });
+    }
+
+    // Whole-book % in the background after first paint.
+    Promise.resolve()
+      .then(function () {
+        return book.locations.generate(1000);
+      })
+      .then(function () {
+        if (!lastPlace.cfi) return;
+        var place = placeFromLocation({ start: { cfi: lastPlace.cfi } }, book);
+        if (place.reliable) persist(place, true);
+      })
+      .catch(function () {});
 
     setStatus("");
     return { book: book, rendition: rendition };
@@ -175,18 +330,18 @@
     mount.dataset.owned = "boot";
     var fileUrl = mount.getAttribute("data-file-url") || "";
     var resumeCfi = mount.getAttribute("data-resume-cfi") || "";
+    var bookId = mount.getAttribute("data-book-id") || "";
     if (!fileUrl) {
       setStatus("Missing book file.", true);
       return;
     }
 
-    openWithEpubJs(mount, fileUrl, resumeCfi).catch(function (err) {
+    openWithEpubJs(mount, fileUrl, resumeCfi, bookId).catch(function (err) {
       console.error("[library-reader-boot]", err);
       setStatus(
         (err && err.message) || "Could not open this EPUB",
         true
       );
-      // Keep Download available in the header.
     });
   }
 

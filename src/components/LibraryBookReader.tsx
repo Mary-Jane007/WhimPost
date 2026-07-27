@@ -229,9 +229,8 @@ export function LibraryBookReader({
   const [noteError, setNoteError] = useState("");
 
   async function persistPlace(place: LivePlace, immediate = false) {
-    // Only persist whole-book % once locations are ready — otherwise we would
-    // overwrite a good bookmark with a chapter-local guess (or 0%).
-    if (!place.reliable && !place.cfi) return;
+    // Keep the CFI even before whole-book % is ready so Continue works.
+    if (!place.cfi && !(place.reliable && place.percent > 0)) return;
 
     const run = async () => {
       const res = await fetch("/api/library/progress", {
@@ -257,7 +256,7 @@ export function LibraryBookReader({
         label: place.label,
         updatedAt: new Date().toISOString(),
       };
-      if (place.reliable) {
+      if (place.reliable || place.cfi) {
         onProgressSaved?.({
           bookId,
           percent: place.percent,
@@ -275,7 +274,37 @@ export function LibraryBookReader({
     }
     saveTimer.current = window.setTimeout(() => {
       void run();
-    }, 900);
+    }, 700);
+  }
+
+  function flushPlaceBeacon() {
+    const place = placeRef.current;
+    if (!place.cfi && !(place.reliable && place.percent > 0)) return;
+    const payload = JSON.stringify({
+      type: "saveReadingPosition",
+      bookId,
+      percent: place.reliable ? place.percent : undefined,
+      cfi: place.cfi,
+      page: place.page,
+      total: place.total,
+      label: place.label,
+      reliable: place.reliable,
+    });
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: "application/json" });
+        navigator.sendBeacon("/api/library/progress", blob);
+        return;
+      }
+    } catch {
+      // fall through to fetch
+    }
+    void fetch("/api/library/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true,
+    });
   }
 
   async function loadAnnotations() {
@@ -301,13 +330,44 @@ export function LibraryBookReader({
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    // Mark the book as opened / in progress as soon as the reader mounts.
+    void fetch("/api/library/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "saveReadingPosition",
+        bookId,
+        label: initialPosition?.label || "Reading",
+        percent:
+          initialPosition && Number.isFinite(initialPosition.percent)
+            ? initialPosition.percent
+            : undefined,
+        cfi: initialPosition?.cfi || undefined,
+        page: initialPosition?.page ?? undefined,
+        total: initialPosition?.total ?? undefined,
+      }),
+    }).catch(() => {});
+
+    function onLeave() {
+      if (saveTimer.current) window.clearTimeout(saveTimer.current);
+      flushPlaceBeacon();
+    }
+
+    function onVisibility() {
+      if (document.visibilityState === "hidden") onLeave();
+    }
+
+    window.addEventListener("pagehide", onLeave);
+    window.addEventListener("beforeunload", onLeave);
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       document.body.style.overflow = prev;
-      if (saveTimer.current) window.clearTimeout(saveTimer.current);
-      const place = placeRef.current;
-      if (place.reliable && (place.cfi || place.percent > 0 || place.page)) {
-        void persistPlace(place, true);
-      }
+      window.removeEventListener("pagehide", onLeave);
+      window.removeEventListener("beforeunload", onLeave);
+      document.removeEventListener("visibilitychange", onVisibility);
+      onLeave();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- flush last place on leave
   }, [bookId]);
@@ -609,9 +669,9 @@ export function LibraryBookReader({
             ) : null}
           </div>
           <div className="mh-reader-header-actions">
-            {locationLabel ? (
-              <span className="mh-reader-loc">{locationLabel}</span>
-            ) : null}
+            <span className="mh-reader-loc" aria-live="polite">
+              {locationLabel || " "}
+            </span>
             <button
               type="button"
               className="btn-secondary"
