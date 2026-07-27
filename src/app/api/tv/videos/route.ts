@@ -17,11 +17,35 @@ import {
 } from "@/lib/tvCorner";
 import { parseDurationMinutesInput } from "@/lib/tvLinks";
 import { correctVideoDurationMs } from "@/lib/tvSchedule";
+import {
+  redirectSameHost,
+  wantsHtmlRedirect,
+} from "@/lib/requestBody";
+import type { UserPublic } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 1800; // long movie uploads
 
 const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
+
+function nextPathFrom(raw: string | undefined) {
+  const nextRaw = String(raw || "/tv-corner");
+  return nextRaw.startsWith("/") && !nextRaw.startsWith("//")
+    ? nextRaw
+    : "/tv-corner";
+}
+
+function performVideoDelete(id: string, user: UserPublic) {
+  const result = deleteVideo(id, user);
+  if (!result.ok) return { error: result.error as string };
+  if (result.isFile) {
+    const filePath = path.join(UPLOAD_DIR, result.filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  }
+  return { ok: true as const };
+}
 
 function ensureUploadDir() {
   if (!fs.existsSync(UPLOAD_DIR)) {
@@ -121,21 +145,50 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
-  if (!user) return jsonError("Not signed in", 401);
+  if (!user) {
+    if (wantsHtmlRedirect(req)) return redirectSameHost(req, "/login");
+    return jsonError("Not signed in", 401);
+  }
   if (!user.isOwner) {
     return jsonError("Only the site owner can upload channel videos", 403);
   }
 
   const contentType = (req.headers.get("content-type") || "").toLowerCase();
 
+  // Progressive-enhancement remove (HTML form POST — no React required).
+  // Use urlencoded forms so this never collides with multipart uploads.
+  if (contentType.includes("application/x-www-form-urlencoded")) {
+    const form = await req.formData().catch(() => null);
+    if (form && String(form.get("intent") || "") === "remove") {
+      const id = String(form.get("id") || "").trim();
+      const removed = performVideoDelete(id, user);
+      if ("error" in removed) return jsonError(removed.error, 403);
+      if (wantsHtmlRedirect(req)) {
+        return redirectSameHost(
+          req,
+          nextPathFrom(String(form.get("next") || ""))
+        );
+      }
+      return NextResponse.json({ ok: true });
+    }
+  }
+
   // Add-by-link: JSON body with a YouTube or direct video URL.
   if (contentType.includes("application/json")) {
     const body = (await req.json().catch(() => null)) as {
+      intent?: string;
+      id?: string;
       channelId?: string;
       sourceUrl?: string;
       title?: string;
       durationMinutes?: number | string;
     } | null;
+    if (body?.intent === "remove") {
+      const id = String(body.id || "").trim();
+      const removed = performVideoDelete(id, user);
+      if ("error" in removed) return jsonError(removed.error, 403);
+      return NextResponse.json({ ok: true });
+    }
     if (!body?.channelId) {
       return jsonError("Create a channel first, then add a link to it");
     }
@@ -361,15 +414,8 @@ export async function DELETE(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as { id?: string } | null;
   if (!body?.id) return jsonError("Missing clip id");
 
-  const result = deleteVideo(body.id, user);
-  if (!result.ok) return jsonError(result.error, 403);
-
-  if (result.isFile) {
-    const filePath = path.join(UPLOAD_DIR, result.filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-  }
+  const removed = performVideoDelete(body.id, user);
+  if ("error" in removed) return jsonError(removed.error, 403);
 
   return NextResponse.json({ ok: true });
 }

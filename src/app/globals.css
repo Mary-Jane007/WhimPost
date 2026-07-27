@@ -5037,6 +5037,11 @@ button.linkish:hover {
   cursor: pointer;
 }
 
+.tv-remove-form {
+  display: inline-flex;
+  margin: 0;
+}
+
 .tv-shelf-decor {
   display: flex;
   justify-content: space-between;

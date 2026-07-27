@@ -13,6 +13,7 @@ import { createPortal } from "react-dom";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import type { TvChannel, TvRoomState, TvScheduleSlot, TvVideo } from "@/lib/tvCorner";
+import { TvRemoveForm } from "@/components/TvRemoveForm";
 type VillageOption = { id: VillageId; name: string };
 
 type ScopeTab = "village" | "friends";
@@ -2246,14 +2247,13 @@ export function TvCorner({
                         </span>
                       </button>
                       {user.isOwner ? (
-                        <button
-                          type="button"
-                          className="tv-video-remove"
-                          onClick={() => removeChannel(channel.id)}
-                          aria-label={`Remove ${channel.title}`}
-                        >
-                          ×
-                        </button>
+                        <TvRemoveForm
+                          action="/api/tv/channels"
+                          id={channel.id}
+                          label={`Remove ${channel.title}`}
+                          disabled={busy}
+                          onRemove={removeChannel}
+                        />
                       ) : null}
                     </div>
                     {channel.videos.length > 0 ? (
@@ -2324,14 +2324,13 @@ export function TvCorner({
                                       >
                                         ✎
                                       </button>
-                                      <button
-                                        type="button"
-                                        className="tv-video-remove"
-                                        onClick={() => removeVideo(video.id)}
-                                        aria-label={`Remove ${video.title}`}
-                                      >
-                                        ×
-                                      </button>
+                                      <TvRemoveForm
+                                        action="/api/tv/videos"
+                                        id={video.id}
+                                        label={`Remove ${video.title}`}
+                                        disabled={busy}
+                                        onRemove={removeVideo}
+                                      />
                                     </>
                                   ) : null}
                                 </>
