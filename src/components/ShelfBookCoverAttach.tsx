@@ -7,11 +7,14 @@ export function ShelfBookCoverAttach({
   bookId,
   bookTitle,
   hasCover,
+  returnTo = "/library",
   onAttached,
 }: {
   bookId: string;
   bookTitle: string;
   hasCover?: boolean;
+  /** Where to send the browser after a no-JS form upload. */
+  returnTo?: string;
   onAttached?: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -19,8 +22,7 @@ export function ShelfBookCoverAttach({
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
 
-  async function onPick(file: File | null) {
-    if (!file) return;
+  async function upload(file: File) {
     setBusy(true);
     setError("");
     setStatus("");
@@ -43,20 +45,23 @@ export function ShelfBookCoverAttach({
   }
 
   return (
-    <div className="mh-attach">
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        hidden
-        disabled={busy}
-        onChange={(e) => void onPick(e.target.files?.[0] || null)}
-      />
-      <button
-        type="button"
-        className="btn-secondary mh-attach-btn"
-        disabled={busy}
-        onClick={() => inputRef.current?.click()}
+    <form
+      className="mh-attach"
+      action="/api/library/books"
+      method="post"
+      encType="multipart/form-data"
+      onSubmit={(e) => {
+        // Progressive enhancement: fetch when JS is alive.
+        const file = inputRef.current?.files?.[0];
+        if (!file) return;
+        e.preventDefault();
+        void upload(file);
+      }}
+    >
+      <input type="hidden" name="attachTo" value={bookId} />
+      <input type="hidden" name="next" value={returnTo} />
+      <label
+        className={`btn-secondary mh-attach-btn${busy ? " is-busy" : ""}`}
         title={
           hasCover
             ? `Replace cover for ${bookTitle}`
@@ -64,9 +69,26 @@ export function ShelfBookCoverAttach({
         }
       >
         {busy ? "Uploading…" : hasCover ? "Replace cover" : "Add cover"}
+        <input
+          ref={inputRef}
+          className="mh-visually-hidden"
+          type="file"
+          name="cover"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          disabled={busy}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            // Auto-upload once a file is chosen when JS works.
+            e.currentTarget.form?.requestSubmit();
+          }}
+        />
+      </label>
+      <button type="submit" className="mh-attach-upload">
+        Upload
       </button>
       {error ? <p className="form-error">{error}</p> : null}
       {status ? <p className="form-success">{status}</p> : null}
-    </div>
+    </form>
   );
 }

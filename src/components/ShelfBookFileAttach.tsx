@@ -7,11 +7,14 @@ export function ShelfBookFileAttach({
   bookId,
   bookTitle,
   hasFile,
+  returnTo = "/library",
   onAttached,
 }: {
   bookId: string;
   bookTitle: string;
   hasFile?: boolean;
+  /** Where to send the browser after a no-JS form upload. */
+  returnTo?: string;
   onAttached?: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -19,8 +22,7 @@ export function ShelfBookFileAttach({
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
 
-  async function onPick(file: File | null) {
-    if (!file) return;
+  async function upload(file: File) {
     setBusy(true);
     setError("");
     setStatus("");
@@ -43,20 +45,22 @@ export function ShelfBookFileAttach({
   }
 
   return (
-    <div className="mh-attach">
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".pdf,.epub,application/pdf,application/epub+zip"
-        hidden
-        disabled={busy}
-        onChange={(e) => void onPick(e.target.files?.[0] || null)}
-      />
-      <button
-        type="button"
-        className="btn-secondary mh-attach-btn"
-        disabled={busy}
-        onClick={() => inputRef.current?.click()}
+    <form
+      className="mh-attach"
+      action="/api/library/books"
+      method="post"
+      encType="multipart/form-data"
+      onSubmit={(e) => {
+        const file = inputRef.current?.files?.[0];
+        if (!file) return;
+        e.preventDefault();
+        void upload(file);
+      }}
+    >
+      <input type="hidden" name="attachTo" value={bookId} />
+      <input type="hidden" name="next" value={returnTo} />
+      <label
+        className={`btn-secondary mh-attach-btn${busy ? " is-busy" : ""}`}
         title={
           hasFile
             ? `Replace file for ${bookTitle}`
@@ -68,9 +72,25 @@ export function ShelfBookFileAttach({
           : hasFile
             ? "Replace EPUB"
             : "Attach EPUB"}
+        <input
+          ref={inputRef}
+          className="mh-visually-hidden"
+          type="file"
+          name="file"
+          accept=".pdf,.epub,application/pdf,application/epub+zip"
+          disabled={busy}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            e.currentTarget.form?.requestSubmit();
+          }}
+        />
+      </label>
+      <button type="submit" className="mh-attach-upload">
+        Upload
       </button>
       {error ? <p className="form-error">{error}</p> : null}
       {status ? <p className="form-success">{status}</p> : null}
-    </div>
+    </form>
   );
 }

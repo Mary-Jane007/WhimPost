@@ -7056,17 +7056,55 @@ button.linkish:hover {
 
 .mh-attach {
   margin: 0.45rem 0 0.35rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .mh-attach-btn {
   font-size: 0.85rem;
   padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+
+.mh-attach-btn.is-busy {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.mh-attach-upload {
+  font-size: 0.78rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(196, 170, 120, 0.35);
+  background: rgba(24, 30, 24, 0.55);
+  color: #e8dcc4;
+  border-radius: var(--frame-button);
+  cursor: pointer;
+}
+
+.mh-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .mh-attach .form-error,
 .mh-attach .form-success {
   margin: 0.35rem 0 0;
   font-size: 0.85rem;
+  flex-basis: 100%;
+}
+
+.mh-actions form {
+  display: inline;
+  margin: 0;
 }
 
 .mh-shelf-row {

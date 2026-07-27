@@ -64,6 +64,7 @@ export function MosshollowLibrary({
   const mystery = featuredMystery();
   const thought = featuredThought();
   const challenges = weeklyChallenges();
+  const returnTo = `/library?tab=${tab}`;
 
   async function refreshShelves() {
     const res = await fetch("/api/library/books");
@@ -274,12 +275,14 @@ export function MosshollowLibrary({
                       bookId={book.id}
                       bookTitle={book.title}
                       hasCover={Boolean(book.coverUrl)}
+                      returnTo={returnTo}
                       onAttached={() => void refreshShelves()}
                     />
                     <ShelfBookFileAttach
                       bookId={book.id}
                       bookTitle={book.title}
                       hasFile={Boolean(book.fileUrl)}
+                      returnTo={returnTo}
                       onAttached={() => void refreshShelves()}
                     />
                   </div>
@@ -412,12 +415,14 @@ export function MosshollowLibrary({
                               bookId={b.id}
                               bookTitle={b.title}
                               hasCover={Boolean(b.coverUrl)}
+                              returnTo={returnTo}
                               onAttached={() => void refreshShelves()}
                             />
                             <ShelfBookFileAttach
                               bookId={b.id}
                               bookTitle={b.title}
                               hasFile={Boolean(b.fileUrl)}
+                              returnTo={returnTo}
                               onAttached={() => void refreshShelves()}
                             />
                           </>
@@ -496,50 +501,86 @@ export function MosshollowLibrary({
                           bookId={b.id}
                           bookTitle={b.title}
                           hasCover={Boolean(b.coverUrl)}
+                          returnTo={returnTo}
                           onAttached={() => void refreshShelves()}
                         />
                         <ShelfBookFileAttach
                           bookId={b.id}
                           bookTitle={b.title}
                           hasFile={Boolean(b.fileUrl)}
+                          returnTo={returnTo}
                           onAttached={() => void refreshShelves()}
                         />
                       </div>
                     ) : null}
                     <div className="mh-actions">
-                      <button
-                        type="button"
-                        className="btn-secondary"
-                        disabled={busy}
-                        onClick={() =>
+                      <form
+                        action="/api/library/progress"
+                        method="post"
+                        onSubmit={(e) => {
+                          e.preventDefault();
                           void postAction({
                             type: "wishlist",
                             bookId: b.id,
                             on: !wished,
-                          })
-                        }
+                          });
+                        }}
                       >
-                        {wished ? "Wishlisted" : "Wishlist"}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-primary"
-                        disabled={busy || status === "finished"}
-                        onClick={() =>
+                        <input type="hidden" name="type" value="wishlist" />
+                        <input type="hidden" name="bookId" value={b.id} />
+                        <input
+                          type="hidden"
+                          name="on"
+                          value={wished ? "0" : "1"}
+                        />
+                        <input type="hidden" name="next" value={returnTo} />
+                        <button
+                          type="submit"
+                          className="btn-secondary"
+                          disabled={busy}
+                        >
+                          {wished ? "Wishlisted" : "Wishlist"}
+                        </button>
+                      </form>
+                      <form
+                        action="/api/library/progress"
+                        method="post"
+                        onSubmit={(e) => {
+                          e.preventDefault();
                           void postAction({
                             type: "readingStatus",
                             bookId: b.id,
                             status:
                               status === "reading" ? "finished" : "reading",
-                          })
-                        }
+                          });
+                        }}
                       >
-                        {status === "finished"
-                          ? "Finished"
-                          : status === "reading"
-                            ? "Mark finished"
-                            : "Start reading"}
-                      </button>
+                        <input
+                          type="hidden"
+                          name="type"
+                          value="readingStatus"
+                        />
+                        <input type="hidden" name="bookId" value={b.id} />
+                        <input
+                          type="hidden"
+                          name="status"
+                          value={
+                            status === "reading" ? "finished" : "reading"
+                          }
+                        />
+                        <input type="hidden" name="next" value={returnTo} />
+                        <button
+                          type="submit"
+                          className="btn-primary"
+                          disabled={busy || status === "finished"}
+                        >
+                          {status === "finished"
+                            ? "Finished"
+                            : status === "reading"
+                              ? "Mark finished"
+                              : "Start reading"}
+                        </button>
+                      </form>
                     </div>
                   </article>
                 );

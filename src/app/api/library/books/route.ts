@@ -15,6 +15,7 @@ import {
   type LibraryShelf,
 } from "@/lib/libraryBooks";
 import type { ReadingCategory, ReadingListBook } from "@/lib/libraryContent";
+import { redirectSameHost, wantsHtmlRedirect } from "@/lib/requestBody";
 
 export const runtime = "nodejs";
 
@@ -99,12 +100,24 @@ async function saveCoverFile(cover: File) {
 
 async function requireOwner() {
   const user = await getCurrentUser();
-  if (!user) return { error: jsonError("Not signed in", 401) };
+  if (!user) return { error: jsonError("Not signed in", 401) as NextResponse };
   const db = getDb();
   if (!user.isOwner && !isSiteOwner(db, user.id)) {
-    return { error: jsonError("Only the site owner can manage library books", 403) };
+    return {
+      error: jsonError(
+        "Only the site owner can manage library books",
+        403
+      ) as NextResponse,
+    };
   }
   return { user };
+}
+
+function nextFromForm(form: FormData) {
+  const nextRaw = String(form.get("next") || "/library");
+  return nextRaw.startsWith("/") && !nextRaw.startsWith("//")
+    ? nextRaw
+    : "/library";
 }
 
 /** Villagers see the merged shelf; owners can ask for raw uploaded records. */
@@ -132,11 +145,15 @@ export async function GET(req: NextRequest) {
 /** Owner creates/updates a library book, or attaches a file to an existing shelf title. */
 export async function POST(req: NextRequest) {
   const gate = await requireOwner();
-  if ("error" in gate && gate.error) return gate.error;
+  if ("error" in gate && gate.error) {
+    if (wantsHtmlRedirect(req)) return redirectSameHost(req, "/login");
+    return gate.error;
+  }
   const user = gate.user!;
 
   const form = await req.formData().catch(() => null);
   if (!form) return jsonError("Expected multipart form data");
+  const nextPath = nextFromForm(form);
 
   const attachTo = String(form.get("attachTo") || form.get("id") || "").trim();
   const attachOnly =
@@ -182,6 +199,7 @@ export async function POST(req: NextRequest) {
         coverUrl,
         createdBy: user.id,
       });
+      if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
       return NextResponse.json({ book, attached: true });
     } catch (err) {
       return jsonError(
@@ -255,6 +273,7 @@ export async function POST(req: NextRequest) {
       published: String(form.get("published") || "1") !== "0",
       createdBy: user.id,
     });
+    if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
     return NextResponse.json({ book });
   } catch (err) {
     return jsonError(

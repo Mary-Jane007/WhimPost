@@ -51,14 +51,25 @@ export async function readRequestFields(
 
 export function wantsHtmlRedirect(req: NextRequest): boolean {
   const mode = req.headers.get("sec-fetch-mode") || "";
-  const contentType = req.headers.get("content-type") || "";
+  // fetch()/XHR — keep JSON responses even for multipart uploads.
+  if (mode === "cors" || mode === "same-origin" || mode === "no-cors") {
+    return false;
+  }
+  if (mode === "navigate" || mode === "nested-navigate") return true;
+
   const accept = req.headers.get("accept") || "";
-  return (
-    mode === "navigate" ||
-    contentType.includes("application/x-www-form-urlencoded") ||
-    contentType.includes("multipart/form-data") ||
-    (accept.includes("text/html") && !accept.includes("application/json"))
-  );
+  if (accept.includes("application/json") && !accept.includes("text/html")) {
+    return false;
+  }
+  const contentType = req.headers.get("content-type") || "";
+  if (
+    (contentType.includes("application/x-www-form-urlencoded") ||
+      contentType.includes("multipart/form-data")) &&
+    accept.includes("text/html")
+  ) {
+    return true;
+  }
+  return accept.includes("text/html") && !accept.includes("application/json");
 }
 
 /**
