@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-27T01:23:54.672Z",
+  "updatedAt": "2026-07-28T14:38:29.331Z",
   "books": [
     {
       "id": "princess",
@@ -32,12 +32,34 @@
       "description": "Orphan Anne Shirley arrives with an imagination large enough for Avonlea — and a red-haired insistence that beauty belongs everywhere.",
       "minutes": 320,
       "coverEmoji": "🍒",
-      "coverUrl": null,
+      "coverUrl": "/api/uploads/98077cb2-75b6-4eb6-a726-e41ac555abd2.jpg",
       "fileUrl": "/api/uploads/c6a9a3bd-50db-4320-ab1c-834b97963d60.epub",
       "fileName": "anne.epub",
       "fileMime": "application/epub+zip",
       "quotesJson": "[\"Dear old world, you are very lovely, and I am glad to be alive in you.\",\"Kindred spirits are not so scarce as I used to think.\"]",
       "reflectionsJson": "[\"What place first felt like home because of imagination?\",\"Who is your kindred spirit?\"]",
+      "category": null,
+      "difficulty": null,
+      "length": null,
+      "mood": "",
+      "themesJson": "[]",
+      "rating": 4.5,
+      "published": true
+    },
+    {
+      "id": "narnia",
+      "shelf": "club",
+      "title": "The Chronicles of Narnia",
+      "author": "C.S. Lewis",
+      "description": "Wardrobes open onto snow and lamp-posts; courage, betrayal, and second chances wait beyond the coats.",
+      "minutes": 400,
+      "coverEmoji": "🦁",
+      "coverUrl": "/api/uploads/2473b5ab-55a9-4059-9390-281b2752f5d1.jpg",
+      "fileUrl": "/api/uploads/e598f462-b251-4792-bbba-d12e1d7d9667.epub",
+      "fileName": "lewis-lion-the-witch-and-the-wardrobe.epub",
+      "fileMime": "application/epub+zip",
+      "quotesJson": "[\"Wrong will be right, when Aslan comes in sight.\",\"Once a king or queen of Narnia, always a king or queen.\"]",
+      "reflectionsJson": "[\"What doorway in your life still feels magical?\",\"When have you needed a second chance?\"]",
       "category": null,
       "difficulty": null,
       "length": null,
@@ -54,12 +76,34 @@
       "description": "A neglected garden awakens with a lonely girl, a boy who speaks to earth, and the quiet miracle of tending what was forgotten.",
       "minutes": 280,
       "coverEmoji": "🌹",
-      "coverUrl": null,
+      "coverUrl": "/api/uploads/86aaf27c-4b79-415d-bcc8-67b878cc4cee.webp",
       "fileUrl": "/api/uploads/8b940374-9c6b-4116-a65f-f0176899d881.epub",
       "fileName": "secret-garden.epub",
       "fileMime": "application/epub+zip",
       "quotesJson": "[\"If you look the right way, you can see that the whole world is a garden.\",\"Where you tend a rose, my lad, a thistle cannot grow.\"]",
       "reflectionsJson": "[\"What neglected corner of your life could use a little care?\",\"Who helped you rediscover wonder?\"]",
+      "category": null,
+      "difficulty": null,
+      "length": null,
+      "mood": "",
+      "themesJson": "[]",
+      "rating": 4.5,
+      "published": true
+    },
+    {
+      "id": "velveteen",
+      "shelf": "club",
+      "title": "The Velveteen Rabbit",
+      "author": "Margery Williams",
+      "description": "A stuffed rabbit learns that becoming Real takes love, time, and being worn soft by someone who needs you.",
+      "minutes": 60,
+      "coverEmoji": "🐇",
+      "coverUrl": "/api/uploads/0caf2e64-df23-44a8-b8c4-2dac1868bb50.jpg",
+      "fileUrl": null,
+      "fileName": null,
+      "fileMime": null,
+      "quotesJson": "[\"Real isn't how you are made. It's a thing that happens to you.\",\"Once you are Real you can't become unreal again.\"]",
+      "reflectionsJson": "[\"What has love worn soft and Real in you?\",\"Which childhood object still feels alive?\"]",
       "category": null,
       "difficulty": null,
       "length": null,
@@ -113,5 +157,9 @@
       "published": true
     }
   ],
-  "removedIds": []
+  "removedIds": [
+    "hobbit",
+    "little-prince",
+    "rl-frankl"
+  ]
 }
