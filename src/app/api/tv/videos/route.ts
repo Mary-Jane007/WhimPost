@@ -37,7 +37,9 @@ function nextPathFrom(raw: string | undefined) {
 
 function performVideoDelete(id: string, user: UserPublic) {
   const result = deleteVideo(id, user);
-  if (!result.ok) return { error: result.error as string };
+  if (!result.ok) {
+    return { error: String(result.error || "Could not remove video") };
+  }
   if (result.isFile) {
     const filePath = path.join(UPLOAD_DIR, result.filename);
     if (fs.existsSync(filePath)) {
@@ -162,7 +164,9 @@ export async function POST(req: NextRequest) {
     if (form && String(form.get("intent") || "") === "remove") {
       const id = String(form.get("id") || "").trim();
       const removed = performVideoDelete(id, user);
-      if ("error" in removed) return jsonError(removed.error, 403);
+      if ("error" in removed) {
+        return jsonError(String(removed.error || "Could not remove video"), 403);
+      }
       if (wantsHtmlRedirect(req)) {
         return redirectSameHost(
           req,
@@ -186,7 +190,9 @@ export async function POST(req: NextRequest) {
     if (body?.intent === "remove") {
       const id = String(body.id || "").trim();
       const removed = performVideoDelete(id, user);
-      if ("error" in removed) return jsonError(removed.error, 403);
+      if ("error" in removed) {
+        return jsonError(String(removed.error || "Could not remove video"), 403);
+      }
       return NextResponse.json({ ok: true });
     }
     if (!body?.channelId) {
@@ -415,7 +421,9 @@ export async function DELETE(req: NextRequest) {
   if (!body?.id) return jsonError("Missing clip id");
 
   const removed = performVideoDelete(body.id, user);
-  if ("error" in removed) return jsonError(removed.error, 403);
+  if ("error" in removed) {
+        return jsonError(String(removed.error || "Could not remove video"), 403);
+      }
 
   return NextResponse.json({ ok: true });
 }
