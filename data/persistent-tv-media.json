@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-11T20:32:48.571Z",
+  "updatedAt": "2026-08-11T20:49:29.230Z",
   "clips": [
     {
       "title": "Tulip",
@@ -11,46 +11,6 @@
       "channelTitle": "Clover Exclusive",
       "villageId": "clovermeadow",
       "isGlobal": false
-    },
-    {
-      "title": "Peter Rabbit — The Tale of Samuel Whiskers",
-      "filename": "a7f0d2ba-0baf-4b2b-a0dd-ce60f63c2c77.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 208374134,
-      "durationMs": 1000,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "Prize Piglet / Fast Friends | The New Adventures of Winnie the Pooh S2 E5",
-      "filename": "7eb6eb40-ca8f-4b4f-ab82-b3b5382b14d0.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 734803948,
-      "durationMs": 1000,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "The World Of Peter Rabbit & Friends - The Tale of the Flopsy Bunnies & Mrs Tittl",
-      "filename": "fce79c8f-ce2d-4253-8fae-d40ca9c359f6.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 160119019,
-      "durationMs": 1000,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "The World Of Peter Rabbit & Friends - The Tale of Tom Kitten & Jemima Puddle Du",
-      "filename": "2926fad6-4a4d-4065-97fc-34a33a93a671.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 208342523,
-      "durationMs": 1401139,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
     },
     {
       "title": "YTDown.com_YouTube_Ophelia-Full-Movie_Media_Z02DxYjpx6Q_001_720p",
