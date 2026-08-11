@@ -2801,6 +2801,8 @@ body.theme-clovermeadow .village-sticker-pack {
   width: min(100%, 34rem);
   max-height: none;
   overflow: visible;
+  /* Keep last lines clear of the village mascot medallion. */
+  padding-bottom: 7rem;
 }
 
 .welcome-letter-stage .placed-item {
