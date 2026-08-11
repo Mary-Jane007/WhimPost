@@ -156,8 +156,8 @@ export function correctVideoDurationMs(
     return { ok: true, durationMs: existing, changed: false };
   }
 
-  // Guard against the old client bug that force-wrote wall-clock "aired so
-  // far" as the full runtime — that jumped airStartsAt and restarted the show.
+  // Ignore force-shortens that disagree with the real file — those used to
+  // rewrite air times from wall-clock and restart the village broadcast.
   if (
     opts?.force &&
     existing > 60_000 &&
@@ -167,7 +167,6 @@ export function correctVideoDurationMs(
   ) {
     const probed = probeUploadDurationMs(videoRow.filename);
     if (probed > next + 5_000) {
-      // File is still the longer clip; ignore the under-report.
       if (Math.abs(existing - probed) < DURATION_DRIFT_MS) {
         return { ok: true, durationMs: existing, changed: false };
       }
