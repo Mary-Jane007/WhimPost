@@ -2794,10 +2794,18 @@ body.theme-clovermeadow .village-sticker-pack {
   text-align: left;
 }
 
+/* Let the modal scroll — never clamp/scroll .letter-paper itself.
+ * Stickers use % of the paper box; max-height + overflow on the paper made
+ * bottom stickers sit over the first screen of body text on first open. */
 .welcome-letter-stage .letter-paper {
   width: min(100%, 34rem);
-  max-height: min(62vh, 36rem);
-  overflow: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+.welcome-letter-stage .placed-item {
+  /* Decorative only in the welcome modal — never steal clicks from text. */
+  pointer-events: none;
 }
 
 /* Village welcome letters always read in vintage typewriter */
