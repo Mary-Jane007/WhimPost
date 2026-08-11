@@ -156,6 +156,25 @@ export function correctVideoDurationMs(
     return { ok: true, durationMs: existing, changed: false };
   }
 
+  // Guard against the old client bug that force-wrote wall-clock "aired so
+  // far" as the full runtime — that jumped airStartsAt and restarted the show.
+  if (
+    opts?.force &&
+    existing > 60_000 &&
+    next < existing * 0.85 &&
+    videoRow.filename &&
+    !videoRow.filename.startsWith("link-")
+  ) {
+    const probed = probeUploadDurationMs(videoRow.filename);
+    if (probed > next + 5_000) {
+      // File is still the longer clip; ignore the under-report.
+      if (Math.abs(existing - probed) < DURATION_DRIFT_MS) {
+        return { ok: true, durationMs: existing, changed: false };
+      }
+      next = probed;
+    }
+  }
+
   // Prefer shortening an overstated runtime (video done sooner). Still allow
   // modest lengthening when metadata was wrong the other way.
   setVideoDurationMs(videoId, next);
