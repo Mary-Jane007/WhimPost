@@ -237,6 +237,46 @@ export function TvCorner({
     message: string;
   } | null>(null);
   const [powerOn, setPowerOn] = useState(true);
+  /** Village audio unlock — browsers require a gesture before unmuted play. */
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mark = () => setAudioUnlocked(true);
+    if (window.__whimTvUnlocked) mark();
+    const onUnlock = () => mark();
+    document.addEventListener("pointerdown", onUnlock, true);
+    document.addEventListener("keydown", onUnlock, true);
+    document.addEventListener("whimtv-audio-unlocked", onUnlock);
+    const poll = window.setInterval(() => {
+      if (window.__whimTvUnlocked) {
+        mark();
+        window.clearInterval(poll);
+      }
+    }, 250);
+    return () => {
+      document.removeEventListener("pointerdown", onUnlock, true);
+      document.removeEventListener("keydown", onUnlock, true);
+      document.removeEventListener("whimtv-audio-unlocked", onUnlock);
+      window.clearInterval(poll);
+    };
+  }, []);
+
+  // After a gesture unlocks audio, unmute the live village tube.
+  useEffect(() => {
+    if (!audioUnlocked) return;
+    const el = videoRef.current;
+    if (!el || !isVillageBroadcast(room)) return;
+    el.muted = false;
+    try {
+      el.volume = 1;
+    } catch {
+      // ignore
+    }
+    if (powerOn && room.isPlaying && el.paused) {
+      void el.play().catch(() => undefined);
+    }
+  }, [audioUnlocked, powerOn, room.isPlaying, room.scope, room.broadcastMode]);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   // State twin of the video node so sync effects re-run when the element mounts
@@ -268,16 +308,19 @@ export function TvCorner({
   function tryPlayVillage(el: HTMLVideoElement) {
     if (!powerOn || !room.isPlaying) return;
     if (!isVillageBroadcast(room)) return;
-    // Sound stays on — no mute UI. If the browser blocks unmuted autoplay,
-    // fall back to muted picture; /tv-sound-boot.js unlocks audio on the
-    // next real user gesture (any click/key) without a prompt.
-    el.muted = false;
+    // Browsers block unmuted autoplay. Start muted so the picture always
+    // runs; any click/key unlocks sound (no Sound button).
+    const unlocked =
+      audioUnlocked ||
+      (typeof window !== "undefined" && Boolean(window.__whimTvUnlocked));
+    el.muted = !unlocked;
     try {
       el.volume = 1;
     } catch {
       // ignore
     }
     void el.play().catch(() => {
+      // Last resort: muted play so the set never sits frozen.
       el.muted = true;
       void el.play().catch(() => undefined);
     });
@@ -1635,21 +1678,14 @@ export function TvCorner({
                     }
                     playsInline
                     preload="auto"
+                    muted={isVillageBroadcast(room) ? !audioUnlocked : false}
                     autoPlay={isVillageBroadcast(room)}
                     disablePictureInPicture
                     controlsList="nodownload noplaybackrate noremoteplayback"
                     onPlay={() => {
                       if (isVillageBroadcast(room)) {
-                        // Prefer sound on while playing; boot script also holds this.
-                        const el = videoRef.current;
-                        if (el && el.muted) {
-                          el.muted = false;
-                          try {
-                            el.volume = 1;
-                          } catch {
-                            // ignore
-                          }
-                        }
+                        // Keep muted autoplay intact until a real user gesture
+                        // unlocks audio via tv-sound-boot.js — do not force unmute.
                         return;
                       }
                       if (applyingRemote.current) return;
