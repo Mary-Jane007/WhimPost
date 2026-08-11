@@ -18,9 +18,11 @@ export async function POST(req: NextRequest) {
       `SELECT id, username, display_name, bio, forest_name, created_at, password_hash, email, is_owner,
               village_id, reputation
        FROM users
-       WHERE username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE`
+       WHERE username = ? COLLATE NOCASE
+          OR email = ? COLLATE NOCASE
+          OR display_name = ? COLLATE NOCASE`
     )
-    .get(login, login.toLowerCase()) as
+    .get(login, login.toLowerCase(), login) as
     | {
         id: string;
         username: string;
