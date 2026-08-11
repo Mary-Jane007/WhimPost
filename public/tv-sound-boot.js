@@ -1,6 +1,8 @@
 /* Village TV — keep sound on. No Sound/Mute UI or "tap for sound" prompt.
  * Browsers may block unmuted autoplay; the first real pointer/key gesture
- * unlocks audio silently. While the picture is playing, we keep it unmuted.
+ * unlocks audio silently. Playback itself is owned by React so the village
+ * set can seek to the live schedule before play() — forcing play() on insert
+ * used to stream opening credits mid-show.
  */
 (function () {
   if (window.__whimTvSoundBoot) return;
@@ -11,30 +13,36 @@
     return document.querySelector("video.tv-video");
   }
 
-  function applySound() {
+  function applySound(opts) {
     var v = videoEl();
     if (!v) return false;
     v.muted = false;
     try {
       v.volume = 1;
     } catch (e) {}
-    try {
-      var p = v.play();
-      if (p && p.catch) p.catch(function () {});
-    } catch (e) {}
+    var allowPlay = opts && opts.play;
+    var onAir = v.getAttribute("data-tv-on-air") === "1";
+    // Never start playback just because the node appeared — that raced the
+    // mid-show seek and made the broadcast look like it restarted.
+    if (allowPlay && onAir) {
+      try {
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      } catch (e) {}
+    }
     return true;
   }
 
   function unlock() {
     window.__whimTvWantSound = true;
-    applySound();
+    applySound({ play: true });
   }
 
   // Any real user gesture unlocks audio (no prompt / no Sound knob).
   document.addEventListener("pointerdown", unlock, true);
   document.addEventListener("keydown", unlock, true);
 
-  // Re-apply when React swaps the <video> for a new airing.
+  // Re-apply unmute when React swaps the <video> for a new airing.
   if (typeof MutationObserver !== "undefined") {
     var obs = new MutationObserver(function (records) {
       for (var i = 0; i < records.length; i++) {
@@ -46,7 +54,7 @@
             (node.matches && node.matches("video.tv-video")) ||
             (node.querySelector && node.querySelector("video.tv-video"))
           ) {
-            applySound();
+            applySound({ play: false });
             return;
           }
         }
@@ -60,17 +68,19 @@
     else document.addEventListener("DOMContentLoaded", startObs);
   }
 
-  // If something remutes a playing broadcast, turn sound back on.
+  // If something remutes a playing on-air broadcast, turn sound back on.
   window.setInterval(function () {
     var v = videoEl();
     if (!v || v.paused) return;
-    if (v.muted || v.volume < 0.05) applySound();
+    if (v.muted || v.volume < 0.05) applySound({ play: false });
   }, 500);
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", applySound);
+    document.addEventListener("DOMContentLoaded", function () {
+      applySound({ play: false });
+    });
   } else {
-    applySound();
+    applySound({ play: false });
   }
 
   window.__whimTvUnmute = unlock;
