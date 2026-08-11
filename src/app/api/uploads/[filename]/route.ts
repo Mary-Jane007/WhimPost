@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { canAccessVideo, getVideoByFilename } from "@/lib/tvCorner";
+import { resolvePlayableUploadPath } from "@/lib/tvUploadFiles";
 
 export const runtime = "nodejs";
 
@@ -142,10 +143,16 @@ export async function GET(
     }
   }
 
-  const filePath = path.join(UPLOAD_DIR, filename);
-  if (!fs.existsSync(filePath)) {
+  const filePath = isVideo
+    ? resolvePlayableUploadPath(filename) || path.join(UPLOAD_DIR, filename)
+    : path.join(UPLOAD_DIR, filename);
+  if (!fs.existsSync(filePath) || (isVideo && !resolvePlayableUploadPath(filename))) {
     return jsonError(
-      isVideo ? "Clip not found" : isBook ? "Book not found" : "Image not found",
+      isVideo
+        ? "Clip file missing — re-upload it from the channel shelf"
+        : isBook
+          ? "Book not found"
+          : "Image not found",
       404
     );
   }

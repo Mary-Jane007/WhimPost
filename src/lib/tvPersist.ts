@@ -8,6 +8,10 @@ import {
   PERSISTENT_TV_MEDIA_PATH,
   UPLOAD_DIR,
 } from "@/lib/persistentTvMedia";
+import {
+  isLfsPointerFile,
+  materializeTvStandins,
+} from "@/lib/tvUploadFiles";
 
 const ROOT = process.cwd();
 const LOCK_PATH = path.join(ROOT, "data", ".tv-persist.lock");
@@ -49,20 +53,12 @@ function durablePersistEnabled() {
   return raw !== "0" && raw.toLowerCase() !== "false";
 }
 
-function isLfsPointerFile(filePath: string) {
-  try {
-    const stat = fs.statSync(filePath);
-    if (stat.size > 1024) return false;
-    const head = fs.readFileSync(filePath, "utf8");
-    return head.startsWith("version https://git-lfs.github.com/spec/v1");
-  } catch {
-    return false;
-  }
-}
-
 /** Pull Git LFS bytes for TV uploads before restoring the catalog. */
 export function ensureTvUploadBytes() {
-  if (!gitOk()) return;
+  if (!gitOk()) {
+    materializeTvStandins();
+    return;
+  }
   try {
     if (!fs.existsSync(UPLOAD_DIR)) {
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -79,7 +75,10 @@ export function ensureTvUploadBytes() {
 
   // Warn about any catalog clips that are still pointer-only / missing.
   try {
-    if (!fs.existsSync(PERSISTENT_TV_MEDIA_PATH)) return;
+    if (!fs.existsSync(PERSISTENT_TV_MEDIA_PATH)) {
+      materializeTvStandins();
+      return;
+    }
     const raw = fs.readFileSync(PERSISTENT_TV_MEDIA_PATH, "utf8");
     const parsed = JSON.parse(raw) as { clips?: Array<{ filename?: string }> };
     const clips = Array.isArray(parsed.clips) ? parsed.clips : [];
@@ -99,9 +98,12 @@ export function ensureTvUploadBytes() {
       console.warn(
         `[persistent-tv] upload shelf incomplete: ${missing} missing, ${pointers} LFS pointer-only`
       );
+      // Keep the set watchable when GitHub LFS cannot smudge the bytes.
+      materializeTvStandins();
     }
   } catch (err) {
     console.warn("[persistent-tv] could not verify upload shelf:", err);
+    materializeTvStandins();
   }
 }
 
