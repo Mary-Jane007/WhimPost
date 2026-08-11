@@ -27,7 +27,9 @@ function nextPathFrom(raw: string | undefined) {
 
 function performChannelDelete(id: string, user: UserPublic) {
   const result = deleteChannel(id, user);
-  if (!result.ok) return { error: result.error as string };
+  if (!result.ok) {
+    return { error: String(result.error || "Could not remove channel") };
+  }
   for (const filename of result.filenames) {
     const filePath = path.join(UPLOAD_DIR, filename);
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -66,7 +68,9 @@ export async function POST(req: NextRequest) {
       }
       const id = String(fields.id || "").trim();
       const removed = performChannelDelete(id, user);
-      if ("error" in removed) return jsonError(removed.error, 403);
+      if ("error" in removed) {
+        return jsonError(String(removed.error || "Could not remove channel"), 403);
+      }
       if (wantsHtmlRedirect(req)) {
         return redirectSameHost(req, nextPathFrom(fields.next));
       }
@@ -119,7 +123,9 @@ export async function DELETE(req: NextRequest) {
   if (!body?.id) return jsonError("Missing channel id");
 
   const removed = performChannelDelete(body.id, user);
-  if ("error" in removed) return jsonError(removed.error, 403);
+  if ("error" in removed) {
+    return jsonError(String(removed.error || "Could not remove channel"), 403);
+  }
 
   return NextResponse.json({ ok: true });
 }
