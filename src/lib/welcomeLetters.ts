@@ -327,8 +327,8 @@ Welcome to **Moonmere**.
       {
         id: "welcome-seal",
         kind: "moon-seal-sun",
-        x: 12,
-        y: 48,
+        x: 90,
+        y: 90,
         scale: 0.48,
         rotation: 6,
       },

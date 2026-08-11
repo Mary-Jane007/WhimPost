@@ -1,17 +1,19 @@
-/* Village TV — keep sound on. No Sound/Mute UI or "tap for sound" prompt.
- * Browsers may block unmuted autoplay; the first real pointer/key gesture
- * unlocks audio silently. While the picture is playing, we keep it unmuted.
+/* Village TV — muted autoplay (browsers allow this), then unlock audio on
+ * the first real pointer/key gesture. No Sound/Mute UI or tap prompt.
+ * Do not unmute before a gesture or the browser will pause/block playback.
  */
 (function () {
   if (window.__whimTvSoundBoot) return;
   window.__whimTvSoundBoot = true;
-  window.__whimTvWantSound = true;
+  window.__whimTvUnlocked = false;
+  window.__whimTvWantSound = false;
 
   function videoEl() {
     return document.querySelector("video.tv-video");
   }
 
   function applySound() {
+    if (!window.__whimTvUnlocked) return false;
     var v = videoEl();
     if (!v) return false;
     v.muted = false;
@@ -26,17 +28,22 @@
   }
 
   function unlock() {
+    window.__whimTvUnlocked = true;
     window.__whimTvWantSound = true;
     applySound();
+    try {
+      document.dispatchEvent(new Event("whimtv-audio-unlocked"));
+    } catch (e) {}
   }
 
   // Any real user gesture unlocks audio (no prompt / no Sound knob).
   document.addEventListener("pointerdown", unlock, true);
   document.addEventListener("keydown", unlock, true);
 
-  // Re-apply when React swaps the <video> for a new airing.
+  // Re-apply when React swaps the <video> for a new airing — only after unlock.
   if (typeof MutationObserver !== "undefined") {
     var obs = new MutationObserver(function (records) {
+      if (!window.__whimTvUnlocked) return;
       for (var i = 0; i < records.length; i++) {
         var added = records[i].addedNodes;
         for (var j = 0; j < added.length; j++) {
@@ -60,18 +67,13 @@
     else document.addEventListener("DOMContentLoaded", startObs);
   }
 
-  // If something remutes a playing broadcast, turn sound back on.
+  // Keep sound on after unlock if something remutes a playing broadcast.
   window.setInterval(function () {
+    if (!window.__whimTvUnlocked) return;
     var v = videoEl();
     if (!v || v.paused) return;
     if (v.muted || v.volume < 0.05) applySound();
   }, 500);
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", applySound);
-  } else {
-    applySound();
-  }
 
   window.__whimTvUnmute = unlock;
 })();
