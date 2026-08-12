@@ -44,6 +44,10 @@ npm run persist-tv:push
 
 Library EPUB files under `data/uploads/` are also restored from the same release (and small public-domain EPUBs are committed in git).
 
+### Persisting Celestial Sounds (Observatory)
+
+Owner-uploaded playlist audio lives under `data/uploads/moon-sounds/` with a git catalog at `data/persistent-moon-sounds.json`. Playable bytes are published to the same `whimpost-media` GitHub Release (as `moon-sounds--<filename>`) so they restore on every server after a re-upload.
+
 ## Scripts
 
 - `npm run dev` — development server (port 3333)

@@ -15,6 +15,12 @@ import {
 import { exportPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
 import {
+  exportPersistentMoonSounds,
+  moonSoundAbsolutePath,
+  moonSoundReleaseName,
+  PERSISTENT_MOON_SOUNDS_PATH,
+} from "@/lib/persistentMoonSounds";
+import {
   isLfsPointerFile,
   isPlayableMediaFile,
   materializeTvStandins,
@@ -73,7 +79,44 @@ function listCatalogUploadPaths() {
   } catch {
     // ignore
   }
+  try {
+    if (fs.existsSync(PERSISTENT_MOON_SOUNDS_PATH)) {
+      const raw = fs.readFileSync(PERSISTENT_MOON_SOUNDS_PATH, "utf8");
+      const parsed = JSON.parse(raw) as {
+        sounds?: Array<{ filename?: string }>;
+      };
+      for (const sound of parsed.sounds || []) {
+        const filename = String(sound.filename || "").trim();
+        if (
+          !filename ||
+          filename.includes("..") ||
+          !/^[a-f0-9-]+\.(mp3|wav|ogg|webm|m4a|aac)$/i.test(filename)
+        ) {
+          continue;
+        }
+        const abs = moonSoundAbsolutePath(filename);
+        if (!fs.existsSync(abs)) continue;
+        paths.add(path.join("data", "uploads", "moon-sounds", filename));
+      }
+    }
+  } catch {
+    // ignore
+  }
   return [...paths];
+}
+
+function listReleaseNamesForPlayableUploads() {
+  const names: string[] = [];
+  for (const rel of listCatalogUploadPaths()) {
+    const abs = path.join(ROOT, rel);
+    if (!isPlayableMediaFile(abs)) continue;
+    if (rel.startsWith("data/uploads/moon-sounds/")) {
+      names.push(moonSoundReleaseName(path.basename(rel)));
+    } else {
+      names.push(path.basename(rel));
+    }
+  }
+  return names;
 }
 
 function durablePersistEnabled() {
@@ -158,7 +201,7 @@ export function persistTvCatalogs(db: Database) {
   scheduleDurableTvGitSync();
 }
 
-/** Snapshot library + accounts and push durable media/catalogs. */
+/** Snapshot library + accounts + celestial sounds and push durable media/catalogs. */
 export function persistAllDurableState(db: Database) {
   try {
     exportPersistentTv(db);
@@ -170,6 +213,11 @@ export function persistAllDurableState(db: Database) {
     exportPersistentLibraryBooks(db);
   } catch (err) {
     console.error("[persistent-library-books] export failed:", err);
+  }
+  try {
+    exportPersistentMoonSounds(db);
+  } catch (err) {
+    console.error("[persistent-moon-sounds] export failed:", err);
   }
   try {
     exportPersistentAccounts(db);
@@ -250,13 +298,10 @@ export async function runDurableTvGitSync(): Promise<{
     const ran = withLock(() => {
       // Publish playable binaries to the GitHub Release shelf first so every
       // server can restore them even when Git LFS quota is exhausted.
-      const playableUploads = listCatalogUploadPaths()
-        .map((rel) => path.basename(rel))
-        .filter((name) =>
-          isPlayableMediaFile(path.join(UPLOAD_DIR, name))
-        );
       try {
-        const published = publishMediaReleaseAssets(playableUploads);
+        const published = publishMediaReleaseAssets(
+          listReleaseNamesForPlayableUploads()
+        );
         if (published.uploaded) {
           console.info(
             `[media-release] published ${published.uploaded} durable asset(s)`
@@ -266,12 +311,12 @@ export async function runDurableTvGitSync(): Promise<{
         console.warn("[media-release] publish failed:", err);
       }
 
-      // Stage catalogs + small uploads (images / restored epubs). Large video
-      // bytes live on the release shelf — do not rely on Git LFS for them.
+      // Stage catalogs + small uploads (images / restored epubs / audio).
+      // Large video bytes live on the release shelf — do not rely on Git LFS.
       const uploadPaths = listCatalogUploadPaths().filter((rel) => {
         const abs = path.join(ROOT, rel);
         if (!isPlayableMediaFile(abs)) return false;
-        // Keep committing modest library/book files in git; skip huge videos.
+        // Keep committing modest files in git; skip huge videos.
         return fs.statSync(abs).size < 95 * 1024 * 1024;
       });
       git([
@@ -281,6 +326,7 @@ export async function runDurableTvGitSync(): Promise<{
         "data/persistent-tv.json",
         "data/persistent-tv-media.json",
         "data/persistent-library-books.json",
+        "data/persistent-moon-sounds.json",
         "data/persistent-accounts.json",
         ...uploadPaths,
       ]);
@@ -296,7 +342,9 @@ export async function runDurableTvGitSync(): Promise<{
           .split("\n")
           .map((line) => line.trim())
           .filter((line) =>
-            /\.(mp4|webm|mov|m4v|mkv|avi|mpeg|mpg|epub|pdf)$/i.test(line)
+            /\.(mp4|webm|mov|m4v|mkv|avi|mpeg|mpg|epub|pdf|mp3|wav|ogg|m4a|aac)$/i.test(
+              line
+            )
           );
         if (deleted.length) {
           git(["add", "--", ...deleted]);
@@ -314,9 +362,11 @@ export async function runDurableTvGitSync(): Promise<{
             line === "data/persistent-tv.json" ||
             line === "data/persistent-tv-media.json" ||
             line === "data/persistent-library-books.json" ||
+            line === "data/persistent-moon-sounds.json" ||
             line === "data/persistent-accounts.json" ||
             (line.startsWith("data/uploads/") &&
-              !line.includes("/.incoming/"))
+              !line.includes("/.incoming/") &&
+              !line.includes("/.media-release-staging/"))
         );
       if (staged.length === 0) {
         return;

@@ -3,6 +3,12 @@ import fs from "fs";
 import path from "path";
 import { PERSISTENT_TV_MEDIA_PATH, UPLOAD_DIR } from "@/lib/persistentTvMedia";
 import { PERSISTENT_LIBRARY_BOOKS_PATH } from "@/lib/persistentLibraryBooks";
+import {
+  moonSoundAbsolutePath,
+  moonSoundReleaseName,
+  PERSISTENT_MOON_SOUNDS_PATH,
+} from "@/lib/persistentMoonSounds";
+import { MOON_SOUND_DIR } from "@/lib/moonPaths";
 import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/tvUploadFiles";
 
 /**
@@ -17,6 +23,13 @@ const ROOT = process.cwd();
 
 type GlobalMedia = typeof globalThis & {
   whimpostMediaReleaseEnsuring?: boolean;
+};
+
+type MediaShelfEntry = {
+  /** Name of the asset on the GitHub Release (flat). */
+  releaseName: string;
+  /** Absolute path where the playable bytes should live locally. */
+  destPath: string;
 };
 
 function repoSlug(): string | null {
@@ -45,14 +58,15 @@ function ghAvailable() {
   }
 }
 
-function releaseAssetUrl(repo: string, filename: string) {
+function releaseAssetUrl(repo: string, releaseName: string) {
   return `https://github.com/${repo}/releases/download/${encodeURIComponent(
     MEDIA_RELEASE_TAG
-  )}/${encodeURIComponent(filename)}`;
+  )}/${encodeURIComponent(releaseName)}`;
 }
 
-function listCatalogFilenames(): string[] {
-  const names = new Set<string>();
+function listCatalogEntries(): MediaShelfEntry[] {
+  const byRelease = new Map<string, MediaShelfEntry>();
+
   try {
     if (fs.existsSync(PERSISTENT_TV_MEDIA_PATH)) {
       const parsed = JSON.parse(
@@ -60,14 +74,23 @@ function listCatalogFilenames(): string[] {
       ) as { clips?: Array<{ filename?: string }> };
       for (const clip of parsed.clips || []) {
         const filename = String(clip.filename || "").trim();
-        if (filename && !filename.startsWith("link-") && !filename.includes("..")) {
-          names.add(filename);
+        if (
+          !filename ||
+          filename.startsWith("link-") ||
+          filename.includes("..")
+        ) {
+          continue;
         }
+        byRelease.set(filename, {
+          releaseName: filename,
+          destPath: path.join(UPLOAD_DIR, filename),
+        });
       }
     }
   } catch {
     // ignore
   }
+
   try {
     if (fs.existsSync(PERSISTENT_LIBRARY_BOOKS_PATH)) {
       const parsed = JSON.parse(
@@ -77,13 +100,43 @@ function listCatalogFilenames(): string[] {
         const match = /\/api\/uploads\/([a-f0-9-]+\.[a-z0-9]+)$/i.exec(
           String(book.fileUrl || "")
         );
-        if (match?.[1]) names.add(match[1]);
+        if (!match?.[1]) continue;
+        byRelease.set(match[1], {
+          releaseName: match[1],
+          destPath: path.join(UPLOAD_DIR, match[1]),
+        });
       }
     }
   } catch {
     // ignore
   }
-  return [...names];
+
+  try {
+    if (fs.existsSync(PERSISTENT_MOON_SOUNDS_PATH)) {
+      const parsed = JSON.parse(
+        fs.readFileSync(PERSISTENT_MOON_SOUNDS_PATH, "utf8")
+      ) as { sounds?: Array<{ filename?: string }> };
+      for (const sound of parsed.sounds || []) {
+        const filename = String(sound.filename || "").trim();
+        if (
+          !filename ||
+          filename.includes("..") ||
+          !/^[a-f0-9-]+\.(mp3|wav|ogg|webm|m4a|aac)$/i.test(filename)
+        ) {
+          continue;
+        }
+        const releaseName = moonSoundReleaseName(filename);
+        byRelease.set(releaseName, {
+          releaseName,
+          destPath: moonSoundAbsolutePath(filename),
+        });
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  return [...byRelease.values()];
 }
 
 function downloadToFile(url: string, destPath: string) {
@@ -208,27 +261,33 @@ export function ensureMediaReleaseBytes() {
     if (!fs.existsSync(UPLOAD_DIR)) {
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
     }
+    if (!fs.existsSync(MOON_SOUND_DIR)) {
+      fs.mkdirSync(MOON_SOUND_DIR, { recursive: true });
+    }
 
-    for (const filename of listCatalogFilenames()) {
-      const dest = path.join(UPLOAD_DIR, filename);
+    for (const entry of listCatalogEntries()) {
+      const dest = entry.destPath;
       if (isPlayableMediaFile(dest)) continue;
       // Only replace missing files or Git LFS pointer stubs.
       if (fs.existsSync(dest) && !isLfsPointerFile(dest)) continue;
 
-      const url = releaseAssetUrl(repo, filename);
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      const url = releaseAssetUrl(repo, entry.releaseName);
       try {
         downloadToFile(url, dest);
         downloaded += 1;
-        console.info(`[media-release] restored ${filename}`);
+        console.info(`[media-release] restored ${entry.releaseName}`);
       } catch (publicErr) {
         try {
           if (!ghAvailable()) throw publicErr;
-          downloadReleaseAssetViaGh(repo, filename, dest);
+          downloadReleaseAssetViaGh(repo, entry.releaseName, dest);
           downloaded += 1;
-          console.info(`[media-release] restored ${filename} via gh api`);
+          console.info(
+            `[media-release] restored ${entry.releaseName} via gh api`
+          );
         } catch (err) {
           console.warn(
-            `[media-release] could not restore ${filename}:`,
+            `[media-release] could not restore ${entry.releaseName}:`,
             err instanceof Error ? err.message : err
           );
         }
@@ -269,7 +328,7 @@ function ensureReleaseExists(repo: string) {
 }
 
 /** Upload playable local files listed in catalogs to the durable release. */
-export function publishMediaReleaseAssets(filenames?: string[]) {
+export function publishMediaReleaseAssets(releaseNames?: string[]) {
   if (!ghAvailable()) {
     return { ok: false, uploaded: 0, error: "gh CLI unavailable" };
   }
@@ -278,12 +337,10 @@ export function publishMediaReleaseAssets(filenames?: string[]) {
     return { ok: false, uploaded: 0, error: "no origin github remote" };
   }
 
-  const targets = (filenames && filenames.length
-    ? filenames
-    : listCatalogFilenames()
-  ).filter((name) => {
-    const abs = path.join(UPLOAD_DIR, name);
-    return isPlayableMediaFile(abs);
+  const wanted = releaseNames ? new Set(releaseNames) : null;
+  const targets = listCatalogEntries().filter((entry) => {
+    if (wanted && !wanted.has(entry.releaseName)) return false;
+    return isPlayableMediaFile(entry.destPath);
   });
   if (targets.length === 0) {
     return { ok: true, uploaded: 0 };
@@ -299,17 +356,21 @@ export function publishMediaReleaseAssets(filenames?: string[]) {
     };
   }
 
+  const stagingDir = path.join(ROOT, "data", ".media-release-staging");
+  fs.mkdirSync(stagingDir, { recursive: true });
+
   let uploaded = 0;
-  for (const filename of targets) {
-    const abs = path.join(UPLOAD_DIR, filename);
+  for (const entry of targets) {
+    const staged = path.join(stagingDir, entry.releaseName);
     try {
+      fs.copyFileSync(entry.destPath, staged);
       execFileSync(
         "gh",
         [
           "release",
           "upload",
           MEDIA_RELEASE_TAG,
-          abs,
+          staged,
           "--repo",
           repo,
           "--clobber",
@@ -317,12 +378,18 @@ export function publishMediaReleaseAssets(filenames?: string[]) {
         { cwd: ROOT, stdio: "pipe", timeout: 30 * 60_000 }
       );
       uploaded += 1;
-      console.info(`[media-release] published ${filename}`);
+      console.info(`[media-release] published ${entry.releaseName}`);
     } catch (err) {
       console.warn(
-        `[media-release] upload failed for ${filename}:`,
+        `[media-release] upload failed for ${entry.releaseName}:`,
         err instanceof Error ? err.message : err
       );
+    } finally {
+      try {
+        if (fs.existsSync(staged)) fs.unlinkSync(staged);
+      } catch {
+        // ignore
+      }
     }
   }
 

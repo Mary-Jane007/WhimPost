@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
 import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
+import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
 import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
 import { ensureTvUploadBytes } from "@/lib/tvPersist";
@@ -589,6 +590,12 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-library-books] import failed:", err);
   }
+  // Restore Celestial Sounds after audio bytes are on disk.
+  try {
+    importPersistentMoonSounds(db);
+  } catch (err) {
+    console.error("[persistent-moon-sounds] import failed:", err);
+  }
   return db;
 }
 
@@ -621,6 +628,11 @@ export function getDb() {
         importPersistentLibraryBooks(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-library-books] import failed:", err);
+      }
+      try {
+        importPersistentMoonSounds(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-moon-sounds] import failed:", err);
       }
       globalForDb.whimpostImportSession = IMPORT_SESSION;
     }
