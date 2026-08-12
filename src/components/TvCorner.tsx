@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -230,18 +231,18 @@ export function TvCorner({
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const [chatBusy, setChatBusy] = useState(false);
+  const [showSoundCue, setShowSoundCue] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     kind: "error" | "success" | "info";
     message: string;
   } | null>(null);
   const [powerOn, setPowerOn] = useState(true);
-  /** Village audio unlock — browsers require a gesture before unmuted play. */
-  const [audioUnlocked, setAudioUnlocked] = useState(false);
   /** Airing id that failed to decode (missing LFS bytes, etc.). */
   const [failedAiringId, setFailedAiringId] = useState("");
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const soundRef = useRef<HTMLAudioElement | null>(null);
   // State twin of the video node so sync effects re-run when the element mounts
   // (refs alone do not trigger renders — that left the set stuck at t=0).
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
@@ -263,46 +264,6 @@ export function TvCorner({
     ms: 0,
     at: 0,
   });
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mark = () => setAudioUnlocked(true);
-    if (window.__whimTvUnlocked) mark();
-    const onUnlock = () => mark();
-    document.addEventListener("pointerdown", onUnlock, true);
-    document.addEventListener("keydown", onUnlock, true);
-    document.addEventListener("whimtv-audio-unlocked", onUnlock);
-    const poll = window.setInterval(() => {
-      if (window.__whimTvUnlocked) {
-        mark();
-        window.clearInterval(poll);
-      }
-    }, 250);
-    return () => {
-      document.removeEventListener("pointerdown", onUnlock, true);
-      document.removeEventListener("keydown", onUnlock, true);
-      document.removeEventListener("whimtv-audio-unlocked", onUnlock);
-      window.clearInterval(poll);
-    };
-  }, []);
-
-  // After a gesture unlocks audio, unmute the live village tube.
-  useEffect(() => {
-    if (!audioUnlocked) return;
-    const el = videoRef.current;
-    if (!el || !isVillageBroadcast(room)) return;
-    el.muted = false;
-    try {
-      el.volume = 1;
-    } catch {
-      // ignore
-    }
-    if (powerOn && room.isPlaying && el.paused && !el.ended) {
-      void el.play().catch(() => undefined);
-    }
-    // room fields listed explicitly — avoid re-running on every poll payload.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioUnlocked, powerOn, room.isPlaying, room.scope, room.broadcastMode]);
 
   function villageAiringId() {
     return airingKey(room.currentVideoId, room.airStartsAt);
@@ -328,22 +289,39 @@ export function TvCorner({
     if (!isVillageBroadcast(room)) return;
     const airing = villageAiringId();
     if (el.ended || villageEndedAiringRef.current === airing) return;
-    // Browsers block unmuted autoplay. Start muted so the picture always
-    // runs; any click/key unlocks sound via /tv-sound-boot.js.
-    const unlocked =
-      audioUnlocked ||
-      (typeof window !== "undefined" && Boolean(window.__whimTvUnlocked));
-    el.muted = !unlocked;
+    el.muted = false;
+    el.defaultMuted = false;
     try {
       el.volume = 1;
     } catch {
       // ignore
     }
-    void el.play().catch(() => {
-      el.muted = true;
-      void el.play().catch(() => undefined);
-    });
+    void el.play().catch(() => undefined);
   }
+
+  const unlockVideoAudio = useCallback(() => {
+    const el = videoRef.current;
+    if (el) {
+      el.muted = false;
+      el.defaultMuted = false;
+      try {
+        el.volume = 1;
+      } catch {
+        // ignore
+      }
+      if (room.isPlaying || isVillageBroadcast(room)) {
+        void el.play().catch(() => undefined);
+      }
+    }
+
+    const sound = soundRef.current;
+    if (sound) {
+      sound.muted = false;
+      sound.volume = 0.7;
+      sound.currentTime = 0;
+      void sound.play().catch(() => undefined);
+    }
+  }, [room]);
 
   /**
    * Join the live wall-clock slot once per airing (like walking into a room
@@ -1553,6 +1531,29 @@ export function TvCorner({
     return () => window.clearTimeout(timer);
   }, [toast]);
 
+  useEffect(() => {
+    if (!showSoundCue) return;
+    const dismiss = () => {
+      unlockVideoAudio();
+      setShowSoundCue(false);
+    };
+    const events = [
+      "pointerdown",
+      "pointerup",
+      "touchstart",
+      "click",
+      "keydown",
+    ] as const;
+    for (const eventName of events) {
+      document.addEventListener(eventName, dismiss, true);
+    }
+    return () => {
+      for (const eventName of events) {
+        document.removeEventListener(eventName, dismiss, true);
+      }
+    };
+  }, [showSoundCue, unlockVideoAudio]);
+
   // Soft progress heartbeat so friends stay roughly aligned without seeking ourselves.
   useEffect(() => {
     if (!room.id || !room.currentVideo || !powerOn) return;
@@ -1742,6 +1743,24 @@ export function TvCorner({
                 {powerOn &&
                 room.currentVideo &&
                 room.currentVideo.sourceKind !== "youtube" &&
+                !videoFailed &&
+                showSoundCue ? (
+                  <div className="tv-sound-cue" aria-live="polite">
+                    Click to enable sound
+                  </div>
+                ) : null}
+                {powerOn ? (
+                  <audio
+                    ref={soundRef}
+                    data-tv-fallback="true"
+                    preload="auto"
+                    src="/tv-startup-tone.wav"
+                    style={{ display: "none" }}
+                  />
+                ) : null}
+                {powerOn &&
+                room.currentVideo &&
+                room.currentVideo.sourceKind !== "youtube" &&
                 !videoFailed ? (
                   <video
                     ref={videoRef}
@@ -1757,10 +1776,21 @@ export function TvCorner({
                     }
                     playsInline
                     preload="auto"
-                    muted={isVillageBroadcast(room) ? !audioUnlocked : false}
+                    muted={false}
                     autoPlay={isVillageBroadcast(room)}
                     disablePictureInPicture
                     controlsList="nodownload noplaybackrate noremoteplayback"
+                    onLoadedData={() => {
+                      const el = videoRef.current;
+                      if (!el) return;
+                      el.muted = false;
+                      el.defaultMuted = false;
+                      try {
+                        el.volume = 1;
+                      } catch {
+                        // ignore
+                      }
+                    }}
                     onError={() => {
                       // Broken pointer / missing bytes — fall back to idle copy
                       // instead of a blank tube.
