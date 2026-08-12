@@ -1,10 +1,9 @@
 /* Village TV — keep sound on. No Sound/Mute UI or "tap for sound" prompt.
  *
- * IMPORTANT: never call play() just because <video> appeared. That raced the
- * mid-show schedule seek and made the broadcast look like it restarted from
- * the opening every refresh. React seeks to the live air slot first, then
- * sets data-tv-on-air="1" and plays. We only unmute here (and resume on a
- * real user gesture once on-air).
+ * Never call play() just because <video> appeared. That raced the mid-show
+ * schedule seek and made the broadcast look like it restarted from the
+ * opening every refresh. React joins the live air slot, then plays.
+ * This script only unmutes (and resumes on a real user gesture).
  */
 (function () {
   if (window.__whimTvSoundBoot) return;
@@ -22,9 +21,7 @@
     try {
       v.volume = 1;
     } catch (e) {}
-    var allowPlay = opts && opts.play;
-    var onAir = v.getAttribute("data-tv-on-air") === "1";
-    if (allowPlay && onAir) {
+    if (opts && opts.play) {
       try {
         var p = v.play();
         if (p && p.catch) p.catch(function () {});
