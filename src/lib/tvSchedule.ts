@@ -57,7 +57,7 @@ function toIsoFromMs(ms: number) {
 
 function parseEpoch(raw: number | string | null | undefined): number {
   const n = typeof raw === "string" ? Number(raw) : Number(raw);
-  if (!Number.isFinite(n) || n <= 0) return Date.now();
+  if (!Number.isFinite(n) || n <= 0) return 0;
   return Math.floor(n);
 }
 
@@ -156,6 +156,24 @@ export function correctVideoDurationMs(
     return { ok: true, durationMs: existing, changed: false };
   }
 
+  // Ignore force-shortens that disagree with the real file — those used to
+  // rewrite air times from wall-clock and restart the village broadcast.
+  if (
+    opts?.force &&
+    existing > 60_000 &&
+    next < existing * 0.85 &&
+    videoRow.filename &&
+    !videoRow.filename.startsWith("link-")
+  ) {
+    const probed = probeUploadDurationMs(videoRow.filename);
+    if (probed > next + 5_000) {
+      if (Math.abs(existing - probed) < DURATION_DRIFT_MS) {
+        return { ok: true, durationMs: existing, changed: false };
+      }
+      next = probed;
+    }
+  }
+
   // Prefer shortening an overstated runtime (video done sooner). Still allow
   // modest lengthening when metadata was wrong the other way.
   setVideoDurationMs(videoId, next);
@@ -223,7 +241,9 @@ export function ensureChannelSchedule(channelId: string): {
   let dirty = false;
 
   if (order.length === 0 && knownIds.length > 0) {
-    epochMs = Date.now();
+    // Rebuild the lineup, but NEVER reset a healthy epoch to Date.now() —
+    // that made every clip-replace / restore restart the broadcast at t=0.
+    if (!epochMs) epochMs = Date.now();
     order = seededShuffle(knownIds, epochMs);
     dirty = true;
   } else if (missing.length > 0) {
@@ -232,11 +252,11 @@ export function ensureChannelSchedule(channelId: string): {
       const insertAt = Math.floor(Math.random() * (order.length + 1));
       order.splice(insertAt, 0, id);
     }
-    if (!channel.schedule_epoch_ms) epochMs = Date.now();
     dirty = true;
   }
 
-  if (!channel.schedule_epoch_ms) {
+  if (!epochMs) {
+    // First-time seed only.
     epochMs = Date.now();
     dirty = true;
   }
