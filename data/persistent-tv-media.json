@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-11T21:26:56.393Z",
+  "updatedAt": "2026-08-12T02:28:30.679Z",
   "clips": [
     {
       "title": "Tulip",
@@ -11,26 +11,6 @@
       "channelTitle": "Clover Exclusive",
       "villageId": "clovermeadow",
       "isGlobal": false
-    },
-    {
-      "title": "YTDown.com_YouTube_CARTOON-ONLY-The-World-Of-Peter-Rabbit-_Media_eorZPofEdko_001",
-      "filename": "456f103f-1db0-4b14-b150-d921580a6db7.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 160119019,
-      "durationMs": 1204164,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": "mosshollow",
-      "isGlobal": true
-    },
-    {
-      "title": "YTDown.com_YouTube_The-World-Of-Peter-Rabbit-_-Friends-The-_Media_kNuomrDksgI_00",
-      "filename": "da559045-69c6-48d7-a5da-6f0b735ebcb1.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 208342523,
-      "durationMs": 1401139,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": "mosshollow",
-      "isGlobal": true
     }
   ]
 }
