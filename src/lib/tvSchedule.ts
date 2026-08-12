@@ -57,7 +57,7 @@ function toIsoFromMs(ms: number) {
 
 function parseEpoch(raw: number | string | null | undefined): number {
   const n = typeof raw === "string" ? Number(raw) : Number(raw);
-  if (!Number.isFinite(n) || n <= 0) return Date.now();
+  if (!Number.isFinite(n) || n <= 0) return 0;
   return Math.floor(n);
 }
 
@@ -156,6 +156,24 @@ export function correctVideoDurationMs(
     return { ok: true, durationMs: existing, changed: false };
   }
 
+  // Ignore force-shortens that disagree with the real file — those used to
+  // rewrite air times from wall-clock and restart the village broadcast.
+  if (
+    opts?.force &&
+    existing > 60_000 &&
+    next < existing * 0.85 &&
+    videoRow.filename &&
+    !videoRow.filename.startsWith("link-")
+  ) {
+    const probed = probeUploadDurationMs(videoRow.filename);
+    if (probed > next + 5_000) {
+      if (Math.abs(existing - probed) < DURATION_DRIFT_MS) {
+        return { ok: true, durationMs: existing, changed: false };
+      }
+      next = probed;
+    }
+  }
+
   // Prefer shortening an overstated runtime (video done sooner). Still allow
   // modest lengthening when metadata was wrong the other way.
   setVideoDurationMs(videoId, next);
@@ -178,7 +196,7 @@ function writeChannelSchedule(
 /**
  * Build or repair the channel lineup.
  * Every clip on the channel is always in the schedule; brand-new clips are
- * spliced into a random upcoming slot without resetting the current airtime.
+ * spliced into a random *upcoming* slot without resetting the current airtime.
  */
 export function ensureChannelSchedule(channelId: string): {
   epochMs: number;
@@ -223,20 +241,22 @@ export function ensureChannelSchedule(channelId: string): {
   let dirty = false;
 
   if (order.length === 0 && knownIds.length > 0) {
-    epochMs = Date.now();
+    // Rebuild the lineup, but NEVER reset a healthy epoch to Date.now() —
+    // that made every clip-replace / restore restart the broadcast at t=0.
+    if (!epochMs) epochMs = Date.now();
     order = seededShuffle(knownIds, epochMs);
     dirty = true;
   } else if (missing.length > 0) {
-    // Fold every new clip into the lineup at random positions.
+    // Fold every new clip into an upcoming slot so the live airing stays put.
+    if (!epochMs) epochMs = Date.now();
     for (const id of shuffleIds(missing)) {
-      const insertAt = Math.floor(Math.random() * (order.length + 1));
-      order.splice(insertAt, 0, id);
+      order = insertIdAfterCurrent(order, id, videos, epochMs, Date.now());
     }
-    if (!channel.schedule_epoch_ms) epochMs = Date.now();
     dirty = true;
   }
 
-  if (!channel.schedule_epoch_ms) {
+  if (!epochMs) {
+    // First-time seed only.
     epochMs = Date.now();
     dirty = true;
   }
@@ -251,15 +271,64 @@ export function ensureChannelSchedule(channelId: string): {
   return { epochMs, order, videos };
 }
 
+/** Index of the clip currently on-air for this epoch/order (or 0). */
+function currentOrderIndex(
+  order: string[],
+  videos: Map<string, { title: string; durationMs: number; filename: string }>,
+  epochMs: number,
+  nowMs: number
+): number {
+  if (order.length === 0) return 0;
+  const durations = order.map(
+    (id) => videos.get(id)?.durationMs || DEFAULT_TV_DURATION_MS
+  );
+  const loopMs = durations.reduce((sum, d) => sum + d, 0);
+  if (loopMs <= 0) return 0;
+  let elapsed = nowMs - epochMs;
+  if (elapsed < 0) elapsed = 0;
+  const offsetInLoop = elapsed % loopMs;
+  let cursor = 0;
+  for (let i = 0; i < order.length; i += 1) {
+    const dur = durations[i];
+    if (offsetInLoop < cursor + dur) return i;
+    cursor += dur;
+  }
+  return 0;
+}
+
+/** Splice a new clip only into an upcoming slot (never before the live one). */
+function insertIdAfterCurrent(
+  order: string[],
+  videoId: string,
+  videos: Map<string, { title: string; durationMs: number; filename: string }>,
+  epochMs: number,
+  nowMs: number
+): string[] {
+  if (order.includes(videoId)) return order;
+  const next = [...order];
+  if (next.length === 0) return [videoId];
+  const currentIdx = currentOrderIndex(next, videos, epochMs, nowMs);
+  const minInsert = Math.min(currentIdx + 1, next.length);
+  const span = next.length - minInsert + 1;
+  const insertAt = minInsert + Math.floor(Math.random() * span);
+  next.splice(insertAt, 0, videoId);
+  return next;
+}
+
 /** Put a freshly uploaded clip into the channel schedule right away. */
 export function addVideoToChannelSchedule(channelId: string, videoId: string) {
-  const { epochMs, order } = ensureChannelSchedule(channelId);
+  const { epochMs, order, videos } = ensureChannelSchedule(channelId);
   if (order.includes(videoId)) return;
 
-  const next = [...order];
-  const insertAt = Math.floor(Math.random() * (next.length + 1));
-  next.splice(insertAt, 0, videoId);
-  writeChannelSchedule(channelId, epochMs || Date.now(), next);
+  const seededEpoch = epochMs || Date.now();
+  const next = insertIdAfterCurrent(
+    order,
+    videoId,
+    videos,
+    seededEpoch,
+    Date.now()
+  );
+  writeChannelSchedule(channelId, seededEpoch, next);
 }
 
 /**
