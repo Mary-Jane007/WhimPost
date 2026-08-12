@@ -1,12 +1,5 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T17:50:07.761Z",
-  "sounds": [
-    {
-      "playlistId": "gentle-rain",
-      "filename": "11111111-1111-1111-1111-111111111111.wav",
-      "originalName": "test-rain.wav",
-      "sizeBytes": 352878
-    }
-  ]
+  "updatedAt": "2026-08-12T17:53:09.911Z",
+  "sounds": []
 }
