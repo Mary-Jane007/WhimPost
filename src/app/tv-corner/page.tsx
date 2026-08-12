@@ -11,6 +11,10 @@ import { getVillage, VILLAGES, type VillageId } from "@/lib/villages";
 import { TvCorner } from "@/components/TvCorner";
 import { PageCrest } from "@/components/PageCrest";
 
+/** Always resolve the live wall-clock airtime — never serve a cached t=0 join. */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type Props = {
   searchParams?: Promise<{ scope?: string }>;
 };

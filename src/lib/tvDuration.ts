@@ -1,6 +1,7 @@
 import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import { resolvePlayableUploadPath } from "@/lib/tvUploadFiles";
 
 /** Fallback when ffprobe cannot read a clip (2 minutes). */
 export const DEFAULT_TV_DURATION_MS = 120_000;
@@ -41,6 +42,10 @@ export function probeDurationMs(filePathOrUrl: string): number | null {
 
 export function probeUploadDurationMs(filename: string): number {
   if (filename.startsWith("link-")) return DEFAULT_TV_DURATION_MS;
+  const playable = resolvePlayableUploadPath(filename);
+  if (playable) {
+    return probeDurationMs(playable) ?? DEFAULT_TV_DURATION_MS;
+  }
   return (
     probeDurationMs(uploadFilePath(filename)) ?? DEFAULT_TV_DURATION_MS
   );
