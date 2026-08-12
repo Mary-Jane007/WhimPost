@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T16:18:26.598Z",
+  "updatedAt": "2026-08-12T16:18:36.259Z",
   "clips": [
     {
       "title": "Tulip",
@@ -59,16 +59,6 @@
       "sizeBytes": 208342523,
       "durationMs": 1401139,
       "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "Ophelia",
-      "filename": "4dea7b99-46e2-4aa5-84be-d275f0b91a10.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 497030903,
-      "durationMs": 6378963,
-      "channelTitle": "Timeless Tales TV",
       "villageId": null,
       "isGlobal": true
     },
