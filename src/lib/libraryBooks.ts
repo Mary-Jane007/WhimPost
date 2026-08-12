@@ -9,7 +9,7 @@ import {
   type ReadingCategory,
   type ReadingListBook,
 } from "@/lib/libraryContent";
-import { exportPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
+import { persistAllDurableState } from "@/lib/tvPersist";
 
 export const LIBRARY_UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
 
@@ -789,7 +789,7 @@ export function upsertLibraryBook(
   ).run(payload);
 
   try {
-    exportPersistentLibraryBooks(db);
+    persistAllDurableState(db);
   } catch (err) {
     console.error("[persistent-library-books] export failed:", err);
   }
@@ -833,7 +833,7 @@ export function deleteLibraryBook(id: string) {
   markBookRemoved(bookId);
 
   try {
-    exportPersistentLibraryBooks(db);
+    persistAllDurableState(db);
   } catch (err) {
     console.error("[persistent-library-books] export failed:", err);
   }
