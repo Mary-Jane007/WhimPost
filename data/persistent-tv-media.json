@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T17:53:09.891Z",
+  "updatedAt": "2026-08-13T00:26:20.154817Z",
   "clips": [
     {
       "title": "Tulip",
@@ -23,11 +23,11 @@
       "isGlobal": true
     },
     {
-      "title": "Peter Rabbit — The Tale of Samuel Whiskers",
+      "title": "Peter Rabbit \u2014 The Tale of Samuel Whiskers",
       "filename": "a7f0d2ba-0baf-4b2b-a0dd-ce60f63c2c77.mp4",
       "mime": "video/mp4",
       "sizeBytes": 138058056,
-      "durationMs": 2032432,
+      "durationMs": 1406781,
       "channelTitle": "Cottage Cartoons",
       "villageId": null,
       "isGlobal": true
@@ -37,7 +37,7 @@
       "filename": "7eb6eb40-ca8f-4b4f-ab82-b3b5382b14d0.mp4",
       "mime": "video/mp4",
       "sizeBytes": 66414606,
-      "durationMs": 1393546,
+      "durationMs": 1388459,
       "channelTitle": "Cottage Cartoons",
       "villageId": null,
       "isGlobal": true
@@ -47,7 +47,7 @@
       "filename": "fce79c8f-ce2d-4253-8fae-d40ca9c359f6.mp4",
       "mime": "video/mp4",
       "sizeBytes": 197063098,
-      "durationMs": 1204164,
+      "durationMs": 1417694,
       "channelTitle": "Cottage Cartoons",
       "villageId": null,
       "isGlobal": true

@@ -309,7 +309,11 @@ export function TvCorner({
       } catch {
         // ignore
       }
-      if (room.isPlaying || isVillageBroadcast(room)) {
+      // Only resume if already mid-show — never play() from 0 here.
+      if (
+        (room.isPlaying || isVillageBroadcast(room)) &&
+        el.currentTime > 0.5
+      ) {
         void el.play().catch(() => undefined);
       }
     }
@@ -318,8 +322,9 @@ export function TvCorner({
     if (sound) {
       sound.muted = false;
       sound.volume = 0.7;
-      sound.currentTime = 0;
-      void sound.play().catch(() => undefined);
+      if (sound.currentTime > 0.05 || sound.paused) {
+        void sound.play().catch(() => undefined);
+      }
     }
   }, [room]);
 
@@ -500,6 +505,10 @@ export function TvCorner({
     if (!Number.isFinite(durationMs)) return;
     const stored = Number(video.durationMs) || 0;
     if (!force && stored > 0 && Math.abs(stored - durationMs) < 1500) return;
+
+    // Never let ~12s LFS stand-in title cards rewrite a real episode runtime —
+    // that collapsed the schedule and remounted the clip from the start forever.
+    if (stored > 60_000 && durationMs < 30_000) return;
 
     // eslint-disable-next-line react-hooks/purity -- throttle stamp for duplicate reports
     const now = Date.now();
@@ -1903,10 +1912,15 @@ export function TvCorner({
                         const mediaMs = Math.floor(
                           (videoRef.current?.duration || 0) * 1000
                         );
+                        const catalogMs =
+                          Number(room.currentVideo?.durationMs) || 0;
                         // Prefer the real file length — never rewrite the
-                        // catalog from wall-clock alone (that jumped the
-                        // schedule back to the start).
-                        if (mediaMs > 1000) {
+                        // catalog from a ~12s stand-in (that jumped the
+                        // schedule back to the start on a loop).
+                        if (
+                          mediaMs > 1000 &&
+                          !(catalogMs > 60_000 && mediaMs < 30_000)
+                        ) {
                           reportActualDuration(mediaMs, mediaMs, true);
                         }
                         void refreshVillageRoom();

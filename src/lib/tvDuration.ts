@@ -1,7 +1,6 @@
 import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { resolvePlayableUploadPath } from "@/lib/tvUploadFiles";
 
 /** Fallback when ffprobe cannot read a clip (2 minutes). */
 export const DEFAULT_TV_DURATION_MS = 120_000;
@@ -42,13 +41,14 @@ export function probeDurationMs(filePathOrUrl: string): number | null {
 
 export function probeUploadDurationMs(filename: string): number {
   if (filename.startsWith("link-")) return DEFAULT_TV_DURATION_MS;
-  const playable = resolvePlayableUploadPath(filename);
-  if (playable) {
-    return probeDurationMs(playable) ?? DEFAULT_TV_DURATION_MS;
+  // Never probe Git LFS stand-in title cards — those are ~12s placeholders and
+  // used to rewrite the TV guide so the village set restarted forever.
+  const primary = uploadFilePath(filename);
+  if (fs.existsSync(primary)) {
+    const probed = probeDurationMs(primary);
+    if (probed != null) return probed;
   }
-  return (
-    probeDurationMs(uploadFilePath(filename)) ?? DEFAULT_TV_DURATION_MS
-  );
+  return DEFAULT_TV_DURATION_MS;
 }
 
 /** Best-effort duration for a remote direct video URL. */

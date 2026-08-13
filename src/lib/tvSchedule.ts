@@ -3,6 +3,13 @@ import {
   DEFAULT_TV_DURATION_MS,
   probeUploadDurationMs,
 } from "@/lib/tvDuration";
+import {
+  isLfsPointerFile,
+  isServingTvStandin,
+} from "@/lib/tvUploadFiles";
+import { UPLOAD_DIR } from "@/lib/persistentTvMedia";
+import path from "path";
+import fs from "fs";
 
 export type TvScheduleSlot = {
   videoId: string;
@@ -156,16 +163,60 @@ export function correctVideoDurationMs(
     return { ok: true, durationMs: existing, changed: false };
   }
 
+  const filename = String(videoRow.filename || "");
+  const servingStandin =
+    Boolean(filename) &&
+    !filename.startsWith("link-") &&
+    isServingTvStandin(filename);
+  const primary = filename
+    ? path.join(UPLOAD_DIR, path.basename(filename))
+    : "";
+  const primaryIsPointer =
+    Boolean(primary) &&
+    fs.existsSync(primary) &&
+    isLfsPointerFile(primary);
+
+  // Stand-in title cards (~12s) must never rewrite the guide — that collapsed
+  // air times and remounted the same clip from 0 on a loop.
+  if (
+    (servingStandin || primaryIsPointer) &&
+    existing > 60_000 &&
+    next < 30_000
+  ) {
+    return { ok: true, durationMs: existing, changed: false };
+  }
+
+  // Refuse absurd shortens from onLoadedMetadata (stand-in / broken probe).
+  if (
+    existing > 60_000 &&
+    next < Math.min(existing * 0.5, 30_000) &&
+    filename &&
+    !filename.startsWith("link-")
+  ) {
+    const probed = probeUploadDurationMs(filename);
+    if (probed >= 60_000) {
+      if (Math.abs(existing - probed) < DURATION_DRIFT_MS) {
+        return { ok: true, durationMs: existing, changed: false };
+      }
+      next = probed;
+    } else {
+      return { ok: true, durationMs: existing, changed: false };
+    }
+  }
+
   // Ignore force-shortens that disagree with the real file — those used to
   // rewrite air times from wall-clock and restart the village broadcast.
   if (
     opts?.force &&
     existing > 60_000 &&
     next < existing * 0.85 &&
-    videoRow.filename &&
-    !videoRow.filename.startsWith("link-")
+    filename &&
+    !filename.startsWith("link-")
   ) {
-    const probed = probeUploadDurationMs(videoRow.filename);
+    if (servingStandin || primaryIsPointer) {
+      return { ok: true, durationMs: existing, changed: false };
+    }
+    const probed = probeUploadDurationMs(filename);
     if (probed > next + 5_000) {
       if (Math.abs(existing - probed) < DURATION_DRIFT_MS) {
         return { ok: true, durationMs: existing, changed: false };
