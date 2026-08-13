@@ -7,7 +7,10 @@ import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
 import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
-import { ensureTvUploadBytes } from "@/lib/tvPersist";
+import {
+  ensureTvUploadBytes,
+  scheduleEnsureTvUploadBytes,
+} from "@/lib/tvPersist";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -566,25 +569,27 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-accounts] import failed:", err);
   }
-  // Pull Git LFS upload bytes before restoring the TV shelf.
+  // Local-only shelf check (stand-ins). Network restore runs in the background
+  // so the first page load is not blocked for minutes on missing release assets.
   try {
-    ensureTvUploadBytes();
+    ensureTvUploadBytes({ skipNetwork: true });
   } catch (err) {
-    console.error("[persistent-tv] lfs pull failed:", err);
+    console.error("[persistent-tv] local shelf check failed:", err);
   }
+  scheduleEnsureTvUploadBytes();
   // Restore TV Corner link catalog (YouTube / direct URLs).
   try {
     importPersistentTv(db);
   } catch (err) {
     console.error("[persistent-tv] import failed:", err);
   }
-  // Restore uploaded file clips when Git LFS bytes are present.
+  // Restore uploaded file clips when bytes are already present locally.
   try {
     importPersistentTvMedia(db);
   } catch (err) {
     console.error("[persistent-tv-media] import failed:", err);
   }
-  // Restore owner-uploaded library books when Git LFS bytes are present.
+  // Restore owner-uploaded library books when bytes are already present locally.
   try {
     importPersistentLibraryBooks(db);
   } catch (err) {
@@ -610,10 +615,11 @@ export function getDb() {
     // never on every request — that used to reset the TV airtime epoch.
     if (globalForDb.whimpostImportSession !== IMPORT_SESSION) {
       try {
-        ensureTvUploadBytes();
+        ensureTvUploadBytes({ skipNetwork: true });
       } catch (err) {
-        console.error("[persistent-tv] lfs pull failed:", err);
+        console.error("[persistent-tv] local shelf check failed:", err);
       }
+      scheduleEnsureTvUploadBytes();
       try {
         importPersistentTv(globalForDb.whimpostDb);
       } catch (err) {

@@ -23,6 +23,8 @@ const ROOT = process.cwd();
 
 type GlobalMedia = typeof globalThis & {
   whimpostMediaReleaseEnsuring?: boolean;
+  whimpostMediaReleaseAssetNames?: Set<string> | null;
+  whimpostMediaReleaseAttempted?: Set<string>;
 };
 
 type MediaShelfEntry = {
@@ -139,6 +141,52 @@ function listCatalogEntries(): MediaShelfEntry[] {
   return [...byRelease.values()];
 }
 
+function listReleaseAssetNames(repo: string): Set<string> {
+  const g = globalThis as GlobalMedia;
+  if (g.whimpostMediaReleaseAssetNames) {
+    return g.whimpostMediaReleaseAssetNames;
+  }
+  try {
+    if (!ghAvailable()) {
+      g.whimpostMediaReleaseAssetNames = new Set();
+      return g.whimpostMediaReleaseAssetNames;
+    }
+    const raw = execFileSync(
+      "gh",
+      [
+        "api",
+        `repos/${repo}/releases/tags/${MEDIA_RELEASE_TAG}`,
+        "--jq",
+        ".assets[].name",
+      ],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        timeout: 20_000,
+      }
+    ).trim();
+    const names = new Set(
+      raw
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+    );
+    g.whimpostMediaReleaseAssetNames = names;
+    return names;
+  } catch {
+    // Release may not exist yet — remember empty so we do not hammer the API.
+    g.whimpostMediaReleaseAssetNames = new Set();
+    return g.whimpostMediaReleaseAssetNames;
+  }
+}
+
+/** Invalidate cached release asset names after publishing new uploads. */
+export function invalidateMediaReleaseAssetCache() {
+  const g = globalThis as GlobalMedia;
+  g.whimpostMediaReleaseAssetNames = undefined;
+}
+
 function downloadToFile(url: string, destPath: string) {
   const tmp = `${destPath}.download`;
   try {
@@ -146,26 +194,34 @@ function downloadToFile(url: string, destPath: string) {
   } catch {
     // ignore
   }
+  // Do NOT use --retry-all-errors: that retries HTTP 404s and freezes boot.
   execFileSync(
     "curl",
     [
       "-fsSL",
+      "--connect-timeout",
+      "8",
+      "--max-time",
+      "120",
       "--retry",
-      "5",
-      "--retry-delay",
       "2",
-      "--retry-all-errors",
+      "--retry-delay",
+      "1",
       "-o",
       tmp,
       url,
     ],
-    { cwd: ROOT, stdio: "pipe", timeout: 30 * 60_000 }
+    { cwd: ROOT, stdio: "pipe", timeout: 130_000 }
   );
   assertPlayableDownload(tmp, url);
   fs.renameSync(tmp, destPath);
 }
 
-function downloadReleaseAssetViaGh(repo: string, filename: string, destPath: string) {
+function downloadReleaseAssetViaGh(
+  repo: string,
+  filename: string,
+  destPath: string
+) {
   const tmp = `${destPath}.download`;
   try {
     if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
@@ -180,7 +236,12 @@ function downloadReleaseAssetViaGh(repo: string, filename: string, destPath: str
       "--jq",
       `.assets[] | select(.name=="${filename}") | .id`,
     ],
-    { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }
+    {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      timeout: 20_000,
+    }
   ).trim();
   if (!assetId) {
     throw new Error(`release asset not found: ${filename}`);
@@ -189,16 +250,20 @@ function downloadReleaseAssetViaGh(repo: string, filename: string, destPath: str
     cwd: ROOT,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
+    timeout: 10_000,
   }).trim();
   execFileSync(
     "curl",
     [
       "-fsSL",
+      "--connect-timeout",
+      "8",
+      "--max-time",
+      "120",
       "--retry",
-      "5",
-      "--retry-delay",
       "2",
-      "--retry-all-errors",
+      "--retry-delay",
+      "1",
       "-H",
       "Accept: application/octet-stream",
       "-H",
@@ -209,7 +274,7 @@ function downloadReleaseAssetViaGh(repo: string, filename: string, destPath: str
       tmp,
       `https://api.github.com/repos/${repo}/releases/assets/${assetId}`,
     ],
-    { cwd: ROOT, stdio: "pipe", timeout: 30 * 60_000 }
+    { cwd: ROOT, stdio: "pipe", timeout: 130_000 }
   );
   assertPlayableDownload(tmp, `gh:${filename}`);
   fs.renameSync(tmp, destPath);
@@ -253,6 +318,9 @@ export function ensureMediaReleaseBytes() {
   const g = globalThis as GlobalMedia;
   if (g.whimpostMediaReleaseEnsuring) return { downloaded: 0 };
   g.whimpostMediaReleaseEnsuring = true;
+  if (!g.whimpostMediaReleaseAttempted) {
+    g.whimpostMediaReleaseAttempted = new Set();
+  }
 
   let downloaded = 0;
   try {
@@ -265,11 +333,21 @@ export function ensureMediaReleaseBytes() {
       fs.mkdirSync(MOON_SOUND_DIR, { recursive: true });
     }
 
+    // One cheap API list — skip assets that are not on the release (avoids
+    // multi-minute curl retries against 404s during boot).
+    const available = listReleaseAssetNames(repo);
+
     for (const entry of listCatalogEntries()) {
       const dest = entry.destPath;
       if (isPlayableMediaFile(dest)) continue;
       // Only replace missing files or Git LFS pointer stubs.
       if (fs.existsSync(dest) && !isLfsPointerFile(dest)) continue;
+      if (g.whimpostMediaReleaseAttempted.has(entry.releaseName)) continue;
+      g.whimpostMediaReleaseAttempted.add(entry.releaseName);
+
+      if (!available.has(entry.releaseName)) {
+        continue;
+      }
 
       fs.mkdirSync(path.dirname(dest), { recursive: true });
       const url = releaseAssetUrl(repo, entry.releaseName);
@@ -338,9 +416,18 @@ export function publishMediaReleaseAssets(releaseNames?: string[]) {
   }
 
   const wanted = releaseNames ? new Set(releaseNames) : null;
+  let available: Set<string> | null = null;
+  try {
+    available = listReleaseAssetNames(repo);
+  } catch {
+    available = null;
+  }
   const targets = listCatalogEntries().filter((entry) => {
     if (wanted && !wanted.has(entry.releaseName)) return false;
-    return isPlayableMediaFile(entry.destPath);
+    if (!isPlayableMediaFile(entry.destPath)) return false;
+    // Skip assets already on the release — republishing every sync freezes the site.
+    if (available?.has(entry.releaseName)) return false;
+    return true;
   });
   if (targets.length === 0) {
     return { ok: true, uploaded: 0 };
@@ -379,6 +466,7 @@ export function publishMediaReleaseAssets(releaseNames?: string[]) {
       );
       uploaded += 1;
       console.info(`[media-release] published ${entry.releaseName}`);
+      invalidateMediaReleaseAssetCache();
     } catch (err) {
       console.warn(
         `[media-release] upload failed for ${entry.releaseName}:`,

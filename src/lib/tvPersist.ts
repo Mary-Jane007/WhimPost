@@ -124,19 +124,22 @@ function durablePersistEnabled() {
   return raw !== "0" && raw.toLowerCase() !== "false";
 }
 
-/** Pull durable upload bytes before restoring catalogs (LFS, then GitHub Releases). */
-export function ensureTvUploadBytes() {
+/**
+ * Pull durable upload bytes (LFS, then GitHub Releases).
+ * Keep this off the request hot-path — call scheduleEnsureTvUploadBytes().
+ */
+export function ensureTvUploadBytes(opts?: { skipNetwork?: boolean }) {
   if (!fs.existsSync(UPLOAD_DIR)) {
     fs.mkdirSync(UPLOAD_DIR, { recursive: true });
   }
 
-  if (gitOk()) {
+  if (!opts?.skipNetwork && gitOk()) {
     try {
       // Fetch LFS objects when the budget still allows it.
       execFileSync("git", ["lfs", "pull", "--include", "data/uploads/**"], {
         cwd: ROOT,
         stdio: "pipe",
-        timeout: 10 * 60_000,
+        timeout: 15_000,
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -150,11 +153,13 @@ export function ensureTvUploadBytes() {
     }
   }
 
-  // Primary durable path when Git LFS quota is exhausted: GitHub Release assets.
-  try {
-    ensureMediaReleaseBytes();
-  } catch (err) {
-    console.warn("[persistent-tv] media release restore failed:", err);
+  if (!opts?.skipNetwork) {
+    // Primary durable path when Git LFS quota is exhausted: GitHub Release assets.
+    try {
+      ensureMediaReleaseBytes();
+    } catch (err) {
+      console.warn("[persistent-tv] media release restore failed:", err);
+    }
   }
 
   // Warn about any catalog clips that are still pointer-only / missing.
@@ -189,6 +194,24 @@ export function ensureTvUploadBytes() {
     console.warn("[persistent-tv] could not verify upload shelf:", err);
     materializeTvStandins();
   }
+}
+
+type GlobalRestore = typeof globalThis & {
+  whimpostMediaRestoreScheduled?: boolean;
+};
+
+/** Restore durable media in the background so page loads stay snappy. */
+export function scheduleEnsureTvUploadBytes() {
+  const g = globalThis as GlobalRestore;
+  if (g.whimpostMediaRestoreScheduled) return;
+  g.whimpostMediaRestoreScheduled = true;
+  setTimeout(() => {
+    try {
+      ensureTvUploadBytes();
+    } catch (err) {
+      console.warn("[persistent-tv] background media restore failed:", err);
+    }
+  }, 0);
 }
 
 /**
