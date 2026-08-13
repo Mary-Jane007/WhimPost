@@ -100,6 +100,7 @@ export function WelcomeLetterModal({ letter }: { letter: LetterView }) {
                 onSubmit={(e) => {
                   // Soft dismiss when JS is alive; form POST still works without it.
                   e.preventDefault();
+                  void fetch(`/api/letters/${letter.id}`, { method: "PATCH" });
                   setDismissed(true);
                 }}
               >

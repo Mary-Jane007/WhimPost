@@ -7,6 +7,8 @@ import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
 import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
+import { importPersistentWelcomeLetters } from "@/lib/persistentWelcomeLetters";
+import { backfillVisitedVillagesFromLetters } from "@/lib/welcomeLetters";
 import {
   ensureTvUploadBytes,
   scheduleEnsureTvUploadBytes,
@@ -57,6 +59,12 @@ function migrate(db: Database.Database) {
     "users",
     "notifications_json",
     "notifications_json TEXT NOT NULL DEFAULT '{}'"
+  );
+  ensureColumn(
+    db,
+    "users",
+    "visited_villages_json",
+    "visited_villages_json TEXT NOT NULL DEFAULT '[]'"
   );
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
@@ -569,6 +577,17 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-accounts] import failed:", err);
   }
+  // Restore welcome letters + visited villages before anything re-delivers mail.
+  try {
+    importPersistentWelcomeLetters(db);
+  } catch (err) {
+    console.error("[persistent-welcome-letters] import failed:", err);
+  }
+  try {
+    backfillVisitedVillagesFromLetters(db);
+  } catch (err) {
+    console.error("[visited-villages] backfill failed:", err);
+  }
   // Local-only shelf check (stand-ins). Network restore runs in the background
   // so the first page load is not blocked for minutes on missing release assets.
   try {
@@ -639,6 +658,16 @@ export function getDb() {
         importPersistentMoonSounds(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-moon-sounds] import failed:", err);
+      }
+      try {
+        importPersistentWelcomeLetters(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-welcome-letters] import failed:", err);
+      }
+      try {
+        backfillVisitedVillagesFromLetters(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[visited-villages] backfill failed:", err);
       }
       globalForDb.whimpostImportSession = IMPORT_SESSION;
     }
