@@ -148,7 +148,10 @@
       throw new Error("Could not load the EPUB reader");
     }
 
-    var res = await fetch(fileUrl, { credentials: "include" });
+    var res = await fetch(fileUrl, {
+      credentials: "include",
+      cache: "no-store",
+    });
     if (!res.ok) {
       var detail = "";
       try {
@@ -232,8 +235,18 @@
     });
 
     try {
-      if (resumeCfi) await rendition.display(resumeCfi);
-      else await rendition.display();
+      // Start page first — a stale resume CFI after re-upload can hang forever.
+      await rendition.display();
+      if (resumeCfi) {
+        try {
+          await Promise.race([
+            rendition.display(resumeCfi),
+            new Promise(function (resolve) {
+              setTimeout(resolve, 2000);
+            }),
+          ]);
+        } catch (_) {}
+      }
     } catch (_) {
       await rendition.display();
     }
@@ -343,7 +356,7 @@
     if (!mount) return;
     if (mount.dataset.owned === "react" || mount.dataset.owned === "boot") return;
     if (mount.querySelector("iframe")) {
-      mount.dataset.owned = "react";
+      mount.dataset.owned = "boot";
       return;
     }
 
@@ -370,10 +383,10 @@
     });
   }
 
-  // Give React a short head start; if it never hydrates, open the book anyway.
+  // Prefer React. Only boot if hydration never claimed the mount.
   function schedule() {
-    setTimeout(tryBoot, 900);
-    setTimeout(tryBoot, 2200);
+    setTimeout(tryBoot, 1800);
+    setTimeout(tryBoot, 3200);
   }
 
   if (document.readyState === "loading") {

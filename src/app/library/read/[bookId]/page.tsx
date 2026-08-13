@@ -23,10 +23,9 @@ export default async function LibraryReadPage({ params }: Props) {
   return (
     <>
       {/*
-        Classic defer script — next/script afterInteractive never runs when
-        React fails to hydrate, which left books stuck on “Opening…”.
+        EPUB open is owned by React (LibraryBookReader). A parallel classic
+        boot script raced Strict Mode remounts and blanked the stage.
       */}
-      <script src="/library-reader-boot.js" defer />
       <LibraryReadClient
         bookId={book.id}
         title={book.title}

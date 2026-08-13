@@ -75,6 +75,38 @@ export function getReadingPosition(
   return all[bookId] || null;
 }
 
+/**
+ * Drop saved CFIs for a book for every reader — call when the EPUB/PDF file
+ * is replaced so a stale resume point cannot hang the opener.
+ */
+export function clearReadingPositionsForBook(bookId: string) {
+  const id = bookId.trim();
+  if (!id) return;
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT user_id, reading_positions_json FROM library_progress
+       WHERE reading_positions_json LIKE ?`
+    )
+    .all(`%${id}%`) as Array<{
+    user_id: string;
+    reading_positions_json: string;
+  }>;
+
+  const update = db.prepare(
+    `UPDATE library_progress
+     SET reading_positions_json = ?, updated_at = datetime('now')
+     WHERE user_id = ?`
+  );
+
+  for (const row of rows) {
+    const positions = parsePositions(row.reading_positions_json);
+    if (!(id in positions)) continue;
+    delete positions[id];
+    update.run(JSON.stringify(positions), row.user_id);
+  }
+}
+
 /** Overwrite last-page position and sync shelf % to the real place. */
 export function saveReadingPosition(
   userId: string,
