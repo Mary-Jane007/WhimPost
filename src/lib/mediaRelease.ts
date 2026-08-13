@@ -377,6 +377,45 @@ export function ensureMediaReleaseBytes() {
   return { downloaded };
 }
 
+/**
+ * Restore one upload from the release shelf (library EPUB/PDF, TV clip, etc.).
+ * Returns the local path when playable bytes are present afterward.
+ */
+export function ensureMediaReleaseAsset(filename: string): string | null {
+  const safe = path.basename(String(filename || "").trim());
+  if (!safe || safe !== filename || filename.includes("..")) return null;
+
+  const dest = path.join(UPLOAD_DIR, safe);
+  if (isPlayableMediaFile(dest)) return dest;
+
+  const repo = repoSlug();
+  if (!repo) return isPlayableMediaFile(dest) ? dest : null;
+
+  const available = listReleaseAssetNames(repo);
+  if (!available.has(safe)) {
+    return isPlayableMediaFile(dest) ? dest : null;
+  }
+
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  const url = releaseAssetUrl(repo, safe);
+  try {
+    downloadToFile(url, dest);
+  } catch (publicErr) {
+    try {
+      if (!ghAvailable()) throw publicErr;
+      downloadReleaseAssetViaGh(repo, safe, dest);
+    } catch (err) {
+      console.warn(
+        `[media-release] on-demand restore failed for ${safe}:`,
+        err instanceof Error ? err.message : err
+      );
+      return isPlayableMediaFile(dest) ? dest : null;
+    }
+  }
+
+  return isPlayableMediaFile(dest) ? dest : null;
+}
+
 function ensureReleaseExists(repo: string) {
   try {
     execFileSync(

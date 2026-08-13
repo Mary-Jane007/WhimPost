@@ -150,13 +150,33 @@
 
     var res = await fetch(fileUrl, { credentials: "include" });
     if (!res.ok) {
-      throw new Error(
+      var detail = "";
+      try {
+        detail = await res.text();
+      } catch (_) {}
+      var message =
         res.status === 401
           ? "Sign in to read this book"
-          : "Could not load the book file"
-      );
+          : "Could not load the book file";
+      try {
+        var parsed = JSON.parse(detail);
+        if (parsed && parsed.error) message = parsed.error;
+      } catch (_) {}
+      throw new Error(message);
     }
     var buffer = await res.arrayBuffer();
+    var head = new Uint8Array(buffer.slice(0, 64));
+    var headText = String.fromCharCode.apply(null, Array.from(head));
+    var isZip = head[0] === 0x50 && head[1] === 0x4b;
+    if (
+      !isZip ||
+      buffer.byteLength < 1024 ||
+      headText.indexOf("git-lfs") !== -1
+    ) {
+      throw new Error(
+        "This EPUB’s file is missing on the shelf — re-upload it from the library admin."
+      );
+    }
     var book = window.ePub(buffer);
     await book.ready;
 
@@ -332,12 +352,17 @@
     var resumeCfi = mount.getAttribute("data-resume-cfi") || "";
     var bookId = mount.getAttribute("data-book-id") || "";
     if (!fileUrl) {
+      delete mount.dataset.owned;
       setStatus("Missing book file.", true);
       return;
     }
 
     openWithEpubJs(mount, fileUrl, resumeCfi, bookId).catch(function (err) {
       console.error("[library-reader-boot]", err);
+      // Release the claim so React hydration can retry.
+      if (mount.dataset.owned === "boot" && !mount.querySelector("iframe")) {
+        delete mount.dataset.owned;
+      }
       setStatus(
         (err && err.message) || "Could not open this EPUB",
         true

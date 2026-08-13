@@ -4,8 +4,12 @@ import { Readable } from "stream";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { ensureMediaReleaseAsset } from "@/lib/mediaRelease";
 import { canAccessVideo, getVideoByFilename } from "@/lib/tvCorner";
-import { resolvePlayableUploadPath } from "@/lib/tvUploadFiles";
+import {
+  isLfsPointerFile,
+  resolvePlayableUploadPath,
+} from "@/lib/tvUploadFiles";
 
 export const runtime = "nodejs";
 
@@ -146,13 +150,53 @@ export async function GET(
   const filePath = isVideo
     ? resolvePlayableUploadPath(filename) || path.join(UPLOAD_DIR, filename)
     : path.join(UPLOAD_DIR, filename);
+
+  if (isBook) {
+    // Never hand the reader a Git LFS pointer — restore from the durable shelf
+    // first, otherwise return a clear missing-file error.
+    let bookPath = filePath;
+    if (!fs.existsSync(bookPath) || isLfsPointerFile(bookPath)) {
+      const restored = ensureMediaReleaseAsset(filename);
+      if (restored) bookPath = restored;
+    }
+    if (!fs.existsSync(bookPath) || isLfsPointerFile(bookPath)) {
+      return jsonError(
+        "Book file missing — re-upload the EPUB/PDF from the library shelf",
+        404
+      );
+    }
+    const bytes = fs.readFileSync(bookPath);
+    // EPUB must be a ZIP (PK…); PDF must start with %PDF.
+    if (ext === "epub" && !(bytes[0] === 0x50 && bytes[1] === 0x4b)) {
+      return jsonError(
+        "Book file is damaged — re-upload the EPUB from the library shelf",
+        404
+      );
+    }
+    if (
+      ext === "pdf" &&
+      bytes.slice(0, 4).toString("utf8") !== "%PDF"
+    ) {
+      return jsonError(
+        "Book file is damaged — re-upload the PDF from the library shelf",
+        404
+      );
+    }
+    return new NextResponse(bytes, {
+      headers: {
+        "Content-Type": MIME[ext] || "application/octet-stream",
+        "Cache-Control": "private, max-age=86400",
+        "Content-Disposition": `inline; filename="${filename}"`,
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
+
   if (!fs.existsSync(filePath) || (isVideo && !resolvePlayableUploadPath(filename))) {
     return jsonError(
       isVideo
         ? "Clip file missing — re-upload it from the channel shelf"
-        : isBook
-          ? "Book not found"
-          : "Image not found",
+        : "Image not found",
       404
     );
   }
@@ -166,11 +210,6 @@ export async function GET(
       headers: {
         "Content-Type": contentType,
         "Cache-Control": "private, max-age=86400",
-        ...(isBook
-          ? {
-              "Content-Disposition": `inline; filename="${filename}"`,
-            }
-          : {}),
       },
     });
   }

@@ -411,27 +411,50 @@ export function LibraryBookReader({
       setLoading(true);
       setError("");
       try {
-        // Plain boot script may already own the mount when React fails to hydrate.
-        if (host.dataset.owned === "boot" || host.querySelector("iframe")) {
+        // Only skip if the classic boot script already rendered pages.
+        // Do not bail on a stale owned=boot flag after a failed boot attempt.
+        if (host.querySelector("iframe")) {
           host.dataset.owned = host.dataset.owned || "boot";
           setLoading(false);
           return;
         }
         host.dataset.owned = "react";
 
+        // epubjs needs JSZip in the bundle; import it first.
+        await import("jszip");
         const mod = await import("epubjs");
         const ePub = resolveEpubFactory(mod);
 
         const res = await fetch(fileUrl, { credentials: "include" });
         if (!res.ok) {
-          throw new Error(
+          const detail = await res.text().catch(() => "");
+          let message =
             res.status === 401
               ? "Sign in to read this book"
-              : "Could not load the book file"
-          );
+              : "Could not load the book file";
+          try {
+            const parsed = JSON.parse(detail) as { error?: string };
+            if (parsed?.error) message = parsed.error;
+          } catch {
+            // ignore
+          }
+          throw new Error(message);
         }
         const buffer = await res.arrayBuffer();
         if (cancelled) return;
+
+        const head = new Uint8Array(buffer.slice(0, 64));
+        const headText = String.fromCharCode(...head);
+        const isZip = head[0] === 0x50 && head[1] === 0x4b;
+        if (
+          !isZip ||
+          buffer.byteLength < 1024 ||
+          headText.startsWith("version https://git-lfs")
+        ) {
+          throw new Error(
+            "This EPUB’s file is missing on the shelf — re-upload it from the library admin."
+          );
+        }
 
         book = ePub(buffer);
         bookApiRef.current = book;

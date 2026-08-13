@@ -351,6 +351,7 @@ export async function runDurableTvGitSync(): Promise<{
         "data/persistent-library-books.json",
         "data/persistent-moon-sounds.json",
         "data/persistent-accounts.json",
+        "data/persistent-welcome-letters.json",
         ...uploadPaths,
       ]);
 
