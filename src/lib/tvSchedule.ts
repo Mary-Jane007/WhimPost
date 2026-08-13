@@ -245,9 +245,56 @@ function writeChannelSchedule(
 }
 
 /**
+ * Full reshuffle: every clip on the channel in a new random order, with the
+ * wall-clock epoch reset to now so the new lineup starts immediately.
+ */
+export function reshuffleChannelSchedule(channelId: string): {
+  epochMs: number;
+  order: string[];
+  videos: Map<string, { title: string; durationMs: number; filename: string }>;
+} {
+  const rows = listChannelVideoRows(channelId);
+  const videos = new Map<
+    string,
+    { title: string; durationMs: number; filename: string }
+  >();
+  for (const row of rows) {
+    const durationMs = ensureVideoDuration(row);
+    videos.set(row.id, {
+      title: row.title,
+      durationMs,
+      filename: row.filename,
+    });
+  }
+  const knownIds = [...videos.keys()];
+  const epochMs = Date.now();
+  const order = shuffleIds(knownIds);
+  writeChannelSchedule(channelId, epochMs, order);
+  return { epochMs, order, videos };
+}
+
+/** Reshuffle every TV channel lineup (owner / maintenance). */
+export function reshuffleAllChannelSchedules(): {
+  channels: number;
+  clips: number;
+} {
+  const db = getDb();
+  const channels = db
+    .prepare(`SELECT id FROM tv_channels`)
+    .all() as { id: string }[];
+  let clips = 0;
+  for (const ch of channels) {
+    const { order } = reshuffleChannelSchedule(ch.id);
+    clips += order.length;
+  }
+  return { channels: channels.length, clips };
+}
+
+/**
  * Build or repair the channel lineup.
- * Every clip on the channel is always in the schedule; brand-new clips are
- * spliced into a random *upcoming* slot without resetting the current airtime.
+ * Every clip on the channel is always in the schedule. Brand-new clips trigger
+ * a full reshuffle (via addVideoToChannelSchedule); this path only rebuilds an
+ * empty/broken order without resetting a healthy epoch.
  */
 export function ensureChannelSchedule(channelId: string): {
   epochMs: number;
@@ -298,12 +345,8 @@ export function ensureChannelSchedule(channelId: string): {
     order = seededShuffle(knownIds, epochMs);
     dirty = true;
   } else if (missing.length > 0) {
-    // Fold every new clip into an upcoming slot so the live airing stays put.
-    if (!epochMs) epochMs = Date.now();
-    for (const id of shuffleIds(missing)) {
-      order = insertIdAfterCurrent(order, id, videos, epochMs, Date.now());
-    }
-    dirty = true;
+    // New clips that skipped addVideoToChannelSchedule — full reshuffle now.
+    return reshuffleChannelSchedule(channelId);
   }
 
   if (!epochMs) {
@@ -322,64 +365,12 @@ export function ensureChannelSchedule(channelId: string): {
   return { epochMs, order, videos };
 }
 
-/** Index of the clip currently on-air for this epoch/order (or 0). */
-function currentOrderIndex(
-  order: string[],
-  videos: Map<string, { title: string; durationMs: number; filename: string }>,
-  epochMs: number,
-  nowMs: number
-): number {
-  if (order.length === 0) return 0;
-  const durations = order.map(
-    (id) => videos.get(id)?.durationMs || DEFAULT_TV_DURATION_MS
-  );
-  const loopMs = durations.reduce((sum, d) => sum + d, 0);
-  if (loopMs <= 0) return 0;
-  let elapsed = nowMs - epochMs;
-  if (elapsed < 0) elapsed = 0;
-  const offsetInLoop = elapsed % loopMs;
-  let cursor = 0;
-  for (let i = 0; i < order.length; i += 1) {
-    const dur = durations[i];
-    if (offsetInLoop < cursor + dur) return i;
-    cursor += dur;
-  }
-  return 0;
-}
-
-/** Splice a new clip only into an upcoming slot (never before the live one). */
-function insertIdAfterCurrent(
-  order: string[],
-  videoId: string,
-  videos: Map<string, { title: string; durationMs: number; filename: string }>,
-  epochMs: number,
-  nowMs: number
-): string[] {
-  if (order.includes(videoId)) return order;
-  const next = [...order];
-  if (next.length === 0) return [videoId];
-  const currentIdx = currentOrderIndex(next, videos, epochMs, nowMs);
-  const minInsert = Math.min(currentIdx + 1, next.length);
-  const span = next.length - minInsert + 1;
-  const insertAt = minInsert + Math.floor(Math.random() * span);
-  next.splice(insertAt, 0, videoId);
-  return next;
-}
-
-/** Put a freshly uploaded clip into the channel schedule right away. */
-export function addVideoToChannelSchedule(channelId: string, videoId: string) {
-  const { epochMs, order, videos } = ensureChannelSchedule(channelId);
-  if (order.includes(videoId)) return;
-
-  const seededEpoch = epochMs || Date.now();
-  const next = insertIdAfterCurrent(
-    order,
-    videoId,
-    videos,
-    seededEpoch,
-    Date.now()
-  );
-  writeChannelSchedule(channelId, seededEpoch, next);
+/**
+ * Put a freshly uploaded clip into the channel schedule by reshuffling the
+ * whole lineup (including the new clip) and starting the clock now.
+ */
+export function addVideoToChannelSchedule(channelId: string, _videoId: string) {
+  reshuffleChannelSchedule(channelId);
 }
 
 /**

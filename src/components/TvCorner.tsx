@@ -1681,8 +1681,8 @@ export function TvCorner({
           <h1>TV Corner</h1>
           <p>
             Gather round the vintage set. The village lounge runs like a real
-            channel — every clip joins the lineup, reshuffled after each full
-            playthrough. Friends couches
+            channel — every clip joins the lineup, reshuffled whenever a new
+            video is added and again after each full playthrough. Friends couches
             stay pause-and-scrub watch parties.
           </p>
         </div>
@@ -2106,8 +2106,9 @@ export function TvCorner({
                 <p>
                   Every clip joins the lineup. Air times are in your local time
                   and follow each file&apos;s real length (and flex if a clip
-                  ends early). After all videos play, the order reshuffles. Join
-                  mid-show — the broadcast does not restart for you.
+                  ends early). Adding a video reshuffles the order; it also
+                  reshuffles after a full playthrough. Join mid-show — the
+                  broadcast does not restart for you.
                 </p>
               </div>
               <ol className="tv-guide-list">

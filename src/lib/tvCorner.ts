@@ -459,8 +459,7 @@ export function createVideo(input: {
     probeAndStoreDuration(id, input.filename);
   }
 
-  // Every new clip joins the wall-clock lineup immediately.
-  ensureChannelSchedule(input.channelId);
+  // Every new clip joins by reshuffling the whole channel lineup from now.
   addVideoToChannelSchedule(input.channelId, id);
   try {
     persistTvCatalogs(db);
@@ -518,10 +517,9 @@ export function createVideoFromLink(input: {
     sourceUrl: parsed.sourceUrl,
   });
 
-  // Persist duration explicitly for schedule (createVideo skipped file probe).
+  // Persist duration explicitly (createVideo skipped file probe for links).
   setVideoDurationMs(video.id, durationMs);
-  ensureChannelSchedule(input.channelId);
-  // createVideo already exported catalogs; refresh again with the final duration.
+  // createVideo already reshuffled the lineup with this clip included.
   try {
     persistTvCatalogs(getDb());
   } catch (err) {
