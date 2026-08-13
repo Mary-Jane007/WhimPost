@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T17:53:09.908Z",
+  "updatedAt": "2026-08-13T03:16:33.893Z",
   "books": [
     {
       "id": "princess",
@@ -55,7 +55,7 @@
       "minutes": 400,
       "coverEmoji": "🦁",
       "coverUrl": "/api/uploads/2473b5ab-55a9-4059-9390-281b2752f5d1.jpg",
-      "fileUrl": "/api/uploads/e598f462-b251-4792-bbba-d12e1d7d9667.epub",
+      "fileUrl": "/api/uploads/f3e6c835-bee8-4c9b-8fe8-2184a22af872.epub",
       "fileName": "lewis-lion-the-witch-and-the-wardrobe.epub",
       "fileMime": "application/epub+zip",
       "quotesJson": "[\"Wrong will be right, when Aslan comes in sight.\",\"Once a king or queen of Narnia, always a king or queen.\"]",
