@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { redirect, notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getLibraryProgress } from "@/lib/library";
@@ -23,9 +24,10 @@ export default async function LibraryReadPage({ params }: Props) {
   return (
     <>
       {/*
-        EPUB open is owned by React (LibraryBookReader). A parallel classic
-        boot script raced Strict Mode remounts and blanked the stage.
+        React opens via vendor epub.min.js. Boot is a fallback that only
+        steals the mount when React left an empty container (no iframe).
       */}
+      <Script src="/library-reader-boot.js" strategy="afterInteractive" />
       <LibraryReadClient
         bookId={book.id}
         title={book.title}

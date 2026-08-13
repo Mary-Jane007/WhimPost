@@ -67,46 +67,58 @@ function kindFromUrl(url: string, fileName?: string | null): BookKind {
   return "unknown";
 }
 
-function resolveEpubFactory(
-  mod: unknown
-): (data: ArrayBuffer, options?: Record<string, unknown>) => EpubBookApi {
-  const m = mod as {
-    default?: unknown;
-    Book?: new (
-      data: ArrayBuffer,
-      options?: Record<string, unknown>
-    ) => EpubBookApi;
-  };
-  if (typeof mod === "function") {
-    return mod as (
-      data: ArrayBuffer,
-      options?: Record<string, unknown>
-    ) => EpubBookApi;
-  }
-  if (typeof m.default === "function") {
-    return m.default as (
-      data: ArrayBuffer,
-      options?: Record<string, unknown>
-    ) => EpubBookApi;
-  }
-  if (
-    m.default &&
-    typeof m.default === "object" &&
-    typeof (m.default as { default?: unknown }).default === "function"
-  ) {
-    return (
-      m.default as {
-        default: (
-          data: ArrayBuffer,
-          options?: Record<string, unknown>
-        ) => EpubBookApi;
+function loadVendorScript(src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(
+      `script[src="${src}"]`
+    ) as HTMLScriptElement | null;
+    if (existing) {
+      if (existing.dataset.loaded === "1") {
+        resolve();
+        return;
       }
-    ).default;
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener(
+        "error",
+        () => reject(new Error(`Could not load ${src}`)),
+        { once: true }
+      );
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = () => {
+      script.dataset.loaded = "1";
+      resolve();
+    };
+    script.onerror = () => reject(new Error(`Could not load ${src}`));
+    document.head.appendChild(script);
+  });
+}
+
+/**
+ * Use the same classic vendor build as library-reader-boot.js.
+ * Webpack's epubjs/jszip chunk often paints an empty .epub-container
+ * (no iframe) in this app — the vendor scripts render reliably.
+ */
+async function loadVendorEpub(): Promise<
+  (data: ArrayBuffer, options?: Record<string, unknown>) => EpubBookApi
+> {
+  await loadVendorScript("/vendor/jszip.min.js");
+  await loadVendorScript("/vendor/epub.min.js");
+  const ePub = (
+    window as unknown as {
+      ePub?: (
+        data: ArrayBuffer,
+        options?: Record<string, unknown>
+      ) => EpubBookApi;
+    }
+  ).ePub;
+  if (typeof ePub !== "function") {
+    throw new Error("Could not load the EPUB reader");
   }
-  if (typeof m.Book === "function") {
-    return (data, options) => new m.Book!(data, options);
-  }
-  throw new Error("Could not load the EPUB reader");
+  return ePub;
 }
 
 /** Skip old chapter-local bookmarks that break resume on re-open. */
@@ -421,22 +433,156 @@ export function LibraryBookReader({
     let cancelled = false;
     let book: EpubBookApi | null = null;
     let observer: ResizeObserver | null = null;
-    let renderedHere = false;
+    let tearDownTimer: number | null = null;
     const token = `react-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     // Claim immediately so the classic boot script does not race us.
     host.dataset.reactToken = token;
     host.dataset.owned = "react";
 
+    const stillMine = () =>
+      !cancelled && host.dataset.reactToken === token;
+
+    const measure = () => {
+      const rect = host.getBoundingClientRect();
+      const width = Math.max(
+        280,
+        Math.floor(rect.width || host.clientWidth || window.innerWidth * 0.7)
+      );
+      const height = Math.max(
+        320,
+        Math.floor(
+          rect.height || host.clientHeight || window.innerHeight * 0.65
+        )
+      );
+      return { width, height };
+    };
+
+    function abandonBook() {
+      try {
+        book?.destroy();
+      } catch {
+        // ignore
+      }
+      book = null;
+      bookApiRef.current = null;
+    }
+
+    async function paintBook(
+      ePub: (
+        data: ArrayBuffer,
+        options?: Record<string, unknown>
+      ) => EpubBookApi,
+      buffer: ArrayBuffer
+    ) {
+      host.innerHTML = "";
+      // Copy bytes — some browsers detach the fetch ArrayBuffer under load.
+      const bytes = buffer.slice(0);
+      book = ePub(bytes, { replacements: "blobUrl" });
+      bookApiRef.current = book;
+      await book.ready;
+      if (!stillMine()) {
+        abandonBook();
+        return null;
+      }
+
+      await new Promise<void>((resolve) =>
+        window.requestAnimationFrame(() => resolve())
+      );
+      if (!stillMine()) {
+        abandonBook();
+        return null;
+      }
+
+      let { width, height } = measure();
+      if (
+        host.getBoundingClientRect().height < 40 ||
+        host.getBoundingClientRect().width < 40
+      ) {
+        await new Promise<void>((resolve) => {
+          window.setTimeout(() => resolve(), 80);
+        });
+        if (!stillMine()) {
+          abandonBook();
+          return null;
+        }
+        ({ width, height } = measure());
+      }
+
+      const rendition = book.renderTo(host, {
+        width,
+        height,
+        flow: "paginated",
+        spread: "none",
+        minSpreadWidth: 100000,
+        allowScriptedContent: true,
+      });
+
+      rendition.themes.default({
+        html: {
+          width: "100% !important",
+          height: "100% !important",
+          overflow: "hidden !important",
+          margin: "0 !important",
+          padding: "0 !important",
+        },
+        body: {
+          color: "#2c2418 !important",
+          background: "#f6edd9 !important",
+          "font-family": "Georgia, 'Times New Roman', serif !important",
+          "line-height": "1.65 !important",
+          "font-size": "1em !important",
+          padding: "0.85rem 1rem !important",
+          margin: "0 !important",
+          width: "100% !important",
+          height: "100% !important",
+          "max-height": "100% !important",
+          "box-sizing": "border-box !important",
+          overflow: "hidden !important",
+        },
+        p: {
+          "margin-top": "0.55em !important",
+          "margin-bottom": "0.55em !important",
+        },
+        a: { color: "#5c3a1e !important" },
+        img: {
+          "max-width": "100% !important",
+          "max-height": "100% !important",
+          width: "auto !important",
+          height: "auto !important",
+          "object-fit": "contain !important",
+        },
+        svg: {
+          "max-width": "100% !important",
+          "max-height": "100% !important",
+        },
+      });
+
+      // Paint the start first so a stale resume CFI after re-upload cannot
+      // hang the reader on “Opening…” forever.
+      await rendition.display();
+      if (!stillMine()) {
+        abandonBook();
+        host.innerHTML = "";
+        return null;
+      }
+
+      // Empty container = failed paint (seen with webpack epubjs / races).
+      if (!host.querySelector("iframe")) {
+        abandonBook();
+        host.innerHTML = "";
+        return null;
+      }
+
+      return rendition;
+    }
+
     async function openEpub() {
       setLoading(true);
       setError("");
       try {
-        host.innerHTML = "";
-
-        await import("jszip");
-        const mod = await import("epubjs");
-        const ePub = resolveEpubFactory(mod);
+        const ePub = await loadVendorEpub();
+        if (!stillMine()) return;
 
         const res = await fetch(fileUrl, {
           credentials: "include",
@@ -457,7 +603,7 @@ export function LibraryBookReader({
           throw new Error(message);
         }
         const buffer = await res.arrayBuffer();
-        if (cancelled) return;
+        if (!stillMine()) return;
 
         const head = new Uint8Array(buffer.slice(0, 64));
         const headText = String.fromCharCode(...Array.from(head));
@@ -472,124 +618,30 @@ export function LibraryBookReader({
           );
         }
 
-        // ArrayBuffer only — blob: URLs are treated as directories by epubjs and
-        // 404 on META-INF/container.xml relative to the page.
-        book = ePub(buffer, { replacements: "blobUrl" });
-        bookApiRef.current = book;
-        await book.ready;
-        if (cancelled) return;
-
-        const measure = () => {
-          const rect = host.getBoundingClientRect();
-          const width = Math.max(
-            280,
-            Math.floor(rect.width || host.clientWidth || window.innerWidth * 0.7)
-          );
-          const height = Math.max(
-            320,
-            Math.floor(
-              rect.height || host.clientHeight || window.innerHeight * 0.65
-            )
-          );
-          return { width, height };
-        };
-
-        await new Promise<void>((resolve) =>
-          window.requestAnimationFrame(() => resolve())
-        );
-        if (cancelled) return;
-
-        let { width, height } = measure();
-        if (
-          host.getBoundingClientRect().height < 40 ||
-          host.getBoundingClientRect().width < 40
-        ) {
-          await new Promise<void>((resolve) => {
-            window.setTimeout(() => resolve(), 60);
-          });
-          if (cancelled) return;
-          ({ width, height } = measure());
+        let rendition = await paintBook(ePub, buffer);
+        // One retry covers Strict Mode teardown racing the first paint.
+        if (!rendition && stillMine()) {
+          rendition = await paintBook(ePub, buffer);
         }
-
-        renderedHere = true;
-        const rendition = book.renderTo(host, {
-          width,
-          height,
-          flow: "paginated",
-          spread: "none",
-          minSpreadWidth: 100000,
-          allowScriptedContent: true,
-        });
-
-        rendition.themes.default({
-          html: {
-            width: "100% !important",
-            height: "100% !important",
-            overflow: "hidden !important",
-            margin: "0 !important",
-            padding: "0 !important",
-          },
-          body: {
-            color: "#2c2418 !important",
-            background: "#f6edd9 !important",
-            "font-family": "Georgia, 'Times New Roman', serif !important",
-            "line-height": "1.65 !important",
-            "font-size": "1em !important",
-            padding: "0.85rem 1rem !important",
-            margin: "0 !important",
-            width: "100% !important",
-            height: "100% !important",
-            "max-height": "100% !important",
-            "box-sizing": "border-box !important",
-            overflow: "hidden !important",
-          },
-          p: {
-            "margin-top": "0.55em !important",
-            "margin-bottom": "0.55em !important",
-          },
-          a: { color: "#5c3a1e !important" },
-          img: {
-            "max-width": "100% !important",
-            "max-height": "100% !important",
-            width: "auto !important",
-            height: "auto !important",
-            "object-fit": "contain !important",
-          },
-          svg: {
-            "max-width": "100% !important",
-            "max-height": "100% !important",
-          },
-        });
+        if (!stillMine()) return;
+        if (!rendition || !book) {
+          throw new Error("Could not open this EPUB");
+        }
 
         const doResize = () => {
           const size = measure();
           if (size.width > 0 && size.height > 0) {
-            rendition.resize(size.width, size.height);
+            rendition!.resize(size.width, size.height);
           }
         };
 
         navRef.current = {
-          next: () => void rendition.next(),
-          prev: () => void rendition.prev(),
-          display: (cfi: string) => void rendition.display(cfi),
+          next: () => void rendition!.next(),
+          prev: () => void rendition!.prev(),
+          display: (cfi: string) => void rendition!.display(cfi),
           resize: doResize,
         };
 
-        // Paint the start first so a stale resume CFI after re-upload cannot
-        // hang the reader on “Opening…” forever.
-        await rendition.display();
-        if (cancelled || host.dataset.reactToken !== token) {
-          // Do not destroy if a newer effect already claimed this mount
-          // (React Strict Mode remount) — that wiped a healthy open.
-          if (host.dataset.reactToken === token) {
-            try {
-              book.destroy();
-            } catch {
-              // ignore
-            }
-          }
-          return;
-        }
         setLoading(false);
         doResize();
 
@@ -607,7 +659,7 @@ export function LibraryBookReader({
           }
         }
 
-        if (cancelled || host.dataset.reactToken !== token) return;
+        if (!stillMine()) return;
 
         window.setTimeout(doResize, 50);
         window.setTimeout(doResize, 200);
@@ -634,7 +686,7 @@ export function LibraryBookReader({
         void (async () => {
           try {
             await bookForLocations.locations.generate(1000);
-            if (cancelled || host.dataset.reactToken !== token) return;
+            if (!stillMine()) return;
             const cfi = placeRef.current.cfi;
             if (!cfi) return;
             const place = placeFromLocation(
@@ -650,7 +702,7 @@ export function LibraryBookReader({
           }
         })();
       } catch (err) {
-        if (cancelled || host.dataset.reactToken !== token) return;
+        if (!stillMine()) return;
         setLoading(false);
         setError(
           err instanceof Error ? err.message : "Could not open this EPUB"
@@ -662,28 +714,35 @@ export function LibraryBookReader({
 
     return () => {
       cancelled = true;
-      // Only tear down if we still own the mount. A remounted effect may have
-      // already claimed it — destroying here blanked the reader after refresh.
-      if (host.dataset.reactToken !== token) {
-        return;
-      }
-      navRef.current = null;
-      bookApiRef.current = null;
-      try {
-        observer?.disconnect();
-      } catch {
-        // ignore
-      }
-      try {
-        book?.destroy();
-      } catch {
-        // ignore
-      }
-      if (renderedHere) {
+      // Defer teardown so React Strict Mode's sync remount can reclaim the
+      // mount before we wipe a healthy iframe (immediate destroy blanked it).
+      tearDownTimer = window.setTimeout(() => {
+        if (host.dataset.reactToken !== token) {
+          return;
+        }
+        navRef.current = null;
+        const liveBook = bookApiRef.current;
+        bookApiRef.current = null;
+        try {
+          observer?.disconnect();
+        } catch {
+          // ignore
+        }
+        try {
+          liveBook?.destroy();
+        } catch {
+          // ignore
+        }
+        try {
+          book?.destroy();
+        } catch {
+          // ignore
+        }
         host.innerHTML = "";
-      }
-      if (host.dataset.owned === "react") delete host.dataset.owned;
-      delete host.dataset.reactToken;
+        if (host.dataset.owned === "react") delete host.dataset.owned;
+        delete host.dataset.reactToken;
+      }, 0);
+      void tearDownTimer;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- open once per file
   }, [fileUrl, kind, bookId]);

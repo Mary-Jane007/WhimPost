@@ -354,13 +354,24 @@
   function tryBoot() {
     var mount = document.querySelector(".mh-reader-epub[data-file-url]");
     if (!mount) return;
-    if (mount.dataset.owned === "react" || mount.dataset.owned === "boot") return;
+    // React already painted a working iframe — leave it alone.
     if (mount.querySelector("iframe")) {
-      mount.dataset.owned = "boot";
+      if (!mount.dataset.owned) mount.dataset.owned = "boot";
       return;
+    }
+    // React claimed the mount but left it blank — take over.
+    if (mount.dataset.owned === "boot") return;
+    if (mount.dataset.owned === "react") {
+      // Give React a moment; only steal if still empty.
+      if (!mount.dataset.bootStealArmed) {
+        mount.dataset.bootStealArmed = "1";
+        setTimeout(tryBoot, 1200);
+        return;
+      }
     }
 
     mount.dataset.owned = "boot";
+    mount.innerHTML = "";
     var fileUrl = mount.getAttribute("data-file-url") || "";
     var resumeCfi = mount.getAttribute("data-resume-cfi") || "";
     var bookId = mount.getAttribute("data-book-id") || "";
@@ -383,10 +394,12 @@
     });
   }
 
-  // Prefer React. Only boot if hydration never claimed the mount.
+  // Prefer React. Only boot if hydration never claimed the mount,
+  // or claimed it but left a blank stage.
   function schedule() {
-    setTimeout(tryBoot, 1800);
-    setTimeout(tryBoot, 3200);
+    setTimeout(tryBoot, 900);
+    setTimeout(tryBoot, 2200);
+    setTimeout(tryBoot, 4000);
   }
 
   if (document.readyState === "loading") {
