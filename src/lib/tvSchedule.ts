@@ -52,6 +52,37 @@ function seededShuffle(ids: string[], seed: number): string[] {
   return next;
 }
 
+/**
+ * Prefer a lineup where the same clip never airs twice in a row.
+ * With only one clip on the channel this is impossible — it will repeat.
+ */
+function avoidStartingWith(order: string[], avoidFirstId?: string | null) {
+  if (!avoidFirstId || order.length <= 1) return order;
+  if (order[0] !== avoidFirstId) return order;
+  const swapAt = order.findIndex((id, index) => index > 0 && id !== avoidFirstId);
+  if (swapAt <= 0) return order;
+  const next = [...order];
+  [next[0], next[swapAt]] = [next[swapAt], next[0]];
+  return next;
+}
+
+function shuffleAvoidingAdjacent(
+  ids: string[],
+  avoidFirstId?: string | null
+): string[] {
+  const unique = [...new Set(ids)];
+  return avoidStartingWith(shuffleIds(unique), avoidFirstId);
+}
+
+function seededShuffleAvoidingAdjacent(
+  ids: string[],
+  seed: number,
+  avoidFirstId?: string | null
+): string[] {
+  const unique = [...new Set(ids)];
+  return avoidStartingWith(seededShuffle(unique, seed), avoidFirstId);
+}
+
 function sameIdOrder(a: string[], b: string[]) {
   return (
     a.length === b.length && a.every((id, index) => id === b[index])
@@ -268,7 +299,7 @@ export function reshuffleChannelSchedule(channelId: string): {
   }
   const knownIds = [...videos.keys()];
   const epochMs = Date.now();
-  const order = shuffleIds(knownIds);
+  const order = shuffleAvoidingAdjacent(knownIds);
   writeChannelSchedule(channelId, epochMs, order);
   return { epochMs, order, videos };
 }
@@ -341,11 +372,12 @@ export function ensureChannelSchedule(channelId: string): {
     // Rebuild the lineup, but NEVER reset a healthy epoch to Date.now() —
     // that made every clip-replace / restore restart the broadcast at t=0.
     if (!epochMs) epochMs = Date.now();
-    order = seededShuffle(knownIds, epochMs);
+    order = seededShuffleAvoidingAdjacent(knownIds, epochMs);
     dirty = true;
   } else if (missing.length > 0) {
     // Append stragglers at the end — do not reshuffle or restart the airing.
-    order = [...order, ...missing];
+    // If the only clip somehow matched the tail, avoidAdjacent is a no-op for uniques.
+    order = [...order, ...missing.filter((id) => !order.includes(id))];
     if (!epochMs) epochMs = Date.now();
     dirty = true;
   }
@@ -438,8 +470,16 @@ function reshuffleCompletedCycles(
 
   // Include every clip currently on the channel, not just the old order.
   const allIds = [...videos.keys()];
+  let prevLast = order[order.length - 1] || null;
+  let nextOrder = order;
+  // Walk each completed cycle so the next lineup never starts on the same
+  // clip that just finished (when at least two clips exist).
+  for (let i = 1; i <= loopsCompleted; i += 1) {
+    const seed = epochMs + i * loopMs;
+    nextOrder = seededShuffleAvoidingAdjacent(allIds, seed, prevLast);
+    prevLast = nextOrder[nextOrder.length - 1] || null;
+  }
   const nextEpoch = epochMs + loopsCompleted * loopMs;
-  const nextOrder = seededShuffle(allIds, nextEpoch);
   writeChannelSchedule(channelId, nextEpoch, nextOrder);
   return { epochMs: nextEpoch, order: nextOrder };
 }
@@ -539,18 +579,52 @@ export function resolveChannelBroadcast(
   let slotStart = airStartsAtMs;
   const schedule: TvScheduleSlot[] = [];
   const horizonEnd = nowMs + scheduleHorizonMs;
-  const allIds = [...videos.keys()];
+  // Always reshuffle the full shelf — never a partial id list.
+  const allIds = [...new Set([...videos.keys(), ...order])].filter((id) =>
+    videos.has(id)
+  );
   let cycleOrder = [...order];
   let posInCycle = currentIndex;
   let cycleIdx = 0;
+  let lastEmittedId: string | null =
+    currentIndex > 0 ? order[currentIndex - 1] : null;
   let guard = 0;
-  while (slotStart < horizonEnd && guard < Math.max(order.length, 1) * 40) {
+  while (slotStart < horizonEnd && guard < Math.max(allIds.length, 1) * 48) {
     if (posInCycle >= cycleOrder.length) {
+      const prevCycleLast = cycleOrder[cycleOrder.length - 1] || lastEmittedId;
       cycleIdx += 1;
-      cycleOrder = seededShuffle(allIds, epochMs + cycleIdx * loopMs);
+      // Seed matches reshuffleCompletedCycles: epochMs + i * loopMs
+      cycleOrder = seededShuffleAvoidingAdjacent(
+        allIds,
+        epochMs + cycleIdx * loopMs,
+        prevCycleLast
+      );
       posInCycle = 0;
     }
-    const videoId = cycleOrder[posInCycle];
+
+    let videoId = cycleOrder[posInCycle];
+    // Hard guard: never air the same clip twice in a row when another exists.
+    if (
+      allIds.length > 1 &&
+      lastEmittedId &&
+      videoId === lastEmittedId
+    ) {
+      const swapAt = cycleOrder.findIndex(
+        (id, index) => index >= posInCycle && id !== lastEmittedId
+      );
+      if (swapAt >= posInCycle) {
+        const next = [...cycleOrder];
+        [next[posInCycle], next[swapAt]] = [next[swapAt], next[posInCycle]];
+        cycleOrder = next;
+        videoId = cycleOrder[posInCycle];
+      } else {
+        // Advance to a fresh cycle rather than repeating.
+        posInCycle = cycleOrder.length;
+        guard += 1;
+        continue;
+      }
+    }
+
     const meta = videos.get(videoId);
     const durationMs = meta?.durationMs || DEFAULT_TV_DURATION_MS;
     const startsAtMs = slotStart;
@@ -568,6 +642,7 @@ export function resolveChannelBroadcast(
           startsAtMs <= nowMs &&
           nowMs < endsAtMs,
       });
+      lastEmittedId = videoId;
     }
     slotStart = endsAtMs;
     posInCycle += 1;
