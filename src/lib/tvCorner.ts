@@ -6,6 +6,7 @@ import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import { getVillage, isVillageId } from "@/lib/villages";
 import { persistAllDurableState } from "@/lib/tvPersist";
+import { isSharedTvChannelTitle } from "@/lib/persistentTvMedia";
 import {
   addVideoToChannelSchedule,
   probeAndStoreDuration,
@@ -224,7 +225,8 @@ export function createChannel(
   if (!title) {
     return { ok: false as const, error: "Give the channel a name", status: 400 };
   }
-  const isGlobal = Boolean(input.isGlobal);
+  const isGlobal =
+    Boolean(input.isGlobal) || isSharedTvChannelTitle(title);
   const villageId = isGlobal
     ? user.villageId || "mosshollow"
     : String(input.villageId || user.villageId || "").trim();
