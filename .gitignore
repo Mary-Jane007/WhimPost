@@ -56,8 +56,8 @@ next-env.d.ts
 !/data/persistent-welcome-letters.json
 /data/tv-cache/
 /data/.media-release-staging/
-# Moon audio bytes are force-added when under 95MB; release shelf covers the rest.
-/data/uploads/moon-sounds/
+# Track celestial audio in git (release shelf is the durable backup).
+/data/uploads/moon-sounds/*
 !/data/uploads/moon-sounds/.gitkeep
 !/data/uploads/moon-sounds/*.mp3
 !/data/uploads/moon-sounds/*.wav
