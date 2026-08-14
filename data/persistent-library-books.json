@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:05:52.759Z",
+  "updatedAt": "2026-08-14T19:17:41.285Z",
   "books": [
     {
       "id": "princess",
@@ -135,28 +135,6 @@
       "published": true
     },
     {
-      "id": "rl-tuchman",
-      "shelf": "readinglist",
-      "title": "A Distant Mirror",
-      "author": "Barbara Tuchman",
-      "description": "",
-      "minutes": 120,
-      "coverEmoji": "📖",
-      "coverUrl": "/api/uploads/c13c8f93-3f7e-4ef6-9334-8a64c9320489.jpg",
-      "fileUrl": null,
-      "fileName": null,
-      "fileMime": null,
-      "quotesJson": "[]",
-      "reflectionsJson": "[]",
-      "category": "History",
-      "difficulty": "Dense",
-      "length": "Long",
-      "mood": "Epic",
-      "themesJson": "[\"middle ages\",\"plague\",\"power\"]",
-      "rating": 4.4,
-      "published": true
-    },
-    {
       "id": "rl-alice",
       "shelf": "readinglist",
       "title": "Alice's Adventures in Wonderland",
@@ -209,9 +187,9 @@
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/91a9708a-5177-4bd1-b757-c30bbc0007ce.jpg",
-      "fileUrl": null,
-      "fileName": null,
-      "fileMime": null,
+      "fileUrl": "/api/uploads/41040601-6b78-4982-a6a8-5e6302ecc3db.epub",
+      "fileName": "Cosmos A Sketch of the Physical Description of the Universe - Alexander von Humboldt (1).epub",
+      "fileMime": "application/epub+zip",
       "quotesJson": "[]",
       "reflectionsJson": "[]",
       "category": "Science",
