@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T14:57:42.276Z",
+  "updatedAt": "2026-08-14T14:57:47.505Z",
   "sounds": [
     {
       "playlistId": "campfire",
@@ -25,6 +25,12 @@
       "filename": "af62ecb5-083a-4036-a825-2ac41279b339.mp3",
       "originalName": "dragon-studio-gentle-ocean-shore-waves-499665.mp3",
       "sizeBytes": 1966848
+    },
+    {
+      "playlistId": "owls-calling",
+      "filename": "e35eafe0-aa96-46b4-b074-830c22a6cef7.mp3",
+      "originalName": "freesound_community-barred-owl-calling-28587.mp3",
+      "sizeBytes": 882720
     },
     {
       "playlistId": "wind-trees",
