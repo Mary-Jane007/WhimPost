@@ -7111,6 +7111,10 @@ button.mh-card-cover {
   margin: 0.65rem 0 0.85rem;
 }
 
+.mh-summary-launch {
+  margin: 0.55rem 0 0.35rem;
+}
+
 .mh-file-link a {
   text-decoration: none;
 }
