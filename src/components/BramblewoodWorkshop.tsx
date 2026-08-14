@@ -24,13 +24,24 @@ type Props = {
   initialProgress: WorkshopProgress;
 };
 
-async function uploadPhoto(file: File) {
+async function uploadPhoto(
+  file: File,
+  onProgress?: (percent: number) => void
+) {
   const form = new FormData();
   form.append("image", file);
-  const res = await fetch("/api/uploads", { method: "POST", body: form });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Upload failed");
-  return data.url as string;
+  const { uploadFormData } = await import("@/lib/clientUpload");
+  const { ok, data } = await uploadFormData("/api/uploads", form, {
+    onProgress,
+  });
+  if (!ok) {
+    throw new Error(
+      (typeof data.error === "string" && data.error) || "Upload failed"
+    );
+  }
+  const url = typeof data.url === "string" ? data.url : "";
+  if (!url) throw new Error("Upload failed");
+  return url;
 }
 
 export function BramblewoodWorkshop({ user, initialProgress }: Props) {
@@ -46,6 +57,12 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
   const [journalMarkComplete, setJournalMarkComplete] = useState(true);
   const [journalShareVillage, setJournalShareVillage] = useState(false);
   const [journalUploading, setJournalUploading] = useState(false);
+  const [journalUploadPercent, setJournalUploadPercent] = useState<
+    number | null
+  >(null);
+  const [photoUploadPercent, setPhotoUploadPercent] = useState<number | null>(
+    null
+  );
   const [journalPrompt, setJournalPrompt] = useState<string>(EXPLORER_PROMPTS[0]);
   const fileRef = useRef<HTMLInputElement>(null);
   const journalFileRef = useRef<HTMLInputElement>(null);
@@ -119,9 +136,10 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
   async function onPickFile(file: File | null) {
     if (!file || !pendingPhotoKind.current || !pendingPhotoKey.current) return;
     setBusy(true);
+    setPhotoUploadPercent(0);
     setError(null);
     try {
-      const url = await uploadPhoto(file);
+      const url = await uploadPhoto(file, setPhotoUploadPercent);
       const kind = pendingPhotoKind.current;
       const key = pendingPhotoKey.current;
       const meta = pendingMeta.current;
@@ -175,6 +193,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
       pendingPhotoKind.current = null;
       pendingPhotoKey.current = null;
       setBusy(false);
+      setPhotoUploadPercent(null);
       if (fileRef.current) fileRef.current.value = "";
     }
   }
@@ -182,14 +201,16 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
   async function onJournalPhoto(file: File | null) {
     if (!file) return;
     setJournalUploading(true);
+    setJournalUploadPercent(0);
     setError(null);
     try {
-      const url = await uploadPhoto(file);
+      const url = await uploadPhoto(file, setJournalUploadPercent);
       setJournalPhoto(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setJournalUploading(false);
+      setJournalUploadPercent(null);
       if (journalFileRef.current) journalFileRef.current.value = "";
     }
   }
@@ -997,7 +1018,11 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                       disabled={busy || journalUploading}
                       onClick={() => journalFileRef.current?.click()}
                     >
-                      {journalUploading ? "Uploading…" : "Change photo"}
+                      {journalUploading
+                        ? journalUploadPercent != null
+                          ? `Uploading ${journalUploadPercent}%…`
+                          : "Uploading…"
+                        : "Change photo"}
                     </button>
                   </div>
                 ) : (
@@ -1008,10 +1033,34 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                     onClick={() => journalFileRef.current?.click()}
                   >
                     {journalUploading
-                      ? "Uploading…"
+                      ? journalUploadPercent != null
+                        ? `Uploading ${journalUploadPercent}%…`
+                        : "Uploading…"
                       : "📷 Choose image from your device"}
                   </button>
                 )}
+                {journalUploading && journalUploadPercent != null ? (
+                  <div
+                    className="mh-upload-meter"
+                    role="progressbar"
+                    aria-valuenow={journalUploadPercent}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
+                    <span style={{ width: `${journalUploadPercent}%` }} />
+                  </div>
+                ) : null}
+                {busy && photoUploadPercent != null ? (
+                  <div
+                    className="mh-upload-meter"
+                    role="progressbar"
+                    aria-valuenow={photoUploadPercent}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
+                    <span style={{ width: `${photoUploadPercent}%` }} />
+                  </div>
+                ) : null}
               </div>
               {journalCraftId ? (
                 <label className="bw-check">

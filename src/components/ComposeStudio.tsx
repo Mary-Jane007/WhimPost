@@ -66,6 +66,7 @@ export function ComposeStudio({
   >("paper");
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const [image, setImage] = useState<PlacedImage | null>(null);
   const [error, setError] = useState("");
   const [preview, setPreview] = useState<"letter" | "envelope">("letter");
@@ -210,25 +211,45 @@ export function ComposeStudio({
   async function onPickImage(file: File | null) {
     if (!file) return;
     setUploading(true);
+    setUploadPercent(0);
     setError("");
     const form = new FormData();
     form.append("image", file);
-    const res = await fetch("/api/uploads", { method: "POST", body: form });
-    const data = await res.json();
-    setUploading(false);
-    if (!res.ok) {
-      setError(data.error || "Could not upload image");
-      return;
+    try {
+      const { uploadFormData } = await import("@/lib/clientUpload");
+      const { ok, data } = await uploadFormData("/api/uploads", form, {
+        onProgress: setUploadPercent,
+      });
+      setUploading(false);
+      setUploadPercent(null);
+      if (!ok) {
+        setError(
+          (typeof data.error === "string" && data.error) ||
+            "Could not upload image"
+        );
+        return;
+      }
+      const url = typeof data.url === "string" ? data.url : "";
+      if (!url) {
+        setError("Could not upload image");
+        return;
+      }
+      setImage({
+        url,
+        x: 50,
+        y: 58,
+        scale: 1,
+        rotation: -1,
+      });
+      setSelectedId(PHOTO_SELECT_ID);
+      setPreview("letter");
+    } catch (err) {
+      setUploading(false);
+      setUploadPercent(null);
+      setError(
+        err instanceof Error ? err.message : "Could not upload image"
+      );
     }
-    setImage({
-      url: data.url,
-      x: 50,
-      y: 58,
-      scale: 1,
-      rotation: -1,
-    });
-    setSelectedId(PHOTO_SELECT_ID);
-    setPreview("letter");
   }
 
   async function sendLetter() {
@@ -378,12 +399,25 @@ export function ComposeStudio({
                 />
                 <span>
                   {uploading
-                    ? "Tucking the photo in…"
+                    ? uploadPercent != null
+                      ? `Uploading ${uploadPercent}%…`
+                      : "Tucking the photo in…"
                     : image
                       ? "Replace photo"
                       : "Upload an image"}
                 </span>
               </label>
+              {uploading && uploadPercent != null ? (
+                <div
+                  className="mh-upload-meter"
+                  role="progressbar"
+                  aria-valuenow={uploadPercent}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
+                  <span style={{ width: `${uploadPercent}%` }} />
+                </div>
+              ) : null}
               {image ? (
                 <p className="compose-hint">
                   Drag the photo on the letter. Use the corner handle or +/− to

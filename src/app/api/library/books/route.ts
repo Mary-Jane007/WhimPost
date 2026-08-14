@@ -10,6 +10,7 @@ import { getDb } from "@/lib/db";
 import {
   attachAssetsToShelfBook,
   bumpClubShuffleSalt,
+  clearLibraryBookFile,
   deleteLibraryBook,
   getBookClubRotation,
   listClubBooks,
@@ -211,6 +212,21 @@ export async function POST(req: NextRequest) {
     if (!result.ok) return jsonError(result.error, 404);
     if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
     return NextResponse.json({ ok: true, removed: id });
+  }
+
+  if (intent === "clear-file") {
+    const id = String(form.get("bookId") || form.get("id") || "").trim();
+    if (!id) return jsonError("Book id required");
+    try {
+      const book = clearLibraryBookFile(id, user.id);
+      if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
+      return NextResponse.json({ ok: true, book, clearedFile: true });
+    } catch (err) {
+      return jsonError(
+        err instanceof Error ? err.message : "Could not remove the book file",
+        400
+      );
+    }
   }
 
   if (intent === "reshuffle") {

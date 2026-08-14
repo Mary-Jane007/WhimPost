@@ -107,6 +107,96 @@ export function clearReadingPositionsForBook(bookId: string) {
   }
 }
 
+/**
+ * Wipe one reader's progress for a book (bookmark, %, finished flag)
+ * so they can start again from the beginning.
+ */
+export function resetUserReadingProgress(userId: string, bookId: string) {
+  const id = bookId.trim();
+  if (!id) throw new Error("Book id required");
+  const db = getDb();
+
+  const exists = db
+    .prepare(`SELECT user_id FROM library_progress WHERE user_id = ?`)
+    .get(userId);
+  if (!exists) {
+    db.prepare(`INSERT INTO library_progress (user_id, xp) VALUES (?, 0)`).run(
+      userId
+    );
+  }
+
+  const row = db
+    .prepare(
+      `SELECT reading_positions_json, book_progress_json, reading_status_json,
+              finished_json
+       FROM library_progress WHERE user_id = ?`
+    )
+    .get(userId) as {
+    reading_positions_json: string;
+    book_progress_json: string;
+    reading_status_json: string;
+    finished_json: string;
+  };
+
+  const positions = parsePositions(row.reading_positions_json);
+  delete positions[id];
+
+  const bookProgress = (() => {
+    try {
+      return JSON.parse(row.book_progress_json || "{}") as Record<
+        string,
+        number
+      >;
+    } catch {
+      return {};
+    }
+  })();
+  delete bookProgress[id];
+
+  const readingStatus = (() => {
+    try {
+      return JSON.parse(row.reading_status_json || "{}") as Record<
+        string,
+        string
+      >;
+    } catch {
+      return {};
+    }
+  })();
+  delete readingStatus[id];
+
+  const finished = (() => {
+    try {
+      return JSON.parse(row.finished_json || "{}") as Record<string, boolean>;
+    } catch {
+      return {};
+    }
+  })();
+  delete finished[id];
+
+  db.prepare(
+    `UPDATE library_progress
+     SET reading_positions_json = ?,
+         book_progress_json = ?,
+         reading_status_json = ?,
+         finished_json = ?,
+         updated_at = datetime('now')
+     WHERE user_id = ?`
+  ).run(
+    JSON.stringify(positions),
+    JSON.stringify(bookProgress),
+    JSON.stringify(readingStatus),
+    JSON.stringify(finished),
+    userId
+  );
+
+  return {
+    positions,
+    bookProgress,
+    readingStatus,
+  };
+}
+
 /** Overwrite last-page position and sync shelf % to the real place. */
 export function saveReadingPosition(
   userId: string,

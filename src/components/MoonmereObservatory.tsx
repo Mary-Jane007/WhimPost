@@ -49,6 +49,7 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
   const [selectedCreature, setSelectedCreature] = useState<string | null>(null);
   const [listeningId, setListeningId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const rituals = dailyRituals();
@@ -175,21 +176,31 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
   async function uploadPlaylistSound(playlistId: string, file: File | null) {
     if (!file || !user.isOwner) return;
     setUploadingId(playlistId);
+    setUploadPercent(0);
     setBusy(true);
     setError(null);
     try {
       const form = new FormData();
       form.set("playlistId", playlistId);
       form.set("audio", file);
-      const res = await fetch("/api/moon/playlist-sound", {
-        method: "POST",
-        body: form,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not upload sound");
-      if (data.progress) setProgress(data.progress);
+      const { uploadFormData } = await import("@/lib/clientUpload");
+      const { ok, data } = await uploadFormData(
+        "/api/moon/playlist-sound",
+        form,
+        { onProgress: setUploadPercent }
+      );
+      if (!ok) {
+        throw new Error(
+          (typeof data.error === "string" && data.error) ||
+            "Could not upload sound"
+        );
+      }
+      if (data.progress) setProgress(data.progress as typeof progress);
       else if (data.playlistSounds) {
-        setProgress((p) => ({ ...p, playlistSounds: data.playlistSounds }));
+        setProgress((p) => ({
+          ...p,
+          playlistSounds: data.playlistSounds as typeof p.playlistSounds,
+        }));
       }
       if (listeningId === playlistId) stopListening();
       setToast("Sound added to this celestial playlist.");
@@ -198,6 +209,7 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
     } finally {
       setBusy(false);
       setUploadingId(null);
+      setUploadPercent(null);
     }
   }
 
@@ -699,7 +711,9 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                         <label className="mm-upload-label">
                           <span>
                             {uploadingId === pl.id
-                              ? "Uploading…"
+                              ? uploadPercent != null
+                                ? `Uploading ${uploadPercent}%…`
+                                : "Uploading…"
                               : hasSound
                                 ? "Replace sound"
                                 : "Add sound"}
@@ -715,6 +729,17 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                             }}
                           />
                         </label>
+                        {uploadingId === pl.id && uploadPercent != null ? (
+                          <div
+                            className="mh-upload-meter"
+                            role="progressbar"
+                            aria-valuenow={uploadPercent}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                          >
+                            <span style={{ width: `${uploadPercent}%` }} />
+                          </div>
+                        ) : null}
                         {hasSound ? (
                           <button
                             type="button"

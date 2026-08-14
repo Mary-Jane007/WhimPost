@@ -9,6 +9,7 @@ import type {
 } from "@/lib/libraryContent";
 import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
+import { ShelfBookFileDetach } from "@/components/ShelfBookFileDetach";
 import { ShelfBookRemove } from "@/components/ShelfBookRemove";
 
 const CATEGORIES: ReadingCategory[] = [
@@ -93,6 +94,7 @@ export function LibraryAdminEditor({
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const [filter, setFilter] = useState<"all" | "club" | "readinglist">("all");
 
   const shelfBooks = useMemo(() => {
@@ -118,22 +120,41 @@ export function LibraryAdminEditor({
     setSaving(true);
     setError("");
     setStatus("");
-    const res = await fetch("/api/library/books", {
-      method: "POST",
-      body: new FormData(form),
-    });
-    const data = await res.json().catch(() => ({}));
-    setSaving(false);
-    if (!res.ok) {
-      setError(data.error || "Could not save library changes");
-      return;
+    setUploadPercent(null);
+    const body = new FormData(form);
+    const hasBinary = Boolean(body.get("file") || body.get("cover"));
+    try {
+      const { uploadFormData } = await import("@/lib/clientUpload");
+      const { ok, data } = await uploadFormData("/api/library/books", body, {
+        onProgress: hasBinary ? setUploadPercent : undefined,
+      });
+      if (!ok) {
+        setError(
+          (typeof data.error === "string" && data.error) ||
+            "Could not save library changes"
+        );
+        return;
+      }
+      const bookTitle =
+        data.book &&
+        typeof data.book === "object" &&
+        data.book !== null &&
+        "title" in data.book &&
+        typeof (data.book as { title?: unknown }).title === "string"
+          ? (data.book as { title: string }).title
+          : "book";
+      if (data.removed) setStatus(`Removed “${String(data.removed)}”.`);
+      else if (data.moved) setStatus(`Moved “${bookTitle}”.`);
+      else if (data.shuffleSalt != null) setStatus("Book Club reshuffled.");
+      else setStatus(`Saved “${bookTitle}”.`);
+      form.reset();
+      onChanged?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save library changes");
+    } finally {
+      setSaving(false);
+      setUploadPercent(null);
     }
-    if (data.removed) setStatus(`Removed “${data.removed}”.`);
-    else if (data.moved) setStatus(`Moved “${data.book?.title || "book"}”.`);
-    else if (data.shuffleSalt != null) setStatus("Book Club reshuffled.");
-    else setStatus(`Saved “${data.book?.title || "book"}”.`);
-    form.reset();
-    onChanged?.();
   }
 
   return (
@@ -282,8 +303,23 @@ export function LibraryAdminEditor({
             />
           </label>
           <button type="submit" className="btn-primary" disabled={saving}>
-            {saving ? "Shelving…" : "Add book to library"}
+            {saving
+              ? uploadPercent != null
+                ? `Uploading ${uploadPercent}%…`
+                : "Shelving…"
+              : "Add book to library"}
           </button>
+          {saving && uploadPercent != null ? (
+            <div
+              className="mh-upload-meter"
+              role="progressbar"
+              aria-valuenow={uploadPercent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <span style={{ width: `${uploadPercent}%` }} />
+            </div>
+          ) : null}
         </form>
 
         <div className="mh-admin-list">
@@ -351,6 +387,14 @@ export function LibraryAdminEditor({
                     returnTo={returnTo}
                     onAttached={() => onChanged?.()}
                   />
+                  {b.fileUrl ? (
+                    <ShelfBookFileDetach
+                      bookId={b.id}
+                      bookTitle={b.title}
+                      returnTo={returnTo}
+                      onDetached={() => onChanged?.()}
+                    />
+                  ) : null}
                   <form
                     className="mh-attach"
                     action="/api/library/books"
@@ -544,8 +588,23 @@ export function LibraryAdminEditor({
                       className="btn-primary"
                       disabled={saving}
                     >
-                      Save changes
+                      {saving
+                        ? uploadPercent != null
+                          ? `Uploading ${uploadPercent}%…`
+                          : "Saving…"
+                        : "Save changes"}
                     </button>
+                    {saving && uploadPercent != null ? (
+                      <div
+                        className="mh-upload-meter"
+                        role="progressbar"
+                        aria-valuenow={uploadPercent}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      >
+                        <span style={{ width: `${uploadPercent}%` }} />
+                      </div>
+                    ) : null}
                   </form>
                 </details>
               </li>

@@ -23,6 +23,7 @@ import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { BookReadingProgress } from "@/components/BookReadingProgress";
 import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
+import { ShelfBookFileDetach } from "@/components/ShelfBookFileDetach";
 import { ShelfBookRemove } from "@/components/ShelfBookRemove";
 import { getBookProgressView } from "@/lib/libraryProgressView";
 
@@ -323,6 +324,14 @@ export function MosshollowLibrary({
                       returnTo={returnTo}
                       onAttached={() => void refreshShelves()}
                     />
+                    {book.fileUrl ? (
+                      <ShelfBookFileDetach
+                        bookId={book.id}
+                        bookTitle={book.title}
+                        returnTo={returnTo}
+                        onDetached={() => void refreshShelves()}
+                      />
+                    ) : null}
                     <ShelfBookRemove
                       bookId={book.id}
                       bookTitle={book.title}
@@ -372,6 +381,30 @@ export function MosshollowLibrary({
                     }}
                   />
                 </label>
+                {bookPct > 0 ||
+                progress.readingPositions?.[book.id] ||
+                bookFinished ? (
+                  <button
+                    type="button"
+                    className="btn-secondary mh-attach-btn"
+                    disabled={busy}
+                    onClick={() => {
+                      if (
+                        !window.confirm(
+                          `Start “${book.title}” over from the beginning? Your saved place will be cleared.`
+                        )
+                      ) {
+                        return;
+                      }
+                      void postAction({
+                        type: "resetReadingProgress",
+                        bookId: book.id,
+                      });
+                    }}
+                  >
+                    Restart progress
+                  </button>
+                ) : null}
                 <div className="mh-quotes">
                   <h4>Favorite quotes</h4>
                   <ul>
@@ -480,6 +513,14 @@ export function MosshollowLibrary({
                               returnTo={returnTo}
                               onAttached={() => void refreshShelves()}
                             />
+                            {b.fileUrl ? (
+                              <ShelfBookFileDetach
+                                bookId={b.id}
+                                bookTitle={b.title}
+                                returnTo={returnTo}
+                                onDetached={() => void refreshShelves()}
+                              />
+                            ) : null}
                             <ShelfBookRemove
                               bookId={b.id}
                               bookTitle={b.title}
@@ -577,6 +618,14 @@ export function MosshollowLibrary({
                           returnTo={returnTo}
                           onAttached={() => void refreshShelves()}
                         />
+                        {b.fileUrl ? (
+                          <ShelfBookFileDetach
+                            bookId={b.id}
+                            bookTitle={b.title}
+                            returnTo={returnTo}
+                            onDetached={() => void refreshShelves()}
+                          />
+                        ) : null}
                         <ShelfBookRemove
                           bookId={b.id}
                           bookTitle={b.title}
@@ -584,6 +633,28 @@ export function MosshollowLibrary({
                           onRemoved={() => void refreshShelves()}
                         />
                       </div>
+                    ) : null}
+                    {view.started || view.finished || status !== "none" ? (
+                      <button
+                        type="button"
+                        className="btn-secondary mh-attach-btn"
+                        disabled={busy}
+                        onClick={() => {
+                          if (
+                            !window.confirm(
+                              `Start “${b.title}” over from the beginning? Your saved place will be cleared.`
+                            )
+                          ) {
+                            return;
+                          }
+                          void postAction({
+                            type: "resetReadingProgress",
+                            bookId: b.id,
+                          });
+                        }}
+                      >
+                        Restart progress
+                      </button>
                     ) : null}
                     <div className="mh-actions">
                       <form

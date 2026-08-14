@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { uploadFormData } from "@/lib/clientUpload";
 
 /** Compact owner control to attach/replace a cover image on a shelf title. */
 export function ShelfBookCoverAttach({
@@ -21,27 +22,42 @@ export function ShelfBookCoverAttach({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const [percent, setPercent] = useState<number | null>(null);
 
   async function upload(file: File) {
     setBusy(true);
     setError("");
     setStatus("");
+    setPercent(0);
     const form = new FormData();
     form.set("attachTo", bookId);
     form.set("cover", file);
-    const res = await fetch("/api/library/books", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json().catch(() => ({}));
-    setBusy(false);
-    if (inputRef.current) inputRef.current.value = "";
-    if (!res.ok) {
-      setError(data.error || "Could not attach cover");
-      return;
+    try {
+      const { ok, data } = await uploadFormData("/api/library/books", form, {
+        onProgress: setPercent,
+      });
+      setBusy(false);
+      setPercent(null);
+      if (inputRef.current) inputRef.current.value = "";
+      if (!ok) {
+        setError(
+          (typeof data.error === "string" && data.error) ||
+            "Could not attach cover"
+        );
+        return;
+      }
+      setStatus(hasCover ? "Cover replaced." : "Cover added.");
+      onAttached?.();
+    } catch (err) {
+      setBusy(false);
+      setPercent(null);
+      if (inputRef.current) inputRef.current.value = "";
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Upload failed — check your connection and try again"
+      );
     }
-    setStatus(hasCover ? "Cover replaced." : "Cover added.");
-    onAttached?.();
   }
 
   return (
@@ -56,7 +72,6 @@ export function ShelfBookCoverAttach({
           e.preventDefault();
           return;
         }
-        // Progressive enhancement: fetch when JS is alive.
         e.preventDefault();
         void upload(file);
       }}
@@ -71,7 +86,13 @@ export function ShelfBookCoverAttach({
             : `Add cover image for ${bookTitle}`
         }
       >
-        {busy ? "Uploading…" : hasCover ? "Replace cover" : "Add cover"}
+        {busy
+          ? percent != null
+            ? `Uploading ${percent}%…`
+            : "Uploading…"
+          : hasCover
+            ? "Replace cover"
+            : "Add cover"}
         <input
           ref={inputRef}
           className="mh-visually-hidden"
@@ -81,6 +102,17 @@ export function ShelfBookCoverAttach({
           disabled={busy}
         />
       </label>
+      {busy && percent != null ? (
+        <div
+          className="mh-upload-meter"
+          role="progressbar"
+          aria-valuenow={percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <span style={{ width: `${percent}%` }} />
+        </div>
+      ) : null}
       {error ? <p className="form-error">{error}</p> : null}
       {status ? <p className="form-success">{status}</p> : null}
     </form>

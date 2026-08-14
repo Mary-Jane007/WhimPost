@@ -21,6 +21,7 @@ import {
 } from "@/lib/libraryBooks";
 import {
   getReadingPositions,
+  resetUserReadingProgress,
   saveReadingPosition,
   type ReadingPositions,
 } from "@/lib/libraryReading";
@@ -279,6 +280,7 @@ export type LibraryAction =
       label?: string;
       reliable?: boolean;
     }
+  | { type: "resetReadingProgress"; bookId: string }
   | { type: "finishBook"; bookId: string; reflection?: string; quote?: string }
   | { type: "wishlist"; bookId: string; on: boolean }
   | { type: "readingStatus"; bookId: string; status: "none" | "reading" | "finished" }
@@ -360,6 +362,10 @@ export function applyLibraryAction(
     readingStatus[action.bookId] =
       pct >= 100 ? "finished" : pct > 0 ? "reading" : readingStatus[action.bookId] || "none";
     // Early return — saveReadingPosition already wrote progress columns.
+    return getLibraryProgress(userId);
+  } else if (action.type === "resetReadingProgress") {
+    resetUserReadingProgress(userId, action.bookId);
+    // Early return — reset already wrote progress columns.
     return getLibraryProgress(userId);
   } else if (action.type === "finishBook") {
     const book = findLibraryBook(action.bookId);

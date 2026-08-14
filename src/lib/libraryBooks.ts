@@ -852,3 +852,114 @@ export function deleteLibraryBook(id: string) {
 
   return { ok: true as const };
 }
+
+/**
+ * Remove only the attached EPUB/PDF from a shelf title.
+ * Keeps the book (metadata, cover, shelf place) intact.
+ */
+export function clearLibraryBookFile(bookId: string, createdBy: string) {
+  const id = bookId.trim();
+  if (!id) throw new Error("Book id required");
+
+  const existing = getLibraryBookRecord(id);
+  const catalog = findCatalogShelfBook(id);
+  const merged = findLibraryBook(id);
+  if (!existing && !catalog && !merged) {
+    throw new Error("That book is not on the library shelves");
+  }
+
+  const fileUrl = existing?.fileUrl || merged?.fileUrl || null;
+  if (!fileUrl) {
+    throw new Error("This book has no EPUB/PDF to remove");
+  }
+
+  const match = /\/api\/uploads\/([a-f0-9-]+\.[a-z0-9]+)$/i.exec(fileUrl);
+  if (match) {
+    const filePath = path.join(LIBRARY_UPLOAD_DIR, match[1]);
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch {
+        // ignore cleanup errors
+      }
+    }
+  }
+
+  const shelf: LibraryShelf =
+    existing?.shelf ||
+    catalog?.shelf ||
+    (listReadingListBooks().some((b) => b.id === id) ? "readinglist" : "club");
+
+  const club = catalog?.club;
+  const reading = catalog?.reading;
+  const readingMerged =
+    shelf === "readinglist" ? (merged as ReadingListBook | null) : null;
+  const clubMerged = shelf === "club" ? (merged as ClubBook | null) : null;
+
+  const record = upsertLibraryBook({
+    id,
+    shelf,
+    title:
+      existing?.title ||
+      club?.title ||
+      reading?.title ||
+      clubMerged?.title ||
+      readingMerged?.title ||
+      "Untitled",
+    author:
+      existing?.author ||
+      club?.author ||
+      reading?.author ||
+      clubMerged?.author ||
+      readingMerged?.author ||
+      "Unknown",
+    description:
+      existing?.description ||
+      club?.description ||
+      reading?.description ||
+      clubMerged?.description ||
+      readingMerged?.description ||
+      "",
+    minutes: existing?.minutes || club?.minutes || clubMerged?.minutes || 120,
+    coverEmoji:
+      existing?.coverEmoji ||
+      club?.coverEmoji ||
+      reading?.coverEmoji ||
+      clubMerged?.coverEmoji ||
+      readingMerged?.coverEmoji ||
+      "📖",
+    coverUrl:
+      existing?.coverUrl ?? clubMerged?.coverUrl ?? readingMerged?.coverUrl ?? null,
+    fileUrl: null,
+    fileName: null,
+    fileMime: null,
+    quotes: existing?.quotes?.length
+      ? existing.quotes
+      : club?.quotes || clubMerged?.quotes || [],
+    reflections: existing?.reflections?.length
+      ? existing.reflections
+      : club?.reflections || clubMerged?.reflections || [],
+    category:
+      existing?.category ||
+      reading?.category ||
+      readingMerged?.category ||
+      null,
+    difficulty:
+      existing?.difficulty ||
+      reading?.difficulty ||
+      readingMerged?.difficulty ||
+      null,
+    length:
+      existing?.length || reading?.length || readingMerged?.length || null,
+    mood: existing?.mood || reading?.mood || readingMerged?.mood || "",
+    themes: existing?.themes?.length
+      ? existing.themes
+      : reading?.themes || readingMerged?.themes || [],
+    rating: existing?.rating || reading?.rating || readingMerged?.rating || 4.5,
+    published: true,
+    createdBy,
+  });
+
+  // Keep reading progress — only an explicit restart (or a replaced EPUB) clears it.
+  return record;
+}

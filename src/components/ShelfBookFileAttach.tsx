@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { uploadFormData } from "@/lib/clientUpload";
 
 const MAX_BOOK_BYTES = 500 * 1024 * 1024;
 
@@ -25,7 +26,7 @@ export function ShelfBookFileAttach({
   const [status, setStatus] = useState("");
   const [percent, setPercent] = useState<number | null>(null);
 
-  function upload(file: File) {
+  async function upload(file: File) {
     if (file.size > MAX_BOOK_BYTES) {
       setError("Book files must be under 500MB");
       return;
@@ -39,40 +40,32 @@ export function ShelfBookFileAttach({
     form.set("attachTo", bookId);
     form.set("file", file);
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/library/books");
-    xhr.responseType = "json";
-    xhr.upload.onprogress = (ev) => {
-      if (!ev.lengthComputable) return;
-      setPercent(Math.min(99, Math.round((ev.loaded / ev.total) * 100)));
-    };
-    xhr.onload = () => {
+    try {
+      const { ok, data } = await uploadFormData("/api/library/books", form, {
+        onProgress: setPercent,
+      });
       setBusy(false);
       setPercent(null);
       if (inputRef.current) inputRef.current.value = "";
-      const data =
-        (xhr.response as { error?: string } | null) ||
-        (() => {
-          try {
-            return JSON.parse(xhr.responseText) as { error?: string };
-          } catch {
-            return {};
-          }
-        })();
-      if (xhr.status < 200 || xhr.status >= 300) {
-        setError(data.error || "Could not attach file");
+      if (!ok) {
+        setError(
+          (typeof data.error === "string" && data.error) ||
+            "Could not attach file"
+        );
         return;
       }
       setStatus(hasFile ? "File replaced." : "EPUB attached.");
       onAttached?.();
-    };
-    xhr.onerror = () => {
+    } catch (err) {
       setBusy(false);
       setPercent(null);
       if (inputRef.current) inputRef.current.value = "";
-      setError("Upload failed — check your connection and try again");
-    };
-    xhr.send(form);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Upload failed — check your connection and try again"
+      );
+    }
   }
 
   return (
@@ -88,7 +81,7 @@ export function ShelfBookFileAttach({
           return;
         }
         e.preventDefault();
-        upload(file);
+        void upload(file);
       }}
     >
       <input type="hidden" name="attachTo" value={bookId} />
@@ -117,6 +110,17 @@ export function ShelfBookFileAttach({
           disabled={busy}
         />
       </label>
+      {busy && percent != null ? (
+        <div
+          className="mh-upload-meter"
+          role="progressbar"
+          aria-valuenow={percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <span style={{ width: `${percent}%` }} />
+        </div>
+      ) : null}
       {error ? <p className="form-error">{error}</p> : null}
       {status ? <p className="form-success">{status}</p> : null}
     </form>

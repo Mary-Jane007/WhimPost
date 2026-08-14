@@ -35,6 +35,7 @@ export function ChronicleAdminEditor({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
 
   function applyPage(page: ChroniclePageContent | undefined) {
     if (!page) return;
@@ -115,19 +116,29 @@ export function ChronicleAdminEditor({
   async function uploadIllustration(file: File | null) {
     if (!file) return;
     setUploading(true);
+    setUploadPercent(0);
     setError("");
     try {
       const form = new FormData();
       form.set("image", file);
-      const res = await fetch("/api/uploads", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      setIllustrationUrl(data.url);
+      const { uploadFormData } = await import("@/lib/clientUpload");
+      const { ok, data } = await uploadFormData("/api/uploads", form, {
+        onProgress: setUploadPercent,
+      });
+      if (!ok) {
+        throw new Error(
+          (typeof data.error === "string" && data.error) || "Upload failed"
+        );
+      }
+      const url = typeof data.url === "string" ? data.url : "";
+      if (!url) throw new Error("Upload failed");
+      setIllustrationUrl(url);
       setStatus("Illustration attached — save the page to publish it.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
+      setUploadPercent(null);
     }
   }
 
@@ -225,7 +236,13 @@ export function ChronicleAdminEditor({
           />
         </label>
         <label className="lc-admin-upload">
-          <span>{uploading ? "Uploading…" : "Upload illustration"}</span>
+          <span>
+            {uploading
+              ? uploadPercent != null
+                ? `Uploading ${uploadPercent}%…`
+                : "Uploading…"
+              : "Upload illustration"}
+          </span>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
@@ -237,6 +254,17 @@ export function ChronicleAdminEditor({
             }}
           />
         </label>
+        {uploading && uploadPercent != null ? (
+          <div
+            className="mh-upload-meter"
+            role="progressbar"
+            aria-valuenow={uploadPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <span style={{ width: `${uploadPercent}%` }} />
+          </div>
+        ) : null}
 
         <label>
           Unlock requirement
