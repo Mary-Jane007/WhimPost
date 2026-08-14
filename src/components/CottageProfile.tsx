@@ -256,7 +256,9 @@ export function CottageProfile({
               {shareVillage && (
                 <p className="muted">
                   You share a village — wave from the{" "}
-                  <Link href="/village">Meeting Bench</Link>.
+                  <Link href="/meeting-bench">Meeting Bench</Link>, or visit
+                  neighbors from the{" "}
+                  <Link href="/village">Village Square</Link>.
                 </p>
               )}
             </div>

@@ -198,11 +198,15 @@ export function mascotForSystemSender(senderId: string): {
   };
 }
 
-export const SHARED_FEATURES = [
+export const SHARED_FEATURES: Array<{
+  emoji: string;
+  name: string;
+  href?: string;
+}> = [
   { emoji: "🏘️", name: "Village Square" },
   { emoji: "📮", name: "Post Office" },
   { emoji: "🌳", name: "Notice Board" },
-  { emoji: "🪑", name: "Meeting Bench" },
+  { emoji: "🪑", name: "Meeting Bench", href: "/meeting-bench" },
   { emoji: "📬", name: "Daily Mail" },
 ];
 

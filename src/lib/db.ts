@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
 import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
+import { importPersistentMeetingBench } from "@/lib/persistentMeetingBench";
 import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
 import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
@@ -435,6 +436,36 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_library_annotations_user_book
       ON library_annotations(user_id, book_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS meeting_bench_items (
+      id TEXT PRIMARY KEY,
+      kind TEXT NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'published',
+      season TEXT,
+      starts_at TEXT,
+      ends_at TEXT,
+      activity_type TEXT,
+      villages_json TEXT NOT NULL DEFAULT '"all"',
+      cta_label TEXT,
+      cta_href TEXT,
+      pinned INTEGER NOT NULL DEFAULT 0,
+      sort_order INTEGER NOT NULL DEFAULT 50,
+      meta_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      created_by TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_meeting_bench_kind
+      ON meeting_bench_items(kind, pinned, sort_order);
+
+    CREATE TABLE IF NOT EXISTS meeting_bench_rsvps (
+      item_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (item_id, user_id)
+    );
   `);
 
   // Column backfills must run after CREATE TABLE so fresh DBs don't fail.
@@ -590,6 +621,12 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-moon-sounds] import failed:", err);
   }
+  // Restore Meeting Bench living-world board.
+  try {
+    importPersistentMeetingBench(db);
+  } catch (err) {
+    console.error("[persistent-meeting-bench] import failed:", err);
+  }
   return db;
 }
 
@@ -628,6 +665,11 @@ export function getDb() {
         importPersistentMoonSounds(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-moon-sounds] import failed:", err);
+      }
+      try {
+        importPersistentMeetingBench(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-meeting-bench] import failed:", err);
       }
       try {
         importPersistentWelcomeLetters(globalForDb.whimpostDb);

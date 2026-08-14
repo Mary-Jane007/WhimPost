@@ -54,6 +54,8 @@ next-env.d.ts
 !/data/persistent-site-uploads.json
 # Keep village welcome letters + first-visit memory across fresh servers.
 !/data/persistent-welcome-letters.json
+# Keep Meeting Bench living-world board across fresh servers.
+!/data/persistent-meeting-bench.json
 /data/tv-cache/
 /data/.media-release-staging/
 # Track celestial audio in git (release shelf is the durable backup).

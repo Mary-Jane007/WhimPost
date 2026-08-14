@@ -41,6 +41,7 @@ export function SiteNav({
       ? [{ href: "/observatory", label: "Observatory" }]
       : []),
     { href: "/tv-corner", label: "TV Corner" },
+    { href: "/meeting-bench", label: "Meeting Bench" },
     { href: "/inbox", label: "Inbox", badgeKey: "inbox" },
     { href: "/sent", label: "Sent" },
     { href: "/compose", label: "Write" },

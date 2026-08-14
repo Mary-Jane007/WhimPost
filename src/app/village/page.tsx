@@ -26,6 +26,7 @@ import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
 import { LostChronicles } from "@/components/LostChronicles";
 import { ChronicleAdminEditor } from "@/components/ChronicleAdminEditor";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
+import { MeetingBenchTeaser } from "@/components/MeetingBenchTeaser";
 import { VillageMascot } from "@/components/VillageMascot";
 import {
   deliverWelcomeLetter,
@@ -33,6 +34,7 @@ import {
 } from "@/lib/welcomeLetters";
 import { markUnlocksSeen } from "@/lib/notifications";
 import { getChronicleProgress } from "@/lib/chronicle";
+import { getMeetingBenchTeaser } from "@/lib/meetingBench";
 import {
   getBookClubRotation,
   listClubBooks,
@@ -69,6 +71,7 @@ export default async function VillagePage() {
     user.id,
     stats.villageId as VillageId
   );
+  const meetingBenchTeaser = getMeetingBenchTeaser();
 
   const neighbors = db
     .prepare(
@@ -229,12 +232,19 @@ export default async function VillagePage() {
         </h2>
         <p className="section-lead">Your village&apos;s special heart.</p>
         <div className="village-features">
-          {SHARED_FEATURES.map((f) => (
-            <div key={f.name} className="feature-chip">
-              <span aria-hidden>{f.emoji}</span>
-              {f.name}
-            </div>
-          ))}
+          {SHARED_FEATURES.map((f) =>
+            f.href ? (
+              <Link key={f.name} href={f.href} className="feature-chip">
+                <span aria-hidden>{f.emoji}</span>
+                {f.name}
+              </Link>
+            ) : (
+              <div key={f.name} className="feature-chip">
+                <span aria-hidden>{f.emoji}</span>
+                {f.name}
+              </div>
+            )
+          )}
         </div>
         <div className="unlock-row">
           {unlockLabels.map((label, i) => (
@@ -332,13 +342,15 @@ export default async function VillagePage() {
 
       <NoticeBoard initialNotes={notes} />
 
+      <MeetingBenchTeaser teaser={meetingBenchTeaser} />
+
       <section className="village-panel">
-        <h2>🪑 Meeting Bench</h2>
-        <p className="section-lead">Neighbors in {village.name}</p>
+        <h2>Neighbors on the path</h2>
+        <p className="section-lead">Villagers sharing {village.name} with you</p>
         {neighbors.length === 0 ? (
           <p className="muted">
             You&apos;re the first here for now. Invite friends — when they join{" "}
-            {village.name}, they&apos;ll appear on this bench.
+            {village.name}, they&apos;ll appear here.
           </p>
         ) : (
           <ul className="user-list">

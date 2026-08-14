@@ -385,6 +385,7 @@ export async function runDurableTvGitSync(): Promise<{
         "data/persistent-site-uploads.json",
         "data/persistent-accounts.json",
         "data/persistent-welcome-letters.json",
+        "data/persistent-meeting-bench.json",
         ...uploadPaths,
       ]);
 
@@ -423,6 +424,7 @@ export async function runDurableTvGitSync(): Promise<{
             line === "data/persistent-site-uploads.json" ||
             line === "data/persistent-accounts.json" ||
             line === "data/persistent-welcome-letters.json" ||
+            line === "data/persistent-meeting-bench.json" ||
             (line.startsWith("data/uploads/") &&
               !line.includes("/.incoming/") &&
               !line.includes("/.media-release-staging/"))
