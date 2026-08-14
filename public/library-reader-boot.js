@@ -271,36 +271,71 @@
 
     rendition.on("rendered", function () {
       expandChapter();
-      setTimeout(expandChapter, 50);
-      setTimeout(expandChapter, 250);
-      setTimeout(expandChapter, 800);
+      setTimeout(expandChapter, 320);
     });
 
     try {
-      // Start page first — a stale resume CFI after re-upload can hang forever.
-      await rendition.display();
+      rendition.hooks &&
+        rendition.hooks.content &&
+        rendition.hooks.content.register(function (contents) {
+          try {
+            if (contents.overflow) contents.overflow("visible");
+          } catch (_) {}
+        });
+    } catch (_) {}
+
+    try {
+      // Paint once at the saved place when possible — avoid start page then jump.
+      var openedAtTarget = false;
       if (resumeCfi) {
         try {
           await Promise.race([
-            rendition.display(resumeCfi),
-            new Promise(function (resolve) {
-              setTimeout(resolve, 2000);
+            rendition.display(resumeCfi).then(function () {
+              openedAtTarget = true;
+            }),
+            new Promise(function (_, reject) {
+              setTimeout(function () {
+                reject(new Error("resume timeout"));
+              }, 1800);
             }),
           ]);
-        } catch (_) {}
+        } catch (_) {
+          openedAtTarget = false;
+        }
+      }
+      if (!openedAtTarget) {
+        await rendition.display();
       }
     } catch (_) {
       await rendition.display();
     }
 
+    expandChapter();
+
+    var lastW = width;
+    var lastH = height;
+    var resizeTimer = null;
     function resize() {
       var r = mount.getBoundingClientRect();
       var w = Math.max(280, Math.floor(r.width || mount.clientWidth || width));
       var h = Math.max(320, Math.floor(r.height || mount.clientHeight || height));
+      if (Math.abs(w - lastW) < 2 && Math.abs(h - lastH) < 2) {
+        expandChapter();
+        return;
+      }
+      lastW = w;
+      lastH = h;
       if (w > 0 && h > 0) rendition.resize(w, h);
+      expandChapter();
     }
-    window.addEventListener("resize", resize);
-    setTimeout(resize, 80);
+    function scheduleResize() {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        resizeTimer = null;
+        resize();
+      }, 160);
+    }
+    window.addEventListener("resize", scheduleResize);
     setTimeout(resize, 280);
     wireNav(rendition);
 

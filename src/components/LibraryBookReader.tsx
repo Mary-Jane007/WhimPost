@@ -135,6 +135,8 @@ function expandChapterToFullHeight(host: HTMLElement) {
       480
     );
     const next = `${Math.ceil(contentHeight + 48)}px`;
+    // Skip no-op updates — repeated height writes were causing open-time flinch.
+    if (iframe.style.height === next) return;
     iframe.style.height = next;
     iframe.style.maxHeight = "none";
     iframe.style.overflow = "visible";
@@ -147,6 +149,13 @@ function expandChapterToFullHeight(host: HTMLElement) {
   } catch {
     // Cross-origin / not ready yet — ignore.
   }
+}
+
+function scheduleExpand(host: HTMLElement, timers: number[]) {
+  const run = () => expandChapterToFullHeight(host);
+  run();
+  // One late pass for images/fonts — avoid the old 4-step height stair-step.
+  timers.push(window.setTimeout(run, 320));
 }
 
 const CHAPTER_THEME = {
@@ -782,12 +791,10 @@ export function LibraryBookReader({
 
       rendition.themes.default(CHAPTER_THEME);
 
+      const expandTimers: number[] = [];
       rendition.on("rendered", () => {
         if (!stillMine()) return;
-        expandChapterToFullHeight(mount);
-        window.setTimeout(() => expandChapterToFullHeight(mount), 50);
-        window.setTimeout(() => expandChapterToFullHeight(mount), 250);
-        window.setTimeout(() => expandChapterToFullHeight(mount), 800);
+        scheduleExpand(mount, expandTimers);
       });
 
       try {
@@ -812,21 +819,9 @@ export function LibraryBookReader({
         // older vendor builds may omit hooks
       }
 
-      await rendition.display();
-      if (!stillMine()) {
-        abandonBook();
-        mount.innerHTML = "";
-        return null;
-      }
-
-      if (!mount.querySelector("iframe")) {
-        abandonBook();
-        mount.innerHTML = "";
-        return null;
-      }
-
-      expandChapterToFullHeight(mount);
-      return rendition;
+      // Do not display yet — caller shows the resume/start target once so the
+      // page does not flash the beginning and then jump.
+      return { rendition, expandTimers };
     }
 
     async function openEpub() {
@@ -838,9 +833,12 @@ export function LibraryBookReader({
         if (!stillMine()) return;
 
         let lastError: Error | null = null;
-        let rendition: ReturnType<EpubBookApi["renderTo"]> | null = null;
+        let painted: {
+          rendition: ReturnType<EpubBookApi["renderTo"]>;
+          expandTimers: number[];
+        } | null = null;
 
-        for (let attempt = 0; attempt < 2 && !rendition; attempt += 1) {
+        for (let attempt = 0; attempt < 2 && !painted; attempt += 1) {
           try {
             const res = await fetch(fileUrl, {
               credentials: "include",
@@ -877,7 +875,10 @@ export function LibraryBookReader({
               );
             }
 
-            rendition = await paintBook(ePub, buffer);
+            painted = await paintBook(ePub, buffer);
+            if (!painted) {
+              throw new Error("Could not open this EPUB");
+            }
           } catch (err) {
             lastError =
               err instanceof Error ? err : new Error("Could not open this EPUB");
@@ -889,65 +890,110 @@ export function LibraryBookReader({
         }
 
         if (!stillMine()) return;
-        if (!rendition || !book || !host) {
+        if (!painted || !book || !host) {
           throw lastError || new Error("Could not open this EPUB");
         }
 
+        const { rendition, expandTimers } = painted;
         const mount = host;
+
+        // Single first paint: resume CFI if present, otherwise beginning.
+        // Never display start then jump — that was the open-time flinch.
+        const cfiToResume = resumeCfiRef.current;
+        let openedAtTarget = false;
+        if (cfiToResume) {
+          try {
+            await Promise.race([
+              rendition.display(cfiToResume).then(() => {
+                openedAtTarget = true;
+              }),
+              new Promise<void>((_, reject) => {
+                window.setTimeout(
+                  () => reject(new Error("resume timeout")),
+                  1800
+                );
+              }),
+            ]);
+          } catch {
+            openedAtTarget = false;
+          }
+        }
+        if (!openedAtTarget) {
+          await rendition.display();
+        }
+        if (!stillMine()) {
+          abandonBook();
+          mount.innerHTML = "";
+          return;
+        }
+
+        if (!mount.querySelector("iframe")) {
+          abandonBook();
+          mount.innerHTML = "";
+          throw lastError || new Error("Could not open this EPUB");
+        }
+
+        expandChapterToFullHeight(mount);
+
+        let lastSize = measure();
+        let resizeTimer: number | null = null;
         const doResize = () => {
           const size = measure();
+          if (
+            Math.abs(size.width - lastSize.width) < 2 &&
+            Math.abs(size.height - lastSize.height) < 2
+          ) {
+            expandChapterToFullHeight(mount);
+            return;
+          }
+          lastSize = size;
           if (size.width > 0 && size.height > 0) {
             try {
-              rendition!.resize(size.width, size.height);
+              rendition.resize(size.width, size.height);
             } catch {
               // ignore
             }
           }
           expandChapterToFullHeight(mount);
         };
+        const scheduleResize = () => {
+          if (resizeTimer) window.clearTimeout(resizeTimer);
+          resizeTimer = window.setTimeout(() => {
+            resizeTimer = null;
+            doResize();
+          }, 160);
+        };
 
         navRef.current = {
           next: () => {
-            void rendition!.next();
+            void rendition.next();
             window.setTimeout(() => expandChapterToFullHeight(mount), 80);
           },
           prev: () => {
-            void rendition!.prev();
+            void rendition.prev();
             window.setTimeout(() => expandChapterToFullHeight(mount), 80);
           },
           display: (href?: string) => {
-            void (href ? rendition!.display(href) : rendition!.display());
+            void (href ? rendition.display(href) : rendition.display());
             window.setTimeout(() => expandChapterToFullHeight(mount), 80);
           },
           resize: doResize,
         };
 
-        setLoading(false);
-        doResize();
-
-        const cfiToResume = resumeCfiRef.current;
-        if (cfiToResume) {
-          try {
-            await Promise.race([
-              rendition.display(cfiToResume),
-              new Promise<void>((resolve) => {
-                window.setTimeout(resolve, 2000);
-              }),
-            ]);
-            expandChapterToFullHeight(mount);
-          } catch {
-            // Keep the start page — resume is best-effort.
-          }
-        }
-
+        // Reveal only after the first real page is in place.
+        await new Promise<void>((resolve) =>
+          window.requestAnimationFrame(() => resolve())
+        );
         if (!stillMine()) return;
+        setLoading(false);
 
-        window.setTimeout(doResize, 50);
-        window.setTimeout(doResize, 200);
-        window.setTimeout(doResize, 600);
-        window.setTimeout(doResize, 1500);
+        // One settle pass after fonts/layout — not a multi-second resize storm.
+        window.setTimeout(() => {
+          if (!stillMine()) return;
+          doResize();
+        }, 280);
 
-        observer = new ResizeObserver(() => doResize());
+        observer = new ResizeObserver(() => scheduleResize());
         observer.observe(mount);
 
         rendition.on("relocated", (location: unknown) => {
@@ -984,6 +1030,9 @@ export function LibraryBookReader({
             // Some EPUBs still work without locations.
           }
         })();
+
+        // Keep expandTimers alive for cleanup via observer teardown path.
+        void expandTimers;
       } catch (err) {
         if (!stillMine()) return;
         setLoading(false);
@@ -1221,7 +1270,7 @@ export function LibraryBookReader({
             {kind === "epub" ? (
               <div
                 ref={viewerRef}
-                className="mh-reader-epub"
+                className={`mh-reader-epub${loading ? " is-opening" : ""}`}
                 data-file-url={fileUrl}
                 data-book-id={bookId}
                 data-resume-cfi={resumeCfi || ""}

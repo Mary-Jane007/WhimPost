@@ -7352,6 +7352,13 @@ button.linkish:hover {
   overflow: hidden;
 }
 
+/* Keep the stage blank until the first real page is ready (no start→jump flinch). */
+.mh-reader-epub.is-opening {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .mh-reader-epub > .epub-container,
 .mh-reader-epub .epub-container {
   width: 100% !important;
