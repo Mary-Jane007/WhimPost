@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T17:54:05.460Z",
+  "updatedAt": "2026-08-14T18:31:38.080Z",
   "books": [
     {
       "id": "princess",
@@ -341,7 +341,7 @@
       "minutes": 180,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/e6d47816-6a01-40b7-8c47-114fa92b8830.jpg",
-      "fileUrl": "/api/uploads/5a7f83ff-71e6-40e1-b6bf-4a3fff416cd3.epub",
+      "fileUrl": "/api/uploads/6af4ca8a-d0a7-4e08-a5b6-90813a332c16.epub",
       "fileName": "White_Nights-Fyodor_Dostoevsky.epub",
       "fileMime": "application/epub+zip",
       "quotesJson": "[]",
