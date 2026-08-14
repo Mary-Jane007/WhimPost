@@ -9,6 +9,7 @@ import {
 } from "@/lib/requestBody";
 import { isVillageId } from "@/lib/villages";
 import { deliverWelcomeLetter } from "@/lib/welcomeLetters";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 
 /** Join or switch village (for accounts created before villages existed). */
 export async function POST(req: NextRequest) {
@@ -32,6 +33,12 @@ export async function POST(req: NextRequest) {
   );
   deliverWelcomeLetter(db, user.id, villageId);
   exportPersistentAccounts(db);
+  trackAnalyticsEvent({
+    event: "village_joined",
+    userId: user.id,
+    villageId,
+    path: "/village",
+  });
 
   const row = db
     .prepare(

@@ -47,6 +47,9 @@ export function SiteNav({
     { href: "/compose", label: "Write" },
     { href: "/friends", label: "Friends", badgeKey: "friends" },
     { href: "/profile", label: "Profile" },
+    ...(user?.isOwner
+      ? [{ href: "/admin/analytics", label: "Analytics" }]
+      : []),
   ];
 
   return (

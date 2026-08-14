@@ -14,6 +14,7 @@ import {
   redirectSameHost,
   wantsHtmlRedirect,
 } from "@/lib/requestBody";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 
 export async function POST(req: NextRequest) {
   const fields = await readRequestFields(req);
@@ -79,6 +80,13 @@ export async function POST(req: NextRequest) {
   const token = await createSessionToken({
     userId: refreshed.id,
     username: refreshed.username,
+  });
+
+  trackAnalyticsEvent({
+    event: "user_login",
+    userId: refreshed.id,
+    villageId: refreshed.village_id,
+    path: "/login",
   });
 
   if (wantsHtmlRedirect(req)) {
