@@ -5467,6 +5467,85 @@ button.linkish:hover {
     rgba(12, 10, 8, 0.82)
   );
   pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.tv-screen:hover .tv-now-osd,
+.tv-screen:focus-within .tv-now-osd,
+.tv-screen.is-fullscreen:hover .tv-now-osd {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tv-screen-hud {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 4;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none;
+}
+
+.tv-screen:hover .tv-screen-hud,
+.tv-screen:focus-within .tv-screen-hud {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tv-fullscreen-btn {
+  border: 1px solid rgba(243, 230, 208, 0.35);
+  background: rgba(12, 10, 8, 0.72);
+  color: var(--cream, #f3e6d0);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.tv-fullscreen-btn:hover {
+  background: rgba(20, 16, 12, 0.88);
+  border-color: rgba(243, 230, 208, 0.55);
+}
+
+.tv-screen:fullscreen,
+.tv-screen.is-fullscreen:fullscreen {
+  aspect-ratio: auto;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  background: #050806;
+  animation: none;
+  box-shadow: none;
+}
+
+.tv-screen:fullscreen .tv-video,
+.tv-screen.is-fullscreen:fullscreen .tv-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.tv-screen:fullscreen .tv-scanlines,
+.tv-screen:fullscreen .tv-vignette {
+  opacity: 0.35;
+}
+
+@media (hover: none) {
+  /* Touch devices: a brief tap/focus still reveals the overlays. */
+  .tv-screen:focus-within .tv-now-osd,
+  .tv-screen:focus-within .tv-screen-hud {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
 }
 
 .tv-now-osd-label {

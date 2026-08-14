@@ -125,8 +125,10 @@ export function TvCorner({
   const [error, setError] = useState<string | null>(null);
   const [powerOn, setPowerOn] = useState(true);
   const [hydrated, setHydrated] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const screenRef = useRef<HTMLDivElement | null>(null);
   const suppressUntil = useRef(0);
   const roomIdRef = useRef(room.id);
   const applyingRemote = useRef(false);
@@ -137,6 +139,29 @@ export function TvCorner({
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    function onFullscreenChange() {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    }
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  async function toggleFullscreen() {
+    const el = screenRef.current;
+    if (!el) return;
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await el.requestFullscreen();
+      }
+    } catch {
+      setError("Full screen isn’t available in this browser");
+    }
+  }
 
   const activeChannel = useMemo(
     () => channels.find((c) => c.id === room.currentChannelId) || null,
@@ -864,7 +889,13 @@ export function TvCorner({
               <span />
             </div>
             <div className="tv-bezel">
-              <div className={`tv-screen ${powerOn ? "on" : "off"}`}>
+              <div
+                ref={screenRef}
+                className={`tv-screen ${powerOn ? "on" : "off"}${
+                  isFullscreen ? " is-fullscreen" : ""
+                }`}
+                tabIndex={0}
+              >
                 {powerOn && room.currentVideo ? (
                   <>
                     <video
@@ -909,12 +940,30 @@ export function TvCorner({
                     {scheduleMode ? (
                       <div className="tv-now-osd" aria-live="polite">
                         <p className="tv-now-osd-label">Now playing</p>
-                        <p className="tv-now-osd-title">{room.currentVideo.title}</p>
+                        <p className="tv-now-osd-title">
+                          {room.currentVideo.title}
+                        </p>
                         {activeChannel ? (
-                          <p className="tv-now-osd-channel">{activeChannel.title}</p>
+                          <p className="tv-now-osd-channel">
+                            {activeChannel.title}
+                          </p>
                         ) : null}
                       </div>
                     ) : null}
+                    <div className="tv-screen-hud">
+                      <button
+                        type="button"
+                        className="tv-fullscreen-btn"
+                        onClick={() => void toggleFullscreen()}
+                        aria-label={
+                          isFullscreen
+                            ? "Exit full screen"
+                            : "Watch in full screen"
+                        }
+                      >
+                        {isFullscreen ? "Exit full screen" : "Full screen"}
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <div className="tv-idle">
@@ -967,6 +1016,18 @@ export function TvCorner({
               >
                 <span />
                 Channel
+              </button>
+              <button
+                type="button"
+                className="tv-knob"
+                onClick={() => void toggleFullscreen()}
+                disabled={!powerOn || !room.currentVideo}
+                aria-label={
+                  isFullscreen ? "Exit full screen" : "Watch in full screen"
+                }
+              >
+                <span />
+                {isFullscreen ? "Exit" : "Full"}
               </button>
             </div>
           </div>
