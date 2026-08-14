@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:20:25.264Z",
+  "updatedAt": "2026-08-14T19:22:04.682Z",
   "books": [
     {
       "id": "princess",
@@ -154,6 +154,28 @@
       "mood": "Epic",
       "themesJson": "[\"middle ages\",\"plague\",\"power\"]",
       "rating": 4.4,
+      "published": true
+    },
+    {
+      "id": "lib-658211d4-03d8-4cd1-8764-84a9112d519f",
+      "shelf": "readinglist",
+      "title": "A Silent Witness",
+      "author": "R. Austin Freeman",
+      "description": "A Silent Witness is a Dr Thorndyke mystery by R. Austin Freeman, first published in 1914. Walking home across Hampstead Heath one foggy night, the young doctor Humphrey Jardine stumbles on the body of a man, only for it to vanish before the police arrive. Drawn into the puzzle, and into a romance along the way, he turns to the medical jurist Dr John Thorndyke, whose careful reading of physical evidence slowly builds the truth. Freeman was the master of the scientific detective story, and here he shows how a single fibre, a footprint, or a trace of poison can convict where guesswork fails. This free PDF and EPUB delivers the full novel for lovers of classic crime fiction.",
+      "minutes": 180,
+      "coverEmoji": "📖",
+      "coverUrl": null,
+      "fileUrl": null,
+      "fileName": null,
+      "fileMime": null,
+      "quotesJson": "[]",
+      "reflectionsJson": "[]",
+      "category": "Mystery",
+      "difficulty": "Dense",
+      "length": "Medium",
+      "mood": "Thrilling",
+      "themesJson": "[]",
+      "rating": 4.5,
       "published": true
     },
     {
