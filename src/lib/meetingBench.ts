@@ -584,6 +584,7 @@ function getItemById(id: string) {
 export function updateMeetingBenchItem(
   id: string,
   patch: Partial<{
+    kind: BenchItemKind;
     title: string;
     body: string;
     status: BenchItemStatus;
@@ -610,11 +611,12 @@ export function updateMeetingBenchItem(
   const db = getDb();
   db.prepare(
     `UPDATE meeting_bench_items SET
-       title = ?, body = ?, status = ?, season = ?, starts_at = ?, ends_at = ?,
+       kind = ?, title = ?, body = ?, status = ?, season = ?, starts_at = ?, ends_at = ?,
        activity_type = ?, villages_json = ?, cta_label = ?, cta_href = ?,
        pinned = ?, sort_order = ?, meta_json = ?, updated_at = datetime('now')
      WHERE id = ?`
   ).run(
+    patch.kind ?? existing.kind,
     title,
     body,
     patch.status ?? existing.status,
@@ -636,6 +638,29 @@ export function updateMeetingBenchItem(
   );
   persistSafe(db);
   return { ok: true as const, item: getItemById(id)! };
+}
+
+/** Owner convenience: clone an item as a new draftable paper. */
+export function duplicateMeetingBenchItem(id: string, createdBy: string) {
+  const existing = getItemById(id);
+  if (!existing) return { ok: false as const, error: "Item not found" };
+  return createMeetingBenchItem({
+    kind: existing.kind,
+    title: `${existing.title} (copy)`,
+    body: existing.body,
+    status: existing.status === "archived" ? "draft" : existing.status,
+    season: existing.season,
+    startsAt: existing.startsAt,
+    endsAt: existing.endsAt,
+    activityType: existing.activityType,
+    villages: existing.villages,
+    ctaLabel: existing.ctaLabel,
+    ctaHref: existing.ctaHref,
+    pinned: false,
+    sortOrder: existing.sortOrder + 1,
+    meta: existing.meta,
+    createdBy,
+  });
 }
 
 export function deleteMeetingBenchItem(id: string) {

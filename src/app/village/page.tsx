@@ -342,7 +342,7 @@ export default async function VillagePage() {
 
       <NoticeBoard initialNotes={notes} />
 
-      <MeetingBenchTeaser teaser={meetingBenchTeaser} />
+      <MeetingBenchTeaser teaser={meetingBenchTeaser} isOwner={user.isOwner} />
 
       <section className="village-panel">
         <h2>Neighbors on the path</h2>

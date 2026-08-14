@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import {
   createMeetingBenchItem,
   deleteMeetingBenchItem,
+  duplicateMeetingBenchItem,
   getMeetingBenchBoard,
   getMeetingBenchTeaser,
   listMeetingBenchItems,
@@ -151,6 +152,11 @@ export async function PATCH(req: NextRequest) {
   if (!body?.id) return jsonError("Missing item id");
 
   const patch: Parameters<typeof updateMeetingBenchItem>[1] = {};
+  if (body.kind !== undefined) {
+    const kind = String(body.kind) as BenchItemKind;
+    if (!KINDS.has(kind)) return jsonError("Unknown board kind");
+    patch.kind = kind;
+  }
   if (body.title !== undefined) patch.title = String(body.title);
   if (body.body !== undefined) patch.body = String(body.body);
   if (body.status !== undefined) {
@@ -212,4 +218,27 @@ export async function DELETE(req: NextRequest) {
   const result = deleteMeetingBenchItem(id);
   if (!result.ok) return jsonError(result.error);
   return NextResponse.json({ ok: true, board: getMeetingBenchBoard() });
+}
+
+/** Duplicate an existing paper onto the board (owner only). */
+export async function PUT(req: NextRequest) {
+  const gate = await requireOwner();
+  if ("error" in gate) return gate.error;
+
+  const body = (await req.json().catch(() => null)) as {
+    action?: string;
+    id?: string;
+  } | null;
+  if (!body?.id) return jsonError("Missing item id");
+  if (body.action !== "duplicate") {
+    return jsonError("Unknown action");
+  }
+
+  const result = duplicateMeetingBenchItem(String(body.id), gate.user.id);
+  if (!result.ok) return jsonError(result.error);
+  return NextResponse.json({
+    item: result.item,
+    board: getMeetingBenchBoard(),
+    items: listMeetingBenchItems({ includeDrafts: true, userId: gate.user.id }),
+  });
 }

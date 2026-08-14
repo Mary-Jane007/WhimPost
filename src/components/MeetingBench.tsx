@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { BenchItem } from "@/lib/meetingBench";
+import type { BenchItem, BenchItemKind } from "@/lib/meetingBench";
 import { VILLAGES, type VillageId } from "@/lib/villages";
 
 export type MeetingBenchBoard = {
@@ -63,10 +63,64 @@ function SeasonDecor({ season }: { season: string }) {
   );
 }
 
-function NoticeSlip({ item }: { item: BenchItem }) {
+function OwnerBar({
+  isOwner,
+  onEdit,
+  onAdd,
+  kind,
+}: {
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
+  onAdd?: (kind: BenchItemKind) => void;
+  kind?: BenchItemKind;
+  itemId?: string;
+}) {
+  if (!isOwner) return null;
+  return (
+    <div className="mb-owner-bar">
+      {onAdd && kind ? (
+        <button type="button" className="nav-ghost" onClick={() => onAdd(kind)}>
+          + Add
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function EditBtn({
+  isOwner,
+  itemId,
+  onEdit,
+}: {
+  isOwner?: boolean;
+  itemId: string;
+  onEdit?: (id: string) => void;
+}) {
+  if (!isOwner || !onEdit) return null;
+  return (
+    <button
+      type="button"
+      className="mb-edit-btn"
+      onClick={() => onEdit(itemId)}
+    >
+      Edit
+    </button>
+  );
+}
+
+function NoticeSlip({
+  item,
+  isOwner,
+  onEdit,
+}: {
+  item: BenchItem;
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
+}) {
   return (
     <article className={`mb-slip ${item.pinned ? "is-pinned" : ""}`}>
       {item.pinned ? <span className="mb-pin" aria-hidden /> : null}
+      <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEdit} />
       <h3>{item.title}</h3>
       <p>{item.body}</p>
       <div className="mb-slip-meta">
@@ -85,14 +139,19 @@ function GatheringCard({
   item,
   onRsvp,
   busy,
+  isOwner,
+  onEdit,
 }: {
   item: BenchItem;
   onRsvp: (id: string) => void;
   busy: boolean;
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
 }) {
   const when = formatWhen(item.startsAt);
   return (
     <article className={`mb-gathering status-${item.status}`}>
+      <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEdit} />
       <div className="mb-gathering-top">
         <span className="mb-status">{statusLabel(item.status)}</span>
         {item.activityType ? (
@@ -128,9 +187,18 @@ function GatheringCard({
   );
 }
 
-function ChronicleStory({ item }: { item: BenchItem }) {
+function ChronicleStory({
+  item,
+  isOwner,
+  onEdit,
+}: {
+  item: BenchItem;
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
+}) {
   return (
     <article className="mb-chronicle-story">
+      <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEdit} />
       <h3>{item.title}</h3>
       <p>
         <em>{item.body}</em>
@@ -144,10 +212,14 @@ function CommunityEvent({
   item,
   onRsvp,
   busy,
+  isOwner,
+  onEdit,
 }: {
   item: BenchItem;
   onRsvp: (id: string) => void;
   busy: boolean;
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
 }) {
   const tasks =
     item.meta &&
@@ -158,6 +230,7 @@ function CommunityEvent({
 
   return (
     <article className="mb-community">
+      <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEdit} />
       <div className="mb-gathering-top">
         <span className="mb-status">{statusLabel(item.status)}</span>
         {item.season ? <span className="mb-type">{item.season}</span> : null}
@@ -191,24 +264,67 @@ function CommunityEvent({
             ? "Joined the gathering"
             : item.ctaLabel || "Join in"}
         </button>
-        <em>
-          {item.rsvpCount || 0} across the villages
-        </em>
+        <em>{item.rsvpCount || 0} across the villages</em>
       </div>
     </article>
   );
 }
 
+function SectionHead({
+  title,
+  lead,
+  kind,
+  isOwner,
+  onAdd,
+}: {
+  title: string;
+  lead: string;
+  kind: BenchItemKind;
+  isOwner?: boolean;
+  onAdd?: (kind: BenchItemKind) => void;
+}) {
+  return (
+    <header className="mb-section-head">
+      <div>
+        <h2>{title}</h2>
+        <p>{lead}</p>
+      </div>
+      <OwnerBar isOwner={isOwner} onAdd={onAdd} kind={kind} />
+    </header>
+  );
+}
+
 export function MeetingBench({
   initialBoard,
+  board: controlledBoard,
   canRsvp = true,
+  isOwner = false,
+  onEditItem,
+  onAddKind,
 }: {
   initialBoard: MeetingBenchBoard;
+  board?: MeetingBenchBoard;
   canRsvp?: boolean;
+  isOwner?: boolean;
+  onEditItem?: (id: string) => void;
+  onAddKind?: (kind: BenchItemKind) => void;
 }) {
-  const [board, setBoard] = useState(initialBoard);
+  const baseBoard = controlledBoard ?? initialBoard;
+  const [rsvpPatches, setRsvpPatches] = useState<
+    Record<string, Pick<BenchItem, "rsvpCount" | "userJoined">>
+  >({});
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  const board = {
+    ...baseBoard,
+    gatherings: baseBoard.gatherings.map((g) =>
+      rsvpPatches[g.id] ? { ...g, ...rsvpPatches[g.id] } : g
+    ),
+    communityEvents: baseBoard.communityEvents.map((g) =>
+      rsvpPatches[g.id] ? { ...g, ...rsvpPatches[g.id] } : g
+    ),
+  };
 
   async function rsvp(itemId: string) {
     if (!canRsvp) return;
@@ -223,14 +339,12 @@ export function MeetingBench({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not join");
       const updated = data.item as BenchItem;
-      setBoard((prev) => ({
+      setRsvpPatches((prev) => ({
         ...prev,
-        gatherings: prev.gatherings.map((g) =>
-          g.id === updated.id ? { ...g, ...updated } : g
-        ),
-        communityEvents: prev.communityEvents.map((g) =>
-          g.id === updated.id ? { ...g, ...updated } : g
-        ),
+        [updated.id]: {
+          rsvpCount: updated.rsvpCount,
+          userJoined: updated.userJoined,
+        },
       }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not join");
@@ -268,26 +382,37 @@ export function MeetingBench({
       {error ? <p className="form-error">{error}</p> : null}
 
       <section id="notices" className="mb-section mb-notices">
-        <header>
-          <h2>📌 Village Notices</h2>
-          <p>Important whispers from the living world of WhimPost.</p>
-        </header>
+        <SectionHead
+          title="📌 Village Notices"
+          lead="Important whispers from the living world of WhimPost."
+          kind="notice"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
         {board.notices.length === 0 ? (
           <p className="muted">The board is clear for now. Check back soon.</p>
         ) : (
           <div className="mb-slip-grid">
             {board.notices.map((item) => (
-              <NoticeSlip key={item.id} item={item} />
+              <NoticeSlip
+                key={item.id}
+                item={item}
+                isOwner={isOwner}
+                onEdit={onEditItem}
+              />
             ))}
           </div>
         )}
       </section>
 
       <section id="gatherings" className="mb-section">
-        <header>
-          <h2>🗓️ Gatherings</h2>
-          <p>Upcoming activities where villages meet in the middle.</p>
-        </header>
+        <SectionHead
+          title="🗓️ Gatherings"
+          lead="Upcoming activities where villages meet in the middle."
+          kind="gathering"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
         {board.gatherings.length === 0 ? (
           <p className="muted">No gatherings pencilled in yet.</p>
         ) : (
@@ -298,6 +423,8 @@ export function MeetingBench({
                 item={item}
                 busy={busyId === item.id}
                 onRsvp={rsvp}
+                isOwner={isOwner}
+                onEdit={onEditItem}
               />
             ))}
           </div>
@@ -305,19 +432,24 @@ export function MeetingBench({
       </section>
 
       <section id="seasonal" className="mb-section mb-seasonal">
-        <header>
-          <h2>🌱 Seasonal Activities</h2>
-          <p>
-            Celebrating the feel of {board.seasonLabel.toLowerCase()} — weather,
-            plants, light, and quiet outdoor (or fireside) traditions.
-          </p>
-        </header>
+        <SectionHead
+          title="🌱 Seasonal Activities"
+          lead={`Celebrating the feel of ${board.seasonLabel.toLowerCase()} — weather, plants, light, and quiet outdoor (or fireside) traditions.`}
+          kind="seasonal"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
         {board.seasonal.length === 0 ? (
           <p className="muted">The season is still finding its activities.</p>
         ) : (
           <div className="mb-slip-grid">
             {board.seasonal.map((item) => (
               <article key={item.id} className="mb-slip mb-season-card">
+                <EditBtn
+                  isOwner={isOwner}
+                  itemId={item.id}
+                  onEdit={onEditItem}
+                />
                 <span className="mb-type">{item.season || board.season}</span>
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
@@ -333,30 +465,38 @@ export function MeetingBench({
       </section>
 
       <section id="chronicle" className="mb-section mb-chronicle">
-        <header>
-          <h2>📰 The WhimPost Chronicle</h2>
-          <p>A tiny village newspaper of discoveries and soft mysteries.</p>
-        </header>
+        <SectionHead
+          title="📰 The WhimPost Chronicle"
+          lead="A tiny village newspaper of discoveries and soft mysteries."
+          kind="chronicle"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
         <div className="mb-chronicle-paper">
           <p className="mb-chronicle-masthead">THE WHIMPOST CHRONICLE</p>
           {board.chronicles.length === 0 ? (
             <p className="muted">The press is quiet today.</p>
           ) : (
             board.chronicles.map((item) => (
-              <ChronicleStory key={item.id} item={item} />
+              <ChronicleStory
+                key={item.id}
+                item={item}
+                isOwner={isOwner}
+                onEdit={onEditItem}
+              />
             ))
           )}
         </div>
       </section>
 
       <section id="community" className="mb-section">
-        <header>
-          <h2>🌍 Community-Wide Events</h2>
-          <p>
-            Occasional gatherings that give every village its own piece of a
-            shared story.
-          </p>
-        </header>
+        <SectionHead
+          title="🌍 Community-Wide Events"
+          lead="Occasional gatherings that give every village its own piece of a shared story."
+          kind="community_event"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
         {board.communityEvents.length === 0 ? (
           <p className="muted">No community-wide event is stirring yet.</p>
         ) : (
@@ -367,6 +507,8 @@ export function MeetingBench({
                 item={item}
                 busy={busyId === item.id}
                 onRsvp={rsvp}
+                isOwner={isOwner}
+                onEdit={onEditItem}
               />
             ))}
           </div>

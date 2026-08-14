@@ -1,7 +1,13 @@
 import Link from "next/link";
 import type { BenchTeaser } from "@/lib/meetingBench";
 
-export function MeetingBenchTeaser({ teaser }: { teaser: BenchTeaser }) {
+export function MeetingBenchTeaser({
+  teaser,
+  isOwner = false,
+}: {
+  teaser: BenchTeaser;
+  isOwner?: boolean;
+}) {
   return (
     <section className={`village-panel mb-teaser season-${teaser.season}`}>
       <h2>🪑 The Meeting Bench</h2>
@@ -62,9 +68,16 @@ export function MeetingBenchTeaser({ teaser }: { teaser: BenchTeaser }) {
         ) : null}
       </ul>
 
-      <Link href="/meeting-bench" className="btn-primary">
-        Sit at the Bench
-      </Link>
+      <div className="mb-teaser-actions">
+        <Link href="/meeting-bench" className="btn-primary">
+          Sit at the Bench
+        </Link>
+        {isOwner ? (
+          <Link href="/meeting-bench#mb-owner-desk" className="btn-secondary">
+            Edit Meeting Bench
+          </Link>
+        ) : null}
+      </div>
     </section>
   );
 }
