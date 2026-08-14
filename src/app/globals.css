@@ -15,7 +15,8 @@
   --sepia: #5c3a1e;
   --bark: #8b5a2b;
   --gold: #d4af37;
-  --ink: #2f2418;
+  --ink: #12100e;
+  --ink-muted: rgba(18, 16, 14, 0.72);
   --blush: #c4a484;
   --lavender: #b7a6c2;
   --fog: rgba(243, 230, 208, 0.12);
@@ -64,7 +65,7 @@ body {
 }
 
 body {
-  color: var(--cream);
+  color: var(--ink);
   background: var(--bg-glow);
   background-attachment: fixed;
   font-family: var(--font-letter);
@@ -126,8 +127,9 @@ select {
   border-bottom-left-radius: 1.75rem 1.1rem;
   border-bottom-right-radius: 2.1rem 1.35rem;
   backdrop-filter: blur(10px);
-  background: linear-gradient(180deg, rgba(31, 42, 30, 0.92), rgba(31, 42, 30, 0.55));
-  border-bottom: 1px solid rgba(243, 230, 208, 0.08);
+  background: linear-gradient(180deg, rgba(247, 241, 230, 0.94), rgba(243, 230, 208, 0.82));
+  border-bottom: 1px solid rgba(18, 16, 14, 0.12);
+  color: var(--ink);
 }
 
 .brand-mark {
@@ -147,7 +149,7 @@ select {
   font-weight: 800;
   font-size: 1.55rem;
   letter-spacing: 0.02em;
-  color: var(--cream);
+  color: var(--ink);
 }
 
 .nav-links {
@@ -256,7 +258,7 @@ select {
 .btn-secondary {
   background: transparent;
   border: 1px solid rgba(243, 230, 208, 0.35);
-  color: var(--cream);
+  color: var(--ink);
 }
 
 /* Landing */
@@ -308,7 +310,7 @@ select {
   font-weight: 800;
   line-height: 0.95;
   letter-spacing: -0.02em;
-  color: var(--cream);
+  color: var(--ink);
   text-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
   margin: 0 0 1rem;
   animation: riseIn 1s ease both;
@@ -318,7 +320,7 @@ select {
   font-family: var(--font-letter);
   font-size: clamp(1.2rem, 2.6vw, 1.55rem);
   font-style: italic;
-  color: rgba(243, 230, 208, 0.88);
+  color: rgba(18, 16, 14, 0.88);
   max-width: 28rem;
   margin: 0 0 1.75rem;
   animation: riseIn 1s ease 0.15s both;
@@ -343,12 +345,12 @@ select {
   font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 2.8rem);
   margin: 0 0 0.75rem;
-  color: var(--cream);
+  color: var(--ink);
 }
 
 .landing-section > p {
   max-width: 36rem;
-  color: rgba(243, 230, 208, 0.78);
+  color: rgba(18, 16, 14, 0.78);
   margin: 0 0 2rem;
   font-size: 1.2rem;
 }
@@ -401,7 +403,7 @@ select {
 }
 
 .feature-copy span {
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
 }
 
 .motif-strip {
@@ -455,7 +457,7 @@ select {
 
 .auth-panel .lede {
   margin: 0 0 1.5rem;
-  color: rgba(243, 230, 208, 0.75);
+  color: rgba(18, 16, 14, 0.75);
 }
 
 .auth-form {
@@ -472,7 +474,7 @@ select {
   font-size: 0.78rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(243, 230, 208, 0.8);
+  color: rgba(18, 16, 14, 0.8);
 }
 
 .auth-form input,
@@ -520,7 +522,7 @@ select {
 .auth-switch {
   margin: 0.25rem 0 0;
   font-size: 1rem;
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
 }
 
 .auth-switch a {
@@ -548,7 +550,7 @@ select {
 
 .page-header p {
   margin: 0;
-  color: rgba(243, 230, 208, 0.72);
+  color: rgba(18, 16, 14, 0.72);
 }
 
 .empty-state {
@@ -570,7 +572,7 @@ select {
 }
 
 .empty-state p {
-  color: rgba(243, 230, 208, 0.75);
+  color: rgba(18, 16, 14, 0.75);
   margin: 0 0 1.25rem;
 }
 
@@ -579,7 +581,7 @@ select {
 }
 
 .muted {
-  color: rgba(243, 230, 208, 0.65);
+  color: rgba(18, 16, 14, 0.65);
 }
 
 /* Mail list */
@@ -640,7 +642,7 @@ select {
 
 .mail-snippet {
   margin: 0;
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
   font-size: 1.05rem;
 }
 
@@ -729,7 +731,7 @@ select {
 }
 .env-sage .envelope-content,
 .env-ink .envelope-content {
-  color: #f3e6d0;
+  color: var(--ink);
 }
 .env-blush,
 .env-swatch.env-blush {
@@ -774,7 +776,7 @@ select {
   display: grid;
   place-items: center;
   background: radial-gradient(circle at 35% 30%, #8f2f2f, #5c1818 70%);
-  color: #f3e6d0;
+  color: var(--ink);
   box-shadow: inset 0 0 0 2px rgba(243, 230, 208, 0.25), 0 4px 10px rgba(0, 0, 0, 0.3);
   font-size: 1rem;
 }
@@ -825,7 +827,7 @@ select {
 }
 .paper-night {
   background: linear-gradient(180deg, #2d342d, #1f2a1e);
-  color: #f3e6d0;
+  color: var(--ink);
 }
 
 .nav-badge {
@@ -974,7 +976,7 @@ select {
 }
 .paper-swatch.paper-night {
   background: #2a322a;
-  color: #f3e6d0;
+  color: var(--ink);
 }
 
 .letter-subject-input,
@@ -1232,7 +1234,7 @@ select {
 .preview-toggle button {
   background: transparent;
   border: none;
-  color: var(--cream);
+  color: var(--ink);
   padding: 0.55rem 0.85rem;
   cursor: pointer;
   font-family: var(--font-stamp);
@@ -1288,7 +1290,7 @@ select {
   cursor: pointer;
   border: 1px solid rgba(243, 230, 208, 0.15);
   background: rgba(243, 230, 208, 0.05);
-  color: var(--cream);
+  color: var(--ink);
   border-radius: var(--frame-chip);
 }
 
@@ -1371,7 +1373,7 @@ select {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(243, 230, 208, 0.72);
+  color: rgba(18, 16, 14, 0.72);
 }
 
 .village-sticker-pack {
@@ -1400,7 +1402,7 @@ select {
   font-size: 0.62rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(243, 230, 208, 0.55);
+  color: rgba(18, 16, 14, 0.55);
 }
 
 .village-sticker-btn {
@@ -1477,7 +1479,7 @@ body.theme-clovermeadow .village-sticker-pack {
 .compose-hint {
   margin: 0;
   text-align: center;
-  color: rgba(243, 230, 208, 0.6);
+  color: rgba(18, 16, 14, 0.6);
   font-size: 0.95rem;
 }
 
@@ -1502,7 +1504,7 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .section-lead {
   margin: 0 0 1rem;
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
 }
 
 .friend-invite-row {
@@ -1553,13 +1555,13 @@ body.theme-clovermeadow .village-sticker-pack {
   display: inline-block;
   margin-right: 0.5rem;
   font-style: normal;
-  color: rgba(243, 230, 208, 0.65);
+  color: rgba(18, 16, 14, 0.65);
   font-size: 0.95rem;
 }
 
 .user-list p {
   margin: 0.25rem 0 0;
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
   font-size: 0.95rem;
 }
 
@@ -1618,7 +1620,7 @@ body.theme-clovermeadow .village-sticker-pack {
 .reader-meta time {
   display: block;
   margin-top: 0.25rem;
-  color: rgba(243, 230, 208, 0.6);
+  color: rgba(18, 16, 14, 0.6);
   font-size: 0.95rem;
 }
 
@@ -1828,7 +1830,7 @@ body.theme-clovermeadow .village-sticker-pack {
   top: 18%;
   right: 8%;
   background: linear-gradient(145deg, #6a7464, #4a5346);
-  color: #e8f0df;
+  color: var(--ink);
   font-family: var(--font-stamp);
   font-size: 0.78rem;
   letter-spacing: 0.06em;
@@ -1840,7 +1842,7 @@ body.theme-clovermeadow .village-sticker-pack {
   top: 12%;
   left: 6%;
   background: rgba(18, 24, 18, 0.72);
-  color: #f3e6d0;
+  color: var(--ink);
   font-family: var(--font-stamp);
   font-size: 0.72rem;
   letter-spacing: 0.04em;
@@ -1866,7 +1868,7 @@ body.theme-clovermeadow .village-sticker-pack {
   bottom: 24%;
   right: 10%;
   background: rgba(31, 42, 30, 0.75);
-  color: #f3e6d0;
+  color: var(--ink);
   font-family: var(--font-letter);
   font-style: italic;
   font-size: 0.95rem;
@@ -1906,8 +1908,9 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .app-main.forest-panel {
   background:
-    linear-gradient(160deg, rgba(36, 48, 36, 0.55), rgba(26, 34, 25, 0.35));
-  border: 1px solid rgba(243, 230, 208, 0.1);
+    linear-gradient(160deg, rgba(252, 247, 238, 0.94), rgba(243, 230, 208, 0.88));
+  border: 1px solid rgba(18, 16, 14, 0.12);
+  color: var(--ink);
   border-radius: var(--frame-panel);
   padding: 1.5rem 1.25rem 2.5rem;
   margin-top: 1rem;
@@ -2150,7 +2153,7 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .village-picker-lead {
   margin: 0 0 0.85rem;
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
   font-size: 0.98rem;
 }
 
@@ -2179,7 +2182,7 @@ body.theme-clovermeadow .village-sticker-pack {
     color-mix(in srgb, var(--village-soft, #6b8f71) 22%, transparent),
     rgba(31, 42, 30, 0.35)
   );
-  color: var(--cream);
+  color: var(--ink);
   cursor: pointer;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
@@ -2256,7 +2259,7 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .village-card em {
   font-style: italic;
-  color: rgba(243, 230, 208, 0.78);
+  color: rgba(18, 16, 14, 0.78);
   font-size: 0.95rem;
 }
 
@@ -2301,7 +2304,7 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .village-motto {
   font-style: italic;
-  color: color-mix(in srgb, var(--village-soft, #f3e6d0) 80%, white);
+  color: color-mix(in srgb, var(--ink) 80%, var(--moss));
   font-size: 1.25rem;
   margin: 0.25rem 0 0.75rem;
 }
@@ -2334,7 +2337,7 @@ body.theme-clovermeadow .village-sticker-pack {
 
 .village-stats span,
 .village-stats em {
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
   font-size: 0.95rem;
   font-style: normal;
 }
@@ -2395,7 +2398,7 @@ a.feature-chip {
 
 a.feature-chip:hover {
   background: rgba(243, 230, 208, 0.14);
-  border-color: rgba(243, 230, 208, 0.35);
+  border-color: rgba(18, 16, 14, 0.35);
 }
 
 .unlock-row {
@@ -2412,7 +2415,7 @@ a.feature-chip:hover {
 .belong-list {
   margin: 0.35rem 0 0.75rem;
   padding-left: 1.1rem;
-  color: rgba(243, 230, 208, 0.85);
+  color: rgba(18, 16, 14, 0.85);
 }
 
 .collectible-grid {
@@ -2620,7 +2623,7 @@ a.feature-chip:hover {
 
 .village-change-lead {
   margin: 0 0 0.75rem;
-  color: rgba(243, 230, 208, 0.78);
+  color: rgba(18, 16, 14, 0.78);
 }
 
 .village-change-panel .btn-secondary {
@@ -2641,7 +2644,7 @@ a.feature-chip:hover {
 }
 
 .village-change-cancel:hover {
-  color: var(--cream);
+  color: var(--ink);
 }
 
 .village-card.current {
@@ -2675,7 +2678,7 @@ a.feature-chip:hover {
   font-size: 0.75rem !important;
   letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
-  color: var(--cream);
+  color: var(--ink);
 }
 
 .photo-upload input {
@@ -2713,7 +2716,7 @@ a.feature-chip:hover {
 
 .paper-night .letter-photo {
   background: rgba(243, 230, 208, 0.12);
-  border-color: rgba(243, 230, 208, 0.2);
+  border-color: rgba(18, 16, 14, 0.2);
 }
 
 .photo-resize-handle {
@@ -2872,8 +2875,8 @@ body.theme-clovermeadow .open-cue {
 
 body.theme-clovermeadow .btn-primary {
   background: linear-gradient(145deg, #e8a0b5, #d4849a);
-  color: #fff8fa;
-  border-color: rgba(255, 244, 247, 0.35);
+  color: #111111;
+  border-color: rgba(90, 40, 55, 0.2);
 }
 
 body.theme-clovermeadow .btn-primary:hover {
@@ -2882,7 +2885,7 @@ body.theme-clovermeadow .btn-primary:hover {
 
 body.theme-clovermeadow .btn-secondary {
   border-color: rgba(242, 196, 208, 0.45);
-  color: var(--cream);
+  color: var(--ink);
 }
 
 body.theme-clovermeadow .forest-backdrop {
@@ -2909,7 +2912,7 @@ body.theme-clovermeadow .village-page {
 }
 
 body.theme-clovermeadow .village-motto {
-  color: color-mix(in srgb, var(--village-soft, #f2c4d0) 85%, white);
+  color: color-mix(in srgb, var(--ink) 82%, var(--village-color, #d4849a));
 }
 
 body.theme-clovermeadow .forest-stickers-clovermeadow .forest-sticker {
@@ -2966,7 +2969,7 @@ body.theme-clovermeadow .form-error {
 }
 
 .paper-night .letter-mascot em {
-  color: rgba(243, 230, 208, 0.65);
+  color: rgba(18, 16, 14, 0.65);
 }
 
 /* —— Mosshollow dark-academia forest library theme —— */
@@ -2993,8 +2996,8 @@ body.theme-mosshollow .open-cue {
 }
 
 body.theme-mosshollow .btn-primary {
-  background: linear-gradient(145deg, #3d6b52, #1a3d2e);
-  color: #e8dcc8;
+  background: linear-gradient(145deg, #c9a227, #a8841c);
+  color: #111111;
   border-color: rgba(201, 162, 39, 0.35);
 }
 
@@ -3004,7 +3007,7 @@ body.theme-mosshollow .btn-primary:hover {
 
 body.theme-mosshollow .btn-secondary {
   border-color: rgba(107, 143, 113, 0.45);
-  color: var(--cream);
+  color: var(--ink);
 }
 
 body.theme-mosshollow .forest-backdrop {
@@ -3037,7 +3040,7 @@ body.theme-mosshollow .village-page {
 }
 
 body.theme-mosshollow .village-motto {
-  color: color-mix(in srgb, var(--village-soft, #6b8f71) 75%, #e8dcc8);
+  color: color-mix(in srgb, var(--ink) 78%, var(--village-color, #1a3d2e));
 }
 
 body.theme-mosshollow .forest-stickers-mosshollow .forest-sticker {
@@ -3101,7 +3104,7 @@ body.theme-mosshollow .paper-moss {
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(243, 230, 208, 0.55);
+  color: rgba(18, 16, 14, 0.55);
 }
 
 .cottage-nameplate h1 {
@@ -3113,7 +3116,7 @@ body.theme-mosshollow .paper-moss {
 
 .cottage-handle {
   margin: 0.25rem 0 0;
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
 }
 
 .cottage-meter {
@@ -3158,7 +3161,7 @@ body.theme-mosshollow .paper-moss {
 .cottage-meter-hint {
   margin: 0;
   font-size: 0.9rem;
-  color: rgba(243, 230, 208, 0.6);
+  color: rgba(18, 16, 14, 0.6);
 }
 
 .cottage-stage {
@@ -3425,7 +3428,7 @@ body.theme-mosshollow .paper-moss {
 
 .cottage-inspect p {
   margin: 0;
-  color: rgba(243, 230, 208, 0.78);
+  color: rgba(18, 16, 14, 0.78);
   line-height: 1.5;
 }
 
@@ -3433,7 +3436,7 @@ body.theme-mosshollow .paper-moss {
   padding: 0.45rem 0.55rem;
   border-left: 2px solid var(--gold);
   background: rgba(212, 175, 55, 0.08);
-  color: var(--cream) !important;
+  color: var(--ink) !important;
   font-family: var(--font-stamp);
   font-size: 0.85rem;
 }
@@ -3477,7 +3480,7 @@ body.theme-mosshollow .paper-moss {
   grid-column: 2;
   font-style: normal;
   font-size: 0.85rem;
-  color: rgba(243, 230, 208, 0.6);
+  color: rgba(18, 16, 14, 0.6);
 }
 
 .cottage-panel-close {
@@ -3518,7 +3521,7 @@ body.theme-mosshollow .paper-moss {
   font-size: 0.72rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
 }
 
 .profile-edit input,
@@ -3547,7 +3550,7 @@ body.theme-mosshollow .paper-moss {
   padding: 0.55rem 0.85rem;
   border: 1px solid rgba(243, 230, 208, 0.28);
   background: rgba(243, 230, 208, 0.06);
-  color: var(--cream);
+  color: var(--ink);
   text-decoration: none;
   font-family: var(--font-stamp);
   font-size: 0.78rem;
@@ -3718,7 +3721,7 @@ body.theme-moonmere .btn-primary:hover {
 
 body.theme-moonmere .btn-secondary {
   border-color: rgba(138, 155, 136, 0.4);
-  color: var(--cream);
+  color: var(--ink);
 }
 
 body.theme-moonmere .forest-backdrop {
@@ -3834,9 +3837,9 @@ body.theme-hearthwick .open-cue {
 }
 
 body.theme-hearthwick .btn-primary {
-  background: linear-gradient(145deg, #d4783a, #8b5a2b);
-  color: #f3e6d4;
-  border-color: rgba(243, 230, 212, 0.4);
+  background: linear-gradient(145deg, #e8b86d, #d4783a);
+  color: #111111;
+  border-color: rgba(60, 30, 12, 0.25);
 }
 
 body.theme-hearthwick .btn-primary:hover {
@@ -3845,7 +3848,7 @@ body.theme-hearthwick .btn-primary:hover {
 
 body.theme-hearthwick .btn-secondary {
   border-color: rgba(226, 195, 154, 0.5);
-  color: var(--cream);
+  color: var(--ink);
 }
 
 body.theme-hearthwick .forest-backdrop {
@@ -3989,7 +3992,7 @@ body.theme-hearthwick .cottage-plaque {
 .belonging-lead,
 .belonging-result-blurb {
   margin: 0 0 1.1rem;
-  color: rgba(243, 230, 208, 0.82);
+  color: rgba(18, 16, 14, 0.82);
   font-size: 1.08rem;
   line-height: 1.55;
 }
@@ -4027,7 +4030,7 @@ body.theme-hearthwick .cottage-plaque {
 .belonging-traits em {
   font-style: italic;
   font-size: 0.92rem;
-  color: rgba(243, 230, 208, 0.7);
+  color: rgba(18, 16, 14, 0.7);
 }
 
 .belonging-account-cue {
@@ -4041,7 +4044,7 @@ body.theme-hearthwick .cottage-plaque {
 
 .belonging-account-cue p {
   margin: 0.25rem 0 0;
-  color: rgba(243, 230, 208, 0.8);
+  color: rgba(18, 16, 14, 0.8);
 }
 
 .belonging-progress {
@@ -4077,7 +4080,7 @@ body.theme-hearthwick .cottage-plaque {
   background:
     linear-gradient(145deg, rgba(243, 230, 208, 0.07), transparent 55%),
     rgba(24, 32, 22, 0.55);
-  color: var(--cream);
+  color: var(--ink);
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
@@ -4154,7 +4157,7 @@ body.theme-hearthwick .cottage-plaque {
   margin: 0;
   font-family: var(--font-letter);
   font-size: 1.15rem;
-  color: rgba(243, 230, 208, 0.88);
+  color: rgba(18, 16, 14, 0.88);
 }
 
 .cinema-path-sign {
@@ -4245,7 +4248,7 @@ body.theme-hearthwick .cottage-plaque {
 .belonging-result-note {
   margin: 0 0 1rem;
   font-size: 0.95rem;
-  color: rgba(243, 230, 208, 0.68);
+  color: rgba(18, 16, 14, 0.68);
 }
 
 .belonging-confirm,
@@ -4260,7 +4263,7 @@ body.theme-hearthwick .cottage-plaque {
 button.linkish {
   background: none;
   border: none;
-  color: rgba(243, 230, 208, 0.75);
+  color: rgba(18, 16, 14, 0.75);
   cursor: pointer;
   font: inherit;
   text-decoration: underline;
@@ -4287,7 +4290,7 @@ button.linkish:hover {
   font-size: 0.78rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(243, 230, 208, 0.8);
+  color: rgba(18, 16, 14, 0.8);
 }
 
 .welcome-editor-form input,
@@ -4315,7 +4318,7 @@ button.linkish:hover {
 .welcome-editor-status {
   margin: 0;
   font-size: 0.92rem;
-  color: rgba(243, 230, 208, 0.72);
+  color: rgba(18, 16, 14, 0.72);
   text-transform: none;
   letter-spacing: 0;
   font-family: var(--font-letter);
@@ -4438,20 +4441,20 @@ button.linkish:hover {
   font-size: 0.85rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--village-soft, #c4a574) 80%, var(--cream, #f3e6d0));
+  color: color-mix(in srgb, var(--ink) 78%, var(--village-soft, #c4a574));
 }
 
 .tv-nook-header h1 {
   margin: 0 0 0.45rem;
   font-family: var(--font-display, Georgia, serif);
   font-size: clamp(2rem, 4vw, 2.85rem);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   line-height: 1.05;
 }
 
 .tv-nook-header p {
   margin: 0;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 72%, transparent);
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
   max-width: 34rem;
   line-height: 1.55;
 }
@@ -4476,7 +4479,7 @@ button.linkish:hover {
 .tv-scope-tabs button {
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 45%, transparent);
   background: color-mix(in srgb, var(--village-color, #2a3548) 35%, rgba(0, 0, 0, 0.25));
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   border-radius: 999px;
   padding: 0.45rem 1rem;
   font-size: 0.92rem;
@@ -4642,7 +4645,7 @@ button.linkish:hover {
   gap: 0.35rem;
   padding: 1.5rem;
   text-align: center;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 80%, transparent);
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
   background:
     radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--village-color, #2a3548) 55%, transparent), transparent 60%),
     linear-gradient(180deg, #142018, #0a100c);
@@ -4722,7 +4725,7 @@ button.linkish:hover {
   gap: 0.3rem;
   background: transparent;
   border: 0;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 78%, transparent);
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -4788,7 +4791,7 @@ button.linkish:hover {
 .tv-watchers-label {
   margin: 0 0 0.55rem;
   font-family: var(--font-display, Georgia, serif);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
 }
 
 .tv-watchers ul {
@@ -4807,7 +4810,7 @@ button.linkish:hover {
   padding: 0.28rem 0.65rem;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.22);
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 88%, transparent);
+  color: color-mix(in srgb, var(--ink) 88%, transparent);
   font-size: 0.88rem;
 }
 
@@ -4837,7 +4840,7 @@ button.linkish:hover {
   border-radius: 0.65rem;
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 35%, transparent);
   background: rgba(0, 0, 0, 0.25);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   padding: 0.55rem 0.75rem;
 }
 
@@ -4858,7 +4861,7 @@ button.linkish:hover {
   border-radius: 0.75rem;
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 28%, transparent);
   background: color-mix(in srgb, var(--village-color, #2a3548) 30%, rgba(0, 0, 0, 0.25));
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   cursor: pointer;
 }
 
@@ -4890,13 +4893,13 @@ button.linkish:hover {
 .tv-shelf h2 {
   margin: 0 0 0.35rem;
   font-family: var(--font-display, Georgia, serif);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   font-size: 1.35rem;
 }
 
 .tv-shelf-copy {
   margin: 0 0 0.9rem;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 72%, transparent);
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -4932,7 +4935,7 @@ button.linkish:hover {
   display: grid;
   gap: 0.3rem;
   margin-bottom: 0.65rem;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 80%, transparent);
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
   font-size: 0.85rem;
 }
 
@@ -4940,7 +4943,7 @@ button.linkish:hover {
   border-radius: 0.65rem;
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 35%, transparent);
   background: rgba(0, 0, 0, 0.22);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   padding: 0.55rem 0.7rem;
 }
 
@@ -5017,7 +5020,7 @@ button.linkish:hover {
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 40%, transparent);
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.28);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   padding: 0.25rem 0.7rem;
   font-size: 0.78rem;
   cursor: pointer;
@@ -5030,7 +5033,7 @@ button.linkish:hover {
 .tv-upload-banner-top strong {
   font-family: var(--font-display, Georgia, serif);
   font-size: 1.05rem;
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
 }
 
 .tv-upload-pct {
@@ -5061,7 +5064,7 @@ button.linkish:hover {
 
 .tv-upload-banner p {
   margin: 0.55rem 0 0;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 88%, white);
+  color: color-mix(in srgb, var(--ink) 88%, #3a342c);
   font-size: 0.9rem;
   line-height: 1.4;
   word-break: break-word;
@@ -5106,7 +5109,7 @@ button.linkish:hover {
   border-radius: 0.75rem;
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 28%, transparent);
   background: rgba(0, 0, 0, 0.22);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   cursor: pointer;
 }
 
@@ -5147,7 +5150,7 @@ button.linkish:hover {
   border-radius: 0.55rem;
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 40%, transparent);
   background: rgba(0, 0, 0, 0.28);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   padding: 0.4rem 0.55rem;
   font-size: 0.85rem;
   min-width: 0;
@@ -5164,19 +5167,19 @@ button.linkish:hover {
 
 .tv-rename-save {
   background: color-mix(in srgb, var(--village-soft, #c4a574) 35%, rgba(0, 0, 0, 0.25));
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
 }
 
 .tv-rename-cancel {
   background: rgba(0, 0, 0, 0.28);
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 80%, transparent);
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
 }
 
 .tv-video-remove {
   border: 0;
   border-radius: 0.65rem;
   background: rgba(0, 0, 0, 0.28);
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 75%, transparent);
+  color: color-mix(in srgb, var(--ink) 75%, transparent);
   width: 2rem;
   cursor: pointer;
 }
@@ -5225,7 +5228,7 @@ button.linkish:hover {
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 28%, transparent);
   border-radius: 0.85rem;
   background: rgba(0, 0, 0, 0.22);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   padding: 0.65rem 0.8rem;
   cursor: pointer;
 }
@@ -5289,7 +5292,7 @@ button.linkish:hover {
   border: 0;
   border-radius: 0.75rem;
   background: rgba(0, 0, 0, 0.18);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   padding: 0.6rem 0.7rem;
   cursor: pointer;
 }
@@ -5348,7 +5351,7 @@ button.linkish:hover {
   border-radius: 0.55rem;
   border: 1px solid transparent;
   background: rgba(0, 0, 0, 0.18);
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 88%, transparent);
+  color: color-mix(in srgb, var(--ink) 88%, transparent);
   padding: 0.4rem 0.55rem;
   font-size: 0.85rem;
   cursor: pointer;
@@ -5394,7 +5397,7 @@ button.linkish:hover {
   align-items: center;
   gap: 0.45rem;
   font-size: 0.86rem;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 80%, transparent);
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
 }
 
 .tv-upload select {
@@ -5403,7 +5406,7 @@ button.linkish:hover {
   border-radius: 0.7rem;
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 35%, transparent);
   background: rgba(0, 0, 0, 0.25);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   padding: 0.55rem 0.7rem;
 }
 
@@ -5500,7 +5503,7 @@ button.linkish:hover {
 .tv-fullscreen-btn {
   border: 1px solid rgba(243, 230, 208, 0.35);
   background: rgba(12, 10, 8, 0.72);
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   border-radius: 999px;
   padding: 0.35rem 0.75rem;
   font: inherit;
@@ -5512,7 +5515,7 @@ button.linkish:hover {
 
 .tv-fullscreen-btn:hover {
   background: rgba(20, 16, 12, 0.88);
-  border-color: rgba(243, 230, 208, 0.55);
+  border-color: rgba(18, 16, 14, 0.55);
 }
 
 .tv-screen:fullscreen,
@@ -5560,7 +5563,7 @@ button.linkish:hover {
   margin: 0.15rem 0 0;
   font-family: var(--font-display, Georgia, serif);
   font-size: 0.95rem;
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   line-height: 1.25;
 }
 
@@ -5568,7 +5571,7 @@ button.linkish:hover {
   margin: 0.15rem 0 0;
   font-size: 0.72rem;
   opacity: 0.8;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 85%, transparent);
+  color: color-mix(in srgb, var(--ink) 85%, transparent);
 }
 
 .tv-village-broadcast {
@@ -5605,7 +5608,7 @@ button.linkish:hover {
   margin: 0.25rem 0 0;
   font-family: var(--font-display, Georgia, serif);
   font-size: 1.25rem;
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   line-height: 1.25;
 }
 
@@ -5613,7 +5616,7 @@ button.linkish:hover {
   margin: 0.35rem 0 0;
   font-size: 0.88rem;
   line-height: 1.4;
-  color: color-mix(in srgb, var(--cream, #f3e6d0) 82%, transparent);
+  color: color-mix(in srgb, var(--ink) 82%, transparent);
 }
 
 .tv-guide {
@@ -5645,14 +5648,14 @@ button.linkish:hover {
   margin: 0 0 0.35rem;
   font-family: var(--font-display, Georgia, serif);
   font-size: 1.25rem;
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
 }
 
 .tv-guide-header p {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.45;
-  color: rgba(243, 230, 208, 0.78);
+  color: rgba(18, 16, 14, 0.78);
 }
 
 .tv-guide-list {
@@ -5690,7 +5693,7 @@ button.linkish:hover {
 
 .tv-guide-list strong {
   display: block;
-  color: var(--cream, #f3e6d0);
+  color: var(--ink);
   font-size: 0.95rem;
 }
 
@@ -5698,7 +5701,7 @@ button.linkish:hover {
   display: block;
   margin-top: 0.15rem;
   font-size: 0.78rem;
-  color: rgba(243, 230, 208, 0.65);
+  color: rgba(18, 16, 14, 0.65);
 }
 
 /* ─── Bramblewood Workshop ─────────────────────────────────── */
@@ -5925,7 +5928,7 @@ button.linkish:hover {
 .bw-tabs button.active {
   background: linear-gradient(165deg, #6f8f52, #557240);
   border-color: transparent;
-  color: #fff8ea;
+  color: var(--ink);
 }
 
 .bw-inspire-grid {
@@ -6374,7 +6377,7 @@ button.linkish:hover {
 
 .bw-chip.active {
   background: #6f8f52;
-  color: #fff8ea;
+  color: var(--ink);
   border-color: transparent;
 }
 
@@ -6445,7 +6448,7 @@ button.linkish:hover {
   margin: 0.55rem 0;
   border-radius: 1rem;
   background: linear-gradient(165deg, #3d2a18, #1f140c);
-  color: #f3e6d0;
+  color: var(--ink);
   text-align: center;
   padding: 1rem;
 }
@@ -6548,7 +6551,7 @@ button.linkish:hover {
   justify-self: start;
   border: 1px solid rgba(95, 122, 69, 0.45);
   background: linear-gradient(165deg, #6f8f52, #557240);
-  color: #fff8ea;
+  color: var(--ink);
   border-radius: 999px;
   padding: 0.55rem 1rem;
   font: inherit;
@@ -6640,7 +6643,7 @@ button.linkish:hover {
 .mh-library {
   position: relative;
   isolation: isolate;
-  color: #e8dcc4;
+  color: var(--ink);
 }
 
 .mh-atmosphere {
@@ -6746,7 +6749,7 @@ button.linkish:hover {
   margin: 0;
   font-family: var(--font-display), Georgia, "Palatino Linotype", serif;
   font-size: clamp(2.1rem, 5vw, 3.1rem);
-  color: #f3e6d0;
+  color: var(--ink);
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
 }
 
@@ -6780,7 +6783,7 @@ button.linkish:hover {
 }
 
 .mh-toast {
-  color: #e8f0d8;
+  color: var(--ink);
   background: rgba(50, 72, 42, 0.55);
   padding: 0.65rem 0.85rem;
   border-radius: 0.75rem;
@@ -6799,7 +6802,7 @@ button.linkish:hover {
 .mh-tabs a {
   border: 1px solid rgba(196, 170, 120, 0.3);
   background: rgba(24, 30, 24, 0.75);
-  color: #e8dcc4;
+  color: var(--ink);
   border-radius: 999px;
   padding: 0.4rem 0.75rem;
   font-size: 0.84rem;
@@ -6814,7 +6817,7 @@ button.linkish:hover {
 .mh-tabs a.active {
   background: linear-gradient(180deg, #8a6a3d, #5c4528);
   border-color: transparent;
-  color: #fff6e4;
+  color: var(--ink);
 }
 
 .mh-panel {
@@ -6825,7 +6828,7 @@ button.linkish:hover {
 .mh-section h2 {
   margin: 0 0 0.35rem;
   font-family: var(--font-display), Georgia, serif;
-  color: #f0e2c4;
+  color: var(--ink);
 }
 
 .mh-section-lead {
@@ -6993,7 +6996,7 @@ button.mh-card-cover {
   border: 1px solid rgba(214, 178, 110, 0.35);
   background:
     linear-gradient(165deg, rgba(42, 34, 24, 0.98), rgba(22, 28, 22, 0.98));
-  color: #f3e6d0;
+  color: var(--ink);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
   padding: 1rem 1.05rem 1.15rem;
 }
@@ -7028,7 +7031,7 @@ button.mh-card-cover {
   margin: 0.15rem 0 0;
   font-family: var(--font-display), Georgia, serif;
   font-size: 1.35rem;
-  color: #f6edd9;
+  color: var(--ink);
 }
 
 .mh-summary-titles .muted,
@@ -7039,7 +7042,7 @@ button.mh-card-cover {
 .mh-summary-body p {
   margin: 0 0 1rem;
   line-height: 1.65;
-  color: #e8dcc4;
+  color: var(--ink);
 }
 
 .mh-summary-empty {
@@ -7139,7 +7142,7 @@ button.mh-card-cover {
 }
 
 .mh-shelf-select:hover {
-  color: #f3e6d0;
+  color: var(--ink);
 }
 
 .mh-shelf-actions {
@@ -7222,7 +7225,7 @@ button.mh-card-cover {
 
 .mh-admin-edit summary {
   cursor: pointer;
-  color: #e8dcc8;
+  color: var(--ink);
   font-size: 0.92rem;
 }
 
@@ -7347,7 +7350,7 @@ button.mh-card-cover {
   background:
     linear-gradient(165deg, rgba(34, 44, 34, 0.98), rgba(18, 26, 20, 0.98));
   box-shadow: none;
-  color: #f3e6d0;
+  color: var(--ink);
   overflow: hidden;
 }
 
@@ -7366,7 +7369,7 @@ button.mh-card-cover {
   margin: 0.05rem 0 0;
   font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1rem, 2vw, 1.35rem);
-  color: #f6edd9;
+  color: var(--ink);
   line-height: 1.25;
 }
 
@@ -7442,7 +7445,7 @@ button.mh-card-cover {
 .mh-toc-panel h3 {
   margin: 0.2rem 0 0.35rem;
   font-family: var(--font-display), Georgia, serif;
-  color: #f6edd9;
+  color: var(--ink);
 }
 
 .mh-toc-list {
@@ -7465,7 +7468,7 @@ button.mh-card-cover {
   border: 0;
   border-radius: 0.45rem;
   background: transparent;
-  color: #e8dcc8;
+  color: var(--ink);
   font: inherit;
   font-size: 0.88rem;
   line-height: 1.35;
@@ -7609,7 +7612,7 @@ button.mh-card-cover {
 .mh-margin-header h3 {
   margin: 0.2rem 0 0.35rem;
   font-family: var(--font-display), Georgia, serif;
-  color: #f6edd9;
+  color: var(--ink);
 }
 
 .mh-margin-compose {
@@ -7650,7 +7653,7 @@ button.mh-card-cover {
   appearance: none;
   border: 1px solid rgba(196, 170, 120, 0.3);
   background: rgba(12, 18, 14, 0.45);
-  color: #e8dcc8;
+  color: var(--ink);
   border-radius: 999px;
   padding: 0.25rem 0.5rem 0.25rem 0.3rem;
   display: inline-flex;
@@ -7840,7 +7843,7 @@ button.mh-card-cover {
 .mh-cover strong {
   font-family: var(--font-display), Georgia, serif;
   font-size: 1.05rem;
-  color: #f3e6d0;
+  color: var(--ink);
 }
 
 .mh-meta,
@@ -7909,7 +7912,7 @@ button.mh-card-cover {
   border-radius: 999px;
   border: 1px solid rgba(196, 170, 120, 0.28);
   background: rgba(24, 30, 24, 0.7);
-  color: #e8dcc4;
+  color: var(--ink);
   padding: 0.3rem 0.65rem;
   font-size: 0.8rem;
   cursor: pointer;
@@ -7945,7 +7948,7 @@ button.mh-card-cover {
 .mh-card h3 {
   margin: 0 0 0.25rem;
   font-family: var(--font-display), Georgia, serif;
-  color: #f0e2c4;
+  color: var(--ink);
 }
 
 .mh-actions {
@@ -7966,7 +7969,7 @@ button.mh-card-cover {
   border-radius: 0.7rem;
   border: 1px solid rgba(196, 170, 120, 0.28);
   background: rgba(18, 22, 18, 0.75);
-  color: #e8dcc4;
+  color: var(--ink);
   padding: 0.5rem 0.7rem;
   cursor: pointer;
 }
@@ -8003,7 +8006,7 @@ button.mh-card-cover {
   border-radius: 0.7rem;
   border: 1px solid rgba(196, 170, 120, 0.3);
   background: rgba(12, 16, 12, 0.7);
-  color: #f3e6d0;
+  color: var(--ink);
   padding: 0.55rem 0.7rem;
   font: inherit;
 }
@@ -8315,7 +8318,7 @@ button.mh-card-cover {
 .cm-tabs button.active {
   background: linear-gradient(180deg, #9fc46e, #6f9a48);
   border-color: transparent;
-  color: #fffdf4;
+  color: var(--ink);
 }
 
 .cm-panel { position: relative; z-index: 1; }
@@ -8881,7 +8884,7 @@ button.mh-card-cover {
 .hw-tabs button.active {
   background: linear-gradient(180deg, #9a6a3c, #6f4a2c);
   border-color: transparent;
-  color: #f7efe3;
+  color: var(--ink);
 }
 
 .hw-panel { position: relative; z-index: 1; }
@@ -8985,8 +8988,8 @@ button.mh-card-cover {
 
 /* Readable cottage buttons — override bright theme cream-on-cream secondary */
 .hw-fireside .btn-primary {
-  background: linear-gradient(180deg, #8f5f35, #6a4324);
-  color: #f7efe3;
+  background: linear-gradient(180deg, #e8b86d, #d4783a);
+  color: #111111;
   border: 1px solid rgba(70, 45, 20, 0.35);
   text-shadow: none;
 }
@@ -9045,7 +9048,7 @@ button.mh-card-cover {
 .hw-chip-row button.active {
   background: linear-gradient(180deg, #8f5f35, #6a4324);
   border-color: transparent;
-  color: #f7efe3;
+  color: var(--ink);
 }
 
 .hw-todays-herb { margin-bottom: 1rem; }
@@ -10827,7 +10830,7 @@ button.mh-card-cover {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   font-size: 0.78rem;
-  color: rgba(243, 230, 208, 0.8);
+  color: rgba(18, 16, 14, 0.8);
 }
 
 .mb-season-decor {
@@ -10848,7 +10851,7 @@ button.mh-card-cover {
 .mb-scene-lead {
   margin: 0;
   max-width: 38rem;
-  color: rgba(243, 230, 208, 0.9);
+  color: rgba(18, 16, 14, 0.9);
 }
 
 .mb-bench-illustration {
@@ -10892,7 +10895,7 @@ button.mh-card-cover {
   left: 42%;
   bottom: 0.15rem;
   font-size: 0.72rem;
-  color: rgba(243, 230, 208, 0.55);
+  color: rgba(18, 16, 14, 0.55);
   transform: rotate(-2deg);
   animation: mbLetterPeek 4.8s ease-in-out infinite;
 }
@@ -11236,7 +11239,7 @@ button.mh-card-cover {
 .mb-admin-filters button.active,
 .mb-admin-filters button:hover {
   background: rgba(243, 230, 208, 0.14);
-  border-color: rgba(243, 230, 208, 0.4);
+  border-color: rgba(18, 16, 14, 0.4);
 }
 
 .mb-admin-item-actions {
@@ -11319,9 +11322,9 @@ button.mh-card-cover {
 }
 .mb-gathering .mb-edit-btn,
 .mb-community .mb-edit-btn {
-  border-color: rgba(243, 230, 208, 0.35);
+  border-color: rgba(18, 16, 14, 0.35);
   background: rgba(20, 14, 10, 0.45);
-  color: rgba(243, 230, 208, 0.95);
+  color: rgba(18, 16, 14, 0.95);
 }
 .mb-chronicle-story .mb-edit-btn {
   top: 0;
@@ -11972,4 +11975,44 @@ button.mh-card-cover {
   margin: 0 0 0.75rem;
   max-width: 38rem;
   line-height: 1.4;
+}
+
+
+/* ——— Site-wide dark text (no beige/cream type) ——— */
+body,
+.app-main,
+.page-header,
+.page-header h1,
+.page-header p,
+.brand-text,
+.nav-links,
+.nav-links a,
+.nav-ghost,
+.nav-user,
+.muted,
+.oa-muted,
+.oa-hint,
+.oa-lede,
+.oa-section-lede {
+  color: var(--ink);
+}
+
+.page-header p,
+.muted,
+.oa-muted,
+.oa-hint,
+.oa-lede,
+.oa-section-lede {
+  color: var(--ink-muted);
+}
+
+.nav-links a:hover,
+.nav-links a.active,
+.nav-ghost:hover {
+  color: color-mix(in srgb, var(--ink) 70%, var(--moss));
+}
+
+/* Prefer dark type on light fills; themed buttons set their own contrast */
+.btn-primary {
+  color: #111111;
 }
