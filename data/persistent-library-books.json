@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:04:01.427Z",
+  "updatedAt": "2026-08-14T19:04:06.875Z",
   "books": [
     {
       "id": "princess",
@@ -77,9 +77,9 @@
       "minutes": 380,
       "coverEmoji": "🐉",
       "coverUrl": null,
-      "fileUrl": "/api/uploads/f18ce140-2d45-46d3-90fb-c6eba485b610.epub",
-      "fileName": "And Then There Were None.epub",
-      "fileMime": "application/epub+zip",
+      "fileUrl": null,
+      "fileName": null,
+      "fileMime": null,
       "quotesJson": "[\"Every real story is a never ending story.\",\"You must let what happens happen; everything must be equal in your heart.\"]",
       "reflectionsJson": "[\"What story are you inside without noticing?\",\"If Fantastica asked for a new name, what would you give?\"]",
       "category": null,
