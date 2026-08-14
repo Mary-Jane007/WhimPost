@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T20:57:52.757Z",
+  "updatedAt": "2026-08-14T20:59:21.273Z",
   "books": [
     {
       "id": "princess",
@@ -223,28 +223,6 @@
       "published": true
     },
     {
-      "id": "rl-marcus",
-      "shelf": "readinglist",
-      "title": "Meditations",
-      "author": "Marcus Aurelius",
-      "description": "",
-      "minutes": 120,
-      "coverEmoji": "📖",
-      "coverUrl": "/api/uploads/7f11beb3-8166-4dc7-8402-54f369a3781a.jpg",
-      "fileUrl": "/api/uploads/7b05ad7a-9957-467f-95dd-e119e7ad90ae.epub",
-      "fileName": "Meditations-By-Marcus-Aurelius.epub",
-      "fileMime": "application/epub+zip",
-      "quotesJson": "[]",
-      "reflectionsJson": "[]",
-      "category": "Philosophy",
-      "difficulty": "Dense",
-      "length": "Medium",
-      "mood": "Contemplative",
-      "themesJson": "[\"stoicism\",\"duty\",\"impermanence\"]",
-      "rating": 4.5,
-      "published": true
-    },
-    {
       "id": "rl-austen",
       "shelf": "readinglist",
       "title": "Pride and Prejudice",
@@ -385,6 +363,7 @@
     "rl-Carson",
     "rl-frankl",
     "rl-le-guin",
+    "rl-marcus",
     "rl-oliver",
     "rl-tuchman",
     "tollbooth"
