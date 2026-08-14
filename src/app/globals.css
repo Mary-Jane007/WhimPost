@@ -11952,3 +11952,24 @@ button.mh-card-cover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Owner analytics launch on village page */
+.oa-owner-launch {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--moss) 28%, transparent);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--moss) 12%, transparent), transparent 55%),
+    color-mix(in srgb, var(--cream) 88%, #fff);
+}
+.oa-owner-launch h2 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+.oa-owner-launch p {
+  margin: 0 0 0.75rem;
+  max-width: 38rem;
+  line-height: 1.4;
+}

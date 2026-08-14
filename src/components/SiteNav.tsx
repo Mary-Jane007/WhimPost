@@ -42,14 +42,14 @@ export function SiteNav({
       : []),
     { href: "/tv-corner", label: "TV Corner" },
     { href: "/meeting-bench", label: "Meeting Bench" },
+    ...(user?.isOwner
+      ? [{ href: "/admin/analytics", label: "Owner Analytics" }]
+      : []),
     { href: "/inbox", label: "Inbox", badgeKey: "inbox" },
     { href: "/sent", label: "Sent" },
     { href: "/compose", label: "Write" },
     { href: "/friends", label: "Friends", badgeKey: "friends" },
     { href: "/profile", label: "Profile" },
-    ...(user?.isOwner
-      ? [{ href: "/admin/analytics", label: "Analytics" }]
-      : []),
   ];
 
   return (
