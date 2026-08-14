@@ -2,6 +2,7 @@ import type { Database } from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import { UPLOAD_DIR } from "@/lib/uploadPaths";
 
 /**
  * Git-tracked catalog of uploaded TV files (metadata only).
@@ -12,7 +13,7 @@ export const PERSISTENT_TV_MEDIA_PATH = path.join(
   "persistent-tv-media.json"
 );
 
-export const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
+export { UPLOAD_DIR };
 
 export type PersistentTvMediaClip = {
   title: string;

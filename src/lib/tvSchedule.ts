@@ -3,11 +3,9 @@ import {
   DEFAULT_TV_DURATION_MS,
   probeUploadDurationMs,
 } from "@/lib/tvDuration";
-import {
-  isLfsPointerFile,
-  isServingTvStandin,
-} from "@/lib/tvUploadFiles";
-import { UPLOAD_DIR } from "@/lib/persistentTvMedia";
+import { isLfsPointerFile } from "@/lib/lfsPointer";
+import { isServingTvStandin } from "@/lib/tvUploadFiles";
+import { UPLOAD_DIR } from "@/lib/uploadPaths";
 import path from "path";
 import fs from "fs";
 

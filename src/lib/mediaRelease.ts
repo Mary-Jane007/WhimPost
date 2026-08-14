@@ -1,15 +1,16 @@
 import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { PERSISTENT_TV_MEDIA_PATH, UPLOAD_DIR } from "@/lib/persistentTvMedia";
+import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
 import { PERSISTENT_LIBRARY_BOOKS_PATH } from "@/lib/persistentLibraryBooks";
+import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/persistentTvMedia";
 import {
   moonSoundAbsolutePath,
   moonSoundReleaseName,
   PERSISTENT_MOON_SOUNDS_PATH,
 } from "@/lib/persistentMoonSounds";
 import { MOON_SOUND_DIR } from "@/lib/moonPaths";
-import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/tvUploadFiles";
+import { UPLOAD_DIR } from "@/lib/uploadPaths";
 
 /**
  * Durable media shelf via GitHub Releases (not Git LFS).

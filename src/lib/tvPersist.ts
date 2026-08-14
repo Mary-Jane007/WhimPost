@@ -10,8 +10,8 @@ import { exportPersistentTv } from "@/lib/persistentTv";
 import {
   exportPersistentTvMedia,
   PERSISTENT_TV_MEDIA_PATH,
-  UPLOAD_DIR,
 } from "@/lib/persistentTvMedia";
+import { UPLOAD_DIR } from "@/lib/uploadPaths";
 import { exportPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
 import {
@@ -22,11 +22,8 @@ import {
   PERSISTENT_MOON_SOUNDS_PATH,
 } from "@/lib/persistentMoonSounds";
 import { PERSISTENT_SITE_UPLOADS_PATH } from "@/lib/persistentSiteUploads";
-import {
-  isLfsPointerFile,
-  isPlayableMediaFile,
-  materializeTvStandins,
-} from "@/lib/tvUploadFiles";
+import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
+import { materializeTvStandins } from "@/lib/tvUploadFiles";
 
 const ROOT = process.cwd();
 const LOCK_PATH = path.join(ROOT, "data", ".tv-persist.lock");

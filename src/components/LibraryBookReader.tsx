@@ -553,39 +553,33 @@ export function LibraryBookReader({
 
   useEffect(() => {
     if (kind !== "epub") return;
-    const mount = viewerRef.current;
-    if (!mount) return;
-    const host: HTMLDivElement = mount;
 
     let cancelled = false;
     let book: EpubBookApi | null = null;
     let observer: ResizeObserver | null = null;
     let tearDownTimer: number | null = null;
-    const token = `react-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
-    // Claim immediately so the classic boot script does not race us.
-    host.dataset.reactToken = token;
-    host.dataset.owned = "react";
+    let host: HTMLDivElement | null = null;
+    let token = "";
+    let startTimer: number | null = null;
 
     const stillMine = () =>
-      !cancelled && host.dataset.reactToken === token;
+      Boolean(host) && !cancelled && host!.dataset.reactToken === token;
 
     const measure = () => {
-      const rect = host.getBoundingClientRect();
+      const el = host!;
+      const rect = el.getBoundingClientRect();
       const width = Math.max(
         280,
-        Math.floor(rect.width || host.clientWidth || window.innerWidth * 0.7)
+        Math.floor(rect.width || el.clientWidth || window.innerWidth * 0.7)
       );
       const height = Math.max(
         320,
         Math.floor(
-          rect.height || host.clientHeight || window.innerHeight * 0.65
+          rect.height || el.clientHeight || window.innerHeight * 0.65
         )
       );
       return { width, height };
     };
-
-    let objectUrl: string | null = null;
 
     function abandonBook() {
       try {
@@ -595,14 +589,6 @@ export function LibraryBookReader({
       }
       book = null;
       bookApiRef.current = null;
-      if (objectUrl) {
-        try {
-          URL.revokeObjectURL(objectUrl);
-        } catch {
-          // ignore
-        }
-        objectUrl = null;
-      }
     }
 
     async function paintBook(
@@ -612,8 +598,15 @@ export function LibraryBookReader({
       ) => EpubBookApi,
       source: ArrayBuffer | string
     ) {
-      host.innerHTML = "";
-      book = ePub(source);
+      const mount = host!;
+      mount.innerHTML = "";
+      // Blob object URLs have no .epub extension, so epubjs treats them as a
+      // directory of files and hangs on /META-INF/container.xml. Always open
+      // binary bytes (or pass openAs when forced to use a URL).
+      book =
+        typeof source === "string"
+          ? ePub(source, { openAs: "epub" })
+          : ePub(source);
       bookApiRef.current = book;
       await book.ready;
       if (!stillMine()) {
@@ -631,8 +624,8 @@ export function LibraryBookReader({
 
       let { width, height } = measure();
       if (
-        host.getBoundingClientRect().height < 40 ||
-        host.getBoundingClientRect().width < 40
+        mount.getBoundingClientRect().height < 40 ||
+        mount.getBoundingClientRect().width < 40
       ) {
         await new Promise<void>((resolve) => {
           window.setTimeout(() => resolve(), 120);
@@ -644,7 +637,7 @@ export function LibraryBookReader({
         ({ width, height } = measure());
       }
 
-      const rendition = book.renderTo(host, {
+      const rendition = book.renderTo(mount, {
         width,
         height,
         flow: "scrolled-doc",
@@ -659,10 +652,10 @@ export function LibraryBookReader({
 
       rendition.on("rendered", () => {
         if (!stillMine()) return;
-        expandChapterToFullHeight(host);
-        window.setTimeout(() => expandChapterToFullHeight(host), 50);
-        window.setTimeout(() => expandChapterToFullHeight(host), 250);
-        window.setTimeout(() => expandChapterToFullHeight(host), 800);
+        expandChapterToFullHeight(mount);
+        window.setTimeout(() => expandChapterToFullHeight(mount), 50);
+        window.setTimeout(() => expandChapterToFullHeight(mount), 250);
+        window.setTimeout(() => expandChapterToFullHeight(mount), 800);
       });
 
       try {
@@ -678,7 +671,7 @@ export function LibraryBookReader({
             if (img.complete) continue;
             img.addEventListener(
               "load",
-              () => expandChapterToFullHeight(host),
+              () => expandChapterToFullHeight(mount),
               { once: true }
             );
           }
@@ -690,17 +683,17 @@ export function LibraryBookReader({
       await rendition.display();
       if (!stillMine()) {
         abandonBook();
-        host.innerHTML = "";
+        mount.innerHTML = "";
         return null;
       }
 
-      if (!host.querySelector("iframe")) {
+      if (!mount.querySelector("iframe")) {
         abandonBook();
-        host.innerHTML = "";
+        mount.innerHTML = "";
         return null;
       }
 
-      expandChapterToFullHeight(host);
+      expandChapterToFullHeight(mount);
       return rendition;
     }
 
@@ -735,14 +728,14 @@ export function LibraryBookReader({
               throw new Error(message);
             }
 
-            const blob = await res.blob();
+            const buffer = await res.arrayBuffer();
             if (!stillMine()) return;
-            if (blob.size < 1024) {
+            if (buffer.byteLength < 1024) {
               throw new Error(
                 "This EPUB’s file is missing on the shelf — re-upload it from the library admin."
               );
             }
-            const head = new Uint8Array(await blob.slice(0, 64).arrayBuffer());
+            const head = new Uint8Array(buffer.slice(0, 64));
             const headText = String.fromCharCode(...Array.from(head));
             const isZip = head[0] === 0x50 && head[1] === 0x4b;
             if (!isZip || headText.includes("git-lfs")) {
@@ -751,15 +744,7 @@ export function LibraryBookReader({
               );
             }
 
-            if (objectUrl) {
-              try {
-                URL.revokeObjectURL(objectUrl);
-              } catch {
-                // ignore
-              }
-            }
-            objectUrl = URL.createObjectURL(blob);
-            rendition = await paintBook(ePub, objectUrl);
+            rendition = await paintBook(ePub, buffer);
           } catch (err) {
             lastError =
               err instanceof Error ? err : new Error("Could not open this EPUB");
@@ -771,10 +756,11 @@ export function LibraryBookReader({
         }
 
         if (!stillMine()) return;
-        if (!rendition || !book) {
+        if (!rendition || !book || !host) {
           throw lastError || new Error("Could not open this EPUB");
         }
 
+        const mount = host;
         const doResize = () => {
           const size = measure();
           if (size.width > 0 && size.height > 0) {
@@ -784,21 +770,21 @@ export function LibraryBookReader({
               // ignore
             }
           }
-          expandChapterToFullHeight(host);
+          expandChapterToFullHeight(mount);
         };
 
         navRef.current = {
           next: () => {
             void rendition!.next();
-            window.setTimeout(() => expandChapterToFullHeight(host), 80);
+            window.setTimeout(() => expandChapterToFullHeight(mount), 80);
           },
           prev: () => {
             void rendition!.prev();
-            window.setTimeout(() => expandChapterToFullHeight(host), 80);
+            window.setTimeout(() => expandChapterToFullHeight(mount), 80);
           },
           display: (cfi: string) => {
             void rendition!.display(cfi);
-            window.setTimeout(() => expandChapterToFullHeight(host), 80);
+            window.setTimeout(() => expandChapterToFullHeight(mount), 80);
           },
           resize: doResize,
         };
@@ -815,7 +801,7 @@ export function LibraryBookReader({
                 window.setTimeout(resolve, 2000);
               }),
             ]);
-            expandChapterToFullHeight(host);
+            expandChapterToFullHeight(mount);
           } catch {
             // Keep the start page — resume is best-effort.
           }
@@ -829,11 +815,11 @@ export function LibraryBookReader({
         window.setTimeout(doResize, 1500);
 
         observer = new ResizeObserver(() => doResize());
-        observer.observe(host);
+        observer.observe(mount);
 
         rendition.on("relocated", (location: unknown) => {
-          if (host.dataset.reactToken !== token) return;
-          expandChapterToFullHeight(host);
+          if (!host || host.dataset.reactToken !== token) return;
+          expandChapterToFullHeight(mount);
           const place = placeFromLocation(location, bookApiRef.current);
           if (!place.reliable) {
             place.percent = placeRef.current.percent;
@@ -874,12 +860,32 @@ export function LibraryBookReader({
       }
     }
 
-    void openEpub();
+    function claimAndOpen(attempt = 0) {
+      const mount = viewerRef.current;
+      if (!mount) {
+        // Ref can lag one frame behind hydration — retry briefly.
+        if (attempt < 40) {
+          startTimer = window.setTimeout(() => claimAndOpen(attempt + 1), 50);
+        } else {
+          setLoading(false);
+          setError("Could not open the reading pane — try refreshing.");
+        }
+        return;
+      }
+      host = mount;
+      token = `react-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      host.dataset.reactToken = token;
+      host.dataset.owned = "react";
+      void openEpub();
+    }
+
+    claimAndOpen();
 
     return () => {
       cancelled = true;
+      if (startTimer) window.clearTimeout(startTimer);
       tearDownTimer = window.setTimeout(() => {
-        if (host.dataset.reactToken !== token) {
+        if (!host || host.dataset.reactToken !== token) {
           return;
         }
         navRef.current = null;
@@ -899,14 +905,6 @@ export function LibraryBookReader({
           book?.destroy();
         } catch {
           // ignore
-        }
-        if (objectUrl) {
-          try {
-            URL.revokeObjectURL(objectUrl);
-          } catch {
-            // ignore
-          }
-          objectUrl = null;
         }
         host.innerHTML = "";
         if (host.dataset.owned === "react") delete host.dataset.owned;

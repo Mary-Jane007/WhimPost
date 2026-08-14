@@ -1,33 +1,15 @@
 import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { PERSISTENT_TV_MEDIA_PATH, UPLOAD_DIR } from "@/lib/persistentTvMedia";
+import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/persistentTvMedia";
+import { UPLOAD_DIR } from "@/lib/uploadPaths";
+import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
+
+export { UPLOAD_DIR } from "@/lib/uploadPaths";
+export { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
 
 /** Local playable copies when Git LFS pointers cannot be smudged. */
 export const TV_CACHE_DIR = path.join(process.cwd(), "data", "tv-cache");
-
-const MIN_PLAYABLE_BYTES = 8_192;
-
-export function isLfsPointerFile(filePath: string) {
-  try {
-    const stat = fs.statSync(filePath);
-    if (stat.size > 1024) return false;
-    const head = fs.readFileSync(filePath, "utf8");
-    return head.startsWith("version https://git-lfs.github.com/spec/v1");
-  } catch {
-    return false;
-  }
-}
-
-export function isPlayableMediaFile(filePath: string) {
-  try {
-    if (!fs.existsSync(filePath)) return false;
-    if (isLfsPointerFile(filePath)) return false;
-    return fs.statSync(filePath).size >= MIN_PLAYABLE_BYTES;
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Prefer a real upload; fall back to a local tv-cache stand-in when the
