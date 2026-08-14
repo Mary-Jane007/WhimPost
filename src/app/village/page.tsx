@@ -397,7 +397,7 @@ export default async function VillagePage() {
               Private control room for WhimPost — users, villages, letters, TV Corner,
               health, and what to improve next.
             </p>
-            <Link className="btn primary" href="/admin/analytics">
+            <Link className="btn-primary" href="/admin/analytics">
               Open owner analytics
             </Link>
           </section>
