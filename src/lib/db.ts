@@ -1,5 +1,4 @@
 import Database from "better-sqlite3";
-import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
@@ -480,36 +479,7 @@ function migrate(db: Database.Database) {
     "shared INTEGER NOT NULL DEFAULT 0"
   );
 
-  // Fold any pre-channel clips into a village channel so the dial stays usable.
-  const orphans = db
-    .prepare(
-      `SELECT id, title, village_id, uploader_id
-       FROM tv_videos
-       WHERE channel_id IS NULL AND village_id IS NOT NULL`
-    )
-    .all() as Array<{
-    id: string;
-    title: string;
-    village_id: string;
-    uploader_id: string;
-  }>;
-
-  for (const video of orphans) {
-    const channelId = randomUUID();
-    db.prepare(
-      `INSERT INTO tv_channels (id, title, village_id, created_by)
-       VALUES (?, ?, ?, ?)`
-    ).run(
-      channelId,
-      video.title.slice(0, 80) || "Village channel",
-      video.village_id,
-      video.uploader_id
-    );
-    db.prepare(`UPDATE tv_videos SET channel_id = ? WHERE id = ?`).run(
-      channelId,
-      video.id
-    );
-  }
+  // Fresh-start TV Corner uses a flat clip shelf (no auto-channels).
 }
 
 function createDb() {
