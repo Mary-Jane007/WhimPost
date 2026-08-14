@@ -1,7 +1,13 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T14:56:30.203Z",
+  "updatedAt": "2026-08-14T14:56:56.754Z",
   "sounds": [
+    {
+      "playlistId": "campfire",
+      "filename": "d4f03bfb-6f1d-4f4e-8031-869976419ebd.mp3",
+      "originalName": "king_of_the_christmas-fireplace-loop-original-noise-178209.mp3",
+      "sizeBytes": 9511915
+    },
     {
       "playlistId": "forest-night",
       "filename": "9c3d7457-2140-40e3-89bd-d6ac9fd05bc1.mp3",
