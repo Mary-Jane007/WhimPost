@@ -1119,6 +1119,17 @@ export function LibraryBookReader({
               <button
                 type="button"
                 className="btn-secondary"
+                onClick={() => (tocOpen ? closeToc() : openToc())}
+                disabled={loading || Boolean(error)}
+                aria-pressed={tocOpen}
+              >
+                Table of contents
+              </button>
+            ) : null}
+            {kind === "epub" ? (
+              <button
+                type="button"
+                className="btn-secondary"
                 onClick={() => void restartReading()}
                 disabled={loading || Boolean(error) || restartBusy}
               >
