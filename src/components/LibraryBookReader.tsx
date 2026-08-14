@@ -910,7 +910,7 @@ export function LibraryBookReader({
               new Promise<void>((_, reject) => {
                 window.setTimeout(
                   () => reject(new Error("resume timeout")),
-                  1800
+                  4500
                 );
               }),
             ]);
