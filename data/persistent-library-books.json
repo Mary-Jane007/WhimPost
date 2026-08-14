@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T18:58:45.198Z",
+  "updatedAt": "2026-08-14T18:59:12.949Z",
   "books": [
     {
       "id": "princess",
@@ -253,9 +253,9 @@
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/5c9b70ee-6104-4a2c-9e96-806715c921e1.jpg",
-      "fileUrl": "/api/uploads/8e7021f2-3c6d-4a67-95f6-46be2121bfc0.epub",
-      "fileName": "20151002.epub",
-      "fileMime": "application/epub+zip",
+      "fileUrl": null,
+      "fileName": null,
+      "fileMime": null,
       "quotesJson": "[]",
       "reflectionsJson": "[]",
       "category": "Nature",
