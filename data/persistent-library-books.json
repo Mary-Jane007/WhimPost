@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:22:17.070Z",
+  "updatedAt": "2026-08-14T19:22:21.256Z",
   "books": [
     {
       "id": "princess",
@@ -165,9 +165,9 @@
       "minutes": 180,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/7299f05d-6d8e-4790-bca6-9372d17a54c4.jpg",
-      "fileUrl": null,
-      "fileName": null,
-      "fileMime": null,
+      "fileUrl": "/api/uploads/1f69643d-0607-44a2-a3fb-52b583a35442.epub",
+      "fileName": "A silent witness - R. Austin Freeman.epub",
+      "fileMime": "application/epub+zip",
       "quotesJson": "[]",
       "reflectionsJson": "[]",
       "category": "Mystery",
