@@ -365,6 +365,27 @@ export function MosshollowLibrary({
                       : ""}
                 </p>
                 <BookReadingProgress progress={progress} bookId={book.id} />
+                <p className="mh-summary-launch">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() =>
+                      openBookSummary({
+                        id: book.id,
+                        title: book.title,
+                        author: book.author,
+                        description: book.description || "",
+                        coverEmoji: book.coverEmoji,
+                        coverUrl: book.coverUrl,
+                        fileUrl: book.fileUrl,
+                        fileName: book.fileName,
+                        minutes: book.minutes,
+                      })
+                    }
+                  >
+                    Summary
+                  </button>
+                </p>
                 {book.fileUrl ? (
                   <p className="mh-file-link">
                     <Link
@@ -711,6 +732,27 @@ export function MosshollowLibrary({
                     <p className="mh-themes">{b.themes.join(" · ")}</p>
                     <p className="mh-rating">★ {b.rating.toFixed(1)} community</p>
                     <BookReadingProgress progress={progress} bookId={b.id} />
+                    <p className="mh-summary-launch">
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={() =>
+                          openBookSummary({
+                            id: b.id,
+                            title: b.title,
+                            author: b.author,
+                            description: b.description || "",
+                            coverEmoji: b.coverEmoji,
+                            coverUrl: b.coverUrl,
+                            fileUrl: b.fileUrl,
+                            fileName: b.fileName,
+                            metaLine: `${b.category} · ${b.difficulty} · ${b.length} · ${b.mood}`,
+                          })
+                        }
+                      >
+                        Summary
+                      </button>
+                    </p>
                     {b.fileUrl ? (
                       <p className="mh-file-link">
                         <Link
