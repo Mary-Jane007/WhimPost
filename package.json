@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack -p 3333",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start -p 3333",
     "lint": "eslint src --max-warnings 0",
     "persist-tv": "node scripts/persist-tv.mjs",

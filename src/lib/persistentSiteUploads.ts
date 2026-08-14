@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { UPLOAD_DIR } from "@/lib/persistentTvMedia";
+import { UPLOAD_DIR } from "@/lib/uploadPaths";
 
 /**
  * Git-tracked catalog of generic site uploads (letter images, covers,

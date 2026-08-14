@@ -7,7 +7,7 @@ import { getLibraryProgress } from "@/lib/library";
 import { findLibraryBook } from "@/lib/libraryBooks";
 import { ensureMediaReleaseAsset } from "@/lib/mediaRelease";
 import { ensureLibraryBookBytes } from "@/lib/persistentLibraryBooks";
-import { isLfsPointerFile } from "@/lib/tvUploadFiles";
+import { isLfsPointerFile } from "@/lib/lfsPointer";
 import { LibraryReadClient } from "@/components/LibraryReadClient";
 
 type Props = {

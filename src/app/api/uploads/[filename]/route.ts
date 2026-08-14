@@ -4,12 +4,10 @@ import { Readable } from "stream";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { isLfsPointerFile } from "@/lib/lfsPointer";
 import { ensureMediaReleaseAsset } from "@/lib/mediaRelease";
 import { canAccessVideo, getVideoByFilename } from "@/lib/tvCorner";
-import {
-  isLfsPointerFile,
-  resolvePlayableUploadPath,
-} from "@/lib/tvUploadFiles";
+import { resolvePlayableUploadPath } from "@/lib/tvUploadFiles";
 
 export const runtime = "nodejs";
 /** Serving large EPUBs should not time out mid-stream. */
