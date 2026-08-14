@@ -7276,7 +7276,12 @@ button.linkish:hover {
 .mh-reader-epub .epub-container {
   width: 100% !important;
   /* Keep epubjs stage height (viewport); it scrolls overflow inside. */
+  height: 100% !important;
   max-width: 100% !important;
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mh-reader-epub .epub-view {

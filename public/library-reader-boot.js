@@ -167,17 +167,18 @@
       } catch (_) {}
       throw new Error(message);
     }
-    var blob = await res.blob();
-    var head = new Uint8Array(await blob.slice(0, 64).arrayBuffer());
+    var buffer = await res.arrayBuffer();
+    var head = new Uint8Array(buffer.slice(0, 64));
     var headText = String.fromCharCode.apply(null, Array.from(head));
     var isZip = head[0] === 0x50 && head[1] === 0x4b;
-    if (!isZip || blob.size < 1024 || headText.indexOf("git-lfs") !== -1) {
+    if (!isZip || buffer.byteLength < 1024 || headText.indexOf("git-lfs") !== -1) {
       throw new Error(
         "This EPUB’s file is missing on the shelf — re-upload it from the library admin."
       );
     }
-    var objectUrl = URL.createObjectURL(blob);
-    var book = window.ePub(objectUrl);
+    // Pass binary bytes — blob: URLs have no .epub suffix and epubjs hangs
+    // trying to fetch /META-INF/container.xml from the site root.
+    var book = window.ePub(buffer);
     await book.ready;
 
     var rect = mount.getBoundingClientRect();
@@ -438,9 +439,10 @@
   // Prefer React. Only boot if hydration never claimed the mount,
   // or claimed it but left a blank stage.
   function schedule() {
-    setTimeout(tryBoot, 900);
-    setTimeout(tryBoot, 2200);
-    setTimeout(tryBoot, 4000);
+    setTimeout(tryBoot, 400);
+    setTimeout(tryBoot, 1200);
+    setTimeout(tryBoot, 2500);
+    setTimeout(tryBoot, 5000);
   }
 
   if (document.readyState === "loading") {

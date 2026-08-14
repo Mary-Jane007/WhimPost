@@ -1,4 +1,3 @@
-import Script from "next/script";
 import fs from "fs";
 import path from "path";
 import { redirect, notFound } from "next/navigation";
@@ -61,10 +60,12 @@ export default async function LibraryReadPage({ params }: Props) {
   return (
     <>
       {/*
-        React opens via vendor epub.min.js. Boot is a fallback that only
-        steals the mount when React left an empty container (no iframe).
+        Plain classic script (not next/script) so the fallback always runs
+        even when React hydration is slow. React still owns the mount first;
+        boot only steals an empty stage.
       */}
-      <Script src="/library-reader-boot.js" strategy="afterInteractive" />
+      {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+      <script src="/library-reader-boot.js" defer />
       <LibraryReadClient
         bookId={book.id}
         title={book.title}
