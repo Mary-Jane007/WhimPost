@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T17:48:17.763Z",
+  "updatedAt": "2026-08-14T17:54:05.460Z",
   "books": [
     {
       "id": "princess",
@@ -201,28 +201,6 @@
       "published": true
     },
     {
-      "id": "lib-16cacc36-c7dd-429c-bcca-7df91a1b1a01",
-      "shelf": "readinglist",
-      "title": "Frankenstein",
-      "author": "Mary Shelly",
-      "description": "Victor Frankenstein builds a living man out of dead matter, then flees the room the moment it opens its eyes. Everything that follows comes from that flinch. The creature teaches itself to speak and read, discovers it was abandoned before it had done anything wrong, and asks its maker for one thing: a companion. Mary Shelley was twenty when she wrote it, and she gave the monster the most reasonable voice in the  book.\r\n\r\nThis is the original 1818 text, before Shelley revised it in 1831 to soften Victor and add a heavier hand of fate. The earlier version is colder and blames him more directly, which is why many readers and most scholars now prefer it.",
-      "minutes": 180,
-      "coverEmoji": "📖",
-      "coverUrl": "/api/uploads/2a997ff9-1a42-479f-b47b-1ed0d11da9c1.jpg",
-      "fileUrl": "/api/uploads/e4bc87ca-8680-4117-88b8-dd8a6dd7e373.epub",
-      "fileName": "frankenstein.epub",
-      "fileMime": "application/epub+zip",
-      "quotesJson": "[]",
-      "reflectionsJson": "[]",
-      "category": "Classic Literature",
-      "difficulty": "Gentle",
-      "length": "Medium",
-      "mood": "Cozy",
-      "themesJson": "[\"story\"]",
-      "rating": 4.5,
-      "published": true
-    },
-    {
       "id": "rl-marcus",
       "shelf": "readinglist",
       "title": "Meditations",
@@ -379,6 +357,7 @@
   ],
   "removedIds": [
     "hobbit",
+    "lib-16cacc36-c7dd-429c-bcca-7df91a1b1a01",
     "little-prince",
     "rl-frankl",
     "rl-le-guin",
