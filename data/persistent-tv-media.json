@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T02:10:30.721Z",
+  "updatedAt": "2026-08-14T02:11:10.090Z",
   "clips": [
     {
       "title": "Peter Rabbit",
@@ -8,16 +8,6 @@
       "mime": "video/mp4",
       "sizeBytes": 208342523,
       "durationMs": 1401139,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": "moonmere",
-      "isGlobal": false
-    },
-    {
-      "title": "Queued Later Clip",
-      "filename": "e95e5731-7552-4629-86b0-a865e7d9ffda.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 300024,
-      "durationMs": 120000,
       "channelTitle": "Cottage Cartoons",
       "villageId": "moonmere",
       "isGlobal": false
