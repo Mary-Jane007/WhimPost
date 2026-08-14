@@ -412,12 +412,41 @@ export function LibraryBookReader({
       }
       if (notesOpen) return;
       if (kind !== "epub") return;
-      if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+      // Page keys scroll within the chapter; arrows move between chapters.
+      if (e.key === "ArrowRight") {
         e.preventDefault();
         navRef.current?.next();
-      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+      } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         navRef.current?.prev();
+      } else if (e.key === "PageDown" || e.key === " ") {
+        e.preventDefault();
+        const stage = viewerRef.current?.closest(".mh-reader-stage") as
+          | HTMLElement
+          | null;
+        const scroller =
+          (viewerRef.current?.querySelector(".epub-container") as HTMLElement) ||
+          stage;
+        if (scroller) {
+          scroller.scrollBy({
+            top: Math.max(240, scroller.clientHeight * 0.88),
+            behavior: "smooth",
+          });
+        }
+      } else if (e.key === "PageUp") {
+        e.preventDefault();
+        const stage = viewerRef.current?.closest(".mh-reader-stage") as
+          | HTMLElement
+          | null;
+        const scroller =
+          (viewerRef.current?.querySelector(".epub-container") as HTMLElement) ||
+          stage;
+        if (scroller) {
+          scroller.scrollBy({
+            top: -Math.max(240, scroller.clientHeight * 0.88),
+            behavior: "smooth",
+          });
+        }
       }
     }
     window.addEventListener("keydown", onKey);
@@ -512,7 +541,10 @@ export function LibraryBookReader({
       const rendition = book.renderTo(host, {
         width,
         height,
-        flow: "paginated",
+        // Full chapter documents — scroll within the chapter instead of
+        // clipping text at the bottom of a fixed paginated frame.
+        flow: "scrolled-doc",
+        manager: "default",
         spread: "none",
         minSpreadWidth: 100000,
         allowScriptedContent: true,
@@ -521,8 +553,9 @@ export function LibraryBookReader({
       rendition.themes.default({
         html: {
           width: "100% !important",
-          height: "100% !important",
-          overflow: "hidden !important",
+          height: "auto !important",
+          "min-height": "100% !important",
+          overflow: "visible !important",
           margin: "0 !important",
           padding: "0 !important",
         },
@@ -530,31 +563,36 @@ export function LibraryBookReader({
           color: "#2c2418 !important",
           background: "#f6edd9 !important",
           "font-family": "Georgia, 'Times New Roman', serif !important",
-          "line-height": "1.65 !important",
-          "font-size": "1em !important",
-          padding: "0.85rem 1rem !important",
+          "line-height": "1.7 !important",
+          "font-size": "1.05em !important",
+          padding: "1.1rem 1.25rem 2.5rem !important",
           margin: "0 !important",
           width: "100% !important",
-          height: "100% !important",
-          "max-height": "100% !important",
+          height: "auto !important",
+          "min-height": "100% !important",
+          "max-height": "none !important",
           "box-sizing": "border-box !important",
-          overflow: "hidden !important",
+          overflow: "visible !important",
         },
         p: {
-          "margin-top": "0.55em !important",
-          "margin-bottom": "0.55em !important",
+          "margin-top": "0.65em !important",
+          "margin-bottom": "0.65em !important",
         },
         a: { color: "#5c3a1e !important" },
         img: {
           "max-width": "100% !important",
-          "max-height": "100% !important",
+          "max-height": "none !important",
           width: "auto !important",
           height: "auto !important",
           "object-fit": "contain !important",
         },
         svg: {
           "max-width": "100% !important",
-          "max-height": "100% !important",
+          "max-height": "none !important",
+        },
+        table: {
+          "max-width": "100% !important",
+          "overflow-x": "auto !important",
         },
       });
 
@@ -851,10 +889,10 @@ export function LibraryBookReader({
               onClick={() => navRef.current?.prev()}
               disabled={loading || Boolean(error)}
             >
-              ← Previous
+              ← Previous chapter
             </button>
             <span className="muted">
-              Arrow keys or space turn the page
+              Scroll to read the full chapter · arrows change chapter
             </span>
             <button
               type="button"
@@ -863,7 +901,7 @@ export function LibraryBookReader({
               onClick={() => navRef.current?.next()}
               disabled={loading || Boolean(error)}
             >
-              Next →
+              Next chapter →
             </button>
           </div>
         ) : null}

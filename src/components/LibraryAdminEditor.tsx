@@ -266,7 +266,7 @@ export function LibraryAdminEditor({
             <textarea name="reflections" rows={2} />
           </label>
           <label>
-            Book file (PDF or EPUB)
+            Book file (PDF or EPUB, up to 500MB)
             <input
               type="file"
               name="file"
@@ -524,7 +524,7 @@ export function LibraryAdminEditor({
                       />
                     </label>
                     <label>
-                      Replace book file (optional)
+                      Replace book file (optional, up to 500MB)
                       <input
                         type="file"
                         name="file"

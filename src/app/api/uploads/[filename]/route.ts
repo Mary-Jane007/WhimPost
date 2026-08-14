@@ -12,6 +12,8 @@ import {
 } from "@/lib/tvUploadFiles";
 
 export const runtime = "nodejs";
+/** Serving large EPUBs should not time out mid-stream. */
+export const maxDuration = 600;
 
 const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
 const MIME: Record<string, string> = {
@@ -165,31 +167,32 @@ export async function GET(
         404
       );
     }
-    const bytes = fs.readFileSync(bookPath);
-    // EPUB must be a ZIP (PK…); PDF must start with %PDF.
-    if (ext === "epub" && !(bytes[0] === 0x50 && bytes[1] === 0x4b)) {
+    // Validate magic bytes without loading the whole book into memory.
+    const header = Buffer.alloc(8);
+    const fd = fs.openSync(bookPath, "r");
+    fs.readSync(fd, header, 0, 8, 0);
+    fs.closeSync(fd);
+    if (ext === "epub" && !(header[0] === 0x50 && header[1] === 0x4b)) {
       return jsonError(
         "Book file is damaged — re-upload the EPUB from the library shelf",
         404
       );
     }
-    if (
-      ext === "pdf" &&
-      bytes.slice(0, 4).toString("utf8") !== "%PDF"
-    ) {
+    if (ext === "pdf" && header.slice(0, 4).toString("utf8") !== "%PDF") {
       return jsonError(
         "Book file is damaged — re-upload the PDF from the library shelf",
         404
       );
     }
-    return new NextResponse(bytes, {
-      headers: {
-        "Content-Type": MIME[ext] || "application/octet-stream",
-        "Cache-Control": "private, max-age=86400",
-        "Content-Disposition": `inline; filename="${filename}"`,
-        "X-Content-Type-Options": "nosniff",
-      },
-    });
+    const response = fileStreamResponse(
+      bookPath,
+      MIME[ext] || "application/octet-stream"
+    );
+    response.headers.set(
+      "Content-Disposition",
+      `inline; filename="${filename}"`
+    );
+    return response;
   }
 
   let resolvedPath = filePath;

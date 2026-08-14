@@ -1,6 +1,8 @@
 import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
+import { Readable } from "stream";
+import { pipeline } from "stream/promises";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { isSiteOwner } from "@/lib/owner";
@@ -21,9 +23,11 @@ import type { ReadingCategory, ReadingListBook } from "@/lib/libraryContent";
 import { redirectSameHost, wantsHtmlRedirect } from "@/lib/requestBody";
 
 export const runtime = "nodejs";
+/** Large EPUB uploads can take a while on slow links. */
+export const maxDuration = 600;
 
 const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
-const MAX_BOOK_BYTES = 40 * 1024 * 1024; // 40MB
+const MAX_BOOK_BYTES = 500 * 1024 * 1024; // 500MB — full novels / illustrated EPUBs
 const MAX_COVER_BYTES = 4 * 1024 * 1024;
 const BOOK_MIME: Record<string, string> = {
   "application/pdf": "pdf",
@@ -62,14 +66,46 @@ async function saveBookFile(bookFile: File) {
   const ext = extFromBookFile(bookFile);
   if (!ext) return { error: "Upload a PDF or EPUB book file" as const };
   if (bookFile.size > MAX_BOOK_BYTES) {
-    return { error: "Book files must be under 40MB" as const };
+    return { error: "Book files must be under 500MB" as const };
   }
   ensureUploadDir();
   const filename = `${randomUUID()}.${ext}`;
-  fs.writeFileSync(
-    path.join(UPLOAD_DIR, filename),
-    Buffer.from(await bookFile.arrayBuffer())
-  );
+  const dest = path.join(UPLOAD_DIR, filename);
+  try {
+    // Stream to disk so large EPUBs do not need a second full copy in RAM.
+    const webStream = bookFile.stream();
+    const nodeStream = Readable.fromWeb(
+      webStream as unknown as import("stream/web").ReadableStream
+    );
+    await pipeline(nodeStream, fs.createWriteStream(dest));
+  } catch (err) {
+    try {
+      if (fs.existsSync(dest)) fs.unlinkSync(dest);
+    } catch {
+      // ignore
+    }
+    console.error("[library] book upload failed:", err);
+    return { error: "Could not save the book file — try again" as const };
+  }
+
+  // Sanity-check EPUB is a real ZIP before we keep it.
+  if (ext === "epub") {
+    const fd = fs.openSync(dest, "r");
+    const header = Buffer.alloc(4);
+    fs.readSync(fd, header, 0, 4, 0);
+    fs.closeSync(fd);
+    if (!(header[0] === 0x50 && header[1] === 0x4b)) {
+      try {
+        fs.unlinkSync(dest);
+      } catch {
+        // ignore
+      }
+      return {
+        error: "That file does not look like a valid EPUB — try another export" as const,
+      };
+    }
+  }
+
   return {
     fileUrl: `/api/uploads/${filename}`,
     fileName: bookFile.name.slice(0, 180) || filename,
