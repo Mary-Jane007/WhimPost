@@ -170,10 +170,7 @@ export function BookSummaryModal({
             {summary.trim() ? (
               <p>{summary}</p>
             ) : (
-              <p className="muted">
-                No summary yet
-                {isOwner ? " — add one so villagers know what’s waiting inside." : "."}
-              </p>
+              <p className="mh-summary-empty">There is no summary yet.</p>
             )}
             <div className="mh-summary-actions">
               {book.fileUrl ? (
@@ -191,7 +188,7 @@ export function BookSummaryModal({
                   className="btn-secondary"
                   onClick={() => setEditing(true)}
                 >
-                  Edit summary
+                  {summary.trim() ? "Edit summary" : "Add summary"}
                 </button>
               ) : null}
             </div>

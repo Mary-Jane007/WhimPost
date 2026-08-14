@@ -86,7 +86,11 @@ export function MosshollowLibrary({
   const returnTo = `/library?tab=${tab}`;
 
   function openBookSummary(next: BookSummaryInfo) {
-    setSummaryBook(next);
+    // Always open — even when description is empty (shows “no summary yet”).
+    setSummaryBook({
+      ...next,
+      description: next.description || "",
+    });
   }
 
   function applySummaryEdit(next: BookSummaryInfo) {
@@ -306,7 +310,7 @@ export function MosshollowLibrary({
                     id: book.id,
                     title: book.title,
                     author: book.author,
-                    description: book.description,
+                    description: book.description || "",
                     coverEmoji: book.coverEmoji,
                     coverUrl: book.coverUrl,
                     fileUrl: book.fileUrl,
@@ -325,9 +329,33 @@ export function MosshollowLibrary({
                 {!book.coverUrl ? <strong>{book.title}</strong> : null}
               </button>
               <div>
-                <h3>{book.title}</h3>
+                <h3>
+                  <button
+                    type="button"
+                    className="mh-title-link"
+                    onClick={() =>
+                      openBookSummary({
+                        id: book.id,
+                        title: book.title,
+                        author: book.author,
+                        description: book.description || "",
+                        coverEmoji: book.coverEmoji,
+                        coverUrl: book.coverUrl,
+                        fileUrl: book.fileUrl,
+                        fileName: book.fileName,
+                        minutes: book.minutes,
+                      })
+                    }
+                  >
+                    {book.title}
+                  </button>
+                </h3>
                 <p className="muted">by {book.author}</p>
-                <p>{book.description}</p>
+                {book.description?.trim() ? (
+                  <p>{book.description}</p>
+                ) : (
+                  <p className="mh-summary-empty">There is no summary yet.</p>
+                )}
                 <p className="mh-meta">
                   Estimated reading time · about {book.minutes} minutes
                   {progress.readingPositions?.[book.id]?.label
@@ -537,7 +565,7 @@ export function MosshollowLibrary({
                               id: b.id,
                               title: b.title,
                               author: b.author,
-                              description: b.description,
+                              description: b.description || "",
                               coverEmoji: b.coverEmoji,
                               coverUrl: b.coverUrl,
                               fileUrl: b.fileUrl,
