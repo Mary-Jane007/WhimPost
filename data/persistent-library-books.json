@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:02:42.543Z",
+  "updatedAt": "2026-08-14T19:04:01.427Z",
   "books": [
     {
       "id": "princess",
@@ -60,6 +60,28 @@
       "fileMime": "application/epub+zip",
       "quotesJson": "[\"Wrong will be right, when Aslan comes in sight.\",\"Once a king or queen of Narnia, always a king or queen.\"]",
       "reflectionsJson": "[\"What doorway in your life still feels magical?\",\"When have you needed a second chance?\"]",
+      "category": null,
+      "difficulty": null,
+      "length": null,
+      "mood": "",
+      "themesJson": "[]",
+      "rating": 4.5,
+      "published": true
+    },
+    {
+      "id": "neverending",
+      "shelf": "club",
+      "title": "The NeverEnding Story",
+      "author": "Michael Ende",
+      "description": "Bastian hides in an attic with a stolen book — and discovers Fantastica needs a reader brave enough to give it a new name.",
+      "minutes": 380,
+      "coverEmoji": "🐉",
+      "coverUrl": null,
+      "fileUrl": "/api/uploads/f18ce140-2d45-46d3-90fb-c6eba485b610.epub",
+      "fileName": "And Then There Were None.epub",
+      "fileMime": "application/epub+zip",
+      "quotesJson": "[\"Every real story is a never ending story.\",\"You must let what happens happen; everything must be equal in your heart.\"]",
+      "reflectionsJson": "[\"What story are you inside without noticing?\",\"If Fantastica asked for a new name, what would you give?\"]",
       "category": null,
       "difficulty": null,
       "length": null,
