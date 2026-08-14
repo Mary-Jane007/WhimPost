@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T14:57:53.902Z",
+  "updatedAt": "2026-08-14T14:57:58.620Z",
   "sounds": [
     {
       "playlistId": "campfire",
@@ -19,6 +19,12 @@
       "filename": "e8115767-4c71-4d6d-8a56-0bcc2d5bf7d0.mp3",
       "originalName": "dragon-studio-cozy-midnight-rain-07-448572.mp3",
       "sizeBytes": 960768
+    },
+    {
+      "playlistId": "night-jazz",
+      "filename": "665df808-eabe-4af5-b5aa-3b4766851939.mp3",
+      "originalName": "Relaxing Jazz Music  Piano  Classic  Lounge (Short Jazz).mp3",
+      "sizeBytes": 3752365
     },
     {
       "playlistId": "ocean-waves",
