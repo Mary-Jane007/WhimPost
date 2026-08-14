@@ -5,7 +5,6 @@ import { randomUUID } from "crypto";
 
 /**
  * Git-tracked catalog of uploaded TV files (metadata only).
- * Fresh-start TV Corner uses a flat clip shelf (no channels).
  */
 export const PERSISTENT_TV_MEDIA_PATH = path.join(
   process.cwd(),
@@ -21,7 +20,6 @@ export type PersistentTvMediaClip = {
   mime: string;
   sizeBytes: number;
   durationMs?: number;
-  /** Kept for catalog compatibility; unused by the flat shelf UI. */
   channelTitle: string;
   villageId: string | null;
   isGlobal?: boolean;
@@ -54,8 +52,12 @@ function writeFile(clips: PersistentTvMediaClip[]) {
     version: 1,
     updatedAt: new Date().toISOString(),
     clips: clips
-      .filter((c) => c.filename && c.title)
-      .sort((a, b) => a.title.localeCompare(b.title)),
+      .filter((c) => c.filename && c.title && c.channelTitle)
+      .sort((a, b) =>
+        `${a.channelTitle}:${a.title}`.localeCompare(
+          `${b.channelTitle}:${b.title}`
+        )
+      ),
   };
 
   const tmp = `${PERSISTENT_TV_MEDIA_PATH}.tmp`;
@@ -63,13 +65,23 @@ function writeFile(clips: PersistentTvMediaClip[]) {
   fs.renameSync(tmp, PERSISTENT_TV_MEDIA_PATH);
 }
 
+function shuffleIds(ids: string[]): string[] {
+  const next = [...ids];
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+}
+
 /** Snapshot uploaded (file) TV clips so fresh servers can restore them. */
 export function exportPersistentTvMedia(db: Database) {
   const rows = db
     .prepare(
       `SELECT v.title, v.filename, v.mime, v.size_bytes, v.duration_ms,
-              v.village_id
+              v.village_id, c.title AS channel_title, c.is_global
        FROM tv_videos v
+       LEFT JOIN tv_channels c ON c.id = v.channel_id
        WHERE v.source_url IS NULL OR trim(v.source_url) = ''
        ORDER BY v.created_at ASC`
     )
@@ -80,6 +92,8 @@ export function exportPersistentTvMedia(db: Database) {
     size_bytes: number;
     duration_ms: number;
     village_id: string | null;
+    channel_title: string | null;
+    is_global: number | null;
   }>;
 
   const clips: PersistentTvMediaClip[] = [];
@@ -93,16 +107,16 @@ export function exportPersistentTvMedia(db: Database) {
       mime: row.mime || "video/mp4",
       sizeBytes: row.size_bytes || 0,
       durationMs: row.duration_ms > 0 ? row.duration_ms : undefined,
-      channelTitle: "Clip shelf",
+      channelTitle: row.channel_title || "Clip shelf",
       villageId: row.village_id,
-      isGlobal: false,
+      isGlobal: Boolean(row.is_global),
     });
   }
 
   writeFile(clips);
 }
 
-/** Restore file-based TV clips onto the flat shelf when upload bytes exist. */
+/** Restore uploaded clips into owner channels (and seed shuffle schedules). */
 export function importPersistentTvMedia(db: Database) {
   const file = readFile();
   if (!file || file.clips.length === 0) return;
@@ -121,20 +135,31 @@ export function importPersistentTvMedia(db: Database) {
   const uploaderId = owner?.id || anyUser?.id;
   if (!uploaderId) return;
 
+  const findChannel = db.prepare(
+    `SELECT id FROM tv_channels
+     WHERE lower(trim(title)) = lower(?)
+     ORDER BY is_global DESC, created_at ASC
+     LIMIT 1`
+  );
+  const insertChannel = db.prepare(
+    `INSERT INTO tv_channels (id, title, village_id, created_by, is_global)
+     VALUES (?, ?, ?, ?, ?)`
+  );
   const findByFilename = db.prepare(
     `SELECT id FROM tv_videos WHERE filename = ? LIMIT 1`
   );
   const insertVideo = db.prepare(
     `INSERT INTO tv_videos
       (id, title, filename, mime, size_bytes, duration_ms, uploader_id, village_id, channel_id, source_url)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)`
   );
   const updateVideo = db.prepare(
     `UPDATE tv_videos
-     SET title = ?, mime = ?, size_bytes = ?, duration_ms = ?, village_id = ?
+     SET title = ?, mime = ?, size_bytes = ?, duration_ms = ?, village_id = ?, channel_id = ?
      WHERE id = ?`
   );
 
+  const touched = new Set<string>();
   let restored = 0;
   let skippedMissing = 0;
 
@@ -142,6 +167,9 @@ export function importPersistentTvMedia(db: Database) {
     for (const clip of clips) {
       const filename = String(clip.filename || "").trim();
       const title = String(clip.title || "").trim().slice(0, 80);
+      const channelTitle =
+        String(clip.channelTitle || "Clip shelf").trim().slice(0, 80) ||
+        "Clip shelf";
       if (!filename || !title) continue;
       if (filename.startsWith("link-") || filename.includes("..")) continue;
 
@@ -153,13 +181,28 @@ export function importPersistentTvMedia(db: Database) {
 
       const sizeBytes =
         clip.sizeBytes > 0 ? clip.sizeBytes : fs.statSync(filePath).size;
-      const villageId = clip.villageId
-        ? String(clip.villageId).trim() || null
-        : null;
+      const villageId =
+        String(clip.villageId || "mosshollow").trim() || "mosshollow";
+      const isGlobal = Boolean(clip.isGlobal);
       const durationMs =
         clip.durationMs && clip.durationMs > 0
           ? Math.floor(clip.durationMs)
           : 0;
+
+      let channelId = (
+        findChannel.get(channelTitle) as { id: string } | undefined
+      )?.id;
+      if (!channelId) {
+        channelId = randomUUID();
+        insertChannel.run(
+          channelId,
+          channelTitle,
+          villageId,
+          uploaderId,
+          isGlobal ? 1 : 0
+        );
+      }
+
       const existing = findByFilename.get(filename) as
         | { id: string }
         | undefined;
@@ -169,7 +212,8 @@ export function importPersistentTvMedia(db: Database) {
           clip.mime || "video/mp4",
           sizeBytes,
           durationMs,
-          villageId,
+          isGlobal ? null : villageId,
+          channelId,
           existing.id
         );
       } else {
@@ -181,14 +225,54 @@ export function importPersistentTvMedia(db: Database) {
           sizeBytes,
           durationMs,
           uploaderId,
-          villageId
+          isGlobal ? null : villageId,
+          channelId
         );
       }
+      touched.add(channelId);
       restored += 1;
     }
   });
 
   sync(file.clips);
+
+  // Seed a shuffle order for each restored channel if empty.
+  for (const channelId of touched) {
+    const row = db
+      .prepare(
+        `SELECT schedule_epoch_ms, schedule_order_json FROM tv_channels WHERE id = ?`
+      )
+      .get(channelId) as
+      | { schedule_epoch_ms: number | null; schedule_order_json: string | null }
+      | undefined;
+    const ids = (
+      db
+        .prepare(
+          `SELECT id FROM tv_videos WHERE channel_id = ? ORDER BY created_at ASC`
+        )
+        .all(channelId) as Array<{ id: string }>
+    ).map((v) => v.id);
+    if (ids.length === 0) continue;
+    const hasOrder =
+      Boolean(row?.schedule_order_json) &&
+      Array.isArray(
+        (() => {
+          try {
+            return JSON.parse(row?.schedule_order_json || "[]");
+          } catch {
+            return null;
+          }
+        })()
+      ) &&
+      (JSON.parse(row?.schedule_order_json || "[]") as unknown[]).length > 0;
+    if (!hasOrder || !row?.schedule_epoch_ms) {
+      db.prepare(
+        `UPDATE tv_channels
+         SET schedule_epoch_ms = ?, schedule_order_json = ?
+         WHERE id = ?`
+      ).run(Date.now(), JSON.stringify(shuffleIds(ids)), channelId);
+    }
+  }
 
   if (skippedMissing > 0) {
     console.warn(

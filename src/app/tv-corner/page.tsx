@@ -3,13 +3,16 @@ import { getCurrentUser } from "@/lib/auth";
 import { listFriends } from "@/lib/letters";
 import {
   getOrCreateVillageRoom,
+  listChannelsForUser,
   listFriendRooms,
-  listVideosForUser,
 } from "@/lib/tvCorner";
 import { getVillage, type VillageId } from "@/lib/villages";
 import { TvCorner } from "@/components/TvCorner";
 import { PageCrest } from "@/components/PageCrest";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function TvCornerPage() {
   const user = await getCurrentUser();
@@ -33,7 +36,7 @@ export default async function TvCornerPage() {
 
   const village = getVillage(user.villageId as VillageId)!;
   const room = getOrCreateVillageRoom(user, user.villageId as VillageId);
-  const videos = listVideosForUser(user);
+  const channels = listChannelsForUser(user);
   const friendRooms = listFriendRooms(user);
   const friends = listFriends(user.id);
 
@@ -46,7 +49,7 @@ export default async function TvCornerPage() {
         mascot={village.mascot}
         mascotImage={village.mascotImage || null}
         initialRoom={room}
-        initialVideos={videos}
+        initialChannels={channels}
         initialFriendRooms={friendRooms}
         friendCount={friends.length}
       />

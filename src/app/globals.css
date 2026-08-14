@@ -5006,6 +5006,77 @@ button.linkish:hover {
   animation-delay: 1s;
 }
 
+.tv-channel-dial {
+  margin-top: 0.85rem;
+}
+
+.tv-channel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.tv-channel-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.tv-channel-list button:first-child {
+  text-align: left;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 28%, transparent);
+  border-radius: 0.85rem;
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--cream, #f3e6d0);
+  padding: 0.65rem 0.8rem;
+  cursor: pointer;
+}
+
+.tv-channel-list button:first-child strong {
+  display: block;
+  font-size: 0.98rem;
+}
+
+.tv-channel-list button:first-child span {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.tv-channel-list button.active {
+  border-color: color-mix(in srgb, var(--gold, #c9a227) 55%, transparent);
+  background: color-mix(in srgb, var(--village-color, #2a3548) 45%, rgba(0, 0, 0, 0.35));
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.25);
+}
+
+.tv-owner-create {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+
+.tv-global-check {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.86rem;
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 80%, transparent);
+}
+
+.tv-upload select {
+  width: 100%;
+  margin-top: 0.25rem;
+  border-radius: 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 35%, transparent);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--cream, #f3e6d0);
+  padding: 0.55rem 0.7rem;
+}
+
 /* Village flavor washes */
 .tv-nook-mosshollow .tv-cabinet {
   background:

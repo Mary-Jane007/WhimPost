@@ -4,6 +4,7 @@ import {
   createFriendsRoom,
   getOrCreateVillageRoom,
   getRoomById,
+  listChannelsForUser,
   listFriendRooms,
   listVideosForUser,
   touchPresence,
@@ -17,6 +18,8 @@ export async function GET(req: NextRequest) {
 
   const scope = req.nextUrl.searchParams.get("scope") || "village";
   const roomId = req.nextUrl.searchParams.get("roomId");
+  const channels = listChannelsForUser(user);
+  const videos = listVideosForUser(user);
 
   if (roomId) {
     const room = getRoomById(roomId);
@@ -27,7 +30,8 @@ export async function GET(req: NextRequest) {
     touchPresence(room.id, user.id);
     return NextResponse.json({
       room: getRoomById(room.id),
-      videos: listVideosForUser(user),
+      videos,
+      channels,
       friendRooms: room.scope === "friends" ? listFriendRooms(user) : [],
     });
   }
@@ -38,7 +42,8 @@ export async function GET(req: NextRequest) {
     if (active) touchPresence(active.id, user.id);
     return NextResponse.json({
       room: active ? getRoomById(active.id) : null,
-      videos: listVideosForUser(user),
+      videos,
+      channels,
       friendRooms,
     });
   }
@@ -50,7 +55,8 @@ export async function GET(req: NextRequest) {
   const room = getOrCreateVillageRoom(user, user.villageId as VillageId);
   return NextResponse.json({
     room,
-    videos: listVideosForUser(user),
+    videos,
+    channels,
     friendRooms: [],
   });
 }
@@ -72,6 +78,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     room,
     videos: listVideosForUser(user),
+    channels: listChannelsForUser(user),
     friendRooms: listFriendRooms(user),
   });
 }

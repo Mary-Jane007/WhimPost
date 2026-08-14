@@ -9,8 +9,11 @@ import {
   TV_MIME_EXT,
   createVideo,
   deleteVideo,
+  getChannelById,
+  listChannelsForUser,
   listVideosForUser,
 } from "@/lib/tvCorner";
+import { redirectSameHost, wantsHtmlRedirect } from "@/lib/requestBody";
 
 const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
 
@@ -23,15 +26,26 @@ function ensureUploadDir() {
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return jsonError("Not signed in", 401);
-  return NextResponse.json({ videos: listVideosForUser(user) });
+  return NextResponse.json({
+    videos: listVideosForUser(user),
+    channels: listChannelsForUser(user),
+  });
 }
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return jsonError("Not signed in", 401);
+  if (!user.isOwner) {
+    return jsonError("Only the site owner can upload channel videos", 403);
+  }
 
   const form = await req.formData().catch(() => null);
   if (!form) return jsonError("Expected multipart form data");
+
+  const channelId = String(form.get("channelId") || "").trim();
+  if (!channelId) return jsonError("Pick a channel for this clip");
+  const channel = getChannelById(channelId);
+  if (!channel) return jsonError("Channel not found", 404);
 
   const file = form.get("video");
   if (!(file instanceof File)) {
@@ -41,7 +55,7 @@ export async function POST(req: NextRequest) {
     return jsonError("Use an MP4, WebM, or MOV video");
   }
   if (file.size > TV_MAX_BYTES) {
-    return jsonError("Clips must be under 80MB");
+    return jsonError("Clips must be under 500MB");
   }
 
   const titleRaw = String(form.get("title") || "").trim();
@@ -62,10 +76,27 @@ export async function POST(req: NextRequest) {
     mime: file.type,
     sizeBytes: file.size,
     uploaderId: user.id,
-    villageId: user.villageId,
+    villageId: channel.isGlobal ? null : channel.villageId,
+    channelId: channel.id,
   });
 
-  return NextResponse.json({ video });
+  const nextRaw = String(form.get("next") || "/tv-corner");
+  const next =
+    nextRaw.startsWith("/") && !nextRaw.startsWith("//")
+      ? nextRaw
+      : "/tv-corner";
+
+  if (wantsHtmlRedirect(req)) {
+    return redirectSameHost(
+      req,
+      `${next}?tuned=${encodeURIComponent(channel.id)}`
+    );
+  }
+
+  return NextResponse.json({
+    video,
+    channels: listChannelsForUser(user),
+  });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -83,5 +114,8 @@ export async function DELETE(req: NextRequest) {
     fs.unlinkSync(filePath);
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    channels: listChannelsForUser(user),
+  });
 }

@@ -4,8 +4,15 @@ import { mapUser } from "@/lib/auth";
 import { areFriends, listFriends } from "@/lib/letters";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
-import { getVillage } from "@/lib/villages";
+import { getVillage, isVillageId } from "@/lib/villages";
 import { persistAllDurableState } from "@/lib/tvPersist";
+import {
+  addVideoToChannelSchedule,
+  probeAndStoreDuration,
+  removeVideoFromChannelSchedule,
+  resolveChannelBroadcast,
+  type TvScheduleSlot,
+} from "@/lib/tvSchedule";
 
 export type TvRoomScope = "village" | "friends";
 
@@ -15,10 +22,22 @@ export type TvVideo = {
   url: string;
   mime: string;
   sizeBytes: number;
+  durationMs: number;
   uploaderId: string;
   uploaderName: string;
   villageId: string | null;
+  channelId: string | null;
   createdAt: string;
+};
+
+export type TvChannel = {
+  id: string;
+  title: string;
+  villageId: string;
+  isGlobal: boolean;
+  createdBy: string;
+  createdAt: string;
+  videos: TvVideo[];
 };
 
 export type TvWatcher = {
@@ -32,11 +51,15 @@ export type TvRoomState = {
   villageId: string | null;
   hostId: string;
   title: string;
+  currentChannelId: string | null;
   currentVideoId: string | null;
   currentVideo: TvVideo | null;
   isPlaying: boolean;
   positionMs: number;
   positionUpdatedAt: string;
+  airStartsAt: string | null;
+  broadcastMode: "schedule" | "interactive";
+  schedule: TvScheduleSlot[];
   updatedAt: string;
   createdAt: string;
   watchers: TvWatcher[];
@@ -48,10 +71,21 @@ type VideoRow = {
   filename: string;
   mime: string;
   size_bytes: number;
+  duration_ms?: number | null;
   uploader_id: string;
   village_id: string | null;
+  channel_id?: string | null;
   created_at: string;
   uploader_name?: string;
+};
+
+type ChannelRow = {
+  id: string;
+  title: string;
+  village_id: string;
+  created_by: string;
+  is_global: number;
+  created_at: string;
 };
 
 type RoomRow = {
@@ -60,6 +94,7 @@ type RoomRow = {
   village_id: string | null;
   host_id: string;
   title: string;
+  current_channel_id?: string | null;
   current_video_id: string | null;
   is_playing: number;
   position_ms: number;
@@ -81,9 +116,11 @@ function mapVideo(row: VideoRow): TvVideo {
     url: videoUrl(row.filename),
     mime: row.mime,
     sizeBytes: Number(row.size_bytes) || 0,
+    durationMs: Number(row.duration_ms) || 0,
     uploaderId: row.uploader_id,
     uploaderName: row.uploader_name || "Villager",
     villageId: row.village_id,
+    channelId: row.channel_id || null,
     createdAt: row.created_at,
   };
 }
@@ -119,32 +156,128 @@ export function canAccessVideo(user: UserPublic, video: TvVideo) {
   if (video.uploaderId === user.id) return true;
   if (video.villageId && user.villageId === video.villageId) return true;
   if (areFriends(user.id, video.uploaderId)) return true;
+  // Global channel clips (villageId null) are for every lounge.
+  if (!video.villageId && video.channelId) return true;
   return false;
 }
 
-export function listVideosForUser(user: UserPublic): TvVideo[] {
+function listVideosForChannel(channelId: string): TvVideo[] {
   const db = getDb();
-  const friends = listFriends(user.id);
-  const friendIds = friends.map((f) => f.id);
-
   const rows = db
     .prepare(
       `SELECT v.*, u.display_name as uploader_name
        FROM tv_videos v
        JOIN users u ON u.id = v.uploader_id
-       ORDER BY v.created_at DESC
-       LIMIT 80`
+       WHERE v.channel_id = ?
+       ORDER BY v.created_at DESC`
     )
-    .all() as VideoRow[];
+    .all(channelId) as VideoRow[];
+  return rows.map(mapVideo);
+}
 
-  return rows
-    .map(mapVideo)
-    .filter((video) => {
-      if (user.isOwner || video.uploaderId === user.id) return true;
-      if (video.villageId && user.villageId === video.villageId) return true;
-      if (friendIds.includes(video.uploaderId)) return true;
-      return false;
-    });
+function mapChannel(row: ChannelRow): TvChannel {
+  return {
+    id: row.id,
+    title: row.title,
+    villageId: row.village_id,
+    isGlobal: Boolean(row.is_global),
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    videos: listVideosForChannel(row.id),
+  };
+}
+
+export function getChannelById(id: string): TvChannel | null {
+  const db = getDb();
+  const row = db
+    .prepare(`SELECT * FROM tv_channels WHERE id = ?`)
+    .get(id) as ChannelRow | undefined;
+  return row ? mapChannel(row) : null;
+}
+
+/** Channels the viewer can see: their village + global. */
+export function listChannelsForUser(user: UserPublic): TvChannel[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT * FROM tv_channels
+       WHERE is_global = 1
+          OR village_id = ?
+       ORDER BY is_global DESC, title COLLATE NOCASE ASC`
+    )
+    .all(user.villageId || "") as ChannelRow[];
+  return rows.map(mapChannel);
+}
+
+export function listVideosForUser(user: UserPublic): TvVideo[] {
+  return listChannelsForUser(user).flatMap((ch) => ch.videos);
+}
+
+export function createChannel(
+  user: UserPublic,
+  input: { title: string; villageId?: string; isGlobal?: boolean }
+) {
+  if (!user.isOwner) {
+    return { ok: false as const, error: "Only the owner can make channels", status: 403 };
+  }
+  const title = input.title.trim().slice(0, 80);
+  if (!title) {
+    return { ok: false as const, error: "Give the channel a name", status: 400 };
+  }
+  const isGlobal = Boolean(input.isGlobal);
+  const villageId = isGlobal
+    ? user.villageId || "mosshollow"
+    : String(input.villageId || user.villageId || "").trim();
+  if (!isVillageId(villageId)) {
+    return { ok: false as const, error: "Pick a village for this channel", status: 400 };
+  }
+
+  const db = getDb();
+  const id = randomUUID();
+  db.prepare(
+    `INSERT INTO tv_channels (id, title, village_id, created_by, is_global)
+     VALUES (?, ?, ?, ?, ?)`
+  ).run(id, title, villageId, user.id, isGlobal ? 1 : 0);
+
+  try {
+    persistAllDurableState(db);
+  } catch (err) {
+    console.error("[tv] persist after channel create failed:", err);
+  }
+
+  return { ok: true as const, channel: getChannelById(id)! };
+}
+
+export function deleteChannel(channelId: string, user: UserPublic) {
+  if (!user.isOwner) {
+    return { ok: false as const, error: "Only the owner can remove channels", status: 403 };
+  }
+  const channel = getChannelById(channelId);
+  if (!channel) {
+    return { ok: false as const, error: "Channel not found", status: 404 };
+  }
+
+  const db = getDb();
+  const filenames = (
+    db
+      .prepare(`SELECT filename FROM tv_videos WHERE channel_id = ?`)
+      .all(channelId) as Array<{ filename: string }>
+  ).map((r) => r.filename);
+
+  db.prepare(
+    `UPDATE tv_rooms SET current_channel_id = NULL, current_video_id = NULL
+     WHERE current_channel_id = ?`
+  ).run(channelId);
+  db.prepare(`DELETE FROM tv_videos WHERE channel_id = ?`).run(channelId);
+  db.prepare(`DELETE FROM tv_channels WHERE id = ?`).run(channelId);
+
+  try {
+    persistAllDurableState(db);
+  } catch (err) {
+    console.error("[tv] persist after channel delete failed:", err);
+  }
+
+  return { ok: true as const, filenames };
 }
 
 export function createVideo(input: {
@@ -154,13 +287,14 @@ export function createVideo(input: {
   sizeBytes: number;
   uploaderId: string;
   villageId: string | null;
+  channelId: string;
 }): TvVideo {
   const db = getDb();
   const id = randomUUID();
   db.prepare(
     `INSERT INTO tv_videos
-      (id, title, filename, mime, size_bytes, uploader_id, village_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
+      (id, title, filename, mime, size_bytes, uploader_id, village_id, channel_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     id,
     input.title,
@@ -168,8 +302,18 @@ export function createVideo(input: {
     input.mime,
     input.sizeBytes,
     input.uploaderId,
-    input.villageId
+    input.villageId,
+    input.channelId
   );
+
+  try {
+    probeAndStoreDuration(id, input.filename);
+  } catch {
+    // Duration can fill in later from playback metadata.
+  }
+
+  addVideoToChannelSchedule(input.channelId, id);
+
   try {
     persistAllDurableState(db);
   } catch (err) {
@@ -182,13 +326,19 @@ export function deleteVideo(videoId: string, user: UserPublic) {
   const video = getVideoById(videoId);
   if (!video) return { ok: false as const, error: "Clip not found" };
   if (!user.isOwner && video.uploaderId !== user.id) {
-    return { ok: false as const, error: "Only the uploader can remove this clip" };
+    return {
+      ok: false as const,
+      error: "Only the owner or uploader can remove this clip",
+    };
   }
   const db = getDb();
   const filename = video.url.replace("/api/uploads/", "");
-  db.prepare(`UPDATE tv_rooms SET current_video_id = NULL WHERE current_video_id = ?`).run(
-    videoId
-  );
+  if (video.channelId) {
+    removeVideoFromChannelSchedule(video.channelId, videoId);
+  }
+  db.prepare(
+    `UPDATE tv_rooms SET current_video_id = NULL WHERE current_video_id = ?`
+  ).run(videoId);
   db.prepare(`DELETE FROM tv_videos WHERE id = ?`).run(videoId);
   try {
     persistAllDurableState(db);
@@ -230,31 +380,72 @@ function listWatchers(roomId: string): TvWatcher[] {
   }));
 }
 
-function mapRoom(row: RoomRow): TvRoomState {
-  const currentVideo = row.current_video_id
-    ? getVideoById(row.current_video_id)
-    : null;
+function applyScheduleOverlay(room: TvRoomState): TvRoomState {
+  if (room.scope !== "village" || !room.currentChannelId) {
+    return {
+      ...room,
+      broadcastMode: "interactive",
+      airStartsAt: null,
+      schedule: [],
+    };
+  }
+
+  const broadcast = resolveChannelBroadcast(room.currentChannelId);
+  if (!broadcast) {
+    return {
+      ...room,
+      currentVideoId: null,
+      currentVideo: null,
+      isPlaying: false,
+      positionMs: 0,
+      broadcastMode: "schedule",
+      airStartsAt: null,
+      schedule: [],
+    };
+  }
+
+  const currentVideo = getVideoById(broadcast.videoId);
   return {
+    ...room,
+    currentVideoId: broadcast.videoId,
+    currentVideo,
+    isPlaying: broadcast.isPlaying,
+    positionMs: broadcast.positionMs,
+    positionUpdatedAt: broadcast.positionUpdatedAt,
+    airStartsAt: broadcast.airStartsAt,
+    broadcastMode: "schedule",
+    schedule: broadcast.schedule,
+  };
+}
+
+function mapRoom(row: RoomRow): TvRoomState {
+  const base: TvRoomState = {
     id: row.id,
     scope: row.scope,
     villageId: row.village_id,
     hostId: row.host_id,
     title: row.title,
+    currentChannelId: row.current_channel_id || null,
     currentVideoId: row.current_video_id,
-    currentVideo,
+    currentVideo: row.current_video_id
+      ? getVideoById(row.current_video_id)
+      : null,
     isPlaying: Boolean(row.is_playing),
     positionMs: Number(row.position_ms) || 0,
     positionUpdatedAt: row.position_updated_at,
+    airStartsAt: null,
+    broadcastMode: "interactive",
+    schedule: [],
     updatedAt: row.updated_at,
     createdAt: row.created_at,
     watchers: listWatchers(row.id),
   };
+  return applyScheduleOverlay(base);
 }
 
-export function estimatedPositionMs(room: Pick<
-  TvRoomState,
-  "positionMs" | "isPlaying" | "positionUpdatedAt"
->) {
+export function estimatedPositionMs(
+  room: Pick<TvRoomState, "positionMs" | "isPlaying" | "positionUpdatedAt">
+) {
   if (!room.isPlaying) return room.positionMs;
   const started = Date.parse(room.positionUpdatedAt.replace(" ", "T") + "Z");
   if (Number.isNaN(started)) return room.positionMs;
@@ -326,8 +517,7 @@ export function createFriendsRoom(user: UserPublic, title?: string): TvRoomState
   const db = getDb();
   const id = randomUUID();
   const roomTitle =
-    (title || "").trim().slice(0, 60) ||
-    `${user.displayName}'s couch`;
+    (title || "").trim().slice(0, 60) || `${user.displayName}'s couch`;
   db.prepare(
     `INSERT INTO tv_rooms
       (id, scope, village_id, host_id, title)
@@ -362,6 +552,7 @@ export function updateRoomPlayback(
   roomId: string,
   user: UserPublic,
   patch: {
+    channelId?: string | null;
     videoId?: string | null;
     isPlaying?: boolean;
     positionMs?: number;
@@ -371,7 +562,51 @@ export function updateRoomPlayback(
   const room = getRoomById(roomId);
   if (!room) return { ok: false as const, error: "Room not found", status: 404 };
   if (!canAccessRoom(user, room)) {
-    return { ok: false as const, error: "This couch is for other villagers", status: 403 };
+    return {
+      ok: false as const,
+      error: "This couch is for other villagers",
+      status: 403,
+    };
+  }
+
+  const db = getDb();
+  let nextChannelId =
+    patch.channelId !== undefined ? patch.channelId : room.currentChannelId;
+
+  if (patch.channelId) {
+    const channel = getChannelById(patch.channelId);
+    if (!channel) {
+      return { ok: false as const, error: "Channel not found", status: 404 };
+    }
+    if (
+      !channel.isGlobal &&
+      room.scope === "village" &&
+      room.villageId &&
+      channel.villageId !== room.villageId &&
+      !user.isOwner
+    ) {
+      return {
+        ok: false as const,
+        error: "That channel belongs to another village",
+        status: 403,
+      };
+    }
+  }
+
+  // Village lounges follow the shuffle schedule once a channel is tuned.
+  if (room.scope === "village" && nextChannelId) {
+    db.prepare(
+      `UPDATE tv_rooms
+       SET current_channel_id = ?,
+           current_video_id = NULL,
+           is_playing = 1,
+           position_ms = 0,
+           position_updated_at = datetime('now'),
+           updated_at = datetime('now')
+       WHERE id = ?`
+    ).run(nextChannelId, roomId);
+    touchPresence(roomId, user.id);
+    return { ok: true as const, room: getRoomById(roomId)! };
   }
 
   let nextVideoId = room.currentVideoId;
@@ -381,14 +616,25 @@ export function updateRoomPlayback(
     } else {
       const video = getVideoById(patch.videoId);
       if (!video || !canAccessVideo(user, video)) {
-        return { ok: false as const, error: "That clip is not on this shelf", status: 400 };
+        return {
+          ok: false as const,
+          error: "That clip is not on this shelf",
+          status: 400,
+        };
       }
       nextVideoId = video.id;
+      if (video.channelId) nextChannelId = video.channelId;
     }
   }
 
   const isPlaying =
-    patch.isPlaying === undefined ? (room.isPlaying ? 1 : 0) : patch.isPlaying ? 1 : 0;
+    patch.isPlaying === undefined
+      ? room.isPlaying
+        ? 1
+        : 0
+      : patch.isPlaying
+        ? 1
+        : 0;
   const positionMs =
     patch.positionMs === undefined
       ? estimatedPositionMs(room)
@@ -398,17 +644,17 @@ export function updateRoomPlayback(
       ? patch.title.trim().slice(0, 60) || room.title
       : room.title;
 
-  const db = getDb();
   db.prepare(
     `UPDATE tv_rooms
-     SET current_video_id = ?,
+     SET current_channel_id = ?,
+         current_video_id = ?,
          is_playing = ?,
          position_ms = ?,
          position_updated_at = datetime('now'),
          title = ?,
          updated_at = datetime('now')
      WHERE id = ?`
-  ).run(nextVideoId, isPlaying, positionMs, title, roomId);
+  ).run(nextChannelId, nextVideoId, isPlaying, positionMs, title, roomId);
 
   touchPresence(roomId, user.id);
   return { ok: true as const, room: getRoomById(roomId)! };
@@ -421,4 +667,4 @@ export const TV_MIME_EXT: Record<string, string> = {
 };
 
 export const TV_ALLOWED_MIME = new Set(Object.keys(TV_MIME_EXT));
-export const TV_MAX_BYTES = 80 * 1024 * 1024; // 80MB
+export const TV_MAX_BYTES = 500 * 1024 * 1024; // 500MB
