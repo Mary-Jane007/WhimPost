@@ -7,4 +7,5 @@ data/uploads/**/*.avi filter=lfs diff=lfs merge=lfs -text
 data/uploads/**/*.mpeg filter=lfs diff=lfs merge=lfs -text
 data/uploads/**/*.mpg filter=lfs diff=lfs merge=lfs -text
 data/uploads/**/*.pdf filter=lfs diff=lfs merge=lfs -text
-data/uploads/**/*.epub filter=lfs diff=lfs merge=lfs -text
+# EPUB bytes are committed as normal git files (and mirrored to the
+# whimpost-media GitHub Release) so library shelves restore without LFS.

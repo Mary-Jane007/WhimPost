@@ -4,7 +4,10 @@ import { getDb } from "@/lib/db";
 import { toLetterView } from "@/lib/letters";
 import { LetterReader } from "@/components/LetterReader";
 import type { LetterRecord } from "@/lib/types";
-import { syncWelcomeLetterDecorations } from "@/lib/welcomeLetters";
+import {
+  markLetterRead,
+  syncWelcomeLetterDecorations,
+} from "@/lib/welcomeLetters";
 
 export default async function LetterPage({
   params,
@@ -28,7 +31,7 @@ export default async function LetterPage({
 
   const wasUnread = row.recipient_id === user.id && !row.is_read;
   if (wasUnread) {
-    db.prepare(`UPDATE letters SET is_read = 1 WHERE id = ?`).run(id);
+    markLetterRead(db, id, user.id);
     row.is_read = 1;
   }
 

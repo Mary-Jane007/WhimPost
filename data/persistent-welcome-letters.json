@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-14T02:18:09.665Z",
+  "letters": [
+    {
+      "id": "3cb66e53-c2ee-4f59-87df-ee6776e4d5f1",
+      "villageId": "clovermeadow",
+      "recipientId": "6f6cdd06-16fb-4677-8b80-987ce3310511",
+      "senderId": "system-clovermeadow",
+      "subject": "Welcome to Clovermeadow",
+      "body": "Dear friend,\n\nThe flowers began blooming a little earlier today.\n\nWe suspect they heard someone new was arriving.\n\nWelcome to **Clovermeadow**, where every cottage keeps a kettle warm, every path leads to a friendly hello, and every letter has the chance to brighten someone's day.\n\nHere, kindness is planted one small act at a time.\n\nA compliment tucked into an envelope.\nA thoughtful question.\nA gentle reminder that someone, somewhere, is thinking of you.\n\nBeside your doorstep, we've left a woven basket — the first pieces of your Clovermeadow collection.\n\nInside you'll discover:\n\n* ![Pink Butterflies](/stickers/collectibles/clovermeadow/clover-butterflies.png) A pink meadow butterfly for your jar.\n* ![Pink Ribbons](/stickers/collectibles/clovermeadow/clover-ribbon.png) A soft ribbon for tying kindness into letters.\n* ![Village Honey](/stickers/collectibles/clovermeadow/clover-honey.png) A spoon of village honey from the bees.\n* ![Cherry Blossoms](/stickers/collectibles/clovermeadow/clover-blossoms.png) A handful of cherry blossoms to start your shelf.\n\nThese are only the beginning. Write letters, welcome friends, and gather more keepsakes as kindness grows. Your cottage will fill as your collection blooms.\n\nWe hope you'll help our gardens grow—not only with flowers, but with the warmth your words bring to others.\n\nTake your time.\n\nThere's no rush in a meadow.\n\nWelcome home.\n\n*May your letters bloom wherever they are read.*",
+      "paperStyle": "floral",
+      "envelopeStyle": "blush",
+      "waxSeal": "heart",
+      "stampStyle": "dragonfly",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-sunflower\",\"kind\":\"sunflower\",\"x\":93,\"y\":7,\"scale\":0.7,\"rotation\":14},{\"id\":\"welcome-butterfly\",\"kind\":\"butterfly-green\",\"x\":7,\"y\":8,\"scale\":0.62,\"rotation\":-16},{\"id\":\"welcome-honey\",\"kind\":\"honey-jar\",\"x\":91,\"y\":90,\"scale\":0.65,\"rotation\":-8},{\"id\":\"welcome-narcissus\",\"kind\":\"narcissus\",\"x\":94,\"y\":96,\"scale\":0.55,\"rotation\":10}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":94,\"scale\":0.5,\"rotation\":12}]",
+      "isRead": true,
+      "sentAt": "2026-08-14 00:23:40",
+      "createdAt": "2026-08-14 00:23:40"
+    },
+    {
+      "id": "6d98d6e7-5015-4130-9ddc-54cf2041fea8",
+      "villageId": "moonmere",
+      "recipientId": "6f6cdd06-16fb-4677-8b80-987ce3310511",
+      "senderId": "system-moonmere",
+      "subject": "Welcome to Moonmere",
+      "body": "**To the traveler beneath the stars,**\n\nLast night, the lake held an extra reflection.\n\nNot of the moon.\n\nOf you.\n\nWelcome to **Moonmere**, where lanterns glow long after sunset and conversations linger like ripples across quiet water.\n\nSome villagers write after midnight.\nSome write after watching the rain.\nSome simply wait until their heart has something gentle to say.\n\nThere is no wrong time to begin.\n\nWaiting at your window is a silver lantern — the first pieces of your Moonmere collection.\n\nInside it you'll find:\n\n* ![Night Lilies](/stickers/collectibles/moonmere/moon-lilies.png) Night lily petals from the lakeshore blooms.\n* ![Mere Pearls](/stickers/collectibles/moonmere/moon-pearls.png) A mere pearl, smooth as the water's hush.\n* ![Dock Lanterns](/stickers/collectibles/moonmere/moon-lanterns.png) A dock lantern that burns with a quiet light.\n* ![Dream Notes](/stickers/collectibles/moonmere/moon-dreams.png) A dream note that asks only one question:\n\n*\"What have you been dreaming about lately?\"*\n\nThese are only the beginning. Write letters, welcome friends, and gather more keepsakes as starlight settles on the dock. Your cottage will fill as your collection grows.\n\nYou needn't have the answer today.\n\nMoonmere has always believed that the best letters arrive when they're ready.\n\nUntil then, the lake will keep your secrets, and the stars will keep you company.\n\nWelcome to **Moonmere**.\n\n*May your words drift softly into waiting hearts.*",
+      "paperStyle": "night",
+      "envelopeStyle": "ink",
+      "waxSeal": "moon",
+      "stampStyle": "moon-full",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-moon-full\",\"kind\":\"moon-full-clouds\",\"x\":92,\"y\":8,\"scale\":0.62,\"rotation\":8},{\"id\":\"welcome-fairy\",\"kind\":\"moon-fairy-blue\",\"x\":8,\"y\":10,\"scale\":0.55,\"rotation\":-10},{\"id\":\"welcome-lantern\",\"kind\":\"moon-lantern\",\"x\":8,\"y\":88,\"scale\":0.55,\"rotation\":-4},{\"id\":\"welcome-seal\",\"kind\":\"moon-seal-sun\",\"x\":12,\"y\":48,\"scale\":0.48,\"rotation\":6}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":6,\"scale\":0.5,\"rotation\":-8}]",
+      "isRead": true,
+      "sentAt": "2026-08-12 18:26:06",
+      "createdAt": "2026-08-12 18:26:06"
+    },
+    {
+      "id": "81f6a84f-54de-41a1-b6ad-ea043fab5c05",
+      "villageId": "mosshollow",
+      "recipientId": "6f6cdd06-16fb-4677-8b80-987ce3310511",
+      "senderId": "system-mosshollow",
+      "subject": "Welcome to Mosshollow",
+      "body": "To our newest neighbor,\n\nThe forest noticed your footsteps long before we did.\n\nThis morning, the old owl blinked twice from the library oak, the moss softened beneath the winding paths, and somewhere between the shelves of forgotten stories, an empty place quietly filled itself.\n\nThat place was waiting for you.\n\nHere in **Mosshollow**, we believe every person carries a story worth preserving. Some are written in careful ink, others in crossed-out sentences and coffee stains. We cherish them all.\n\nShould you ever lose your words, wander to the Great Library. The trees have a remarkable way of lending them back.\n\nYour neighbors are eager to know you—not through perfect introductions, but through honest letters, curious questions, and the pages you'll leave behind.\n\nA small satchel has been prepared for you — the first pieces of your Mosshollow collection.\n\nInside you'll find:\n\n* ![Mushrooms](/stickers/collectibles/forest/mushrooms.png) A soft woodland mushroom for your jar.\n* ![Leaves](/stickers/collectibles/forest/leaves.png) A pressed oak leaf, the first of many.\n* ![Feathers](/stickers/collectibles/forest/feathers.png) A feather from the library owl.\n* ![Lost Pages](/stickers/collectibles/forest/lost-pages.png) A lost page, waiting to join your shelf of stories.\n\nThese are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the village. Your cottage will fill as your collection grows.\n\nMay your mailbox always be full, your thoughts never hurried, and your stories find a home among ours.\n\nWelcome to **Mosshollow**.\n\n*May your words take root.*",
+      "paperStyle": "moss",
+      "envelopeStyle": "sage",
+      "waxSeal": "fern",
+      "stampStyle": "leafy-branch",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-leaf\",\"kind\":\"leafy-branch\",\"x\":93,\"y\":7,\"scale\":0.72,\"rotation\":18},{\"id\":\"welcome-mushroom\",\"kind\":\"mushroom-amanita\",\"x\":90,\"y\":88,\"scale\":0.68,\"rotation\":-12},{\"id\":\"welcome-moon\",\"kind\":\"moon-crescent\",\"x\":94,\"y\":96,\"scale\":0.55,\"rotation\":8}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":6,\"scale\":0.55,\"rotation\":-10}]",
+      "isRead": true,
+      "sentAt": "2026-08-13 02:16:18",
+      "createdAt": "2026-08-13 02:16:18"
+    }
+  ]
+}

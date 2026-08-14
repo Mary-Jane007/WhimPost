@@ -21,6 +21,8 @@ export type PersistentAccount = {
   village_id: string | null;
   reputation: number;
   collectibles_json: string;
+  /** Villages this account has already received a welcome letter for. */
+  visited_villages_json: string;
   created_at: string;
 };
 
@@ -62,7 +64,9 @@ function listUsersFromDb(db: Database): PersistentAccount[] {
   return db
     .prepare(
       `SELECT id, username, display_name, email, password_hash, bio, forest_name,
-              is_owner, village_id, reputation, collectibles_json, created_at
+              is_owner, village_id, reputation, collectibles_json,
+              COALESCE(visited_villages_json, '[]') AS visited_villages_json,
+              created_at
        FROM users`
     )
     .all() as PersistentAccount[];
@@ -94,10 +98,12 @@ export function importPersistentAccounts(db: Database) {
   const insert = db.prepare(
     `INSERT INTO users (
       id, username, display_name, email, password_hash, bio, forest_name,
-      is_owner, village_id, reputation, collectibles_json, created_at
+      is_owner, village_id, reputation, collectibles_json, visited_villages_json,
+      created_at
     ) VALUES (
       @id, @username, @display_name, @email, @password_hash, @bio, @forest_name,
-      @is_owner, @village_id, @reputation, @collectibles_json, @created_at
+      @is_owner, @village_id, @reputation, @collectibles_json, @visited_villages_json,
+      @created_at
     )`
   );
 
@@ -112,8 +118,14 @@ export function importPersistentAccounts(db: Database) {
       is_owner = @is_owner,
       village_id = @village_id,
       reputation = @reputation,
-      collectibles_json = @collectibles_json
+      collectibles_json = @collectibles_json,
+      visited_villages_json = @visited_villages_json
      WHERE id = @id`
+  );
+
+  const readVisited = db.prepare(
+    `SELECT COALESCE(visited_villages_json, '[]') AS visited_villages_json
+     FROM users WHERE id = ?`
   );
 
   const sync = db.transaction((accounts: PersistentAccount[]) => {
@@ -125,6 +137,14 @@ export function importPersistentAccounts(db: Database) {
       const matched = findMatch.get(account.id, username, email) as
         | { id: string }
         | undefined;
+
+      let visited = account.visited_villages_json || "[]";
+      if (matched) {
+        const local = readVisited.get(matched.id) as
+          | { visited_villages_json: string }
+          | undefined;
+        visited = mergeVisitedJson(visited, local?.visited_villages_json);
+      }
 
       const row = {
         id: matched?.id ?? account.id,
@@ -138,6 +158,7 @@ export function importPersistentAccounts(db: Database) {
         village_id: account.village_id,
         reputation: account.reputation ?? 0,
         collectibles_json: account.collectibles_json || "{}",
+        visited_villages_json: visited,
         created_at: account.created_at || new Date().toISOString(),
       };
 
@@ -150,4 +171,18 @@ export function importPersistentAccounts(db: Database) {
   });
 
   sync(file.accounts);
+}
+
+function mergeVisitedJson(a: string | null | undefined, b: string | null | undefined) {
+  const parse = (raw: string | null | undefined) => {
+    try {
+      const v = JSON.parse(raw || "[]");
+      return Array.isArray(v)
+        ? v.filter((id): id is string => typeof id === "string")
+        : [];
+    } catch {
+      return [] as string[];
+    }
+  };
+  return JSON.stringify([...new Set([...parse(a), ...parse(b)])].sort());
 }

@@ -3,6 +3,13 @@ import {
   DEFAULT_TV_DURATION_MS,
   probeUploadDurationMs,
 } from "@/lib/tvDuration";
+import {
+  isLfsPointerFile,
+  isServingTvStandin,
+} from "@/lib/tvUploadFiles";
+import { UPLOAD_DIR } from "@/lib/persistentTvMedia";
+import path from "path";
+import fs from "fs";
 
 export type TvScheduleSlot = {
   videoId: string;
@@ -43,6 +50,37 @@ function seededShuffle(ids: string[], seed: number): string[] {
     [next[i], next[j]] = [next[j], next[i]];
   }
   return next;
+}
+
+/**
+ * Prefer a lineup where the same clip never airs twice in a row.
+ * With only one clip on the channel this is impossible — it will repeat.
+ */
+function avoidStartingWith(order: string[], avoidFirstId?: string | null) {
+  if (!avoidFirstId || order.length <= 1) return order;
+  if (order[0] !== avoidFirstId) return order;
+  const swapAt = order.findIndex((id, index) => index > 0 && id !== avoidFirstId);
+  if (swapAt <= 0) return order;
+  const next = [...order];
+  [next[0], next[swapAt]] = [next[swapAt], next[0]];
+  return next;
+}
+
+function shuffleAvoidingAdjacent(
+  ids: string[],
+  avoidFirstId?: string | null
+): string[] {
+  const unique = [...new Set(ids)];
+  return avoidStartingWith(shuffleIds(unique), avoidFirstId);
+}
+
+function seededShuffleAvoidingAdjacent(
+  ids: string[],
+  seed: number,
+  avoidFirstId?: string | null
+): string[] {
+  const unique = [...new Set(ids)];
+  return avoidStartingWith(seededShuffle(unique, seed), avoidFirstId);
 }
 
 function sameIdOrder(a: string[], b: string[]) {
@@ -156,16 +194,60 @@ export function correctVideoDurationMs(
     return { ok: true, durationMs: existing, changed: false };
   }
 
+  const filename = String(videoRow.filename || "");
+  const servingStandin =
+    Boolean(filename) &&
+    !filename.startsWith("link-") &&
+    isServingTvStandin(filename);
+  const primary = filename
+    ? path.join(UPLOAD_DIR, path.basename(filename))
+    : "";
+  const primaryIsPointer =
+    Boolean(primary) &&
+    fs.existsSync(primary) &&
+    isLfsPointerFile(primary);
+
+  // Stand-in title cards (~12s) must never rewrite the guide — that collapsed
+  // air times and remounted the same clip from 0 on a loop.
+  if (
+    (servingStandin || primaryIsPointer) &&
+    existing > 60_000 &&
+    next < 30_000
+  ) {
+    return { ok: true, durationMs: existing, changed: false };
+  }
+
+  // Refuse absurd shortens from onLoadedMetadata (stand-in / broken probe).
+  if (
+    existing > 60_000 &&
+    next < Math.min(existing * 0.5, 30_000) &&
+    filename &&
+    !filename.startsWith("link-")
+  ) {
+    const probed = probeUploadDurationMs(filename);
+    if (probed >= 60_000) {
+      if (Math.abs(existing - probed) < DURATION_DRIFT_MS) {
+        return { ok: true, durationMs: existing, changed: false };
+      }
+      next = probed;
+    } else {
+      return { ok: true, durationMs: existing, changed: false };
+    }
+  }
+
   // Ignore force-shortens that disagree with the real file — those used to
   // rewrite air times from wall-clock and restart the village broadcast.
   if (
     opts?.force &&
     existing > 60_000 &&
     next < existing * 0.85 &&
-    videoRow.filename &&
-    !videoRow.filename.startsWith("link-")
+    filename &&
+    !filename.startsWith("link-")
   ) {
-    const probed = probeUploadDurationMs(videoRow.filename);
+    if (servingStandin || primaryIsPointer) {
+      return { ok: true, durationMs: existing, changed: false };
+    }
+    const probed = probeUploadDurationMs(filename);
     if (probed > next + 5_000) {
       if (Math.abs(existing - probed) < DURATION_DRIFT_MS) {
         return { ok: true, durationMs: existing, changed: false };
@@ -194,9 +276,55 @@ function writeChannelSchedule(
 }
 
 /**
+ * Full reshuffle: every clip on the channel in a new random order, with the
+ * wall-clock epoch reset to now so the new lineup starts immediately.
+ */
+export function reshuffleChannelSchedule(channelId: string): {
+  epochMs: number;
+  order: string[];
+  videos: Map<string, { title: string; durationMs: number; filename: string }>;
+} {
+  const rows = listChannelVideoRows(channelId);
+  const videos = new Map<
+    string,
+    { title: string; durationMs: number; filename: string }
+  >();
+  for (const row of rows) {
+    const durationMs = ensureVideoDuration(row);
+    videos.set(row.id, {
+      title: row.title,
+      durationMs,
+      filename: row.filename,
+    });
+  }
+  const knownIds = [...videos.keys()];
+  const epochMs = Date.now();
+  const order = shuffleAvoidingAdjacent(knownIds);
+  writeChannelSchedule(channelId, epochMs, order);
+  return { epochMs, order, videos };
+}
+
+/** Reshuffle every TV channel lineup (owner / maintenance). */
+export function reshuffleAllChannelSchedules(): {
+  channels: number;
+  clips: number;
+} {
+  const db = getDb();
+  const channels = db
+    .prepare(`SELECT id FROM tv_channels`)
+    .all() as { id: string }[];
+  let clips = 0;
+  for (const ch of channels) {
+    const { order } = reshuffleChannelSchedule(ch.id);
+    clips += order.length;
+  }
+  return { channels: channels.length, clips };
+}
+
+/**
  * Build or repair the channel lineup.
- * Every clip on the channel is always in the schedule; brand-new clips are
- * spliced into a random *upcoming* slot without resetting the current airtime.
+ * Every clip on the channel is always in the schedule. Brand-new clips are
+ * appended without resetting the epoch (see addVideoToChannelSchedule).
  */
 export function ensureChannelSchedule(channelId: string): {
   epochMs: number;
@@ -244,14 +372,13 @@ export function ensureChannelSchedule(channelId: string): {
     // Rebuild the lineup, but NEVER reset a healthy epoch to Date.now() —
     // that made every clip-replace / restore restart the broadcast at t=0.
     if (!epochMs) epochMs = Date.now();
-    order = seededShuffle(knownIds, epochMs);
+    order = seededShuffleAvoidingAdjacent(knownIds, epochMs);
     dirty = true;
   } else if (missing.length > 0) {
-    // Fold every new clip into an upcoming slot so the live airing stays put.
+    // Append stragglers at the end — do not reshuffle or restart the airing.
+    // If the only clip somehow matched the tail, avoidAdjacent is a no-op for uniques.
+    order = [...order, ...missing.filter((id) => !order.includes(id))];
     if (!epochMs) epochMs = Date.now();
-    for (const id of shuffleIds(missing)) {
-      order = insertIdAfterCurrent(order, id, videos, epochMs, Date.now());
-    }
     dirty = true;
   }
 
@@ -271,64 +398,50 @@ export function ensureChannelSchedule(channelId: string): {
   return { epochMs, order, videos };
 }
 
-/** Index of the clip currently on-air for this epoch/order (or 0). */
-function currentOrderIndex(
-  order: string[],
-  videos: Map<string, { title: string; durationMs: number; filename: string }>,
-  epochMs: number,
-  nowMs: number
-): number {
-  if (order.length === 0) return 0;
-  const durations = order.map(
-    (id) => videos.get(id)?.durationMs || DEFAULT_TV_DURATION_MS
-  );
-  const loopMs = durations.reduce((sum, d) => sum + d, 0);
-  if (loopMs <= 0) return 0;
-  let elapsed = nowMs - epochMs;
-  if (elapsed < 0) elapsed = 0;
-  const offsetInLoop = elapsed % loopMs;
-  let cursor = 0;
-  for (let i = 0; i < order.length; i += 1) {
-    const dur = durations[i];
-    if (offsetInLoop < cursor + dur) return i;
-    cursor += dur;
-  }
-  return 0;
-}
-
-/** Splice a new clip only into an upcoming slot (never before the live one). */
-function insertIdAfterCurrent(
-  order: string[],
-  videoId: string,
-  videos: Map<string, { title: string; durationMs: number; filename: string }>,
-  epochMs: number,
-  nowMs: number
-): string[] {
-  if (order.includes(videoId)) return order;
-  const next = [...order];
-  if (next.length === 0) return [videoId];
-  const currentIdx = currentOrderIndex(next, videos, epochMs, nowMs);
-  const minInsert = Math.min(currentIdx + 1, next.length);
-  const span = next.length - minInsert + 1;
-  const insertAt = minInsert + Math.floor(Math.random() * span);
-  next.splice(insertAt, 0, videoId);
-  return next;
-}
-
-/** Put a freshly uploaded clip into the channel schedule right away. */
+/**
+ * Add a freshly uploaded clip to the channel schedule WITHOUT interrupting
+ * whatever is currently on air. Keeps the wall-clock epoch and existing order;
+ * the new clip is appended after the current cycle's remaining lineup.
+ */
 export function addVideoToChannelSchedule(channelId: string, videoId: string) {
-  const { epochMs, order, videos } = ensureChannelSchedule(channelId);
-  if (order.includes(videoId)) return;
+  const db = getDb();
+  const channel = db
+    .prepare(
+      `SELECT schedule_epoch_ms, schedule_order_json FROM tv_channels WHERE id = ?`
+    )
+    .get(channelId) as
+    | { schedule_epoch_ms: number | null; schedule_order_json: string | null }
+    | undefined;
+  if (!channel) return;
 
-  const seededEpoch = epochMs || Date.now();
-  const next = insertIdAfterCurrent(
-    order,
-    videoId,
-    videos,
-    seededEpoch,
-    Date.now()
+  const rows = listChannelVideoRows(channelId);
+  const knownIds = new Set(rows.map((r) => r.id));
+  if (!knownIds.has(videoId)) return;
+
+  let order = parseOrderJson(channel.schedule_order_json).filter((id) =>
+    knownIds.has(id)
   );
-  writeChannelSchedule(channelId, seededEpoch, next);
+  if (order.includes(videoId)) {
+    // Already queued — leave the live airing alone.
+    return;
+  }
+
+  let epochMs = parseEpoch(channel.schedule_epoch_ms);
+
+  if (order.length === 0) {
+    // First clip on an empty channel — start the clock now.
+    epochMs = Date.now();
+    order = [videoId];
+    writeChannelSchedule(channelId, epochMs, order);
+    return;
+  }
+
+  if (!epochMs) epochMs = Date.now();
+
+  // Keep epoch + current order intact so mid-show join math stays put.
+  // New uploads wait their turn after the clips already lined up.
+  order = [...order, videoId];
+  writeChannelSchedule(channelId, epochMs, order);
 }
 
 /**
@@ -357,8 +470,16 @@ function reshuffleCompletedCycles(
 
   // Include every clip currently on the channel, not just the old order.
   const allIds = [...videos.keys()];
+  let prevLast = order[order.length - 1] || null;
+  let nextOrder = order;
+  // Walk each completed cycle so the next lineup never starts on the same
+  // clip that just finished (when at least two clips exist).
+  for (let i = 1; i <= loopsCompleted; i += 1) {
+    const seed = epochMs + i * loopMs;
+    nextOrder = seededShuffleAvoidingAdjacent(allIds, seed, prevLast);
+    prevLast = nextOrder[nextOrder.length - 1] || null;
+  }
   const nextEpoch = epochMs + loopsCompleted * loopMs;
-  const nextOrder = seededShuffle(allIds, nextEpoch);
   writeChannelSchedule(channelId, nextEpoch, nextOrder);
   return { epochMs: nextEpoch, order: nextOrder };
 }
@@ -458,18 +579,52 @@ export function resolveChannelBroadcast(
   let slotStart = airStartsAtMs;
   const schedule: TvScheduleSlot[] = [];
   const horizonEnd = nowMs + scheduleHorizonMs;
-  const allIds = [...videos.keys()];
+  // Always reshuffle the full shelf — never a partial id list.
+  const allIds = [...new Set([...videos.keys(), ...order])].filter((id) =>
+    videos.has(id)
+  );
   let cycleOrder = [...order];
   let posInCycle = currentIndex;
   let cycleIdx = 0;
+  let lastEmittedId: string | null =
+    currentIndex > 0 ? order[currentIndex - 1] : null;
   let guard = 0;
-  while (slotStart < horizonEnd && guard < Math.max(order.length, 1) * 40) {
+  while (slotStart < horizonEnd && guard < Math.max(allIds.length, 1) * 48) {
     if (posInCycle >= cycleOrder.length) {
+      const prevCycleLast = cycleOrder[cycleOrder.length - 1] || lastEmittedId;
       cycleIdx += 1;
-      cycleOrder = seededShuffle(allIds, epochMs + cycleIdx * loopMs);
+      // Seed matches reshuffleCompletedCycles: epochMs + i * loopMs
+      cycleOrder = seededShuffleAvoidingAdjacent(
+        allIds,
+        epochMs + cycleIdx * loopMs,
+        prevCycleLast
+      );
       posInCycle = 0;
     }
-    const videoId = cycleOrder[posInCycle];
+
+    let videoId = cycleOrder[posInCycle];
+    // Hard guard: never air the same clip twice in a row when another exists.
+    if (
+      allIds.length > 1 &&
+      lastEmittedId &&
+      videoId === lastEmittedId
+    ) {
+      const swapAt = cycleOrder.findIndex(
+        (id, index) => index >= posInCycle && id !== lastEmittedId
+      );
+      if (swapAt >= posInCycle) {
+        const next = [...cycleOrder];
+        [next[posInCycle], next[swapAt]] = [next[swapAt], next[posInCycle]];
+        cycleOrder = next;
+        videoId = cycleOrder[posInCycle];
+      } else {
+        // Advance to a fresh cycle rather than repeating.
+        posInCycle = cycleOrder.length;
+        guard += 1;
+        continue;
+      }
+    }
+
     const meta = videos.get(videoId);
     const durationMs = meta?.durationMs || DEFAULT_TV_DURATION_MS;
     const startsAtMs = slotStart;
@@ -487,6 +642,7 @@ export function resolveChannelBroadcast(
           startsAtMs <= nowMs &&
           nowMs < endsAtMs,
       });
+      lastEmittedId = videoId;
     }
     slotStart = endsAtMs;
     posInCycle += 1;

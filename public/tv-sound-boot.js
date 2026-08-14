@@ -8,7 +8,13 @@
       v.muted = false;
       v.defaultMuted = false;
       try { v.volume = 1; } catch (e) {}
-      try { v.play().catch(function () {}); } catch (e) {}
+      // Unmute only — calling play() here used to restart mid-show clips from 0
+      // when the element had just remounted before the schedule join seek.
+      if (!v.paused && v.currentTime > 0.5) {
+        /* already rolling */
+      } else if (v.paused && v.currentTime > 0.5) {
+        try { v.play().catch(function () {}); } catch (e) {}
+      }
     }
 
     var a = document.querySelector('audio[data-tv-fallback="true"]');

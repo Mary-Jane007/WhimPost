@@ -9,7 +9,8 @@ import {
   type ReadingCategory,
   type ReadingListBook,
 } from "@/lib/libraryContent";
-import { exportPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
+import { clearReadingPositionsForBook } from "@/lib/libraryReading";
+import { persistAllDurableState } from "@/lib/tvPersist";
 
 export const LIBRARY_UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
 
@@ -377,7 +378,7 @@ export function attachAssetsToShelfBook(input: {
   const clubMerged =
     shelf === "club" ? (merged as ClubBook | null) : null;
 
-  return upsertLibraryBook({
+  const book = upsertLibraryBook({
     id: bookId,
     shelf,
     title:
@@ -445,6 +446,10 @@ export function attachAssetsToShelfBook(input: {
     published: true,
     createdBy: input.createdBy,
   });
+  if (hasFile) {
+    clearReadingPositionsForBook(bookId);
+  }
+  return book;
 }
 
 /** @deprecated Prefer attachAssetsToShelfBook */
@@ -788,8 +793,15 @@ export function upsertLibraryBook(
       published = excluded.published`
   ).run(payload);
 
+  if (
+    input.fileUrl &&
+    input.fileUrl !== (existing?.fileUrl || null)
+  ) {
+    clearReadingPositionsForBook(id);
+  }
+
   try {
-    exportPersistentLibraryBooks(db);
+    persistAllDurableState(db);
   } catch (err) {
     console.error("[persistent-library-books] export failed:", err);
   }
@@ -833,7 +845,7 @@ export function deleteLibraryBook(id: string) {
   markBookRemoved(bookId);
 
   try {
-    exportPersistentLibraryBooks(db);
+    persistAllDurableState(db);
   } catch (err) {
     console.error("[persistent-library-books] export failed:", err);
   }

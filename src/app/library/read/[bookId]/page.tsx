@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { redirect, notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getLibraryProgress } from "@/lib/library";
@@ -23,10 +24,10 @@ export default async function LibraryReadPage({ params }: Props) {
   return (
     <>
       {/*
-        Classic defer script — next/script afterInteractive never runs when
-        React fails to hydrate, which left books stuck on “Opening…”.
+        React opens via vendor epub.min.js. Boot is a fallback that only
+        steals the mount when React left an empty container (no iframe).
       */}
-      <script src="/library-reader-boot.js" defer />
+      <Script src="/library-reader-boot.js" strategy="afterInteractive" />
       <LibraryReadClient
         bookId={book.id}
         title={book.title}

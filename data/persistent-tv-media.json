@@ -1,76 +1,36 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T16:20:03.296Z",
+  "updatedAt": "2026-08-14T02:12:08.204Z",
   "clips": [
     {
-      "title": "Tulip",
-      "filename": "58e9aa37-b287-4fcb-9c9f-b3b881b45015.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 134291109,
-      "durationMs": 544183,
-      "channelTitle": "Clover Exclusive",
-      "villageId": "clovermeadow",
-      "isGlobal": false
-    },
-    {
-      "title": "Franklin - Franklin Plays the Game / Franklin Wants a Pet - Ep. 1",
-      "filename": "521ee9f6-c016-438c-9abe-db958b932d68.mp4",
+      "title": "Franklin- Franklin plays the game",
+      "filename": "374976cd-6799-4209-9df1-71ea07244325.mp4",
       "mime": "video/mp4",
       "sizeBytes": 61965906,
       "durationMs": 1377152,
       "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
+      "villageId": "moonmere",
+      "isGlobal": false
     },
     {
-      "title": "Peter Rabbit — The Tale of Samuel Whiskers",
-      "filename": "a7f0d2ba-0baf-4b2b-a0dd-ce60f63c2c77.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 208374134,
-      "durationMs": 2032432,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "Prize Piglet / Fast Friends | The New Adventures of Winnie the Pooh S2 E5",
-      "filename": "7eb6eb40-ca8f-4b4f-ab82-b3b5382b14d0.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 734803948,
-      "durationMs": 1393546,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "The World Of Peter Rabbit & Friends - The Tale of the Flopsy Bunnies & Mrs Tittl",
-      "filename": "fce79c8f-ce2d-4253-8fae-d40ca9c359f6.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 160119019,
-      "durationMs": 1204164,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "The World Of Peter Rabbit & Friends - The Tale of Tom Kitten & Jemima Puddle Du",
-      "filename": "2926fad6-4a4d-4065-97fc-34a33a93a671.mp4",
+      "title": "Peter Rabbit",
+      "filename": "f9225acf-7406-4b5c-923c-4a1ab6e5ee79.mp4",
       "mime": "video/mp4",
       "sizeBytes": 208342523,
       "durationMs": 1401139,
       "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
+      "villageId": "moonmere",
+      "isGlobal": false
     },
     {
-      "title": "Bambi",
-      "filename": "bfd2a29d-8836-46ac-8fbe-1cc2842f5c94.mp4",
+      "title": "Winnie the pooh- Prize piglet - fast friends",
+      "filename": "4313f009-0f68-4ed4-9c36-b621b97d7c6f.mp4",
       "mime": "video/mp4",
-      "sizeBytes": 174347938,
-      "durationMs": 120000,
-      "channelTitle": "The Storybook Cinema",
+      "sizeBytes": 734803948,
+      "durationMs": 1393546,
+      "channelTitle": "Cottage Cartoons",
       "villageId": "moonmere",
-      "isGlobal": true
+      "isGlobal": false
     }
   ]
 }

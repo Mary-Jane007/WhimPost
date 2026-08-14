@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
+import { listChannelsForUser } from "@/lib/tvCorner";
 import { completeUploadSession } from "@/lib/tvUpload";
 
 export const runtime = "nodejs";
@@ -23,5 +24,6 @@ export async function POST(_req: Request, ctx: Ctx) {
   return NextResponse.json({
     video: result.video,
     channel: result.channel,
+    channels: listChannelsForUser(user),
   });
 }

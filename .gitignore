@@ -48,4 +48,12 @@ next-env.d.ts
 !/data/persistent-tv.json
 # Keep uploaded TV file catalog (pairs with Git LFS objects under data/uploads/).
 !/data/persistent-tv-media.json
+# Keep Celestial Sounds catalog (Observatory playlist audio).
+!/data/persistent-moon-sounds.json
+# Keep village welcome letters + first-visit memory across fresh servers.
+!/data/persistent-welcome-letters.json
 /data/tv-cache/
+/data/.media-release-staging/
+/data/uploads/moon-sounds/
+!/data/uploads/moon-sounds/.gitkeep
+

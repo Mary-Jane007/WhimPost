@@ -23,10 +23,9 @@ export async function GET(
   }
 
   touchPresence(id, user.id);
-  const fresh = getRoomById(id)!;
   return NextResponse.json({
-    room: fresh,
-    channels: listChannelsForUser(user, fresh),
+    room: getRoomById(id),
+    channels: listChannelsForUser(user),
   });
 }
 
@@ -54,6 +53,6 @@ export async function PATCH(
   }
   return NextResponse.json({
     room: result.room,
-    channels: listChannelsForUser(user, result.room),
+    channels: listChannelsForUser(user),
   });
 }

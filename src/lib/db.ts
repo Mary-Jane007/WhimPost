@@ -1,12 +1,17 @@
 import Database from "better-sqlite3";
-import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
 import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
+import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
 import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
-import { ensureTvUploadBytes } from "@/lib/tvPersist";
+import { importPersistentWelcomeLetters } from "@/lib/persistentWelcomeLetters";
+import { backfillVisitedVillagesFromLetters } from "@/lib/welcomeLetters";
+import {
+  ensureTvUploadBytes,
+  scheduleEnsureTvUploadBytes,
+} from "@/lib/tvPersist";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -53,6 +58,12 @@ function migrate(db: Database.Database) {
     "users",
     "notifications_json",
     "notifications_json TEXT NOT NULL DEFAULT '{}'"
+  );
+  ensureColumn(
+    db,
+    "users",
+    "visited_villages_json",
+    "visited_villages_json TEXT NOT NULL DEFAULT '[]'"
   );
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
@@ -468,36 +479,7 @@ function migrate(db: Database.Database) {
     "shared INTEGER NOT NULL DEFAULT 0"
   );
 
-  // Fold any pre-channel clips into a village channel so the dial stays usable.
-  const orphans = db
-    .prepare(
-      `SELECT id, title, village_id, uploader_id
-       FROM tv_videos
-       WHERE channel_id IS NULL AND village_id IS NOT NULL`
-    )
-    .all() as Array<{
-    id: string;
-    title: string;
-    village_id: string;
-    uploader_id: string;
-  }>;
-
-  for (const video of orphans) {
-    const channelId = randomUUID();
-    db.prepare(
-      `INSERT INTO tv_channels (id, title, village_id, created_by)
-       VALUES (?, ?, ?, ?)`
-    ).run(
-      channelId,
-      video.title.slice(0, 80) || "Village channel",
-      video.village_id,
-      video.uploader_id
-    );
-    db.prepare(`UPDATE tv_videos SET channel_id = ? WHERE id = ?`).run(
-      channelId,
-      video.id
-    );
-  }
+  // Fresh-start TV Corner uses a flat clip shelf (no auto-channels).
 }
 
 function createDb() {
@@ -565,29 +547,48 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-accounts] import failed:", err);
   }
-  // Pull Git LFS upload bytes before restoring the TV shelf.
+  // Restore welcome letters + visited villages before anything re-delivers mail.
   try {
-    ensureTvUploadBytes();
+    importPersistentWelcomeLetters(db);
   } catch (err) {
-    console.error("[persistent-tv] lfs pull failed:", err);
+    console.error("[persistent-welcome-letters] import failed:", err);
   }
+  try {
+    backfillVisitedVillagesFromLetters(db);
+  } catch (err) {
+    console.error("[visited-villages] backfill failed:", err);
+  }
+  // Local-only shelf check (stand-ins). Network restore runs in the background
+  // so the first page load is not blocked for minutes on missing release assets.
+  try {
+    ensureTvUploadBytes({ skipNetwork: true });
+  } catch (err) {
+    console.error("[persistent-tv] local shelf check failed:", err);
+  }
+  scheduleEnsureTvUploadBytes();
   // Restore TV Corner link catalog (YouTube / direct URLs).
   try {
     importPersistentTv(db);
   } catch (err) {
     console.error("[persistent-tv] import failed:", err);
   }
-  // Restore uploaded file clips when Git LFS bytes are present.
+  // Restore uploaded file clips when bytes are already present locally.
   try {
     importPersistentTvMedia(db);
   } catch (err) {
     console.error("[persistent-tv-media] import failed:", err);
   }
-  // Restore owner-uploaded library books when Git LFS bytes are present.
+  // Restore owner-uploaded library books when bytes are already present locally.
   try {
     importPersistentLibraryBooks(db);
   } catch (err) {
     console.error("[persistent-library-books] import failed:", err);
+  }
+  // Restore Celestial Sounds after audio bytes are on disk.
+  try {
+    importPersistentMoonSounds(db);
+  } catch (err) {
+    console.error("[persistent-moon-sounds] import failed:", err);
   }
   return db;
 }
@@ -603,10 +604,11 @@ export function getDb() {
     // never on every request — that used to reset the TV airtime epoch.
     if (globalForDb.whimpostImportSession !== IMPORT_SESSION) {
       try {
-        ensureTvUploadBytes();
+        ensureTvUploadBytes({ skipNetwork: true });
       } catch (err) {
-        console.error("[persistent-tv] lfs pull failed:", err);
+        console.error("[persistent-tv] local shelf check failed:", err);
       }
+      scheduleEnsureTvUploadBytes();
       try {
         importPersistentTv(globalForDb.whimpostDb);
       } catch (err) {
@@ -621,6 +623,21 @@ export function getDb() {
         importPersistentLibraryBooks(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-library-books] import failed:", err);
+      }
+      try {
+        importPersistentMoonSounds(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-moon-sounds] import failed:", err);
+      }
+      try {
+        importPersistentWelcomeLetters(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-welcome-letters] import failed:", err);
+      }
+      try {
+        backfillVisitedVillagesFromLetters(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[visited-villages] backfill failed:", err);
       }
       globalForDb.whimpostImportSession = IMPORT_SESSION;
     }

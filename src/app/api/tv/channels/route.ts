@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import {
-  SHARED_CHANNEL_TITLE,
   createChannel,
   deleteChannel,
-  listChannelsForVillage,
+  listChannelsForUser,
 } from "@/lib/tvCorner";
-import { isVillageId } from "@/lib/villages";
 import {
   readRequestFields,
   redirectSameHost,
@@ -14,7 +12,6 @@ import {
 } from "@/lib/requestBody";
 import fs from "fs";
 import path from "path";
-import type { UserPublic } from "@/lib/types";
 
 const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
 
@@ -25,107 +22,75 @@ function nextPathFrom(raw: string | undefined) {
     : "/tv-corner";
 }
 
-function performChannelDelete(id: string, user: UserPublic) {
-  const result = deleteChannel(id, user);
-  if (!result.ok) {
-    return { error: String(result.error || "Could not remove channel") };
-  }
-  for (const filename of result.filenames) {
-    const filePath = path.join(UPLOAD_DIR, filename);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
-  return { ok: true as const };
-}
-
-export async function GET(req: NextRequest) {
+export async function GET() {
   const user = await getCurrentUser();
   if (!user) return jsonError("Not signed in", 401);
-
-  const villageId = req.nextUrl.searchParams.get("villageId") || user.villageId;
-  return NextResponse.json({
-    channels: listChannelsForVillage(villageId),
-  });
+  return NextResponse.json({ channels: listChannelsForUser(user) });
 }
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
-  if (!user) {
-    if (wantsHtmlRedirect(req)) return redirectSameHost(req, "/login");
-    return jsonError("Not signed in", 401);
-  }
+  if (!user) return jsonError("Not signed in", 401);
 
-  const contentType = (req.headers.get("content-type") || "").toLowerCase();
-
-  // Progressive-enhancement remove (HTML form POST — no React required).
-  if (
-    contentType.includes("application/x-www-form-urlencoded") ||
-    contentType.includes("multipart/form-data")
-  ) {
-    const fields = await readRequestFields(req);
-    if (String(fields.intent || "") === "remove") {
-      if (!user.isOwner) {
-        return jsonError("Only the site owner can remove channels", 403);
-      }
-      const id = String(fields.id || "").trim();
-      const removed = performChannelDelete(id, user);
-      if ("error" in removed) {
-        return jsonError(String(removed.error || "Could not remove channel"), 403);
-      }
-      if (wantsHtmlRedirect(req)) {
-        return redirectSameHost(req, nextPathFrom(fields.next));
-      }
-      return NextResponse.json({ ok: true });
-    }
-  }
-
-  if (!user.isOwner) {
-    return jsonError("Only the site owner can create TV channels", 403);
-  }
-
-  const body = (await req.json().catch(() => null)) as {
-    title?: string;
-    villageId?: string;
-    isGlobal?: boolean;
-  } | null;
-
-  if (!body) return jsonError("Expected JSON body");
-
-  const villageRaw = String(body.villageId || user.villageId || "").trim();
-  if (!isVillageId(villageRaw)) {
-    return jsonError("Pick which village this channel belongs to");
-  }
-
-  const title = String(body.title || "").trim();
-  if (!title) return jsonError("Give your channel a name");
-
+  const fields = await readRequestFields(req);
+  const title = String(fields.channelTitle || fields.title || "");
+  const villageId = String(fields.villageId || user.villageId || "");
   const isGlobal =
-    Boolean(body.isGlobal) ||
-    title.toLowerCase() === SHARED_CHANNEL_TITLE.toLowerCase();
+    fields.channelGlobal === "on" ||
+    fields.channelGlobal === "true" ||
+    fields.isGlobal === "true" ||
+    fields.isGlobal === "1";
+  const next = nextPathFrom(fields.next);
 
-  const channel = createChannel({
+  const result = createChannel(user, {
     title,
-    villageId: villageRaw,
-    createdBy: user.id,
-    isGlobal,
+    villageId: villageId || undefined,
+    isGlobal: Boolean(isGlobal),
   });
 
-  return NextResponse.json({ channel });
+  if (!result.ok) {
+    if (wantsHtmlRedirect(req)) {
+      return redirectSameHost(
+        req,
+        `${next}?tvError=${encodeURIComponent(result.error)}`
+      );
+    }
+    return jsonError(result.error, result.status);
+  }
+
+  if (wantsHtmlRedirect(req)) {
+    return redirectSameHost(req, next);
+  }
+
+  return NextResponse.json({
+    channel: result.channel,
+    channels: listChannelsForUser(user),
+  });
 }
 
 export async function DELETE(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return jsonError("Not signed in", 401);
-  if (!user.isOwner) {
-    return jsonError("Only the site owner can remove channels", 403);
-  }
 
   const body = (await req.json().catch(() => null)) as { id?: string } | null;
   if (!body?.id) return jsonError("Missing channel id");
 
-  const removed = performChannelDelete(body.id, user);
-  if ("error" in removed) {
-    return jsonError(String(removed.error || "Could not remove channel"), 403);
+  const result = deleteChannel(body.id, user);
+  if (!result.ok) return jsonError(result.error, result.status);
+
+  for (const filename of result.filenames) {
+    const filePath = path.join(UPLOAD_DIR, filename);
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch {
+        // ignore
+      }
+    }
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    channels: listChannelsForUser(user),
+  });
 }

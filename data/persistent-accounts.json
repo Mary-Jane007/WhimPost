@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T15:16:31.291Z",
+  "updatedAt": "2026-08-14T02:18:09.665Z",
   "accounts": [
     {
       "id": "system-bramblewood",
@@ -14,6 +14,7 @@
       "village_id": "bramblewood",
       "reputation": 0,
       "collectibles_json": "{}",
+      "visited_villages_json": "[]",
       "created_at": "2026-07-20 22:18:13"
     },
     {
@@ -28,6 +29,7 @@
       "village_id": "clovermeadow",
       "reputation": 0,
       "collectibles_json": "{}",
+      "visited_villages_json": "[]",
       "created_at": "2026-07-20 19:15:24"
     },
     {
@@ -42,6 +44,7 @@
       "village_id": "hearthwick",
       "reputation": 0,
       "collectibles_json": "{}",
+      "visited_villages_json": "[]",
       "created_at": "2026-07-20 23:46:48"
     },
     {
@@ -56,6 +59,7 @@
       "village_id": "moonmere",
       "reputation": 0,
       "collectibles_json": "{\"mushrooms\":1,\"leaves\":1,\"feathers\":1,\"lost-pages\":1,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":1,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":1,\"clover-cherries\":0,\"clover-honey\":1,\"clover-blossoms\":1,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":1,\"moon-lanterns\":1,\"moon-lilies\":1,\"moon-dreams\":1,\"moon-dust\":0,\"bramble-fox-tails\":0,\"bramble-maple\":0,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":0,\"bramble-compasses\":0,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":0,\"hearth-muffins\":0,\"hearth-recipes\":0,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":0}",
+      "visited_villages_json": "[\"clovermeadow\",\"moonmere\",\"mosshollow\"]",
       "created_at": "2026-07-20 17:51:34"
     },
     {
@@ -63,13 +67,14 @@
       "username": "moonmere_moth",
       "display_name": "Moonmere",
       "email": "system+moonmere@whimpost.local",
-      "password_hash": "$2b$10$Yu34Wui/N3XgjCDw5MD49uyKQQOk82zTMgWMa7Qf7e9GgeiAIZ15S",
+      "password_hash": "$2b$10$AfQMw3GDrGfy4wlts56Fk.OjkRIvaj58.pOT.X2A.bfMKcwOLMKKu",
       "bio": "Where dreams become letters.",
       "forest_name": "The Moon Dock",
       "is_owner": 0,
       "village_id": "moonmere",
       "reputation": 0,
       "collectibles_json": "{}",
+      "visited_villages_json": "[]",
       "created_at": "2026-07-20 21:16:39"
     },
     {
@@ -84,6 +89,7 @@
       "village_id": "mosshollow",
       "reputation": 0,
       "collectibles_json": "{}",
+      "visited_villages_json": "[]",
       "created_at": "2026-07-20 19:08:57"
     }
   ]

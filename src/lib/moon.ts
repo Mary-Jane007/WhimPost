@@ -12,13 +12,10 @@ import {
   todaysJournalPrompt,
   type DreamTheme,
 } from "@/lib/moonContent";
+import { MOON_SOUND_DIR } from "@/lib/moonPaths";
+import { persistAllDurableState } from "@/lib/tvPersist";
 
-export const MOON_SOUND_DIR = path.join(
-  process.cwd(),
-  "data",
-  "uploads",
-  "moon-sounds"
-);
+export { MOON_SOUND_DIR } from "@/lib/moonPaths";
 
 export const MOON_SOUND_MAX_BYTES = 25 * 1024 * 1024;
 export const MOON_SOUND_TYPES: Record<string, string> = {
@@ -229,6 +226,12 @@ export function setPlaylistSound(input: {
     input.uploadedBy
   );
 
+  try {
+    persistAllDurableState(db);
+  } catch (err) {
+    console.error("[persistent-moon-sounds] export failed:", err);
+  }
+
   return {
     ok: true as const,
     url: `/api/moon/sounds/${input.filename}`,
@@ -250,6 +253,13 @@ export function removePlaylistSound(playlistId: string) {
     playlistId
   );
   deleteSoundFile(existing.filename);
+
+  try {
+    persistAllDurableState(db);
+  } catch (err) {
+    console.error("[persistent-moon-sounds] export failed:", err);
+  }
+
   return { ok: true as const, playlistSounds: listPlaylistSounds() };
 }
 

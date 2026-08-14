@@ -29,20 +29,24 @@ Create two accounts in separate browsers (or normal + private), add each other a
 
 ### Persisting TV Corner videos
 
-Uploaded clips are kept in git with **Git LFS** under `data/uploads/`, plus catalogs:
+Uploaded clips are kept durable in two places:
 
-- `data/persistent-tv.json` — YouTube / direct link shelf
-- `data/persistent-tv-media.json` — uploaded file metadata
+1. **Catalogs in git** — `data/persistent-tv.json` (optional link shelf) and `data/persistent-tv-media.json` (uploaded file metadata)
+2. **Bytes on the `whimpost-media` GitHub Release** — so playable files restore on any server even when Git LFS quota is exhausted
 
-After uploading new movies, commit the new files (and catalogs) so the next server restore still has them:
+On boot, WhimPost tries Git LFS, then downloads any missing / pointer-only uploads from that release into `data/uploads/`. After new uploads, catalogs are committed and playable files are published to the release automatically.
 
 ```bash
-git add data/uploads data/persistent-tv.json data/persistent-tv-media.json
-git commit -m "Persist TV Corner media"
-git push
+# Optional manual refresh from the local database:
+npm run persist-tv
+npm run persist-tv:push
 ```
 
-Prefer **Add by link** for YouTube when you can — links restore automatically without large binaries.
+Library EPUB files under `data/uploads/` are also restored from the same release (and small public-domain EPUBs are committed in git).
+
+### Persisting Celestial Sounds (Observatory)
+
+Owner-uploaded playlist audio lives under `data/uploads/moon-sounds/` with a git catalog at `data/persistent-moon-sounds.json`. Playable bytes are published to the same `whimpost-media` GitHub Release (as `moon-sounds--<filename>`) so they restore on every server after a re-upload.
 
 ## Scripts
 

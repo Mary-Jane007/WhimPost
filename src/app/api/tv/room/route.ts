@@ -4,8 +4,9 @@ import {
   createFriendsRoom,
   getOrCreateVillageRoom,
   getRoomById,
-  listFriendRooms,
   listChannelsForUser,
+  listFriendRooms,
+  listVideosForUser,
   touchPresence,
   canAccessRoom,
 } from "@/lib/tvCorner";
@@ -17,6 +18,8 @@ export async function GET(req: NextRequest) {
 
   const scope = req.nextUrl.searchParams.get("scope") || "village";
   const roomId = req.nextUrl.searchParams.get("roomId");
+  const channels = listChannelsForUser(user);
+  const videos = listVideosForUser(user);
 
   if (roomId) {
     const room = getRoomById(roomId);
@@ -25,10 +28,10 @@ export async function GET(req: NextRequest) {
       return jsonError("This couch is for other villagers", 403);
     }
     touchPresence(room.id, user.id);
-    const fresh = getRoomById(room.id)!;
     return NextResponse.json({
-      room: fresh,
-      channels: listChannelsForUser(user, fresh),
+      room: getRoomById(room.id),
+      videos,
+      channels,
       friendRooms: room.scope === "friends" ? listFriendRooms(user) : [],
     });
   }
@@ -37,10 +40,10 @@ export async function GET(req: NextRequest) {
     const friendRooms = listFriendRooms(user);
     const active = friendRooms[0] || null;
     if (active) touchPresence(active.id, user.id);
-    const room = active ? getRoomById(active.id) : null;
     return NextResponse.json({
-      room,
-      channels: listChannelsForUser(user, room),
+      room: active ? getRoomById(active.id) : null,
+      videos,
+      channels,
       friendRooms,
     });
   }
@@ -52,7 +55,8 @@ export async function GET(req: NextRequest) {
   const room = getOrCreateVillageRoom(user, user.villageId as VillageId);
   return NextResponse.json({
     room,
-    channels: listChannelsForUser(user, room),
+    videos,
+    channels,
     friendRooms: [],
   });
 }
@@ -70,14 +74,11 @@ export async function POST(req: NextRequest) {
     return jsonError("Start a friends couch with scope: friends");
   }
 
-  if (!user.villageId) {
-    return jsonError("Join a village before starting a friends couch", 400);
-  }
-
   const room = createFriendsRoom(user, body.title);
   return NextResponse.json({
     room,
-    channels: listChannelsForUser(user, room),
+    videos: listVideosForUser(user),
+    channels: listChannelsForUser(user),
     friendRooms: listFriendRooms(user),
   });
 }

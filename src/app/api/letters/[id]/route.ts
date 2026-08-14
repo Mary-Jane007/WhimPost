@@ -29,7 +29,7 @@ export async function GET(
   }
 
   if (row.recipient_id === user.id && !row.is_read) {
-    db.prepare(`UPDATE letters SET is_read = 1 WHERE id = ?`).run(id);
+    markLetterRead(db, id, user.id);
     row.is_read = 1;
   }
 

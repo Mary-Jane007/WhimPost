@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * Refresh git-tracked TV catalogs from the local SQLite DB.
- * Run after uploading clips. With --push, also commit + push to origin
- * so the shelf survives fresh servers / resets.
+ * Run after uploading clips. With --push, also:
+ *  - publish playable files to the whimpost-media GitHub Release
+ *  - commit + push catalogs so the shelf survives fresh servers / resets
  */
 import fs from "fs";
 import path from "path";
@@ -15,6 +16,7 @@ const uploadDir = path.join(root, "data", "uploads");
 const linksPath = path.join(root, "data", "persistent-tv.json");
 const mediaPath = path.join(root, "data", "persistent-tv-media.json");
 const wantPush = process.argv.includes("--push");
+const RELEASE_TAG = process.env.WHIMPOST_MEDIA_RELEASE_TAG || "whimpost-media";
 
 if (!fs.existsSync(dbPath)) {
   console.error("No data/whimpost.db yet — start the app once first.");
@@ -63,6 +65,7 @@ fs.writeFileSync(
 
 const mediaClips = [];
 let missingFiles = 0;
+const playableFiles = [];
 for (const ch of channels) {
   const rows = db
     .prepare(
@@ -81,11 +84,25 @@ for (const ch of channels) {
       console.warn(`Missing upload bytes: ${row.filename} (${row.title})`);
       continue;
     }
+    const size = fs.statSync(filePath).size;
+    const fd = fs.openSync(filePath, "r");
+    const buf = Buffer.alloc(64);
+    try {
+      fs.readSync(fd, buf, 0, 64, 0);
+    } finally {
+      fs.closeSync(fd);
+    }
+    const head = buf.toString("utf8");
+    const isPointer =
+      size < 1024 && head.startsWith("version https://git-lfs.github.com/spec/v1");
+    if (!isPointer && size >= 8192) {
+      playableFiles.push(filePath);
+    }
     mediaClips.push({
       title: row.title,
       filename: row.filename,
       mime: row.mime || "video/mp4",
-      sizeBytes: row.size_bytes || 0,
+      sizeBytes: row.size_bytes || size,
       durationMs: row.duration_ms > 0 ? row.duration_ms : undefined,
       channelTitle: ch.title,
       villageId: row.village_id,
@@ -118,7 +135,7 @@ if (missingFiles > 0) {
 
 if (!wantPush) {
   console.log(
-    "Next: npm run persist-tv -- --push   (or git add data/uploads data/persistent-tv.json data/persistent-tv-media.json && git commit && git push)"
+    "Next: npm run persist-tv -- --push   (publishes release assets + commits catalogs)"
   );
   process.exit(0);
 }
@@ -132,33 +149,93 @@ function git(args, timeout = 60_000) {
   }).trim();
 }
 
+function publishRelease(files) {
+  if (!files.length) return 0;
+  try {
+    execFileSync(
+      "gh",
+      ["release", "view", RELEASE_TAG, "--repo", "Mary-Jane007/WhimPost"],
+      { stdio: "pipe" }
+    );
+  } catch {
+    execFileSync(
+      "gh",
+      [
+        "release",
+        "create",
+        RELEASE_TAG,
+        "--repo",
+        "Mary-Jane007/WhimPost",
+        "--title",
+        "WhimPost durable media",
+        "--notes",
+        "Uploaded TV clips and library files so media plays on any server without Git LFS.",
+      ],
+      { stdio: "pipe" }
+    );
+  }
+  let uploaded = 0;
+  for (const file of files) {
+    try {
+      execFileSync(
+        "gh",
+        [
+          "release",
+          "upload",
+          RELEASE_TAG,
+          file,
+          "--repo",
+          "Mary-Jane007/WhimPost",
+          "--clobber",
+        ],
+        { stdio: "pipe", timeout: 30 * 60_000 }
+      );
+      uploaded += 1;
+      console.log(`Published release asset: ${path.basename(file)}`);
+    } catch (err) {
+      console.warn(
+        `Release upload failed for ${file}:`,
+        err instanceof Error ? err.message : err
+      );
+    }
+  }
+  return uploaded;
+}
+
 try {
+  const published = publishRelease(playableFiles);
+  console.log(`Published ${published} playable file(s) to release ${RELEASE_TAG}`);
+
   git([
     "add",
+    "-f",
     "--",
     "data/persistent-tv.json",
     "data/persistent-tv-media.json",
-    "data/uploads",
+    "data/persistent-library-books.json",
+    "data/persistent-accounts.json",
   ]);
   const staged = git(["diff", "--cached", "--name-only"]);
-  if (!staged) {
+  if (!staged && published === 0) {
     console.log("Nothing new to commit — shelf already durable on this branch.");
     process.exit(0);
   }
-  console.log("Staging:\n" + staged);
-  git([
-    "commit",
-    "-m",
-    "Persist TV Corner uploads so clips survive resets",
-  ]);
-  const branch = git(["rev-parse", "--abbrev-ref", "HEAD"]);
-  if (!branch || branch === "HEAD") {
-    console.warn("Committed locally but HEAD is detached — not pushing.");
-    process.exit(0);
+  if (staged) {
+    console.log("Staging:\n" + staged);
+    git([
+      "commit",
+      "-m",
+      "Persist media catalogs and uploads so clips survive resets",
+    ]);
+    const branch = git(["rev-parse", "--abbrev-ref", "HEAD"]);
+    if (!branch || branch === "HEAD") {
+      console.warn("Committed locally but HEAD is detached — not pushing.");
+      process.exit(0);
+    }
+    console.log(`Pushing to origin (${branch})…`);
+    git(["push", "-u", "origin", "HEAD"], 20 * 60_000);
+    console.log("Durable TV shelf pushed.");
   }
-  console.log(`Pushing to origin (${branch})…`);
-  git(["push", "-u", "origin", "HEAD"], 20 * 60_000);
-  console.log("Durable TV shelf pushed.");
 } catch (err) {
   console.error("git persist failed:", err instanceof Error ? err.message : err);
   process.exit(1);

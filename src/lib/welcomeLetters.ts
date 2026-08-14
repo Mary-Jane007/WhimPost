@@ -2,6 +2,8 @@ import { hashSync } from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import type Database from "better-sqlite3";
 import { toLetterView } from "@/lib/letters";
+import { exportPersistentAccounts } from "@/lib/persistentAccounts";
+import { exportPersistentWelcomeLetters } from "@/lib/persistentWelcomeLetters";
 import type { LetterRecord, LetterView } from "@/lib/types";
 import { grantCollectible } from "@/lib/villageProgress";
 import {
@@ -720,7 +722,126 @@ function grantWelcomeCollectionGifts(
   }
 }
 
-/** Idempotent: creates one unread welcome letter per villager per village. */
+function parseVisitedVillages(raw: string | null | undefined): VillageId[] {
+  try {
+    const parsed = JSON.parse(raw || "[]") as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((id): id is VillageId => typeof id === "string" && isVillageId(id));
+  } catch {
+    return [];
+  }
+}
+
+export function getVisitedVillages(
+  db: Database.Database,
+  userId: string
+): VillageId[] {
+  const row = db
+    .prepare(
+      `SELECT COALESCE(visited_villages_json, '[]') AS visited_villages_json
+       FROM users WHERE id = ?`
+    )
+    .get(userId) as { visited_villages_json: string } | undefined;
+  return parseVisitedVillages(row?.visited_villages_json);
+}
+
+export function hasVisitedVillage(
+  db: Database.Database,
+  userId: string,
+  villageId: VillageId
+) {
+  return getVisitedVillages(db, userId).includes(villageId);
+}
+
+/** Remember a village visit so the welcome modal never reappears for it. */
+export function markVillageVisited(
+  db: Database.Database,
+  userId: string,
+  villageId: VillageId
+) {
+  const current = getVisitedVillages(db, userId);
+  if (current.includes(villageId)) return false;
+  const next = [...current, villageId].sort();
+  db.prepare(`UPDATE users SET visited_villages_json = ? WHERE id = ?`).run(
+    JSON.stringify(next),
+    userId
+  );
+  return true;
+}
+
+/**
+ * Backfill visited villages from existing welcome letters (and current home)
+ * so returning villagers are not treated as first-timers after a deploy.
+ */
+export function backfillVisitedVillagesFromLetters(db: Database.Database) {
+  const senderEntries = Object.entries(SYSTEM_SENDERS) as Array<
+    [VillageId, SystemVillageSender]
+  >;
+  if (senderEntries.length === 0) return;
+
+  const users = db
+    .prepare(
+      `SELECT id,
+              COALESCE(visited_villages_json, '[]') AS visited_villages_json
+       FROM users
+       WHERE id NOT LIKE 'system-%'`
+    )
+    .all() as Array<{
+    id: string;
+    visited_villages_json: string;
+  }>;
+
+  const letterVillage = db.prepare(
+    `SELECT 1 AS ok FROM letters
+     WHERE recipient_id = ? AND sender_id = ? AND status = 'sent'
+     LIMIT 1`
+  );
+
+  const update = db.prepare(
+    `UPDATE users SET visited_villages_json = ? WHERE id = ?`
+  );
+
+  const sync = db.transaction(() => {
+    for (const user of users) {
+      const visited = new Set(parseVisitedVillages(user.visited_villages_json));
+      for (const [villageId, sender] of senderEntries) {
+        const hit = letterVillage.get(user.id, sender.id) as
+          | { ok: number }
+          | undefined;
+        if (hit) visited.add(villageId);
+      }
+      const next = [...visited].sort();
+      const prev = parseVisitedVillages(user.visited_villages_json);
+      if (
+        next.length === prev.length &&
+        next.every((id, i) => id === prev[i])
+      ) {
+        continue;
+      }
+      update.run(JSON.stringify(next), user.id);
+    }
+  });
+  sync();
+}
+
+function persistWelcomeState(db: Database.Database) {
+  try {
+    exportPersistentWelcomeLetters(db);
+  } catch (err) {
+    console.error("[persistent-welcome-letters] export failed:", err);
+  }
+  try {
+    exportPersistentAccounts(db);
+  } catch (err) {
+    console.error("[persistent-accounts] export failed:", err);
+  }
+}
+
+/**
+ * Idempotent: one welcome letter per villager per village.
+ * Modal only appears on the first visit (unread). Later visits keep the
+ * letter in the inbox and never show the welcome overlay again.
+ */
 export function deliverWelcomeLetter(
   db: Database.Database,
   recipientId: string,
@@ -742,18 +863,24 @@ export function deliverWelcomeLetter(
     .get(recipientId, senderId) as LetterRecord | undefined;
 
   if (existing) {
-    // Backfill starter gifts for villagers who got the letter before gifts existed.
+    markVillageVisited(db, recipientId, villageId);
     grantWelcomeCollectionGifts(db, recipientId, villageId);
+    persistWelcomeState(db);
     return toLetterView(existing);
   }
 
+  const alreadyVisited = hasVisitedVillage(db, recipientId, villageId);
+
+  // Returning villager after a reset: restore the letter into the inbox as
+  // already-read so the welcome modal does not fire again.
+  const isRead = alreadyVisited ? 1 : 0;
   const id = uuidv4();
   db.prepare(
     `INSERT INTO letters (
       id, sender_id, recipient_id, subject, body,
       paper_style, envelope_style, wax_seal, stamp_style, font_style,
       stickers_json, scrap_json, status, is_read, sent_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'typewriter', ?, ?, 'sent', 0, datetime('now'))`
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'typewriter', ?, ?, 'sent', ?, datetime('now'))`
   ).run(
     id,
     senderId,
@@ -765,10 +892,13 @@ export function deliverWelcomeLetter(
     template.waxSeal,
     template.stampStyle,
     JSON.stringify(template.stickers),
-    JSON.stringify(template.scraps)
+    JSON.stringify(template.scraps),
+    isRead
   );
 
+  markVillageVisited(db, recipientId, villageId);
   grantWelcomeCollectionGifts(db, recipientId, villageId);
+  persistWelcomeState(db);
 
   const row = db.prepare(`SELECT * FROM letters WHERE id = ?`).get(id) as
     | LetterRecord
@@ -788,6 +918,8 @@ export function getUnreadWelcomeLetter(
 
   syncWelcomeLetterDecorations(db, villageId);
 
+  // First visit delivers an unread letter; return visits restore it as read.
+  // Only an unread welcome triggers the overlay.
   const row = db
     .prepare(
       `SELECT * FROM letters
@@ -813,5 +945,22 @@ export function markLetterRead(
        WHERE id = ? AND recipient_id = ? AND is_read = 0`
     )
     .run(letterId, recipientId);
+
+  if (result.changes > 0) {
+    const row = db
+      .prepare(`SELECT sender_id FROM letters WHERE id = ? AND recipient_id = ?`)
+      .get(letterId, recipientId) as { sender_id: string } | undefined;
+    if (row) {
+      for (const [villageId, sender] of Object.entries(SYSTEM_SENDERS) as Array<
+        [VillageId, SystemVillageSender]
+      >) {
+        if (sender.id === row.sender_id) {
+          markVillageVisited(db, recipientId, villageId);
+          break;
+        }
+      }
+    }
+    persistWelcomeState(db);
+  }
   return result.changes > 0;
 }

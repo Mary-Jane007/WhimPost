@@ -60,18 +60,7 @@ export function readUploadMeta(uploadId: string): UploadSessionMeta | null {
 
 export function writeUploadMeta(meta: UploadSessionMeta) {
   ensureUploadDirs();
-  const target = metaPath(meta.id);
-  const tmp = `${target}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(meta));
-  fs.renameSync(tmp, target);
-}
-
-function listReceivedChunks(uploadId: string, chunkCount: number) {
-  const received: number[] = [];
-  for (let i = 0; i < chunkCount; i++) {
-    if (fs.existsSync(chunkPath(uploadId, i))) received.push(i);
-  }
-  return received;
+  fs.writeFileSync(metaPath(meta.id), JSON.stringify(meta));
 }
 
 export function cleanupUploadSession(uploadId: string) {
@@ -111,7 +100,10 @@ export function createUploadSession(input: {
 
   const channel = getChannelById(input.channelId);
   if (!channel) {
-    return { ok: false, error: "Create a channel first, then upload videos to it" };
+    return {
+      ok: false,
+      error: "Create a channel first, then upload videos to it",
+    };
   }
 
   const chunkSize = TV_CHUNK_SIZE;
@@ -133,7 +125,7 @@ export function createUploadSession(input: {
     chunkCount,
     received: [],
     uploaderId: input.uploaderId,
-    villageId: channel.villageId,
+    villageId: channel.isGlobal ? null : channel.villageId,
     createdAt: new Date().toISOString(),
   };
 
@@ -146,9 +138,13 @@ export function saveChunk(
   uploadId: string,
   index: number,
   data: Buffer
-): { ok: true; meta: UploadSessionMeta } | { ok: false; error: string; status?: number } {
+):
+  | { ok: true; meta: UploadSessionMeta }
+  | { ok: false; error: string; status?: number } {
   const meta = readUploadMeta(uploadId);
-  if (!meta) return { ok: false, error: "Upload session expired — try again", status: 404 };
+  if (!meta) {
+    return { ok: false, error: "Upload session expired — try again", status: 404 };
+  }
   if (index < 0 || index >= meta.chunkCount) {
     return { ok: false, error: "Invalid chunk index", status: 400 };
   }
@@ -160,11 +156,12 @@ export function saveChunk(
   }
 
   ensureUploadDirs();
-  // Overwrite is intentional — client retries rewrite the same piece.
   fs.writeFileSync(chunkPath(uploadId, index), data);
-  // Rebuild from disk so parallel/retry writes never lose pieces.
-  meta.received = listReceivedChunks(uploadId, meta.chunkCount);
-  writeUploadMeta(meta);
+  if (!meta.received.includes(index)) {
+    meta.received.push(index);
+    meta.received.sort((a, b) => a - b);
+    writeUploadMeta(meta);
+  }
   return { ok: true, meta };
 }
 
@@ -175,25 +172,22 @@ export function completeUploadSession(
   | { ok: true; video: TvVideo; channel: TvChannel | null }
   | { ok: false; error: string; status?: number } {
   const meta = readUploadMeta(uploadId);
-  if (!meta) return { ok: false, error: "Upload session expired — try again", status: 404 };
+  if (!meta) {
+    return { ok: false, error: "Upload session expired — try again", status: 404 };
+  }
   if (meta.uploaderId !== uploaderId) {
     return { ok: false, error: "Not your upload session", status: 403 };
   }
-
-  const received = listReceivedChunks(uploadId, meta.chunkCount);
-  meta.received = received;
-  writeUploadMeta(meta);
-
-  if (received.length !== meta.chunkCount) {
+  if (meta.received.length !== meta.chunkCount) {
     return {
       ok: false,
-      error: `Upload incomplete (${received.length}/${meta.chunkCount} chunks) — try again`,
+      error: `Upload incomplete (${meta.received.length}/${meta.chunkCount} chunks) — try again`,
       status: 400,
     };
   }
 
   ensureUploadDirs();
-  for (const i of received) {
+  for (let i = 0; i < meta.chunkCount; i++) {
     if (!fs.existsSync(chunkPath(uploadId, i))) {
       return { ok: false, error: `Missing chunk ${i} — try again`, status: 400 };
     }
@@ -214,7 +208,11 @@ export function completeUploadSession(
   } catch (err) {
     if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
     console.error("[tv upload] assemble failed", err);
-    return { ok: false, error: "Could not assemble upload — try again", status: 500 };
+    return {
+      ok: false,
+      error: "Could not assemble upload — try again",
+      status: 500,
+    };
   }
 
   const sizeBytes = fs.statSync(destPath).size;
