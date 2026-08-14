@@ -1,15 +1,13 @@
 import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/persistentTvMedia";
+import { PERSISTENT_TV_MEDIA_PATH, TV_CACHE_DIR } from "@/lib/tvMediaPaths";
 import { UPLOAD_DIR } from "@/lib/uploadPaths";
 import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
 
 export { UPLOAD_DIR } from "@/lib/uploadPaths";
 export { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
-
-/** Local playable copies when Git LFS pointers cannot be smudged. */
-export const TV_CACHE_DIR = path.join(process.cwd(), "data", "tv-cache");
+export { TV_CACHE_DIR } from "@/lib/tvMediaPaths";
 
 /**
  * Prefer a real upload; fall back to a local tv-cache stand-in when the
@@ -18,6 +16,7 @@ export const TV_CACHE_DIR = path.join(process.cwd(), "data", "tv-cache");
 export function resolvePlayableUploadPath(filename: string): string | null {
   const safe = path.basename(filename);
   if (!safe || safe !== filename || filename.includes("..")) return null;
+  if (!UPLOAD_DIR) return null;
 
   const primary = path.join(UPLOAD_DIR, safe);
   if (isPlayableMediaFile(primary)) return primary;
@@ -124,8 +123,11 @@ function writeStandinMp4(destPath: string, title: string) {
  */
 export function materializeTvStandins() {
   try {
-    if (!fs.existsSync(PERSISTENT_TV_MEDIA_PATH)) return { created: 0 };
-    const raw = fs.readFileSync(PERSISTENT_TV_MEDIA_PATH, "utf8");
+    const catalogPath =
+      PERSISTENT_TV_MEDIA_PATH ||
+      path.join(process.cwd(), "data", "persistent-tv-media.json");
+    if (!catalogPath || !fs.existsSync(catalogPath)) return { created: 0 };
+    const raw = fs.readFileSync(catalogPath, "utf8");
     const parsed = JSON.parse(raw) as {
       clips?: Array<{ filename?: string; title?: string }>;
     };
@@ -136,7 +138,7 @@ export function materializeTvStandins() {
       if (!filename || filename.startsWith("link-")) continue;
       if (resolvePlayableUploadPath(filename)) continue;
 
-      const primary = path.join(UPLOAD_DIR, filename);
+      const primary = path.join(UPLOAD_DIR || path.join(process.cwd(), "data", "uploads"), filename);
       const needsStandin =
         !fs.existsSync(primary) || isLfsPointerFile(primary);
       if (!needsStandin) continue;

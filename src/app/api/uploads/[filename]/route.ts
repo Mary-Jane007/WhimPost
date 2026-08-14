@@ -194,16 +194,26 @@ export async function GET(
   }
 
   let resolvedPath = filePath;
-  if (
-    !fs.existsSync(resolvedPath) ||
-    isLfsPointerFile(resolvedPath) ||
-    (isVideo && !resolvePlayableUploadPath(filename))
-  ) {
-    const restored = ensureMediaReleaseAsset(filename);
-    if (restored) resolvedPath = restored;
+  try {
+    if (
+      !resolvedPath ||
+      !fs.existsSync(resolvedPath) ||
+      isLfsPointerFile(resolvedPath) ||
+      (isVideo && !resolvePlayableUploadPath(filename))
+    ) {
+      const restored = ensureMediaReleaseAsset(filename);
+      if (restored) resolvedPath = restored;
+    }
+  } catch (err) {
+    console.warn("[uploads] media restore failed:", err);
   }
 
-  if (!fs.existsSync(resolvedPath) || isLfsPointerFile(resolvedPath)) {
+  if (
+    !resolvedPath ||
+    typeof resolvedPath !== "string" ||
+    !fs.existsSync(resolvedPath) ||
+    isLfsPointerFile(resolvedPath)
+  ) {
     return jsonError(
       isVideo
         ? "Clip file missing — re-upload it from the channel shelf"

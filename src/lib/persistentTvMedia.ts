@@ -3,17 +3,12 @@ import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { UPLOAD_DIR } from "@/lib/uploadPaths";
+import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/tvMediaPaths";
 
 /**
  * Git-tracked catalog of uploaded TV files (metadata only).
  */
-export const PERSISTENT_TV_MEDIA_PATH = path.join(
-  process.cwd(),
-  "data",
-  "persistent-tv-media.json"
-);
-
-export { UPLOAD_DIR };
+export { PERSISTENT_TV_MEDIA_PATH } from "@/lib/tvMediaPaths";
 
 export type PersistentTvMediaClip = {
   title: string;

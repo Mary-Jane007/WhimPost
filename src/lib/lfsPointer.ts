@@ -10,6 +10,7 @@ const MIN_PLAYABLE_BYTES = 8_192;
 
 /** True when the path is a Git LFS pointer stub instead of real bytes. */
 export function isLfsPointerFile(filePath: string) {
+  if (!filePath || typeof filePath !== "string") return false;
   try {
     const stat = fs.statSync(filePath);
     if (stat.size > 1024) return false;
@@ -22,6 +23,7 @@ export function isLfsPointerFile(filePath: string) {
 
 /** True when the path exists and holds playable (non-pointer) media bytes. */
 export function isPlayableMediaFile(filePath: string) {
+  if (!filePath || typeof filePath !== "string") return false;
   try {
     if (!fs.existsSync(filePath)) return false;
     if (isLfsPointerFile(filePath)) return false;

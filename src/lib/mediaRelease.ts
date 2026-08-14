@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
 import { PERSISTENT_LIBRARY_BOOKS_PATH } from "@/lib/persistentLibraryBooks";
-import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/persistentTvMedia";
+import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/tvMediaPaths";
 import {
   moonSoundAbsolutePath,
   moonSoundReleaseName,
