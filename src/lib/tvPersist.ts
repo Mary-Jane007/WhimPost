@@ -2,28 +2,19 @@ import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import type { Database } from "better-sqlite3";
-import {
-  ensureMediaReleaseBytes,
-  publishMediaReleaseAssets,
-} from "@/lib/mediaRelease";
 import { exportPersistentTv } from "@/lib/persistentTv";
-import {
-  exportPersistentTvMedia,
-} from "@/lib/persistentTvMedia";
+import { exportPersistentTvMedia } from "@/lib/persistentTvMedia";
 import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/tvMediaPaths";
 import { UPLOAD_DIR } from "@/lib/uploadPaths";
 import { exportPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
 import {
   exportPersistentMoonSounds,
-  importPersistentMoonSounds,
   moonSoundAbsolutePath,
   moonSoundReleaseName,
   PERSISTENT_MOON_SOUNDS_PATH,
 } from "@/lib/persistentMoonSounds";
 import { PERSISTENT_SITE_UPLOADS_PATH } from "@/lib/persistentSiteUploads";
-import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
-import { materializeTvStandins } from "@/lib/tvUploadFiles";
 
 const ROOT = process.cwd();
 const LOCK_PATH = path.join(ROOT, "data", ".tv-persist.lock");
@@ -45,6 +36,42 @@ function safeExists(filePath: string | null | undefined) {
   } catch {
     return false;
   }
+}
+
+function isPointerOrTiny(filePath: string) {
+  try {
+    if (!safeExists(filePath)) return true;
+    const stat = fs.statSync(filePath);
+    if (stat.size < 8192) return true;
+    if (stat.size > 1024) return false;
+    const head = fs.readFileSync(filePath, "utf8");
+    return head.startsWith("version https://git-lfs.github.com/spec/v1");
+  } catch {
+    return true;
+  }
+}
+
+function runStandins() {
+  try {
+    const { materializeTvStandins } = require("@/lib/tvUploadFiles") as typeof import("@/lib/tvUploadFiles");
+    materializeTvStandins();
+  } catch (err) {
+    console.warn("[tv-cache] stand-in materialize failed:", err);
+  }
+}
+
+function runMediaReleaseRestore() {
+  try {
+    const { ensureMediaReleaseBytes } = require("@/lib/mediaRelease") as typeof import("@/lib/mediaRelease");
+    ensureMediaReleaseBytes();
+  } catch (err) {
+    console.warn("[persistent-tv] media release restore failed:", err);
+  }
+}
+
+function publishReleaseAssets(names?: string[]) {
+  const { publishMediaReleaseAssets } = require("@/lib/mediaRelease") as typeof import("@/lib/mediaRelease");
+  return publishMediaReleaseAssets(names);
 }
 
 function listCatalogUploadPaths() {
@@ -144,7 +171,7 @@ function listReleaseNamesForPlayableUploads() {
   const names: string[] = [];
   for (const rel of listCatalogUploadPaths()) {
     const abs = path.join(ROOT, rel);
-    if (!isPlayableMediaFile(abs)) continue;
+    if (isPointerOrTiny(abs)) continue;
     if (rel.startsWith("data/uploads/moon-sounds/")) {
       names.push(moonSoundReleaseName(path.basename(rel)));
     } else {
@@ -191,11 +218,7 @@ export function ensureTvUploadBytes(opts?: { skipNetwork?: boolean }) {
 
   if (!opts?.skipNetwork) {
     // Primary durable path when Git LFS quota is exhausted: GitHub Release assets.
-    try {
-      ensureMediaReleaseBytes();
-    } catch (err) {
-      console.warn("[persistent-tv] media release restore failed:", err);
-    }
+    runMediaReleaseRestore();
   }
 
   // Warn about any catalog clips that are still pointer-only / missing.
@@ -204,7 +227,7 @@ export function ensureTvUploadBytes(opts?: { skipNetwork?: boolean }) {
       PERSISTENT_TV_MEDIA_PATH ||
       path.join(ROOT, "data", "persistent-tv-media.json");
     if (!safeExists(catalogPath)) {
-      materializeTvStandins();
+      runStandins();
       return;
     }
     const raw = fs.readFileSync(catalogPath, "utf8");
@@ -216,10 +239,9 @@ export function ensureTvUploadBytes(opts?: { skipNetwork?: boolean }) {
       const filename = String(clip.filename || "").trim();
       if (!filename) continue;
       const filePath = path.join(uploadDir, filename);
-      if (!isPlayableMediaFile(filePath)) {
+      if (isPointerOrTiny(filePath)) {
         if (!safeExists(filePath)) missing += 1;
-        else if (isLfsPointerFile(filePath)) pointers += 1;
-        else missing += 1;
+        else pointers += 1;
       }
     }
     if (missing || pointers) {
@@ -227,11 +249,11 @@ export function ensureTvUploadBytes(opts?: { skipNetwork?: boolean }) {
         `[persistent-tv] upload shelf incomplete: ${missing} missing, ${pointers} LFS pointer-only`
       );
       // Keep the set watchable when durable bytes are still unavailable.
-      materializeTvStandins();
+      runStandins();
     }
   } catch (err) {
     console.warn("[persistent-tv] could not verify upload shelf:", err);
-    materializeTvStandins();
+    runStandins();
   }
 }
 
@@ -250,7 +272,8 @@ export function scheduleEnsureTvUploadBytes() {
       // Celestial audio may land after the first import — re-bind rows now.
       try {
         const { getDb } = require("@/lib/db") as typeof import("@/lib/db");
-        importPersistentMoonSounds(getDb());
+        const moon = require("@/lib/persistentMoonSounds") as typeof import("@/lib/persistentMoonSounds");
+        moon.importPersistentMoonSounds(getDb());
       } catch (err) {
         console.warn("[persistent-moon-sounds] post-restore import failed:", err);
       }
@@ -368,7 +391,7 @@ export async function runDurableTvGitSync(): Promise<{
       // Publish playable binaries to the GitHub Release shelf first so every
       // server can restore them even when Git LFS quota is exhausted.
       try {
-        const published = publishMediaReleaseAssets(
+        const published = publishReleaseAssets(
           listReleaseNamesForPlayableUploads()
         );
         if (published.uploaded) {
@@ -384,7 +407,7 @@ export async function runDurableTvGitSync(): Promise<{
       // Large video bytes live on the release shelf — do not rely on Git LFS.
       const uploadPaths = listCatalogUploadPaths().filter((rel) => {
         const abs = path.join(ROOT, rel);
-        if (!isPlayableMediaFile(abs)) return false;
+        if (isPointerOrTiny(abs)) return false;
         // Keep committing modest files in git; skip huge videos.
         return fs.statSync(abs).size < 95 * 1024 * 1024;
       });

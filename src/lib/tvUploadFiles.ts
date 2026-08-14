@@ -6,7 +6,6 @@ import { UPLOAD_DIR } from "@/lib/uploadPaths";
 import { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
 
 export { UPLOAD_DIR } from "@/lib/uploadPaths";
-export { isLfsPointerFile, isPlayableMediaFile } from "@/lib/lfsPointer";
 export { TV_CACHE_DIR } from "@/lib/tvMediaPaths";
 
 /**
