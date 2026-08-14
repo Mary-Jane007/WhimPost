@@ -207,6 +207,7 @@
           480
         );
         var next = Math.ceil(h + 48) + "px";
+        if (iframe.style.height === next) return;
         iframe.style.height = next;
         iframe.style.maxHeight = "none";
         if (iframe.parentElement) {
