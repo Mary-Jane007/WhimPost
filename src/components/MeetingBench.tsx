@@ -358,12 +358,13 @@ export function MeetingBench({
       <section className="mb-scene" aria-label="The wooden bench">
         <div className="mb-board-frame">
           <div className="mb-board-header">
-            <span>Community notice board</span>
+            <span>Community notice board · every village</span>
             <SeasonDecor season={board.season} />
           </div>
           <p className="mb-scene-lead">
-            It is <strong>{board.seasonLabel}</strong> across WhimPost. Papers
-            shift with the wind; someone has left a calendar under a stone.
+            It is <strong>{board.seasonLabel}</strong> across WhimPost. This
+            board is shared by every village — papers shift with the wind;
+            someone has left a calendar under a stone.
           </p>
         </div>
         <div className="mb-bench-illustration" aria-hidden>

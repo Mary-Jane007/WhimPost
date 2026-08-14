@@ -384,8 +384,10 @@ export function MeetingBenchAdmin({
         <div>
           <h3>Edit Meeting Bench</h3>
           <p className="muted">
-            Add and rewrite anything on the board. Villagers only see published /
-            active / upcoming papers — drafts stay private to you.
+            This board is global — every village sees the same papers. Add and
+            rewrite notices, gatherings, seasonal activities, Chronicle stories,
+            and community events. Drafts stay private to you; villagers see
+            published / active / upcoming items.
           </p>
         </div>
         <button type="button" className="nav-ghost" onClick={() => setOpen(false)}>
@@ -660,7 +662,12 @@ export function MeetingBenchAdmin({
           </div>
 
           <fieldset className="mb-admin-villages">
-            <legend>Villages</legend>
+            <legend>Which villages does this mention?</legend>
+            <p className="muted mb-admin-villages-hint">
+              The Meeting Bench itself is shared by everyone. Use this to tag
+              which village(s) a paper is about — leave “All villages” for
+              world-wide news.
+            </p>
             <label className="mb-admin-check">
               <input
                 type="checkbox"
@@ -672,7 +679,7 @@ export function MeetingBenchAdmin({
                   }))
                 }
               />
-              All villages
+              All villages (global)
             </label>
             {VILLAGES.map((v) => (
               <label key={v.id} className="mb-admin-check">

@@ -24,16 +24,18 @@ export default async function MeetingBenchPage() {
     >
       <PageCrest kinds={["mushroom-amanita", "fox-seated", "jam-jar"]} />
       <header className="page-header meeting-bench-header">
-        <p className="meeting-bench-kicker">A quiet place in the villages</p>
+        <p className="meeting-bench-kicker">Shared by every village</p>
         <h1>🪑 The Meeting Bench</h1>
         <p>
-          Come sit for a moment. Notices flutter on the board, gatherings are
-          pencilled on the calendar, and the Chronicle keeps little stories of
-          what the woods have been up to — even while you were away.
+          Come sit for a moment. This is one bench for the whole of WhimPost —
+          Mosshollow, Clovermeadow, Moonmere, Bramblewood, and Hearthwick all
+          gather here. Notices flutter on the board, gatherings are pencilled on
+          the calendar, and the Chronicle keeps little stories of what the woods
+          have been up to — even while you were away.
         </p>
         <p className="muted">
           Looking for neighbor posts and crafts? That&apos;s the{" "}
-          <Link href="/village">Village Square</Link>.
+          <Link href="/village">Village Square</Link> in your own village.
         </p>
         {isOwner ? (
           <p className="mb-owner-banner">
