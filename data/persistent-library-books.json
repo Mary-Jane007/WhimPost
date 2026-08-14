@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:22:21.256Z",
+  "updatedAt": "2026-08-14T19:23:45.914Z",
   "books": [
     {
       "id": "princess",
@@ -132,28 +132,6 @@
       "mood": "",
       "themesJson": "[]",
       "rating": 4.5,
-      "published": true
-    },
-    {
-      "id": "rl-tuchman",
-      "shelf": "readinglist",
-      "title": "A Distant Mirror",
-      "author": "Barbara Tuchman",
-      "description": "",
-      "minutes": 120,
-      "coverEmoji": "📖",
-      "coverUrl": "/api/uploads/832d6377-7d03-4119-a255-7275d958eadc.jpg",
-      "fileUrl": "/api/uploads/0fa6232a-5539-4e49-8014-c6602564c3f6.epub",
-      "fileName": "a-distant-mirror-by-barbara-w-tuchman.epub",
-      "fileMime": "application/epub+zip",
-      "quotesJson": "[]",
-      "reflectionsJson": "[]",
-      "category": "History",
-      "difficulty": "Dense",
-      "length": "Long",
-      "mood": "Epic",
-      "themesJson": "[\"middle ages\",\"plague\",\"power\"]",
-      "rating": 4.4,
       "published": true
     },
     {
@@ -385,6 +363,7 @@
     "rl-frankl",
     "rl-le-guin",
     "rl-oliver",
+    "rl-tuchman",
     "tollbooth"
   ]
 }
