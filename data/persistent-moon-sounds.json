@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T14:57:29.671Z",
+  "updatedAt": "2026-08-14T14:57:42.276Z",
   "sounds": [
     {
       "playlistId": "campfire",
@@ -25,6 +25,12 @@
       "filename": "af62ecb5-083a-4036-a825-2ac41279b339.mp3",
       "originalName": "dragon-studio-gentle-ocean-shore-waves-499665.mp3",
       "sizeBytes": 1966848
+    },
+    {
+      "playlistId": "wind-trees",
+      "filename": "9bebde5e-8c86-488c-9033-b650ffdcb285.mp3",
+      "originalName": "traian1984-ambience-wind-blowing-through-trees-01-186986.mp3",
+      "sizeBytes": 2887680
     }
   ]
 }
