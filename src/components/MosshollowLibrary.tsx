@@ -630,7 +630,7 @@ export function MosshollowLibrary({
           <section className="mh-section">
             <h2>Owl&apos;s Reading List</h2>
             <p className="mh-section-lead">
-              A permanent nest of recommendations — filter by mood of mind.
+              Every title in the library nests here — filter by mood of mind.
             </p>
             <div className="mh-chips">
               <button

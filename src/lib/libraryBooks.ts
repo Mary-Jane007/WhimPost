@@ -236,6 +236,27 @@ function mergeReadingOverlay(
   };
 }
 
+function clubBookToReadingListBook(book: ClubBook): ReadingListBook {
+  return {
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    category: "Classic Literature",
+    difficulty: "Gentle",
+    length:
+      book.minutes >= 300 ? "Long" : book.minutes <= 150 ? "Short" : "Medium",
+    mood: "Cozy",
+    themes: ["story"],
+    rating: 4.5,
+    coverEmoji: book.coverEmoji || "📖",
+    coverUrl: book.coverUrl,
+    fileUrl: book.fileUrl,
+    fileName: book.fileName,
+    description: book.description,
+    uploaded: book.uploaded,
+  };
+}
+
 /** Hardcoded club shelf + published owner uploads (DB overlays same id). */
 export function listClubBooks(): ClubBook[] {
   const removed = getRemovedBookIds();
@@ -269,34 +290,62 @@ export function listClubBooks(): ClubBook[] {
   return merged;
 }
 
+/**
+ * Owl's Reading List — every library title (club + reading list + uploads).
+ * This is the permanent nest; Book Club still rotates a featured shelf from
+ * the same pool.
+ */
 export function listReadingListBooks(): ReadingListBook[] {
   const removed = getRemovedBookIds();
-  const allRecords = listLibraryBookRecords();
-  const movedToClub = new Set(
-    allRecords.filter((r) => r.shelf === "club").map((r) => r.id)
-  );
-  const uploaded = allRecords
-    .filter((r) => r.shelf === "readinglist")
-    .map(toReadingListBook);
   const byId = new Map<string, ReadingListBook>();
+
   for (const book of READING_LIST) {
-    if (removed.has(book.id) || movedToClub.has(book.id)) continue;
+    if (removed.has(book.id)) continue;
     byId.set(book.id, book);
   }
-  for (const book of uploaded) {
-    if (removed.has(book.id)) continue;
-    const prev = byId.get(book.id);
-    byId.set(book.id, prev ? mergeReadingOverlay(prev, book) : book);
+
+  // Any shelf in the DB counts — club uploads belong here too.
+  for (const record of listLibraryBookRecords()) {
+    if (removed.has(record.id)) continue;
+    const asReading = toReadingListBook(record);
+    const prev = byId.get(record.id);
+    byId.set(
+      record.id,
+      prev ? mergeReadingOverlay(prev, asReading) : asReading
+    );
   }
-  const seedIds = new Set(READING_LIST.map((b) => b.id));
-  const merged = READING_LIST.filter((b) => byId.has(b.id)).map(
-    (b) => byId.get(b.id)!
-  );
-  for (const book of uploaded) {
-    if (removed.has(book.id)) continue;
-    if (!seedIds.has(book.id)) merged.push(book);
+
+  // Club catalog / club-shelf titles that are not already present.
+  for (const club of listClubBooks()) {
+    if (removed.has(club.id)) continue;
+    const asReading = clubBookToReadingListBook(club);
+    const prev = byId.get(club.id);
+    byId.set(
+      club.id,
+      prev ? mergeReadingOverlay(asReading, prev) : asReading
+    );
   }
-  return merged;
+
+  const ordered: ReadingListBook[] = [];
+  const seen = new Set<string>();
+  for (const seed of READING_LIST) {
+    const book = byId.get(seed.id);
+    if (!book || seen.has(book.id)) continue;
+    ordered.push(book);
+    seen.add(book.id);
+  }
+  for (const seed of CLUB_BOOKS) {
+    const book = byId.get(seed.id);
+    if (!book || seen.has(book.id)) continue;
+    ordered.push(book);
+    seen.add(book.id);
+  }
+  for (const book of byId.values()) {
+    if (seen.has(book.id)) continue;
+    ordered.push(book);
+    seen.add(book.id);
+  }
+  return ordered;
 }
 
 /** Look up a hardcoded catalog title (before DB overlay). */
