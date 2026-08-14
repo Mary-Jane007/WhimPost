@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T20:37:50.109Z",
+  "updatedAt": "2026-08-14T20:40:51.775Z",
   "books": [
     {
       "id": "princess",
@@ -286,6 +286,28 @@
       "mood": "Witty",
       "themesJson": "[\"pride\",\"love\",\"society\"]",
       "rating": 4.6,
+      "published": true
+    },
+    {
+      "id": "lib-d00139b5-c120-40d6-a06f-5937ae839b97",
+      "shelf": "readinglist",
+      "title": "Sense and Sensibility",
+      "author": "Jane Austen",
+      "description": "Sense and Sensibility\" by Jane Austen is a novel published in 1811. When the Dashwood sisters are forced from their family estate into reduced circumstances, they face romantic trials that test their contrasting natures. Sensible Elinor guards her feelings while passionate Marianne wears her heart openly. Both encounter love, disappointment, and betrayal as suitors prove honorable or false. Through heartbreak and revelation, the sisters must navigate society's demands while discovering what truly matters in matters of the heart.",
+      "minutes": 360,
+      "coverEmoji": "📖",
+      "coverUrl": "/api/uploads/8a19463e-e766-46ea-8ed6-c24b5f0c0754.jpg",
+      "fileUrl": "/api/uploads/236a58be-48f9-4158-b095-2f3c125ad624.epub",
+      "fileName": "Sense and sensibility.epub",
+      "fileMime": "application/epub+zip",
+      "quotesJson": "[\"“The more I know of the world, the more am I convinced that I shall never see a man whom I can really love.”\"]",
+      "reflectionsJson": "[]",
+      "category": "Classic Literature",
+      "difficulty": "Steady",
+      "length": "Medium",
+      "mood": "Elegant, emotional, cozy, and quietly romantic",
+      "themesJson": "[]",
+      "rating": 4.5,
       "published": true
     },
     {
