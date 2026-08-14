@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T18:33:24.646Z",
+  "updatedAt": "2026-08-14T18:34:40.555Z",
   "clips": [
     {
       "title": "Franklin's Garden",
@@ -18,6 +18,16 @@
       "mime": "video/mp4",
       "sizeBytes": 37296337,
       "durationMs": 469484,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "YTDown",
+      "filename": "99e323d8-ebfa-4daf-a307-ffcb545c1883.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 174746605,
+      "durationMs": 4121263,
       "channelTitle": "Clovermeadow Exclusive",
       "villageId": "clovermeadow",
       "isGlobal": false
