@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:25:02.215Z",
+  "updatedAt": "2026-08-14T19:29:59.188Z",
   "clips": [
     {
       "title": "Guess How Much I Love You: Little Redwood Fox",
@@ -33,36 +33,6 @@
       "isGlobal": false
     },
     {
-      "title": "The secret garden (animated)",
-      "filename": "99e323d8-ebfa-4daf-a307-ffcb545c1883.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 174746605,
-      "durationMs": 4121263,
-      "channelTitle": "Clovermeadow Exclusive",
-      "villageId": "clovermeadow",
-      "isGlobal": false
-    },
-    {
-      "title": "Anne of Green Gables: Carrots",
-      "filename": "132dc965-5b15-4c55-a95e-df9332bc57ce.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 100831185,
-      "durationMs": 1477741,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "Autumn fun - Guess how much I love you",
-      "filename": "efab9f1e-9619-4804-a6bf-009bd495ceab.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 303198636,
-      "durationMs": 1634058,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
       "title": "Franklin- Franklin plays the game",
       "filename": "374976cd-6799-4209-9df1-71ea07244325.mp4",
       "mime": "video/mp4",
@@ -78,26 +48,6 @@
       "mime": "video/mp4",
       "sizeBytes": 60763152,
       "durationMs": 1057344,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "Peter Rabbit & Friends - The Tale of Two Bad Mice, Johnny Town Mouse",
-      "filename": "15eb4456-a3eb-4cf4-a0a3-ed5ef2d87260.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 147224657,
-      "durationMs": 1414235,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "The World Of Peter Rabbit & Friends - The Tale of the Flopsy Bunnies & Mrs Tittl",
-      "filename": "b2007af6-28b7-4fef-ae9d-5eb358e25909.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 160119019,
-      "durationMs": 1204164,
       "channelTitle": "Cottage Cartoons",
       "villageId": null,
       "isGlobal": true
@@ -119,26 +69,6 @@
       "sizeBytes": 734803948,
       "durationMs": 1393546,
       "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "Bambi",
-      "filename": "963f28d4-4a47-4a4b-a446-1dc9f2c4d0d8.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 174347938,
-      "durationMs": 4060172,
-      "channelTitle": "The Storybook Cinema",
-      "villageId": null,
-      "isGlobal": true
-    },
-    {
-      "title": "Opheilia",
-      "filename": "3fa4a145-ae79-419a-9d26-b95fd864ba6d.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 497030903,
-      "durationMs": 6378963,
-      "channelTitle": "The Storybook Cinema",
       "villageId": null,
       "isGlobal": true
     }
