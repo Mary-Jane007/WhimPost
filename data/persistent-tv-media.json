@@ -1,16 +1,5 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T01:10:06.391Z",
-  "clips": [
-    {
-      "title": "YTDown.com_YouTube_The-World-Of-Peter-Rabbit-_-Friends-The-_Media_kNuomrDksgI_00",
-      "filename": "433f876b-89b5-496b-92c4-6373e63e10f6.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 208342523,
-      "durationMs": 1401139,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    }
-  ]
+  "updatedAt": "2026-08-14T01:17:37.333Z",
+  "clips": []
 }
