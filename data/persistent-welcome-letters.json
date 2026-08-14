@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T02:43:57.631Z",
+  "updatedAt": "2026-08-14T01:53:50.249Z",
   "letters": [
+    {
+      "id": "3cb66e53-c2ee-4f59-87df-ee6776e4d5f1",
+      "villageId": "clovermeadow",
+      "recipientId": "6f6cdd06-16fb-4677-8b80-987ce3310511",
+      "senderId": "system-clovermeadow",
+      "subject": "Welcome to Clovermeadow",
+      "body": "Dear friend,\n\nThe flowers began blooming a little earlier today.\n\nWe suspect they heard someone new was arriving.\n\nWelcome to **Clovermeadow**, where every cottage keeps a kettle warm, every path leads to a friendly hello, and every letter has the chance to brighten someone's day.\n\nHere, kindness is planted one small act at a time.\n\nA compliment tucked into an envelope.\nA thoughtful question.\nA gentle reminder that someone, somewhere, is thinking of you.\n\nBeside your doorstep, we've left a woven basket — the first pieces of your Clovermeadow collection.\n\nInside you'll discover:\n\n* ![Pink Butterflies](/stickers/collectibles/clovermeadow/clover-butterflies.png) A pink meadow butterfly for your jar.\n* ![Pink Ribbons](/stickers/collectibles/clovermeadow/clover-ribbon.png) A soft ribbon for tying kindness into letters.\n* ![Village Honey](/stickers/collectibles/clovermeadow/clover-honey.png) A spoon of village honey from the bees.\n* ![Cherry Blossoms](/stickers/collectibles/clovermeadow/clover-blossoms.png) A handful of cherry blossoms to start your shelf.\n\nThese are only the beginning. Write letters, welcome friends, and gather more keepsakes as kindness grows. Your cottage will fill as your collection blooms.\n\nWe hope you'll help our gardens grow—not only with flowers, but with the warmth your words bring to others.\n\nTake your time.\n\nThere's no rush in a meadow.\n\nWelcome home.\n\n*May your letters bloom wherever they are read.*",
+      "paperStyle": "floral",
+      "envelopeStyle": "blush",
+      "waxSeal": "heart",
+      "stampStyle": "dragonfly",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-sunflower\",\"kind\":\"sunflower\",\"x\":93,\"y\":7,\"scale\":0.7,\"rotation\":14},{\"id\":\"welcome-butterfly\",\"kind\":\"butterfly-green\",\"x\":7,\"y\":8,\"scale\":0.62,\"rotation\":-16},{\"id\":\"welcome-honey\",\"kind\":\"honey-jar\",\"x\":91,\"y\":90,\"scale\":0.65,\"rotation\":-8},{\"id\":\"welcome-narcissus\",\"kind\":\"narcissus\",\"x\":94,\"y\":96,\"scale\":0.55,\"rotation\":10}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":94,\"scale\":0.5,\"rotation\":12}]",
+      "isRead": true,
+      "sentAt": "2026-08-14 00:23:40",
+      "createdAt": "2026-08-14 00:23:40"
+    },
     {
       "id": "6d98d6e7-5015-4130-9ddc-54cf2041fea8",
       "villageId": "moonmere",

@@ -5439,8 +5439,92 @@ button.linkish:hover {
 
 /* ─── Village lounge program guide ─────────────────────────── */
 
+.tv-now-osd {
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  z-index: 3;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.55rem;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 10, 8, 0.12),
+    rgba(12, 10, 8, 0.82)
+  );
+  pointer-events: none;
+}
+
+.tv-now-osd-label {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--village-soft, #c4a574) 75%, white);
+}
+
+.tv-now-osd-title {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 0.95rem;
+  color: var(--cream, #f3e6d0);
+  line-height: 1.25;
+}
+
+.tv-now-osd-channel {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  opacity: 0.8;
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 85%, transparent);
+}
+
+.tv-village-broadcast {
+  margin-top: 0.95rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.tv-now-playing {
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--gold, #c9a227) 42%, transparent);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--village-color, #2a3548) 55%, #1a120c),
+      rgba(0, 0, 0, 0.38)
+    );
+  padding: 0.85rem 1rem;
+}
+
+.tv-now-playing.is-idle {
+  border-color: color-mix(in srgb, var(--village-soft, #c4a574) 30%, transparent);
+}
+
+.tv-now-playing-label {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--village-soft, #c4a574) 80%, white);
+}
+
+.tv-now-playing h2 {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  color: var(--cream, #f3e6d0);
+  line-height: 1.25;
+}
+
+.tv-now-playing p {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 82%, transparent);
+}
+
 .tv-guide {
-  margin: 1rem 0 0.35rem;
+  margin: 0;
   padding: 0.95rem 1rem 1.05rem;
   border-radius: 1.1rem;
   border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 32%, transparent);

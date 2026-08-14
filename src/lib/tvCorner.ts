@@ -529,7 +529,8 @@ export function getOrCreateVillageRoom(
 
   if (existing) {
     touchPresence(existing.id, user.id);
-    return mapRoom(existing);
+    ensureVillageRoomHasChannel(existing.id, villageId);
+    return getRoomById(existing.id)!;
   }
 
   const village = getVillage(villageId);
@@ -543,7 +544,49 @@ export function getOrCreateVillageRoom(
      VALUES (?, 'village', ?, ?, ?)`
   ).run(id, villageId, user.id, title);
   touchPresence(id, user.id);
+  ensureVillageRoomHasChannel(id, villageId);
   return getRoomById(id)!;
+}
+
+/**
+ * Keep the village set tuned so every neighbor sees Now Playing + the shuffle
+ * guide as soon as they walk into the lounge.
+ */
+function ensureVillageRoomHasChannel(roomId: string, villageId: VillageId) {
+  const db = getDb();
+  const row = db
+    .prepare(`SELECT current_channel_id FROM tv_rooms WHERE id = ?`)
+    .get(roomId) as { current_channel_id: string | null } | undefined;
+  if (!row) return;
+
+  if (row.current_channel_id) {
+    const stillThere = getChannelById(row.current_channel_id);
+    if (stillThere) return;
+  }
+
+  const pick = db
+    .prepare(
+      `SELECT c.id
+       FROM tv_channels c
+       LEFT JOIN tv_videos v ON v.channel_id = c.id
+       WHERE c.is_global = 1 OR c.village_id = ?
+       GROUP BY c.id
+       ORDER BY COUNT(v.id) DESC, c.is_global DESC, c.title COLLATE NOCASE ASC
+       LIMIT 1`
+    )
+    .get(villageId) as { id: string } | undefined;
+  if (!pick?.id) return;
+
+  db.prepare(
+    `UPDATE tv_rooms
+     SET current_channel_id = ?,
+         current_video_id = NULL,
+         is_playing = 1,
+         position_ms = 0,
+         position_updated_at = datetime('now'),
+         updated_at = datetime('now')
+     WHERE id = ?`
+  ).run(pick.id, roomId);
 }
 
 export function createFriendsRoom(user: UserPublic, title?: string): TvRoomState {

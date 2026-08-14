@@ -854,45 +854,56 @@ export function TvCorner({
             <div className="tv-bezel">
               <div className={`tv-screen ${powerOn ? "on" : "off"}`}>
                 {powerOn && room.currentVideo ? (
-                  <video
-                    ref={videoRef}
-                    key={room.currentVideo.id}
-                    className="tv-video"
-                    src={room.currentVideo.url}
-                    playsInline
-                    controls={!scheduleMode}
-                    onPlay={() => {
-                      if (applyingRemote.current || scheduleMode) return;
-                      void patchRoom({
-                        isPlaying: true,
-                        positionMs: Math.floor(
-                          (videoRef.current?.currentTime || 0) * 1000
-                        ),
-                      });
-                    }}
-                    onPause={() => {
-                      if (applyingRemote.current || scheduleMode) return;
-                      void patchRoom({
-                        isPlaying: false,
-                        positionMs: Math.floor(
-                          (videoRef.current?.currentTime || 0) * 1000
-                        ),
-                      });
-                    }}
-                    onSeeked={() => {
-                      if (applyingRemote.current || scheduleMode) return;
-                      void patchRoom({
-                        positionMs: Math.floor(
-                          (videoRef.current?.currentTime || 0) * 1000
-                        ),
-                        isPlaying: !(videoRef.current?.paused ?? true),
-                      });
-                    }}
-                    onEnded={() => {
-                      if (scheduleMode) return;
-                      void patchRoom({ isPlaying: false, positionMs: 0 });
-                    }}
-                  />
+                  <>
+                    <video
+                      ref={videoRef}
+                      key={room.currentVideo.id}
+                      className="tv-video"
+                      src={room.currentVideo.url}
+                      playsInline
+                      controls={!scheduleMode}
+                      onPlay={() => {
+                        if (applyingRemote.current || scheduleMode) return;
+                        void patchRoom({
+                          isPlaying: true,
+                          positionMs: Math.floor(
+                            (videoRef.current?.currentTime || 0) * 1000
+                          ),
+                        });
+                      }}
+                      onPause={() => {
+                        if (applyingRemote.current || scheduleMode) return;
+                        void patchRoom({
+                          isPlaying: false,
+                          positionMs: Math.floor(
+                            (videoRef.current?.currentTime || 0) * 1000
+                          ),
+                        });
+                      }}
+                      onSeeked={() => {
+                        if (applyingRemote.current || scheduleMode) return;
+                        void patchRoom({
+                          positionMs: Math.floor(
+                            (videoRef.current?.currentTime || 0) * 1000
+                          ),
+                          isPlaying: !(videoRef.current?.paused ?? true),
+                        });
+                      }}
+                      onEnded={() => {
+                        if (scheduleMode) return;
+                        void patchRoom({ isPlaying: false, positionMs: 0 });
+                      }}
+                    />
+                    {scheduleMode ? (
+                      <div className="tv-now-osd" aria-live="polite">
+                        <p className="tv-now-osd-label">Now playing</p>
+                        <p className="tv-now-osd-title">{room.currentVideo.title}</p>
+                        {activeChannel ? (
+                          <p className="tv-now-osd-channel">{activeChannel.title}</p>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </>
                 ) : (
                   <div className="tv-idle">
                     <div className="tv-idle-glow" />
@@ -900,7 +911,9 @@ export function TvCorner({
                     <p>
                       {powerOn
                         ? activeChannel
-                          ? `${activeChannel.title} is between reels — upload another clip.`
+                          ? user.isOwner
+                            ? `${activeChannel.title} is between reels — upload another clip.`
+                            : `${activeChannel.title} is between reels — the next shuffle is coming.`
                           : decor.idle
                         : "The set is sleeping."}
                     </p>
@@ -988,27 +1001,55 @@ export function TvCorner({
             )}
           </div>
 
-          {scheduleMode && room.schedule.length > 0 ? (
-            <div className="tv-guide" aria-label="Tonight's shuffle">
-              <div className="tv-guide-header">
-                <p className="tv-guide-eyebrow">Tonight&apos;s shuffle</p>
-                <h2>{activeChannel?.title || "Channel guide"}</h2>
-                <p>Every clip plays in shuffled order — join mid-show anytime.</p>
-              </div>
-              <ul className="tv-guide-list">
-                {room.schedule.slice(0, 8).map((slot) => (
-                  <li
-                    key={`${slot.videoId}-${slot.startsAt}`}
-                    className={slot.isCurrent ? "now" : ""}
-                  >
-                    <time dateTime={slot.startsAt}>
-                      {formatGuideTime(slot.startsAt)}
-                    </time>
-                    <strong>{slot.title}</strong>
-                    <span>{slot.isCurrent ? "Now playing" : "Up next"}</span>
-                  </li>
-                ))}
-              </ul>
+          {scheduleMode ? (
+            <div className="tv-village-broadcast" aria-label="Village broadcast">
+              {room.currentVideo ? (
+                <div className="tv-now-playing" aria-live="polite">
+                  <p className="tv-now-playing-label">Now playing</p>
+                  <h2>{room.currentVideo.title}</h2>
+                  <p>
+                    {activeChannel ? `${activeChannel.title} · ` : ""}
+                    Join mid-show anytime — the whole village shares this set.
+                  </p>
+                </div>
+              ) : (
+                <div className="tv-now-playing is-idle">
+                  <p className="tv-now-playing-label">Village lounge</p>
+                  <h2>{activeChannel?.title || "Waiting for a reel"}</h2>
+                  <p>
+                    {user.isOwner
+                      ? "Add videos to a channel bar and the shuffle starts for everyone."
+                      : "The set is quiet until the owner tucks a clip onto a channel."}
+                  </p>
+                </div>
+              )}
+
+              {room.schedule.length > 0 ? (
+                <div className="tv-guide" aria-label="Tonight's shuffle">
+                  <div className="tv-guide-header">
+                    <p className="tv-guide-eyebrow">Tonight&apos;s shuffle</p>
+                    <h2>{activeChannel?.title || "Channel guide"}</h2>
+                    <p>
+                      Every clip plays in shuffled order — neighbors see the same
+                      schedule.
+                    </p>
+                  </div>
+                  <ul className="tv-guide-list">
+                    {room.schedule.slice(0, 8).map((slot) => (
+                      <li
+                        key={`${slot.videoId}-${slot.startsAt}`}
+                        className={slot.isCurrent ? "now" : ""}
+                      >
+                        <time dateTime={slot.startsAt}>
+                          {formatGuideTime(slot.startsAt)}
+                        </time>
+                        <strong>{slot.title}</strong>
+                        <span>{slot.isCurrent ? "Now playing" : "Up next"}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           ) : null}
 
@@ -1104,8 +1145,8 @@ export function TvCorner({
           <h2>Channel shelf</h2>
           <p className="tv-shelf-copy">
             {user.isOwner
-              ? "Each channel has its own bar — add videos anytime and they join that channel’s shuffle."
-              : "Tune a channel on the set. The owner keeps each bar stocked."}
+              ? "Each channel has its own bar — add videos anytime and they join that channel’s shuffle for the whole village."
+              : "Tune a channel to watch with the village. Now playing and tonight’s shuffle stay in sync for everyone."}
           </p>
 
           {user.isOwner ? (
