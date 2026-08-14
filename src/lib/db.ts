@@ -6,13 +6,18 @@ import { importPersistentLibraryBooks, ensureLibraryBookBytes } from "@/lib/pers
 import { importPersistentMeetingBench } from "@/lib/persistentMeetingBench";
 import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
-import { importPersistentTvMedia, ensureSharedTvChannelsGlobal, exportPersistentTvMedia } from "@/lib/persistentTvMedia";
 import { importPersistentWelcomeLetters } from "@/lib/persistentWelcomeLetters";
 import { backfillVisitedVillagesFromLetters } from "@/lib/welcomeLetters";
 import {
   ensureTvUploadBytes,
   scheduleEnsureTvUploadBytes,
 } from "@/lib/tvPersist";
+
+function loadPersistentTvMedia() {
+  // Lazy require avoids circular init where production bundles can briefly
+  // export undefined for named media helpers during module evaluation.
+  return require("@/lib/persistentTvMedia") as typeof import("@/lib/persistentTvMedia");
+}
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -643,13 +648,15 @@ function createDb() {
   }
   // Restore uploaded file clips when bytes are already present locally.
   try {
-    importPersistentTvMedia(db);
+    const tvMedia = loadPersistentTvMedia();
+    tvMedia.importPersistentTvMedia(db);
   } catch (err) {
     console.error("[persistent-tv-media] import failed:", err);
   }
   try {
-    if (ensureSharedTvChannelsGlobal(db) > 0) {
-      exportPersistentTvMedia(db);
+    const tvMedia = loadPersistentTvMedia();
+    if (tvMedia.ensureSharedTvChannelsGlobal(db) > 0) {
+      tvMedia.exportPersistentTvMedia(db);
     }
   } catch (err) {
     console.error("[persistent-tv-media] shared channel promote failed:", err);
@@ -715,13 +722,15 @@ export function getDb() {
         console.error("[persistent-tv] import failed:", err);
       }
       try {
-        importPersistentTvMedia(globalForDb.whimpostDb);
+        const tvMedia = loadPersistentTvMedia();
+        tvMedia.importPersistentTvMedia(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-tv-media] import failed:", err);
       }
       try {
-        if (ensureSharedTvChannelsGlobal(globalForDb.whimpostDb) > 0) {
-          exportPersistentTvMedia(globalForDb.whimpostDb);
+        const tvMedia = loadPersistentTvMedia();
+        if (tvMedia.ensureSharedTvChannelsGlobal(globalForDb.whimpostDb) > 0) {
+          tvMedia.exportPersistentTvMedia(globalForDb.whimpostDb);
         }
       } catch (err) {
         console.error(

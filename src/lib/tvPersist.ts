@@ -9,8 +9,8 @@ import {
 import { exportPersistentTv } from "@/lib/persistentTv";
 import {
   exportPersistentTvMedia,
-  PERSISTENT_TV_MEDIA_PATH,
 } from "@/lib/persistentTvMedia";
+import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/tvMediaPaths";
 import { UPLOAD_DIR } from "@/lib/uploadPaths";
 import { exportPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
@@ -38,11 +38,24 @@ function gitOk() {
   return fs.existsSync(path.join(ROOT, ".git"));
 }
 
+function safeExists(filePath: string | null | undefined) {
+  if (!filePath || typeof filePath !== "string") return false;
+  try {
+    return fs.existsSync(filePath);
+  } catch {
+    return false;
+  }
+}
+
 function listCatalogUploadPaths() {
   const paths = new Set<string>();
+  const uploadDir = UPLOAD_DIR || path.join(ROOT, "data", "uploads");
   try {
-    if (fs.existsSync(PERSISTENT_TV_MEDIA_PATH)) {
-      const raw = fs.readFileSync(PERSISTENT_TV_MEDIA_PATH, "utf8");
+    const catalogPath =
+      PERSISTENT_TV_MEDIA_PATH ||
+      path.join(ROOT, "data", "persistent-tv-media.json");
+    if (safeExists(catalogPath)) {
+      const raw = fs.readFileSync(catalogPath, "utf8");
       const parsed = JSON.parse(raw) as { clips?: Array<{ filename?: string }> };
       const clips = Array.isArray(parsed.clips) ? parsed.clips : [];
       for (const clip of clips) {
@@ -50,8 +63,8 @@ function listCatalogUploadPaths() {
         if (!filename || filename.startsWith("link-") || filename.includes("..")) {
           continue;
         }
-        const abs = path.join(UPLOAD_DIR, filename);
-        if (!fs.existsSync(abs)) continue;
+        const abs = path.join(uploadDir, filename);
+        if (!safeExists(abs)) continue;
         paths.add(path.join("data", "uploads", filename));
       }
     }
@@ -151,8 +164,9 @@ function durablePersistEnabled() {
  * Keep this off the request hot-path — call scheduleEnsureTvUploadBytes().
  */
 export function ensureTvUploadBytes(opts?: { skipNetwork?: boolean }) {
-  if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  const uploadDir = UPLOAD_DIR || path.join(ROOT, "data", "uploads");
+  if (!safeExists(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
   }
 
   if (!opts?.skipNetwork && gitOk()) {
@@ -186,11 +200,14 @@ export function ensureTvUploadBytes(opts?: { skipNetwork?: boolean }) {
 
   // Warn about any catalog clips that are still pointer-only / missing.
   try {
-    if (!fs.existsSync(PERSISTENT_TV_MEDIA_PATH)) {
+    const catalogPath =
+      PERSISTENT_TV_MEDIA_PATH ||
+      path.join(ROOT, "data", "persistent-tv-media.json");
+    if (!safeExists(catalogPath)) {
       materializeTvStandins();
       return;
     }
-    const raw = fs.readFileSync(PERSISTENT_TV_MEDIA_PATH, "utf8");
+    const raw = fs.readFileSync(catalogPath, "utf8");
     const parsed = JSON.parse(raw) as { clips?: Array<{ filename?: string }> };
     const clips = Array.isArray(parsed.clips) ? parsed.clips : [];
     let missing = 0;
@@ -198,9 +215,9 @@ export function ensureTvUploadBytes(opts?: { skipNetwork?: boolean }) {
     for (const clip of clips) {
       const filename = String(clip.filename || "").trim();
       if (!filename) continue;
-      const filePath = path.join(UPLOAD_DIR, filename);
+      const filePath = path.join(uploadDir, filename);
       if (!isPlayableMediaFile(filePath)) {
-        if (!fs.existsSync(filePath)) missing += 1;
+        if (!safeExists(filePath)) missing += 1;
         else if (isLfsPointerFile(filePath)) pointers += 1;
         else missing += 1;
       }
