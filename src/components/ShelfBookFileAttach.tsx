@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 
+const MAX_BOOK_BYTES = 500 * 1024 * 1024;
+
 /** Compact owner control to attach/replace EPUB|PDF on an existing shelf title. */
 export function ShelfBookFileAttach({
   bookId,
@@ -21,27 +23,56 @@ export function ShelfBookFileAttach({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const [percent, setPercent] = useState<number | null>(null);
 
-  async function upload(file: File) {
+  function upload(file: File) {
+    if (file.size > MAX_BOOK_BYTES) {
+      setError("Book files must be under 500MB");
+      return;
+    }
     setBusy(true);
     setError("");
     setStatus("");
+    setPercent(0);
+
     const form = new FormData();
     form.set("attachTo", bookId);
     form.set("file", file);
-    const res = await fetch("/api/library/books", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json().catch(() => ({}));
-    setBusy(false);
-    if (inputRef.current) inputRef.current.value = "";
-    if (!res.ok) {
-      setError(data.error || "Could not attach file");
-      return;
-    }
-    setStatus(hasFile ? "File replaced." : "EPUB attached.");
-    onAttached?.();
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/library/books");
+    xhr.responseType = "json";
+    xhr.upload.onprogress = (ev) => {
+      if (!ev.lengthComputable) return;
+      setPercent(Math.min(99, Math.round((ev.loaded / ev.total) * 100)));
+    };
+    xhr.onload = () => {
+      setBusy(false);
+      setPercent(null);
+      if (inputRef.current) inputRef.current.value = "";
+      const data =
+        (xhr.response as { error?: string } | null) ||
+        (() => {
+          try {
+            return JSON.parse(xhr.responseText) as { error?: string };
+          } catch {
+            return {};
+          }
+        })();
+      if (xhr.status < 200 || xhr.status >= 300) {
+        setError(data.error || "Could not attach file");
+        return;
+      }
+      setStatus(hasFile ? "File replaced." : "EPUB attached.");
+      onAttached?.();
+    };
+    xhr.onerror = () => {
+      setBusy(false);
+      setPercent(null);
+      if (inputRef.current) inputRef.current.value = "";
+      setError("Upload failed — check your connection and try again");
+    };
+    xhr.send(form);
   }
 
   return (
@@ -57,7 +88,7 @@ export function ShelfBookFileAttach({
           return;
         }
         e.preventDefault();
-        void upload(file);
+        upload(file);
       }}
     >
       <input type="hidden" name="attachTo" value={bookId} />
@@ -71,7 +102,9 @@ export function ShelfBookFileAttach({
         }
       >
         {busy
-          ? "Uploading…"
+          ? percent != null
+            ? `Uploading ${percent}%…`
+            : "Uploading…"
           : hasFile
             ? "Replace EPUB"
             : "Attach EPUB"}
