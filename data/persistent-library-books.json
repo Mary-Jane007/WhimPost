@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T18:59:12.949Z",
+  "updatedAt": "2026-08-14T19:00:09.663Z",
   "books": [
     {
       "id": "princess",
@@ -297,9 +297,9 @@
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/1a31d94c-bcd9-42eb-b697-0972aabeaa69.jpg",
-      "fileUrl": "/api/uploads/e1404a8e-4918-48e4-8019-ecd9cb9cf54a.epub",
-      "fileName": "The Ocean at the End of the Lan - Neil Gaiman.epub",
-      "fileMime": "application/epub+zip",
+      "fileUrl": null,
+      "fileName": null,
+      "fileMime": null,
       "quotesJson": "[]",
       "reflectionsJson": "[]",
       "category": "Fantasy",
