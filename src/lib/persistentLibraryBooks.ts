@@ -227,3 +227,67 @@ export function importPersistentLibraryBooks(db: Database) {
   tx();
   return restored;
 }
+
+/**
+ * Restore every shelf EPUB/PDF that is missing or still a Git LFS pointer
+ * so the reading room always has real bytes to open.
+ */
+export function ensureLibraryBookBytes(db: Database, opts?: { skipNetwork?: boolean }) {
+  const rows = db
+    .prepare(
+      `SELECT file_url FROM library_books
+       WHERE file_url IS NOT NULL AND trim(file_url) != ''`
+    )
+    .all() as Array<{ file_url: string }>;
+
+  let restored = 0;
+  let missing = 0;
+  for (const row of rows) {
+    const filename = filenameFromUploadUrl(row.file_url);
+    if (!filename) continue;
+    const filePath = path.join(LIBRARY_UPLOAD_DIR, filename);
+    try {
+      if (fs.existsSync(filePath) && !isLfsPointerLike(filePath)) {
+        const size = fs.statSync(filePath).size;
+        if (size >= 1024) continue;
+      }
+    } catch {
+      // try restore
+    }
+    if (opts?.skipNetwork) {
+      missing += 1;
+      continue;
+    }
+    try {
+      // Lazy require avoids circular import with mediaRelease.
+      const { ensureMediaReleaseAsset } = require("@/lib/mediaRelease") as {
+        ensureMediaReleaseAsset: (filename: string) => string | null;
+      };
+      const ok = ensureMediaReleaseAsset(filename);
+      if (ok) restored += 1;
+      else missing += 1;
+    } catch {
+      missing += 1;
+    }
+  }
+  if (restored > 0) {
+    console.info(`[library] restored ${restored} book file(s) from media shelf`);
+  }
+  if (missing > 0 && !opts?.skipNetwork) {
+    console.warn(
+      `[library] ${missing} book file(s) still missing after shelf restore`
+    );
+  }
+  return { restored, missing };
+}
+
+function isLfsPointerLike(filePath: string) {
+  try {
+    const stat = fs.statSync(filePath);
+    if (stat.size > 1024) return false;
+    const head = fs.readFileSync(filePath, "utf8");
+    return head.startsWith("version https://git-lfs.github.com/spec/v1");
+  } catch {
+    return false;
+  }
+}

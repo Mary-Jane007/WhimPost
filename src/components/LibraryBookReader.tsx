@@ -56,9 +56,107 @@ type EpubBookApi = {
     prev: () => void;
     resize: (width: number, height: number) => void;
     themes: { default: (rules: Record<string, unknown>) => void };
-    on: (event: string, cb: (loc: unknown) => void) => void;
+    on: (event: string, cb: (...args: unknown[]) => void) => void;
+    hooks?: {
+      content?: {
+        register: (fn: (contents: {
+          document: Document;
+          content?: HTMLElement;
+          overflow?: (value: string) => void;
+        }) => void) => void;
+      };
+    };
   };
 };
+
+/** Stretch the iframe to the chapter's real content height so nothing is clipped. */
+function expandChapterToFullHeight(host: HTMLElement) {
+  const iframe = host.querySelector("iframe") as HTMLIFrameElement | null;
+  if (!iframe) return;
+  try {
+    const doc = iframe.contentDocument;
+    if (!doc?.documentElement) return;
+    const body = doc.body;
+    // Clear leftover height locks from EPUB CSS that clip tall chapters.
+    doc.documentElement.style.height = "auto";
+    doc.documentElement.style.minHeight = "0";
+    doc.documentElement.style.overflow = "visible";
+    if (body) {
+      body.style.height = "auto";
+      body.style.minHeight = "0";
+      body.style.maxHeight = "none";
+      body.style.overflow = "visible";
+    }
+    const contentHeight = Math.max(
+      doc.documentElement.scrollHeight || 0,
+      body?.scrollHeight || 0,
+      body?.offsetHeight || 0,
+      480
+    );
+    const next = `${Math.ceil(contentHeight + 48)}px`;
+    iframe.style.height = next;
+    iframe.style.maxHeight = "none";
+    iframe.style.overflow = "visible";
+    const view = iframe.parentElement as HTMLElement | null;
+    if (view) {
+      view.style.height = next;
+      view.style.maxHeight = "none";
+      view.style.overflow = "visible";
+    }
+  } catch {
+    // Cross-origin / not ready yet — ignore.
+  }
+}
+
+const CHAPTER_THEME = {
+  html: {
+    width: "100% !important",
+    height: "auto !important",
+    "min-height": "0 !important",
+    overflow: "visible !important",
+    margin: "0 !important",
+    padding: "0 !important",
+  },
+  body: {
+    color: "#2c2418 !important",
+    background: "#f6edd9 !important",
+    "font-family": "Georgia, 'Times New Roman', serif !important",
+    "line-height": "1.75 !important",
+    "font-size": "1.08em !important",
+    padding: "1.15rem 1.35rem 3rem !important",
+    margin: "0 auto !important",
+    width: "100% !important",
+    "max-width": "42rem !important",
+    height: "auto !important",
+    "min-height": "0 !important",
+    "max-height": "none !important",
+    "box-sizing": "border-box !important",
+    overflow: "visible !important",
+  },
+  p: {
+    "margin-top": "0.7em !important",
+    "margin-bottom": "0.7em !important",
+  },
+  a: { color: "#5c3a1e !important" },
+  img: {
+    "max-width": "100% !important",
+    "max-height": "none !important",
+    width: "auto !important",
+    height: "auto !important",
+    "object-fit": "contain !important",
+    display: "block !important",
+  },
+  svg: {
+    "max-width": "100% !important",
+    "max-height": "none !important",
+  },
+  table: {
+    "max-width": "100% !important",
+  },
+  "*": {
+    "max-height": "none !important",
+  },
+} as Record<string, Record<string, string>>;
 
 function kindFromUrl(url: string, fileName?: string | null): BookKind {
   const s = `${fileName || ""} ${url}`.toLowerCase();
@@ -103,14 +201,14 @@ function loadVendorScript(src: string): Promise<void> {
  * (no iframe) in this app — the vendor scripts render reliably.
  */
 async function loadVendorEpub(): Promise<
-  (data: ArrayBuffer, options?: Record<string, unknown>) => EpubBookApi
+  (data: ArrayBuffer | string, options?: Record<string, unknown>) => EpubBookApi
 > {
   await loadVendorScript("/vendor/jszip.min.js");
   await loadVendorScript("/vendor/epub.min.js");
   const ePub = (
     window as unknown as {
       ePub?: (
-        data: ArrayBuffer,
+        data: ArrayBuffer | string,
         options?: Record<string, unknown>
       ) => EpubBookApi;
     }
@@ -487,6 +585,8 @@ export function LibraryBookReader({
       return { width, height };
     };
 
+    let objectUrl: string | null = null;
+
     function abandonBook() {
       try {
         book?.destroy();
@@ -495,19 +595,25 @@ export function LibraryBookReader({
       }
       book = null;
       bookApiRef.current = null;
+      if (objectUrl) {
+        try {
+          URL.revokeObjectURL(objectUrl);
+        } catch {
+          // ignore
+        }
+        objectUrl = null;
+      }
     }
 
     async function paintBook(
       ePub: (
-        data: ArrayBuffer,
+        data: ArrayBuffer | string,
         options?: Record<string, unknown>
       ) => EpubBookApi,
-      buffer: ArrayBuffer
+      source: ArrayBuffer | string
     ) {
       host.innerHTML = "";
-      // Copy bytes — some browsers detach the fetch ArrayBuffer under load.
-      const bytes = buffer.slice(0);
-      book = ePub(bytes, { replacements: "blobUrl" });
+      book = ePub(source);
       bookApiRef.current = book;
       await book.ready;
       if (!stillMine()) {
@@ -529,7 +635,7 @@ export function LibraryBookReader({
         host.getBoundingClientRect().width < 40
       ) {
         await new Promise<void>((resolve) => {
-          window.setTimeout(() => resolve(), 80);
+          window.setTimeout(() => resolve(), 120);
         });
         if (!stillMine()) {
           abandonBook();
@@ -541,63 +647,46 @@ export function LibraryBookReader({
       const rendition = book.renderTo(host, {
         width,
         height,
-        // Full chapter documents — scroll within the chapter instead of
-        // clipping text at the bottom of a fixed paginated frame.
         flow: "scrolled-doc",
         manager: "default",
+        overflow: "scroll",
         spread: "none",
         minSpreadWidth: 100000,
         allowScriptedContent: true,
       });
 
-      rendition.themes.default({
-        html: {
-          width: "100% !important",
-          height: "auto !important",
-          "min-height": "100% !important",
-          overflow: "visible !important",
-          margin: "0 !important",
-          padding: "0 !important",
-        },
-        body: {
-          color: "#2c2418 !important",
-          background: "#f6edd9 !important",
-          "font-family": "Georgia, 'Times New Roman', serif !important",
-          "line-height": "1.7 !important",
-          "font-size": "1.05em !important",
-          padding: "1.1rem 1.25rem 2.5rem !important",
-          margin: "0 !important",
-          width: "100% !important",
-          height: "auto !important",
-          "min-height": "100% !important",
-          "max-height": "none !important",
-          "box-sizing": "border-box !important",
-          overflow: "visible !important",
-        },
-        p: {
-          "margin-top": "0.65em !important",
-          "margin-bottom": "0.65em !important",
-        },
-        a: { color: "#5c3a1e !important" },
-        img: {
-          "max-width": "100% !important",
-          "max-height": "none !important",
-          width: "auto !important",
-          height: "auto !important",
-          "object-fit": "contain !important",
-        },
-        svg: {
-          "max-width": "100% !important",
-          "max-height": "none !important",
-        },
-        table: {
-          "max-width": "100% !important",
-          "overflow-x": "auto !important",
-        },
+      rendition.themes.default(CHAPTER_THEME);
+
+      rendition.on("rendered", () => {
+        if (!stillMine()) return;
+        expandChapterToFullHeight(host);
+        window.setTimeout(() => expandChapterToFullHeight(host), 50);
+        window.setTimeout(() => expandChapterToFullHeight(host), 250);
+        window.setTimeout(() => expandChapterToFullHeight(host), 800);
       });
 
-      // Paint the start first so a stale resume CFI after re-upload cannot
-      // hang the reader on “Opening…” forever.
+      try {
+        rendition.hooks?.content?.register((contents) => {
+          try {
+            contents.overflow?.("visible");
+          } catch {
+            // ignore
+          }
+          const doc = contents.document;
+          const imgs = Array.from(doc.images || []);
+          for (const img of imgs) {
+            if (img.complete) continue;
+            img.addEventListener(
+              "load",
+              () => expandChapterToFullHeight(host),
+              { once: true }
+            );
+          }
+        });
+      } catch {
+        // older vendor builds may omit hooks
+      }
+
       await rendition.display();
       if (!stillMine()) {
         abandonBook();
@@ -605,13 +694,13 @@ export function LibraryBookReader({
         return null;
       }
 
-      // Empty container = failed paint (seen with webpack epubjs / races).
       if (!host.querySelector("iframe")) {
         abandonBook();
         host.innerHTML = "";
         return null;
       }
 
+      expandChapterToFullHeight(host);
       return rendition;
     }
 
@@ -622,61 +711,95 @@ export function LibraryBookReader({
         const ePub = await loadVendorEpub();
         if (!stillMine()) return;
 
-        const res = await fetch(fileUrl, {
-          credentials: "include",
-          cache: "no-store",
-        });
-        if (!res.ok) {
-          const detail = await res.text().catch(() => "");
-          let message =
-            res.status === 401
-              ? "Sign in to read this book"
-              : "Could not load the book file";
+        let lastError: Error | null = null;
+        let rendition: ReturnType<EpubBookApi["renderTo"]> | null = null;
+
+        for (let attempt = 0; attempt < 2 && !rendition; attempt += 1) {
           try {
-            const parsed = JSON.parse(detail) as { error?: string };
-            if (parsed?.error) message = parsed.error;
-          } catch {
-            // ignore
+            const res = await fetch(fileUrl, {
+              credentials: "include",
+              cache: "no-store",
+            });
+            if (!res.ok) {
+              const detail = await res.text().catch(() => "");
+              let message =
+                res.status === 401
+                  ? "Sign in to read this book"
+                  : "Could not load the book file";
+              try {
+                const parsed = JSON.parse(detail) as { error?: string };
+                if (parsed?.error) message = parsed.error;
+              } catch {
+                // ignore
+              }
+              throw new Error(message);
+            }
+
+            const blob = await res.blob();
+            if (!stillMine()) return;
+            if (blob.size < 1024) {
+              throw new Error(
+                "This EPUB’s file is missing on the shelf — re-upload it from the library admin."
+              );
+            }
+            const head = new Uint8Array(await blob.slice(0, 64).arrayBuffer());
+            const headText = String.fromCharCode(...Array.from(head));
+            const isZip = head[0] === 0x50 && head[1] === 0x4b;
+            if (!isZip || headText.includes("git-lfs")) {
+              throw new Error(
+                "This EPUB’s file is missing on the shelf — re-upload it from the library admin."
+              );
+            }
+
+            if (objectUrl) {
+              try {
+                URL.revokeObjectURL(objectUrl);
+              } catch {
+                // ignore
+              }
+            }
+            objectUrl = URL.createObjectURL(blob);
+            rendition = await paintBook(ePub, objectUrl);
+          } catch (err) {
+            lastError =
+              err instanceof Error ? err : new Error("Could not open this EPUB");
+            abandonBook();
+            await new Promise<void>((resolve) => {
+              window.setTimeout(() => resolve(), 120);
+            });
           }
-          throw new Error(message);
-        }
-        const buffer = await res.arrayBuffer();
-        if (!stillMine()) return;
-
-        const head = new Uint8Array(buffer.slice(0, 64));
-        const headText = String.fromCharCode(...Array.from(head));
-        const isZip = head[0] === 0x50 && head[1] === 0x4b;
-        if (
-          !isZip ||
-          buffer.byteLength < 1024 ||
-          headText.includes("git-lfs")
-        ) {
-          throw new Error(
-            "This EPUB’s file is missing on the shelf — re-upload it from the library admin."
-          );
         }
 
-        let rendition = await paintBook(ePub, buffer);
-        // One retry covers Strict Mode teardown racing the first paint.
-        if (!rendition && stillMine()) {
-          rendition = await paintBook(ePub, buffer);
-        }
         if (!stillMine()) return;
         if (!rendition || !book) {
-          throw new Error("Could not open this EPUB");
+          throw lastError || new Error("Could not open this EPUB");
         }
 
         const doResize = () => {
           const size = measure();
           if (size.width > 0 && size.height > 0) {
-            rendition!.resize(size.width, size.height);
+            try {
+              rendition!.resize(size.width, size.height);
+            } catch {
+              // ignore
+            }
           }
+          expandChapterToFullHeight(host);
         };
 
         navRef.current = {
-          next: () => void rendition!.next(),
-          prev: () => void rendition!.prev(),
-          display: (cfi: string) => void rendition!.display(cfi),
+          next: () => {
+            void rendition!.next();
+            window.setTimeout(() => expandChapterToFullHeight(host), 80);
+          },
+          prev: () => {
+            void rendition!.prev();
+            window.setTimeout(() => expandChapterToFullHeight(host), 80);
+          },
+          display: (cfi: string) => {
+            void rendition!.display(cfi);
+            window.setTimeout(() => expandChapterToFullHeight(host), 80);
+          },
           resize: doResize,
         };
 
@@ -692,6 +815,7 @@ export function LibraryBookReader({
                 window.setTimeout(resolve, 2000);
               }),
             ]);
+            expandChapterToFullHeight(host);
           } catch {
             // Keep the start page — resume is best-effort.
           }
@@ -702,12 +826,14 @@ export function LibraryBookReader({
         window.setTimeout(doResize, 50);
         window.setTimeout(doResize, 200);
         window.setTimeout(doResize, 600);
+        window.setTimeout(doResize, 1500);
 
         observer = new ResizeObserver(() => doResize());
         observer.observe(host);
 
         rendition.on("relocated", (location: unknown) => {
           if (host.dataset.reactToken !== token) return;
+          expandChapterToFullHeight(host);
           const place = placeFromLocation(location, bookApiRef.current);
           if (!place.reliable) {
             place.percent = placeRef.current.percent;
@@ -752,8 +878,6 @@ export function LibraryBookReader({
 
     return () => {
       cancelled = true;
-      // Defer teardown so React Strict Mode's sync remount can reclaim the
-      // mount before we wipe a healthy iframe (immediate destroy blanked it).
       tearDownTimer = window.setTimeout(() => {
         if (host.dataset.reactToken !== token) {
           return;
@@ -775,6 +899,14 @@ export function LibraryBookReader({
           book?.destroy();
         } catch {
           // ignore
+        }
+        if (objectUrl) {
+          try {
+            URL.revokeObjectURL(objectUrl);
+          } catch {
+            // ignore
+          }
+          objectUrl = null;
         }
         host.innerHTML = "";
         if (host.dataset.owned === "react") delete host.dataset.owned;

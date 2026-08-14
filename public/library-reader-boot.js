@@ -167,20 +167,17 @@
       } catch (_) {}
       throw new Error(message);
     }
-    var buffer = await res.arrayBuffer();
-    var head = new Uint8Array(buffer.slice(0, 64));
+    var blob = await res.blob();
+    var head = new Uint8Array(await blob.slice(0, 64).arrayBuffer());
     var headText = String.fromCharCode.apply(null, Array.from(head));
     var isZip = head[0] === 0x50 && head[1] === 0x4b;
-    if (
-      !isZip ||
-      buffer.byteLength < 1024 ||
-      headText.indexOf("git-lfs") !== -1
-    ) {
+    if (!isZip || blob.size < 1024 || headText.indexOf("git-lfs") !== -1) {
       throw new Error(
         "This EPUB’s file is missing on the shelf — re-upload it from the library admin."
       );
     }
-    var book = window.ePub(buffer);
+    var objectUrl = URL.createObjectURL(blob);
+    var book = window.ePub(objectUrl);
     await book.ready;
 
     var rect = mount.getBoundingClientRect();
@@ -190,12 +187,40 @@
       Math.floor(rect.height || mount.clientHeight || 700)
     );
 
+    function expandChapter() {
+      var iframe = mount.querySelector("iframe");
+      if (!iframe || !iframe.contentDocument) return;
+      try {
+        var doc = iframe.contentDocument;
+        var body = doc.body;
+        doc.documentElement.style.height = "auto";
+        doc.documentElement.style.overflow = "visible";
+        if (body) {
+          body.style.height = "auto";
+          body.style.maxHeight = "none";
+          body.style.overflow = "visible";
+        }
+        var h = Math.max(
+          doc.documentElement.scrollHeight || 0,
+          (body && body.scrollHeight) || 0,
+          480
+        );
+        var next = Math.ceil(h + 48) + "px";
+        iframe.style.height = next;
+        iframe.style.maxHeight = "none";
+        if (iframe.parentElement) {
+          iframe.parentElement.style.height = next;
+          iframe.parentElement.style.maxHeight = "none";
+        }
+      } catch (_) {}
+    }
+
     var rendition = book.renderTo(mount, {
       width: width,
       height: height,
-      // Full chapter documents — scroll within the chapter instead of clipping.
       flow: "scrolled-doc",
       manager: "default",
+      overflow: "scroll",
       spread: "none",
       minSpreadWidth: 100000,
       allowScriptedContent: true,
@@ -205,7 +230,7 @@
       html: {
         width: "100% !important",
         height: "auto !important",
-        "min-height": "100% !important",
+        "min-height": "0 !important",
         overflow: "visible !important",
         margin: "0 !important",
         padding: "0 !important",
@@ -214,13 +239,14 @@
         color: "#2c2418 !important",
         background: "#f6edd9 !important",
         "font-family": "Georgia, 'Times New Roman', serif !important",
-        "line-height": "1.7 !important",
-        "font-size": "1.05em !important",
-        padding: "1.1rem 1.25rem 2.5rem !important",
-        margin: "0 !important",
+        "line-height": "1.75 !important",
+        "font-size": "1.08em !important",
+        padding: "1.15rem 1.35rem 3rem !important",
+        margin: "0 auto !important",
         width: "100% !important",
+        "max-width": "42rem !important",
         height: "auto !important",
-        "min-height": "100% !important",
+        "min-height": "0 !important",
         "max-height": "none !important",
         "box-sizing": "border-box !important",
         overflow: "visible !important",
@@ -231,15 +257,22 @@
         width: "auto !important",
         height: "auto !important",
         "object-fit": "contain !important",
+        display: "block !important",
       },
       svg: {
         "max-width": "100% !important",
         "max-height": "none !important",
       },
-      table: {
-        "max-width": "100% !important",
-        "overflow-x": "auto !important",
+      "*": {
+        "max-height": "none !important",
       },
+    });
+
+    rendition.on("rendered", function () {
+      expandChapter();
+      setTimeout(expandChapter, 50);
+      setTimeout(expandChapter, 250);
+      setTimeout(expandChapter, 800);
     });
 
     try {

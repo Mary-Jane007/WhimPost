@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
-import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
+import { importPersistentLibraryBooks, ensureLibraryBookBytes } from "@/lib/persistentLibraryBooks";
 import { importPersistentMeetingBench } from "@/lib/persistentMeetingBench";
 import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
@@ -622,6 +622,24 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-library-books] import failed:", err);
   }
+  // Heal missing / Git-LFS stub EPUB+PDF bytes from the durable media shelf.
+  try {
+    ensureLibraryBookBytes(db, { skipNetwork: true });
+  } catch (err) {
+    console.error("[library] local book check failed:", err);
+  }
+  try {
+    // Network restore in the background so boot stays snappy.
+    setTimeout(() => {
+      try {
+        ensureLibraryBookBytes(db);
+      } catch (err) {
+        console.error("[library] book restore failed:", err);
+      }
+    }, 250);
+  } catch {
+    // ignore
+  }
   // Restore Celestial Sounds after audio bytes are on disk.
   try {
     importPersistentMoonSounds(db);
@@ -677,6 +695,22 @@ export function getDb() {
         importPersistentLibraryBooks(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-library-books] import failed:", err);
+      }
+      try {
+        ensureLibraryBookBytes(globalForDb.whimpostDb, { skipNetwork: true });
+      } catch (err) {
+        console.error("[library] local book check failed:", err);
+      }
+      try {
+        setTimeout(() => {
+          try {
+            ensureLibraryBookBytes(globalForDb.whimpostDb!);
+          } catch (err) {
+            console.error("[library] book restore failed:", err);
+          }
+        }, 250);
+      } catch {
+        // ignore
       }
       try {
         importPersistentMoonSounds(globalForDb.whimpostDb);

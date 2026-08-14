@@ -7188,25 +7188,20 @@ button.linkish:hover {
   background: #f6edd9;
 }
 
-/* Scrolled chapters: let the full document height show; scroll the container. */
+/* EPUB stage: epubjs owns the scroll container; do not force height:auto on it. */
 .mh-reader-epub {
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 .mh-reader-epub > .epub-container,
 .mh-reader-epub .epub-container {
   width: 100% !important;
-  height: auto !important;
-  min-height: 100% !important;
+  /* Keep epubjs stage height (viewport); it scrolls overflow inside. */
   max-width: 100% !important;
-  max-height: none !important;
-  overflow: visible !important;
 }
 
 .mh-reader-epub .epub-view {
   width: 100% !important;
-  height: auto !important;
   max-width: 100% !important;
   max-height: none !important;
   overflow: visible !important;
@@ -7216,7 +7211,10 @@ button.linkish:hover {
   width: 100% !important;
   max-width: 100% !important;
   max-height: none !important;
+  /* Height is set in JS to the full chapter content height. */
+  border: 0 !important;
   overflow: visible !important;
+  background: #f6edd9;
 }
 
 .mh-reader-status {
