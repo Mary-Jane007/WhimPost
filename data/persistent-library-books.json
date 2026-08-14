@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:29:59.188Z",
+  "updatedAt": "2026-08-14T20:46:37.323Z",
   "books": [
     {
       "id": "princess",
@@ -308,6 +308,28 @@
       "mood": "Dreamlike",
       "themesJson": "[\"memory\",\"childhood\",\"myth\"]",
       "rating": 4.7,
+      "published": true
+    },
+    {
+      "id": "lib-de16fbfc-7d01-4e19-b72e-08a3cb1d2475",
+      "shelf": "readinglist",
+      "title": "The Secret History",
+      "author": "Donna Tartt",
+      "description": "The story is told from the perspective of Richard Papen, a student who looks back on the circumstances that led to the murder of their friend Edmund “Bunny” Corcoran. The events leading up to the murder unfold gradually, examining the impact of Bunny’s death on the academically and socially isolated group.",
+      "minutes": 700,
+      "coverEmoji": "📖",
+      "coverUrl": "/api/uploads/8c3c5a67-da71-4c43-80ae-1e9f41ac9690.jpg",
+      "fileUrl": "/api/uploads/807e5d46-9c1d-41b6-b5f2-07297425d256.epub",
+      "fileName": "The Secret History - Donna Tartt.epub",
+      "fileMime": "application/epub+zip",
+      "quotesJson": "[\"\\\" Iam nothing in my soul if not obsessive\\\"\"]",
+      "reflectionsJson": "[]",
+      "category": "Mystery",
+      "difficulty": "Steady",
+      "length": "Long",
+      "mood": "Dark academia | intellectual | mysterious | melancholic",
+      "themesJson": "[]",
+      "rating": 4.5,
       "published": true
     },
     {
