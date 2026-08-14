@@ -42,7 +42,9 @@ export default async function MeetingBenchPage() {
             You&apos;re the board keeper — use{" "}
             <a href="#mb-owner-desk">Edit Meeting Bench</a> to add notices,
             gatherings, seasonal activities, Chronicle stories, and community
-            events, or tap <strong>Edit</strong> on any paper below.
+            events, or tap <strong>Edit</strong> on any paper below. For the full
+            WhimPost picture, open{" "}
+            <Link href="/admin/analytics">Owner Analytics</Link>.
           </p>
         ) : null}
       </header>

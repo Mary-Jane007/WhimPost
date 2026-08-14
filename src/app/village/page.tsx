@@ -391,6 +391,16 @@ export default async function VillagePage() {
 
       {user.isOwner ? (
         <>
+          <section className="oa-owner-launch forest-cardish" aria-label="Owner analytics">
+            <h2>🏡 Owner Analytics</h2>
+            <p>
+              Private control room for WhimPost — users, villages, letters, TV Corner,
+              health, and what to improve next.
+            </p>
+            <Link className="btn primary" href="/admin/analytics">
+              Open owner analytics
+            </Link>
+          </section>
           <WelcomeLetterEditor
             initialVillageId={stats.villageId as VillageId}
           />
