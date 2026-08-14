@@ -81,8 +81,16 @@ const DECOR: Record<
 };
 
 function formatSize(bytes: number) {
+  if (bytes >= 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  }
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function shortFileName(name: string) {
+  const base = name.replace(/\\/g, "/").split("/").pop()?.trim() || "clip.mp4";
+  return base.length > 48 ? `${base.slice(0, 45)}…` : base;
 }
 
 export function TvCorner({
@@ -110,6 +118,11 @@ export function TvCorner({
     initialChannels[0]?.id || ""
   );
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
+  const [renamingVideoId, setRenamingVideoId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [powerOn, setPowerOn] = useState(true);
   const [hydrated, setHydrated] = useState(false);
@@ -119,6 +132,8 @@ export function TvCorner({
   const roomIdRef = useRef(room.id);
   const applyingRemote = useRef(false);
   const joinedClipKey = useRef("");
+  const uploadCancelRef = useRef(false);
+  const activeXhrRef = useRef<XMLHttpRequest | null>(null);
 
   useEffect(() => {
     setHydrated(true);
@@ -297,36 +312,337 @@ export function TvCorner({
     }
   }
 
-  async function onUpload(file: File | null) {
-    if (!file || !user.isOwner) return;
+  function reportUploadProgress(msg: string, percent: number | null) {
+    setUploadProgress(msg);
+    setUploadPercent(percent);
+  }
+
+  function cancelActiveUpload() {
+    uploadCancelRef.current = true;
+    activeXhrRef.current?.abort();
+    activeXhrRef.current = null;
+  }
+
+  function putChunk(
+    uploadId: string,
+    index: number,
+    blob: Blob,
+    attempts = 3
+  ): Promise<void> {
+    const tryOnce = () =>
+      new Promise<void>((resolve, reject) => {
+        if (uploadCancelRef.current) {
+          reject(new Error("Upload cancelled"));
+          return;
+        }
+        const xhr = new XMLHttpRequest();
+        activeXhrRef.current = xhr;
+        xhr.open(
+          "PUT",
+          `/api/tv/upload/${encodeURIComponent(uploadId)}/chunk?index=${index}`
+        );
+        xhr.timeout = 180_000;
+        xhr.responseType = "text";
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.onload = () => {
+          if (activeXhrRef.current === xhr) activeXhrRef.current = null;
+          let data: { error?: string } | null = null;
+          try {
+            data = JSON.parse(xhr.responseText || "{}");
+          } catch {
+            reject(
+              new Error(
+                xhr.responseText?.slice(0, 140) ||
+                  `Chunk ${index + 1} failed (${xhr.status || "network"})`
+              )
+            );
+            return;
+          }
+          if (xhr.status < 200 || xhr.status >= 300) {
+            reject(new Error(data?.error || `Chunk ${index + 1} failed`));
+            return;
+          }
+          resolve();
+        };
+        xhr.onerror = () => {
+          if (activeXhrRef.current === xhr) activeXhrRef.current = null;
+          reject(
+            new Error(
+              `Network error on chunk ${index + 1} — keep this tab open and retry`
+            )
+          );
+        };
+        xhr.ontimeout = () => {
+          if (activeXhrRef.current === xhr) activeXhrRef.current = null;
+          reject(new Error(`Chunk ${index + 1} timed out`));
+        };
+        xhr.onabort = () => {
+          if (activeXhrRef.current === xhr) activeXhrRef.current = null;
+          reject(new Error("Upload cancelled"));
+        };
+        xhr.send(blob);
+      });
+
+    return (async () => {
+      let lastError: Error | null = null;
+      for (let attempt = 1; attempt <= attempts; attempt++) {
+        if (uploadCancelRef.current) throw new Error("Upload cancelled");
+        try {
+          await tryOnce();
+          return;
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error("Chunk failed");
+          if (lastError.message === "Upload cancelled") throw lastError;
+          if (attempt < attempts) {
+            await new Promise((r) => setTimeout(r, 400 * attempt));
+          }
+        }
+      }
+      throw lastError || new Error(`Chunk ${index + 1} failed`);
+    })();
+  }
+
+  async function uploadOneToChannel(
+    file: File,
+    channelId: string,
+    title: string | undefined,
+    onProgress: (msg: string, percent: number | null) => void
+  ) {
+    const shortName = shortFileName(file.name);
+    if (file.size <= 0) {
+      throw new Error(`${shortName} looks empty`);
+    }
+    if (file.size > 5 * 1024 * 1024 * 1024) {
+      throw new Error(`${shortName} is over 5GB`);
+    }
+
+    const clipName =
+      (title || "").trim() ||
+      shortName.replace(/\.[^.]+$/, "").slice(0, 80) ||
+      "Untitled clip";
+
+    onProgress(`Preparing ${shortName} (${formatSize(file.size)})…`, 0);
+
+    const initRes = await fetch("/api/tv/upload/init", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channelId,
+        title: clipName,
+        filename: file.name,
+        mime: file.type || "application/octet-stream",
+        size: file.size,
+      }),
+    });
+    const initData = (await initRes.json().catch(() => ({}))) as {
+      error?: string;
+      uploadId?: string;
+      chunkSize?: number;
+      chunkCount?: number;
+    };
+    if (!initRes.ok) {
+      throw new Error(initData.error || `Could not start upload for ${shortName}`);
+    }
+
+    const uploadId = String(initData.uploadId || "");
+    const chunkSize = Number(initData.chunkSize) || 2 * 1024 * 1024;
+    const chunkCount =
+      Number(initData.chunkCount) ||
+      Math.max(1, Math.ceil(file.size / chunkSize));
+    if (!uploadId) throw new Error("Upload session missing id");
+
+    const concurrency = 3;
+    let completed = 0;
+    let nextIndex = 0;
+
+    const worker = async () => {
+      while (true) {
+        if (uploadCancelRef.current) throw new Error("Upload cancelled");
+        const i = nextIndex;
+        nextIndex += 1;
+        if (i >= chunkCount) return;
+        const start = i * chunkSize;
+        const end = Math.min(file.size, start + chunkSize);
+        await putChunk(uploadId, i, file.slice(start, end));
+        completed += 1;
+        const pct = Math.min(99, Math.round((completed / chunkCount) * 100));
+        onProgress(
+          `Uploading ${shortName} — ${pct}% (${formatSize(
+            Math.min(file.size, completed * chunkSize)
+          )} of ${formatSize(file.size)}) · piece ${completed}/${chunkCount}`,
+          pct
+        );
+      }
+    };
+
+    await Promise.all(
+      Array.from({ length: Math.min(concurrency, chunkCount) }, () => worker())
+    );
+
+    if (uploadCancelRef.current) throw new Error("Upload cancelled");
+
+    onProgress(`Finishing ${shortName}…`, 99);
+    const doneRes = await fetch(
+      `/api/tv/upload/${encodeURIComponent(uploadId)}/complete`,
+      { method: "POST" }
+    );
+    const doneData = (await doneRes.json().catch(() => ({}))) as {
+      error?: string;
+      video?: TvVideo;
+      channels?: TvChannel[];
+    };
+    if (!doneRes.ok) {
+      throw new Error(doneData.error || `Could not finish ${shortName}`);
+    }
+    if (doneData.channels) setChannels(doneData.channels);
+    if (!doneData.video) {
+      throw new Error(`Upload finished but no clip was saved for ${shortName}`);
+    }
+    onProgress(`Saved ${shortName}`, 100);
+    return doneData.video;
+  }
+
+  async function onUploadClips(files: FileList | File[] | null) {
+    if (!user.isOwner) return;
+    if (!files || files.length === 0) {
+      setError("Choose one or more video files first");
+      return;
+    }
     if (!uploadChannelId) {
       setError("Make a channel first, then upload into it");
+      return;
+    }
+
+    const list = Array.from(files);
+    const firstTitle = uploadTitle.trim();
+    uploadCancelRef.current = false;
+    setUploading(true);
+    setBusy(true);
+    setError(null);
+    reportUploadProgress(
+      `Preparing ${list.length} video${list.length === 1 ? "" : "s"}…`,
+      0
+    );
+
+    let ok = 0;
+    let lastVideo: TvVideo | null = null;
+    const errors: string[] = [];
+
+    try {
+      for (let i = 0; i < list.length; i++) {
+        if (uploadCancelRef.current) throw new Error("Upload cancelled");
+        const file = list[i];
+        const title = i === 0 ? firstTitle || undefined : undefined;
+        try {
+          lastVideo = await uploadOneToChannel(
+            file,
+            uploadChannelId,
+            title,
+            (msg, pct) => {
+              const prefix =
+                list.length > 1 ? `File ${i + 1} of ${list.length} · ` : "";
+              reportUploadProgress(`${prefix}${msg}`, pct);
+            }
+          );
+          ok += 1;
+        } catch (err) {
+          if (err instanceof Error && err.message === "Upload cancelled") {
+            throw err;
+          }
+          errors.push(
+            `${shortFileName(file.name)}: ${
+              err instanceof Error ? err.message : "failed"
+            }`
+          );
+        }
+      }
+
+      setUploadTitle("");
+      if (room.id && scope === "village" && ok > 0) {
+        await patchRoom({ channelId: uploadChannelId });
+      } else if (room.id && lastVideo) {
+        await patchRoom({
+          videoId: lastVideo.id,
+          isPlaying: true,
+          positionMs: 0,
+        });
+      }
+
+      if (ok && !errors.length) {
+        reportUploadProgress(
+          ok === 1
+            ? "Upload finished — rename it on the shelf anytime."
+            : `Uploaded ${ok} clips into tonight’s shuffle.`,
+          100
+        );
+      } else if (ok) {
+        setError(`Uploaded ${ok} of ${list.length}. ${errors.join(" · ")}`);
+        reportUploadProgress(`Uploaded ${ok} of ${list.length}`, 100);
+      } else if (errors.length) {
+        setError(errors.join(" · "));
+        setUploadProgress(null);
+        setUploadPercent(null);
+      }
+    } catch (err) {
+      if (err instanceof Error && err.message === "Upload cancelled") {
+        setError("Upload cancelled");
+      } else {
+        setError(err instanceof Error ? err.message : "Upload failed");
+      }
+      setUploadProgress(null);
+      setUploadPercent(null);
+    } finally {
+      activeXhrRef.current = null;
+      setUploading(false);
+      setBusy(false);
+      window.setTimeout(() => {
+        setUploadProgress(null);
+        setUploadPercent(null);
+      }, 2800);
+    }
+  }
+
+  function startRenameVideo(video: TvVideo) {
+    if (!user.isOwner) return;
+    setRenamingVideoId(video.id);
+    setRenameDraft(video.title);
+    setError(null);
+  }
+
+  function cancelRenameVideo() {
+    setRenamingVideoId(null);
+    setRenameDraft("");
+  }
+
+  async function saveRenameVideo(videoId: string) {
+    if (!user.isOwner) return;
+    const title = renameDraft.trim();
+    if (!title) {
+      setError("Give the clip a name");
       return;
     }
     setBusy(true);
     setError(null);
     try {
-      const form = new FormData();
-      form.append("video", file);
-      form.append("channelId", uploadChannelId);
-      if (uploadTitle.trim()) form.append("title", uploadTitle.trim());
-      const res = await fetch("/api/tv/videos", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      setChannels(data.channels || []);
-      setUploadTitle("");
-      // Village set: tune to that channel so the new shuffle is live.
-      if (room.id && scope === "village") {
-        await patchRoom({ channelId: uploadChannelId });
-      } else if (room.id && data.video) {
-        await patchRoom({
-          videoId: data.video.id,
-          isPlaying: true,
-          positionMs: 0,
-        });
+      const res = await fetch("/api/tv/videos", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: videoId, title }),
+      });
+      const data = (await res.json()) as {
+        error?: string;
+        video?: TvVideo;
+        channels?: TvChannel[];
+      };
+      if (!res.ok) throw new Error(data.error || "Could not rename clip");
+      if (data.channels) setChannels(data.channels);
+      if (room.currentVideoId === videoId && data.video) {
+        setRoom((prev) => ({ ...prev, currentVideo: data.video || prev.currentVideo }));
       }
+      setRenamingVideoId(null);
+      setRenameDraft("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      setError(err instanceof Error ? err.message : "Could not rename clip");
     } finally {
       setBusy(false);
     }
@@ -344,6 +660,10 @@ export function TvCorner({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not remove clip");
       setChannels(data.channels || []);
+      if (renamingVideoId === id) {
+        setRenamingVideoId(null);
+        setRenameDraft("");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not remove clip");
     } finally {
@@ -483,6 +803,48 @@ export function TvCorner({
       </div>
 
       {error ? <p className="tv-error">{error}</p> : null}
+
+      {uploadProgress || uploadPercent !== null ? (
+        <div className="tv-upload-banner" role="status" aria-live="polite">
+          <div className="tv-upload-banner-top">
+            <strong>
+              {uploadPercent !== null && uploadPercent >= 100
+                ? "Upload finished"
+                : "Uploading your video"}
+            </strong>
+            <div className="tv-upload-banner-actions">
+              {uploadPercent !== null ? (
+                <span className="tv-upload-pct">{uploadPercent}%</span>
+              ) : null}
+              {uploading ? (
+                <button
+                  type="button"
+                  className="tv-upload-cancel"
+                  onClick={cancelActiveUpload}
+                >
+                  Cancel
+                </button>
+              ) : null}
+            </div>
+          </div>
+          <div className="tv-upload-bar" aria-hidden={uploadPercent === null}>
+            <span
+              style={{
+                width: `${Math.max(
+                  uploadPercent ?? 0,
+                  uploadPercent === 0 ? 2 : 0
+                )}%`,
+              }}
+            />
+          </div>
+          <p>{uploadProgress || "Working…"}</p>
+          <p className="tv-upload-banner-hint">
+            Keep this tab open until 100%. Movies upload in small pieces — if a
+            piece fails it retries automatically. You can rename clips on the
+            shelf after they land.
+          </p>
+        </div>
+      ) : null}
 
       <div className="tv-nook-layout">
         <section className="tv-stage" aria-label="Vintage television">
@@ -744,7 +1106,7 @@ export function TvCorner({
           <h2>Channel shelf</h2>
           <p className="tv-shelf-copy">
             {user.isOwner
-              ? "Make channels and upload clips — every video joins that channel’s shuffle schedule."
+              ? "Make channels and upload clips or full movies — watch the percent climb, then rename anything on the shelf."
               : "Tune a channel on the set. The owner keeps the shelf stocked."}
           </p>
 
@@ -796,27 +1158,17 @@ export function TvCorner({
               <form
                 id="tv-upload-form"
                 className="tv-upload-form"
-                method="post"
-                action="/api/tv/videos"
-                encType="multipart/form-data"
                 onSubmit={(e) => {
-                  if (!hydrated) return;
                   e.preventDefault();
-                  const input = e.currentTarget.querySelector(
-                    'input[name="video"]'
-                  ) as HTMLInputElement | null;
-                  const file = input?.files?.[0] || null;
-                  void onUpload(file);
                 }}
               >
-                <input type="hidden" name="next" value="/tv-corner" />
                 <label className="tv-upload">
                   <span>Upload into</span>
                   <select
                     name="channelId"
                     value={uploadChannelId}
                     onChange={(e) => setUploadChannelId(e.target.value)}
-                    disabled={channels.length === 0}
+                    disabled={channels.length === 0 || uploading}
                     required
                   >
                     {channels.length === 0 ? (
@@ -831,33 +1183,58 @@ export function TvCorner({
                   </select>
                 </label>
                 <label className="tv-upload">
-                  <span>Title</span>
+                  <span>Title for first file (optional)</span>
                   <input
                     type="text"
                     name="title"
                     value={uploadTitle}
                     onChange={(e) => setUploadTitle(e.target.value)}
-                    placeholder="Moon garden loop"
+                    placeholder="Leaves the filename if blank"
                     maxLength={80}
+                    disabled={!uploadChannelId || uploading}
                   />
                 </label>
-                <label className="tv-upload">
-                  <span>Clip file</span>
+                {uploadProgress ? (
+                  <div className="tv-upload-inline" role="status">
+                    <div className="tv-upload-bar">
+                      <span
+                        style={{
+                          width: `${Math.max(uploadPercent ?? 0, 2)}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="tv-shelf-copy tv-upload-status">
+                      {uploadProgress}
+                    </p>
+                  </div>
+                ) : null}
+                <label
+                  className={`tv-upload-file btn-primary${
+                    !uploadChannelId || uploading ? " is-disabled" : ""
+                  }`}
+                >
                   <input
                     type="file"
                     name="video"
-                    accept="video/mp4,video/webm,video/quicktime"
-                    disabled={busy || !uploadChannelId}
-                    required
+                    accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
+                    multiple
+                    hidden
+                    disabled={busy || !uploadChannelId || uploading}
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      e.target.value = "";
+                      void onUploadClips(files);
+                    }}
                   />
+                  {uploading
+                    ? uploadPercent !== null
+                      ? `Uploading… ${uploadPercent}%`
+                      : "Uploading…"
+                    : "Upload videos (movies OK)"}
                 </label>
-                <button
-                  type="submit"
-                  className="btn-primary"
-                  disabled={busy || !uploadChannelId}
-                >
-                  {busy ? "Tucking away…" : "Upload a clip"}
-                </button>
+                <p className="tv-shelf-copy tv-upload-hint">
+                  Up to 5GB each — progress shows while pieces upload.
+                </p>
               </form>
             </>
           ) : null}
@@ -873,36 +1250,91 @@ export function TvCorner({
               shelfVideos.map((video) => {
                 const active = room.currentVideoId === video.id;
                 const canDelete = user.isOwner || video.uploaderId === user.id;
+                const isRenaming = renamingVideoId === video.id;
                 return (
-                  <li key={video.id} className={active ? "active" : ""}>
-                    <button
-                      type="button"
-                      className="tv-video-pick"
-                      disabled={!room.id || busy || scheduleMode}
-                      onClick={() => {
-                        if (scheduleMode) return;
-                        void patchRoom({
-                          videoId: video.id,
-                          isPlaying: true,
-                          positionMs: 0,
-                        });
-                      }}
-                    >
-                      <strong>{video.title}</strong>
-                      <span>
-                        {video.uploaderName} · {formatSize(video.sizeBytes)}
-                      </span>
-                    </button>
-                    {canDelete ? (
-                      <button
-                        type="button"
-                        className="tv-video-remove"
-                        onClick={() => removeVideo(video.id)}
-                        aria-label={`Remove ${video.title}`}
+                  <li
+                    key={video.id}
+                    className={`${active ? "active" : ""}${
+                      isRenaming ? " is-renaming" : ""
+                    }`}
+                  >
+                    {isRenaming ? (
+                      <form
+                        className="tv-rename-form"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          void saveRenameVideo(video.id);
+                        }}
                       >
-                        ×
-                      </button>
-                    ) : null}
+                        <input
+                          type="text"
+                          value={renameDraft}
+                          onChange={(e) => setRenameDraft(e.target.value)}
+                          maxLength={80}
+                          autoFocus
+                          disabled={busy}
+                          aria-label="Clip title"
+                        />
+                        <button
+                          type="submit"
+                          className="tv-rename-save"
+                          disabled={busy || !renameDraft.trim()}
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          className="tv-rename-cancel"
+                          onClick={cancelRenameVideo}
+                          disabled={busy}
+                        >
+                          Cancel
+                        </button>
+                      </form>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          className="tv-video-pick"
+                          disabled={!room.id || busy || scheduleMode}
+                          onClick={() => {
+                            if (scheduleMode) return;
+                            void patchRoom({
+                              videoId: video.id,
+                              isPlaying: true,
+                              positionMs: 0,
+                            });
+                          }}
+                        >
+                          <strong>{video.title}</strong>
+                          <span>
+                            {video.uploaderName} · {formatSize(video.sizeBytes)}
+                          </span>
+                        </button>
+                        {user.isOwner ? (
+                          <button
+                            type="button"
+                            className="tv-video-rename"
+                            onClick={() => startRenameVideo(video)}
+                            disabled={busy || uploading}
+                            aria-label={`Rename ${video.title}`}
+                            title="Rename"
+                          >
+                            ✎
+                          </button>
+                        ) : null}
+                        {canDelete ? (
+                          <button
+                            type="button"
+                            className="tv-video-remove"
+                            onClick={() => removeVideo(video.id)}
+                            aria-label={`Remove ${video.title}`}
+                          >
+                            ×
+                          </button>
+                        ) : null}
+                      </>
+                    )}
                   </li>
                 );
               })

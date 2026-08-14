@@ -348,6 +348,39 @@ export function deleteVideo(videoId: string, user: UserPublic) {
   return { ok: true as const, filename };
 }
 
+export function renameVideo(
+  videoId: string,
+  titleRaw: string,
+  user: UserPublic
+) {
+  const video = getVideoById(videoId);
+  if (!video) return { ok: false as const, error: "Clip not found" };
+  if (!user.isOwner) {
+    return {
+      ok: false as const,
+      error: "Only the site owner can rename clips",
+    };
+  }
+  const title = titleRaw.trim().slice(0, 80);
+  if (!title) {
+    return { ok: false as const, error: "Give the clip a name" };
+  }
+  const db = getDb();
+  db.prepare(`UPDATE tv_videos SET title = ? WHERE id = ?`).run(title, videoId);
+  try {
+    persistAllDurableState(db);
+  } catch (err) {
+    console.error("[tv] persist after rename failed:", err);
+  }
+  const updated = getVideoById(videoId);
+  if (!updated) return { ok: false as const, error: "Clip not found" };
+  return {
+    ok: true as const,
+    video: updated,
+    channel: video.channelId ? getChannelById(video.channelId) : null,
+  };
+}
+
 function listWatchers(roomId: string): TvWatcher[] {
   const db = getDb();
   const rows = db
@@ -664,7 +697,74 @@ export const TV_MIME_EXT: Record<string, string> = {
   "video/mp4": "mp4",
   "video/webm": "webm",
   "video/quicktime": "mov",
+  "video/x-m4v": "m4v",
+  "video/x-msvideo": "avi",
+  "video/mpeg": "mpg",
+  "video/x-matroska": "mkv",
 };
 
 export const TV_ALLOWED_MIME = new Set(Object.keys(TV_MIME_EXT));
-export const TV_MAX_BYTES = 500 * 1024 * 1024; // 500MB
+export const TV_MAX_BYTES = 5 * 1024 * 1024 * 1024; // 5GB movies
+export const TV_MAX_LABEL = "5GB";
+
+const EXT_MIME: Record<string, string> = {
+  mp4: "video/mp4",
+  m4v: "video/x-m4v",
+  webm: "video/webm",
+  mov: "video/quicktime",
+  qt: "video/quicktime",
+  avi: "video/x-msvideo",
+  mpg: "video/mpeg",
+  mpeg: "video/mpeg",
+  mkv: "video/x-matroska",
+};
+
+export function resolveTvUpload(file: {
+  name: string;
+  type: string;
+  size: number;
+}): { ok: true; mime: string; ext: string } | { ok: false; error: string } {
+  if (file.size <= 0) {
+    return {
+      ok: false,
+      error: "That file looks empty — is it still downloading?",
+    };
+  }
+  if (file.size > TV_MAX_BYTES) {
+    return { ok: false, error: `Videos must be under ${TV_MAX_LABEL}` };
+  }
+  const baseName =
+    file.name.replace(/\\/g, "/").split("/").pop()?.trim() || "clip.mp4";
+  const extFromName = baseName.split(".").pop()?.toLowerCase() || "";
+  const rawType = (file.type || "").toLowerCase().trim();
+  const mimeFromType =
+    (TV_ALLOWED_MIME.has(rawType) ? rawType : "") ||
+    (rawType === "application/mp4" ? "video/mp4" : "") ||
+    (rawType === "video/x-quicktime" ? "video/quicktime" : "");
+  const mime = mimeFromType || EXT_MIME[extFromName] || "";
+  if (!mime || !TV_ALLOWED_MIME.has(mime)) {
+    return {
+      ok: false,
+      error: "Use MP4, WebM, MOV, M4V, AVI, MPEG, or MKV",
+    };
+  }
+  const ext = TV_MIME_EXT[mime] || extFromName || "mp4";
+  return { ok: true, mime, ext };
+}
+
+/** Basename only — strips C:\\Users\\...\\ prefixes from downloaders. */
+export function safeUploadFilename(name: string) {
+  const base =
+    name.replace(/\\/g, "/").split("/").pop()?.trim() || "clip.mp4";
+  return base.replace(/[^\w.\- ()[\]]+/g, "_").slice(0, 180) || "clip.mp4";
+}
+
+export function formatTvBytes(bytes: number) {
+  if (bytes >= 1024 * 1024 * 1024) {
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  }
+  if (bytes >= 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}

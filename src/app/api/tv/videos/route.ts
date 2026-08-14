@@ -4,14 +4,15 @@ import path from "path";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import {
-  TV_ALLOWED_MIME,
-  TV_MAX_BYTES,
-  TV_MIME_EXT,
+  TV_MAX_LABEL,
   createVideo,
   deleteVideo,
   getChannelById,
   listChannelsForUser,
   listVideosForUser,
+  renameVideo,
+  resolveTvUpload,
+  safeUploadFilename,
 } from "@/lib/tvCorner";
 import { redirectSameHost, wantsHtmlRedirect } from "@/lib/requestBody";
 
@@ -51,29 +52,38 @@ export async function POST(req: NextRequest) {
   if (!(file instanceof File)) {
     return jsonError("Choose a cozy clip to tuck onto the shelf");
   }
-  if (!TV_ALLOWED_MIME.has(file.type)) {
-    return jsonError("Use an MP4, WebM, or MOV video");
-  }
-  if (file.size > TV_MAX_BYTES) {
-    return jsonError("Clips must be under 500MB");
+
+  const resolved = resolveTvUpload({
+    name: file.name,
+    type: file.type,
+    size: file.size,
+  });
+  if (!resolved.ok) return jsonError(resolved.error);
+
+  // Prefer chunked uploads for big movies — keep this path for small files.
+  if (file.size > 80 * 1024 * 1024) {
+    return jsonError(
+      `That file is large — use the channel shelf uploader (supports up to ${TV_MAX_LABEL} with progress)`,
+      413
+    );
   }
 
   const titleRaw = String(form.get("title") || "").trim();
+  const safeName = safeUploadFilename(file.name);
   const title =
     titleRaw.slice(0, 80) ||
-    file.name.replace(/\.[^.]+$/, "").slice(0, 80) ||
+    safeName.replace(/\.[^.]+$/, "").slice(0, 80) ||
     "Untitled reel";
 
-  const ext = TV_MIME_EXT[file.type] || "mp4";
   ensureUploadDir();
-  const filename = `${randomUUID()}.${ext}`;
+  const filename = `${randomUUID()}.${resolved.ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
   fs.writeFileSync(path.join(UPLOAD_DIR, filename), buffer);
 
   const video = createVideo({
     title,
     filename,
-    mime: file.type,
+    mime: resolved.mime,
     sizeBytes: file.size,
     uploaderId: user.id,
     villageId: channel.isGlobal ? null : channel.villageId,
@@ -95,6 +105,31 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     video,
+    channels: listChannelsForUser(user),
+  });
+}
+
+export async function PATCH(req: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) return jsonError("Not signed in", 401);
+  if (!user.isOwner) {
+    return jsonError("Only the site owner can rename clips", 403);
+  }
+
+  const body = (await req.json().catch(() => null)) as {
+    id?: string;
+    title?: string;
+  } | null;
+  if (!body?.id || typeof body.title !== "string") {
+    return jsonError("Missing clip id or new title");
+  }
+
+  const result = renameVideo(body.id, body.title, user);
+  if (!result.ok) return jsonError(result.error, 400);
+
+  return NextResponse.json({
+    video: result.video,
+    channel: result.channel,
     channels: listChannelsForUser(user),
   });
 }

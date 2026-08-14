@@ -4934,8 +4934,128 @@ button.linkish:hover {
   display: inline-flex;
   justify-content: center;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 0.45rem;
   cursor: pointer;
+}
+
+.tv-upload-file.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.tv-upload-hint {
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  opacity: 0.78;
+}
+
+.tv-upload-status {
+  color: color-mix(in srgb, var(--village-soft, #c4a574) 85%, white);
+  font-size: 0.86rem;
+}
+
+.tv-upload-inline {
+  margin: 0.35rem 0 0.65rem;
+}
+
+.tv-upload-inline .tv-upload-bar {
+  margin-bottom: 0.35rem;
+}
+
+.tv-upload-banner {
+  position: sticky;
+  top: 5.5rem;
+  z-index: 40;
+  margin: 0 0 1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 45%, transparent);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--village-color, #2a3548) 70%, #1a120c),
+      color-mix(in srgb, #1a120c 80%, var(--village-color, #2a3548))
+    );
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+@media (max-width: 640px) {
+  .tv-upload-banner {
+    top: 7.25rem;
+  }
+}
+
+.tv-upload-banner-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.tv-upload-banner-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.tv-upload-cancel {
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 40%, transparent);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--cream, #f3e6d0);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.tv-upload-cancel:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.tv-upload-banner-top strong {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.05rem;
+  color: var(--cream, #f3e6d0);
+}
+
+.tv-upload-pct {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--village-soft, #c4a574) 70%, white);
+}
+
+.tv-upload-bar {
+  height: 0.7rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 28%, transparent);
+}
+
+.tv-upload-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--village-soft, #c4a574) 75%, #8b5a2b),
+    color-mix(in srgb, var(--cream, #f3e6d0) 55%, var(--village-soft, #c4a574))
+  );
+  transition: width 0.2s ease-out;
+}
+
+.tv-upload-banner p {
+  margin: 0.55rem 0 0;
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 88%, white);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.tv-upload-banner-hint {
+  opacity: 0.75;
+  font-size: 0.8rem !important;
 }
 
 .tv-video-list {
@@ -4950,9 +5070,13 @@ button.linkish:hover {
 
 .tv-video-list > li {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 0.35rem;
   align-items: stretch;
+}
+
+.tv-video-list > li.is-renaming {
+  grid-template-columns: 1fr;
 }
 
 .tv-video-list > li.active .tv-video-pick {
@@ -4975,6 +5099,63 @@ button.linkish:hover {
 .tv-video-pick span {
   font-size: 0.78rem;
   opacity: 0.75;
+}
+
+.tv-video-rename {
+  border: 0;
+  border-radius: 0.65rem;
+  background: rgba(0, 0, 0, 0.22);
+  color: color-mix(in srgb, var(--village-soft, #c4a574) 80%, white);
+  width: 2rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.tv-video-rename:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 22%, rgba(0, 0, 0, 0.22));
+}
+
+.tv-video-rename:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.tv-rename-form {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.3rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+.tv-rename-form input {
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--village-soft, #c4a574) 40%, transparent);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--cream, #f3e6d0);
+  padding: 0.4rem 0.55rem;
+  font-size: 0.85rem;
+  min-width: 0;
+}
+
+.tv-rename-save,
+.tv-rename-cancel {
+  border: 0;
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.tv-rename-save {
+  background: color-mix(in srgb, var(--village-soft, #c4a574) 35%, rgba(0, 0, 0, 0.25));
+  color: var(--cream, #f3e6d0);
+}
+
+.tv-rename-cancel {
+  background: rgba(0, 0, 0, 0.28);
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 80%, transparent);
 }
 
 .tv-video-remove {
