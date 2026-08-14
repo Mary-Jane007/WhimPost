@@ -113,7 +113,6 @@ export function TvCorner({
   const [titleDraft, setTitleDraft] = useState("");
   const [channelTitle, setChannelTitle] = useState("");
   const [channelGlobal, setChannelGlobal] = useState(false);
-  const [uploadTitle, setUploadTitle] = useState("");
   const [uploadChannelId, setUploadChannelId] = useState(
     initialChannels[0]?.id || ""
   );
@@ -143,11 +142,6 @@ export function TvCorner({
     () => channels.find((c) => c.id === room.currentChannelId) || null,
     [channels, room.currentChannelId]
   );
-
-  const shelfVideos: TvVideo[] = useMemo(() => {
-    if (activeChannel) return activeChannel.videos;
-    return channels.flatMap((c) => c.videos);
-  }, [activeChannel, channels]);
 
   useEffect(() => {
     roomIdRef.current = room.id;
@@ -502,20 +496,24 @@ export function TvCorner({
     return doneData.video;
   }
 
-  async function onUploadClips(files: FileList | File[] | null) {
+  async function onUploadClips(
+    files: FileList | File[] | null,
+    channelId?: string
+  ) {
     if (!user.isOwner) return;
     if (!files || files.length === 0) {
       setError("Choose one or more video files first");
       return;
     }
-    if (!uploadChannelId) {
+    const targetChannelId = channelId || uploadChannelId;
+    if (!targetChannelId) {
       setError("Make a channel first, then upload into it");
       return;
     }
 
     const list = Array.from(files);
-    const firstTitle = uploadTitle.trim();
     uploadCancelRef.current = false;
+    setUploadChannelId(targetChannelId);
     setUploading(true);
     setBusy(true);
     setError(null);
@@ -525,19 +523,19 @@ export function TvCorner({
     );
 
     let ok = 0;
-    let lastVideo: TvVideo | null = null;
     const errors: string[] = [];
+    const channelName =
+      channels.find((c) => c.id === targetChannelId)?.title || "channel";
 
     try {
       for (let i = 0; i < list.length; i++) {
         if (uploadCancelRef.current) throw new Error("Upload cancelled");
         const file = list[i];
-        const title = i === 0 ? firstTitle || undefined : undefined;
         try {
-          lastVideo = await uploadOneToChannel(
+          await uploadOneToChannel(
             file,
-            uploadChannelId,
-            title,
+            targetChannelId,
+            undefined,
             (msg, pct) => {
               const prefix =
                 list.length > 1 ? `File ${i + 1} of ${list.length} · ` : "";
@@ -557,22 +555,22 @@ export function TvCorner({
         }
       }
 
-      setUploadTitle("");
-      if (room.id && scope === "village" && ok > 0) {
-        await patchRoom({ channelId: uploadChannelId });
-      } else if (room.id && lastVideo) {
-        await patchRoom({
-          videoId: lastVideo.id,
-          isPlaying: true,
-          positionMs: 0,
-        });
+      // Refresh the live guide if this channel is already tuned — new clips
+      // are already in the shuffle either way.
+      if (
+        room.id &&
+        scope === "village" &&
+        ok > 0 &&
+        room.currentChannelId === targetChannelId
+      ) {
+        await patchRoom({ channelId: targetChannelId });
       }
 
       if (ok && !errors.length) {
         reportUploadProgress(
           ok === 1
-            ? "Upload finished — rename it on the shelf anytime."
-            : `Uploaded ${ok} clips into tonight’s shuffle.`,
+            ? `Added to ${channelName}’s schedule — rename anytime.`
+            : `Added ${ok} clips to ${channelName}’s schedule.`,
           100
         );
       } else if (ok) {
@@ -1106,235 +1104,250 @@ export function TvCorner({
           <h2>Channel shelf</h2>
           <p className="tv-shelf-copy">
             {user.isOwner
-              ? "Make channels and upload clips or full movies — watch the percent climb, then rename anything on the shelf."
-              : "Tune a channel on the set. The owner keeps the shelf stocked."}
+              ? "Each channel has its own bar — add videos anytime and they join that channel’s shuffle."
+              : "Tune a channel on the set. The owner keeps each bar stocked."}
           </p>
 
           {user.isOwner ? (
-            <>
-              <form
-                className="tv-owner-create"
-                method="post"
-                action="/api/tv/channels"
-                onSubmit={(e) => {
-                  if (!hydrated) return;
-                  e.preventDefault();
-                  const form = e.currentTarget;
-                  const fd = new FormData(form);
-                  const title = String(fd.get("channelTitle") || "");
-                  const global = fd.get("channelGlobal") === "on";
-                  setChannelGlobal(global);
-                  void createChannel(title);
-                }}
-              >
-                <input type="hidden" name="next" value="/tv-corner" />
-                <input type="hidden" name="villageId" value={villageId} />
-                <label className="tv-upload">
-                  <span>New channel</span>
-                  <input
-                    type="text"
-                    name="channelTitle"
-                    value={channelTitle}
-                    onChange={(e) => setChannelTitle(e.target.value)}
-                    placeholder="Cottage Cartoons"
-                    maxLength={80}
-                    required
-                  />
-                </label>
-                <label className="tv-global-check">
-                  <input
-                    type="checkbox"
-                    name="channelGlobal"
-                    checked={channelGlobal}
-                    onChange={(e) => setChannelGlobal(e.target.checked)}
-                  />
-                  Share with every village
-                </label>
-                <button type="submit" className="btn-secondary" disabled={busy}>
-                  Make channel
-                </button>
-              </form>
-
-              <form
-                id="tv-upload-form"
-                className="tv-upload-form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                }}
-              >
-                <label className="tv-upload">
-                  <span>Upload into</span>
-                  <select
-                    name="channelId"
-                    value={uploadChannelId}
-                    onChange={(e) => setUploadChannelId(e.target.value)}
-                    disabled={channels.length === 0 || uploading}
-                    required
-                  >
-                    {channels.length === 0 ? (
-                      <option value="">Make a channel first</option>
-                    ) : (
-                      channels.map((ch) => (
-                        <option key={ch.id} value={ch.id}>
-                          {ch.title}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                </label>
-                <label className="tv-upload">
-                  <span>Title for first file (optional)</span>
-                  <input
-                    type="text"
-                    name="title"
-                    value={uploadTitle}
-                    onChange={(e) => setUploadTitle(e.target.value)}
-                    placeholder="Leaves the filename if blank"
-                    maxLength={80}
-                    disabled={!uploadChannelId || uploading}
-                  />
-                </label>
-                {uploadProgress ? (
-                  <div className="tv-upload-inline" role="status">
-                    <div className="tv-upload-bar">
-                      <span
-                        style={{
-                          width: `${Math.max(uploadPercent ?? 0, 2)}%`,
-                        }}
-                      />
-                    </div>
-                    <p className="tv-shelf-copy tv-upload-status">
-                      {uploadProgress}
-                    </p>
-                  </div>
-                ) : null}
-                <label
-                  className={`tv-upload-file btn-primary${
-                    !uploadChannelId || uploading ? " is-disabled" : ""
-                  }`}
-                >
-                  <input
-                    type="file"
-                    name="video"
-                    accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
-                    multiple
-                    hidden
-                    disabled={busy || !uploadChannelId || uploading}
-                    onChange={(e) => {
-                      const files = e.target.files;
-                      e.target.value = "";
-                      void onUploadClips(files);
-                    }}
-                  />
-                  {uploading
-                    ? uploadPercent !== null
-                      ? `Uploading… ${uploadPercent}%`
-                      : "Uploading…"
-                    : "Upload videos (movies OK)"}
-                </label>
-                <p className="tv-shelf-copy tv-upload-hint">
-                  Up to 5GB each — progress shows while pieces upload.
-                </p>
-              </form>
-            </>
+            <form
+              className="tv-owner-create"
+              method="post"
+              action="/api/tv/channels"
+              onSubmit={(e) => {
+                if (!hydrated) return;
+                e.preventDefault();
+                const form = e.currentTarget;
+                const fd = new FormData(form);
+                const title = String(fd.get("channelTitle") || "");
+                const global = fd.get("channelGlobal") === "on";
+                setChannelGlobal(global);
+                void createChannel(title);
+              }}
+            >
+              <input type="hidden" name="next" value="/tv-corner" />
+              <input type="hidden" name="villageId" value={villageId} />
+              <label className="tv-upload">
+                <span>New channel</span>
+                <input
+                  type="text"
+                  name="channelTitle"
+                  value={channelTitle}
+                  onChange={(e) => setChannelTitle(e.target.value)}
+                  placeholder="Cottage Cartoons"
+                  maxLength={80}
+                  required
+                />
+              </label>
+              <label className="tv-global-check">
+                <input
+                  type="checkbox"
+                  name="channelGlobal"
+                  checked={channelGlobal}
+                  onChange={(e) => setChannelGlobal(e.target.checked)}
+                />
+                Share with every village
+              </label>
+              <button type="submit" className="btn-secondary" disabled={busy}>
+                Make channel
+              </button>
+            </form>
           ) : null}
 
-          <ul className="tv-video-list">
-            {shelfVideos.length === 0 ? (
+          {uploadProgress ? (
+            <div className="tv-upload-inline" role="status">
+              <div className="tv-upload-bar">
+                <span
+                  style={{
+                    width: `${Math.max(uploadPercent ?? 0, 2)}%`,
+                  }}
+                />
+              </div>
+              <p className="tv-shelf-copy tv-upload-status">{uploadProgress}</p>
+            </div>
+          ) : null}
+
+          <ul className="tv-channel-bars">
+            {channels.length === 0 ? (
               <li className="muted">
-                {activeChannel
-                  ? "This channel’s shelf is empty."
-                  : "No clips yet — the shuffle is waiting."}
+                {user.isOwner
+                  ? "Make your first channel above — then add videos to its bar."
+                  : "No channels yet."}
               </li>
             ) : (
-              shelfVideos.map((video) => {
-                const active = room.currentVideoId === video.id;
-                const canDelete = user.isOwner || video.uploaderId === user.id;
-                const isRenaming = renamingVideoId === video.id;
+              channels.map((channel, index) => {
+                const tuned = room.currentChannelId === channel.id;
+                const uploadingHere =
+                  uploading && uploadChannelId === channel.id;
                 return (
                   <li
-                    key={video.id}
-                    className={`${active ? "active" : ""}${
-                      isRenaming ? " is-renaming" : ""
-                    }`}
+                    key={channel.id}
+                    className={`tv-channel-bar${tuned ? " active" : ""}`}
                   >
-                    {isRenaming ? (
-                      <form
-                        className="tv-rename-form"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          void saveRenameVideo(video.id);
-                        }}
+                    <div className="tv-channel-bar-head">
+                      <button
+                        type="button"
+                        className="tv-channel-bar-tune"
+                        disabled={!room.id || busy}
+                        onClick={() => patchRoom({ channelId: channel.id })}
+                      >
+                        <strong>
+                          <span className="tv-ch-num">
+                            CH {String(index + 1).padStart(2, "0")}
+                          </span>{" "}
+                          {channel.title}
+                          {channel.isGlobal ? (
+                            <span className="tv-global-tag"> every village</span>
+                          ) : null}
+                        </strong>
+                        <span>
+                          {channel.videos.length} clip
+                          {channel.videos.length === 1 ? "" : "s"}
+                          {channel.videos.length === 0 ? " · empty" : " · in shuffle"}
+                          {tuned ? " · on air" : ""}
+                        </span>
+                      </button>
+                      {user.isOwner ? (
+                        <button
+                          type="button"
+                          className="tv-video-remove"
+                          onClick={() => removeChannel(channel.id)}
+                          aria-label={`Remove ${channel.title}`}
+                          disabled={busy || uploading}
+                        >
+                          ×
+                        </button>
+                      ) : null}
+                    </div>
+
+                    {channel.videos.length > 0 ? (
+                      <ul className="tv-channel-clips">
+                        {channel.videos.map((video) => {
+                          const clipActive = room.currentVideoId === video.id;
+                          const canDelete =
+                            user.isOwner || video.uploaderId === user.id;
+                          const isRenaming = renamingVideoId === video.id;
+                          return (
+                            <li
+                              key={video.id}
+                              className={`${clipActive ? "active" : ""}${
+                                isRenaming ? " is-renaming" : ""
+                              }`}
+                            >
+                              {isRenaming ? (
+                                <form
+                                  className="tv-rename-form"
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    void saveRenameVideo(video.id);
+                                  }}
+                                >
+                                  <input
+                                    type="text"
+                                    value={renameDraft}
+                                    onChange={(e) =>
+                                      setRenameDraft(e.target.value)
+                                    }
+                                    maxLength={80}
+                                    autoFocus
+                                    disabled={busy}
+                                    aria-label="Clip title"
+                                  />
+                                  <button
+                                    type="submit"
+                                    className="tv-rename-save"
+                                    disabled={busy || !renameDraft.trim()}
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="tv-rename-cancel"
+                                    onClick={cancelRenameVideo}
+                                    disabled={busy}
+                                  >
+                                    Cancel
+                                  </button>
+                                </form>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    className="tv-clip-pick"
+                                    disabled={
+                                      !room.id || busy || scheduleMode
+                                    }
+                                    onClick={() => {
+                                      if (scheduleMode) return;
+                                      void patchRoom({
+                                        videoId: video.id,
+                                        isPlaying: true,
+                                        positionMs: 0,
+                                      });
+                                    }}
+                                  >
+                                    <strong>{video.title}</strong>
+                                    <span>{formatSize(video.sizeBytes)}</span>
+                                  </button>
+                                  {user.isOwner ? (
+                                    <button
+                                      type="button"
+                                      className="tv-video-rename"
+                                      onClick={() => startRenameVideo(video)}
+                                      disabled={busy || uploading}
+                                      aria-label={`Rename ${video.title}`}
+                                      title="Rename"
+                                    >
+                                      ✎
+                                    </button>
+                                  ) : null}
+                                  {canDelete ? (
+                                    <button
+                                      type="button"
+                                      className="tv-video-remove"
+                                      onClick={() => removeVideo(video.id)}
+                                      aria-label={`Remove ${video.title}`}
+                                      disabled={busy || uploading}
+                                    >
+                                      ×
+                                    </button>
+                                  ) : null}
+                                </>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="muted tv-channel-empty">
+                        No videos yet — add some and they join the schedule.
+                      </p>
+                    )}
+
+                    {user.isOwner ? (
+                      <label
+                        className={`tv-channel-add btn-primary${
+                          uploading && !uploadingHere ? " is-disabled" : ""
+                        }`}
                       >
                         <input
-                          type="text"
-                          value={renameDraft}
-                          onChange={(e) => setRenameDraft(e.target.value)}
-                          maxLength={80}
-                          autoFocus
-                          disabled={busy}
-                          aria-label="Clip title"
-                        />
-                        <button
-                          type="submit"
-                          className="tv-rename-save"
-                          disabled={busy || !renameDraft.trim()}
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          className="tv-rename-cancel"
-                          onClick={cancelRenameVideo}
-                          disabled={busy}
-                        >
-                          Cancel
-                        </button>
-                      </form>
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          className="tv-video-pick"
-                          disabled={!room.id || busy || scheduleMode}
-                          onClick={() => {
-                            if (scheduleMode) return;
-                            void patchRoom({
-                              videoId: video.id,
-                              isPlaying: true,
-                              positionMs: 0,
-                            });
+                          type="file"
+                          accept="video/*,.mp4,.webm,.mov,.m4v,.avi,.mpg,.mpeg,.mkv"
+                          hidden
+                          multiple
+                          disabled={busy || uploading}
+                          onChange={(e) => {
+                            const files = e.target.files;
+                            e.target.value = "";
+                            void onUploadClips(files, channel.id);
                           }}
-                        >
-                          <strong>{video.title}</strong>
-                          <span>
-                            {video.uploaderName} · {formatSize(video.sizeBytes)}
-                          </span>
-                        </button>
-                        {user.isOwner ? (
-                          <button
-                            type="button"
-                            className="tv-video-rename"
-                            onClick={() => startRenameVideo(video)}
-                            disabled={busy || uploading}
-                            aria-label={`Rename ${video.title}`}
-                            title="Rename"
-                          >
-                            ✎
-                          </button>
-                        ) : null}
-                        {canDelete ? (
-                          <button
-                            type="button"
-                            className="tv-video-remove"
-                            onClick={() => removeVideo(video.id)}
-                            aria-label={`Remove ${video.title}`}
-                          >
-                            ×
-                          </button>
-                        ) : null}
-                      </>
-                    )}
+                        />
+                        {uploadingHere
+                          ? uploadPercent !== null
+                            ? `Uploading… ${uploadPercent}%`
+                            : "Uploading…"
+                          : "Add videos"}
+                      </label>
+                    ) : null}
                   </li>
                 );
               })
