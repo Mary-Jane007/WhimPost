@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T20:46:37.323Z",
+  "updatedAt": "2026-08-14T20:49:59.012Z",
   "books": [
     {
       "id": "princess",
@@ -126,6 +126,28 @@
       "fileMime": null,
       "quotesJson": "[\"Real isn't how you are made. It's a thing that happens to you.\",\"Once you are Real you can't become unreal again.\"]",
       "reflectionsJson": "[\"What has love worn soft and Real in you?\",\"Which childhood object still feels alive?\"]",
+      "category": null,
+      "difficulty": null,
+      "length": null,
+      "mood": "",
+      "themesJson": "[]",
+      "rating": 4.5,
+      "published": true
+    },
+    {
+      "id": "willows",
+      "shelf": "club",
+      "title": "The Wind in the Willows",
+      "author": "Kenneth Grahame",
+      "description": "Riverbank friendship, reckless motorcars, and the soft music of home — a hymn to loyalty and the English countryside.",
+      "minutes": 260,
+      "coverEmoji": "🚣",
+      "coverUrl": "/api/uploads/635c9408-ad89-4a09-99e7-1d3667d33933.jpg",
+      "fileUrl": null,
+      "fileName": null,
+      "fileMime": null,
+      "quotesJson": "[\"Believe me, my young friend, there is nothing — absolutely nothing — half so much worth doing as simply messing about in boats.\"]",
+      "reflectionsJson": "[\"Where do you feel most like yourself outdoors?\",\"Which friend would follow you into a wild adventure?\"]",
       "category": null,
       "difficulty": null,
       "length": null,
