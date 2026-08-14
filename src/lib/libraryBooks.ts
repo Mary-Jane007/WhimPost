@@ -674,6 +674,82 @@ export function moveLibraryBookToShelf(
   });
 }
 
+/** Owner updates only the public summary blurb for a shelf title. */
+export function updateLibraryBookSummary(
+  bookId: string,
+  description: string,
+  createdBy: string
+): LibraryBookRecord {
+  const id = bookId.trim();
+  if (!id) throw new Error("Book id required");
+  const summary = description.trim().slice(0, 2000);
+
+  const existing = getLibraryBookRecord(id);
+  const live = findLibraryBook(id);
+  const catalog = findCatalogShelfBook(id);
+  if (!existing && !live && !catalog) {
+    throw new Error("That book is not on the library shelves");
+  }
+
+  const asClub =
+    live && "quotes" in live
+      ? (live as ClubBook)
+      : catalog?.club || null;
+  const asReading =
+    live && "category" in live
+      ? (live as ReadingListBook)
+      : catalog?.reading || null;
+
+  const shelf: LibraryShelf =
+    existing?.shelf ||
+    catalog?.shelf ||
+    (asReading ? "readinglist" : "club");
+
+  return upsertLibraryBook({
+    id,
+    shelf,
+    title:
+      existing?.title ||
+      asClub?.title ||
+      asReading?.title ||
+      "Untitled",
+    author:
+      existing?.author ||
+      asClub?.author ||
+      asReading?.author ||
+      "Unknown",
+    description: summary,
+    minutes: existing?.minutes || asClub?.minutes || 180,
+    coverEmoji:
+      existing?.coverEmoji ||
+      asClub?.coverEmoji ||
+      asReading?.coverEmoji ||
+      "📖",
+    coverUrl:
+      existing?.coverUrl ?? asClub?.coverUrl ?? asReading?.coverUrl ?? null,
+    fileUrl: existing?.fileUrl ?? asClub?.fileUrl ?? asReading?.fileUrl ?? null,
+    fileName:
+      existing?.fileName ?? asClub?.fileName ?? asReading?.fileName ?? null,
+    fileMime: existing?.fileMime ?? null,
+    quotes: existing?.quotes?.length
+      ? existing.quotes
+      : asClub?.quotes || [],
+    reflections: existing?.reflections?.length
+      ? existing.reflections
+      : asClub?.reflections || [],
+    category: existing?.category || asReading?.category || null,
+    difficulty: existing?.difficulty || asReading?.difficulty || null,
+    length: existing?.length || asReading?.length || null,
+    mood: existing?.mood || asReading?.mood || "",
+    themes: existing?.themes?.length
+      ? existing.themes
+      : asReading?.themes || [],
+    rating: existing?.rating || asReading?.rating || 4.5,
+    published: true,
+    createdBy,
+  });
+}
+
 export function getLibraryBookRecord(id: string): LibraryBookRecord | null {
   const db = getDb();
   const row = db

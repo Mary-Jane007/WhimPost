@@ -17,6 +17,7 @@ import {
   listLibraryBookRecords,
   listReadingListBooks,
   moveLibraryBookToShelf,
+  updateLibraryBookSummary,
   upsertLibraryBook,
   type LibraryShelf,
 } from "@/lib/libraryBooks";
@@ -240,6 +241,22 @@ export async function POST(req: NextRequest) {
       clubBooks: rotation.shelf,
       daysUntilShuffle: rotation.daysUntilShuffle,
     });
+  }
+
+  if (intent === "set-summary") {
+    const id = String(form.get("bookId") || form.get("id") || "").trim();
+    const description = String(form.get("description") || "").trim();
+    if (!id) return jsonError("Book id required");
+    try {
+      const book = updateLibraryBookSummary(id, description, user.id);
+      if (wantsHtmlRedirect(req)) return redirectSameHost(req, nextPath);
+      return NextResponse.json({ ok: true, book, summaryUpdated: true });
+    } catch (err) {
+      return jsonError(
+        err instanceof Error ? err.message : "Could not save the summary",
+        400
+      );
+    }
   }
 
   if (intent === "set-shelf") {

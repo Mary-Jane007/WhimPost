@@ -6866,6 +6866,37 @@ button.linkish:hover {
   overflow: hidden;
 }
 
+button.mh-cover-button {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  width: 100%;
+}
+
+button.mh-cover-button:hover,
+button.mh-cover-button:focus-visible {
+  outline: 2px solid rgba(214, 178, 110, 0.75);
+  outline-offset: 2px;
+}
+
+.mh-title-link {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mh-title-link:hover,
+.mh-title-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
 .mh-cover.has-image {
   padding: 0;
 }
@@ -6934,6 +6965,122 @@ button.linkish:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+button.mh-card-cover {
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.mh-summary-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(8, 14, 12, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.mh-summary-panel {
+  width: min(34rem, 100%);
+  max-height: min(88dvh, 40rem);
+  overflow: auto;
+  border-radius: 1rem;
+  border: 1px solid rgba(214, 178, 110, 0.35);
+  background:
+    linear-gradient(165deg, rgba(42, 34, 24, 0.98), rgba(22, 28, 22, 0.98));
+  color: #f3e6d0;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  padding: 1rem 1.05rem 1.15rem;
+}
+
+.mh-summary-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem 0.9rem;
+  align-items: start;
+  margin-bottom: 0.85rem;
+}
+
+.mh-summary-cover {
+  width: 4.6rem;
+  height: 6.1rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.4rem;
+  overflow: hidden;
+  background: linear-gradient(160deg, #5c3b22, #2a1c12 70%);
+  border: 1px solid rgba(214, 178, 110, 0.4);
+  font-size: 1.6rem;
+}
+
+.mh-summary-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mh-summary-titles h3 {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.35rem;
+  color: #f6edd9;
+}
+
+.mh-summary-titles .muted,
+.mh-summary-titles .mh-meta {
+  margin: 0.2rem 0 0;
+}
+
+.mh-summary-body p {
+  margin: 0 0 1rem;
+  line-height: 1.65;
+  color: #e8dcc4;
+}
+
+.mh-summary-edit {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.mh-summary-edit label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.mh-summary-edit textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 8rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(214, 178, 110, 0.35);
+  background: rgba(246, 237, 217, 0.94);
+  color: #2c2418;
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  line-height: 1.55;
+}
+
+.mh-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (max-width: 560px) {
+  .mh-summary-head {
+    grid-template-columns: auto 1fr;
+  }
+
+  .mh-summary-head > .btn-secondary {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
 }
 
 .mh-owner-book-tools {

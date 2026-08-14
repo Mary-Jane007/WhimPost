@@ -21,6 +21,10 @@ import {
 } from "@/lib/libraryContent";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { BookReadingProgress } from "@/components/BookReadingProgress";
+import {
+  BookSummaryModal,
+  type BookSummaryInfo,
+} from "@/components/BookSummaryModal";
 import { ShelfBookCoverAttach } from "@/components/ShelfBookCoverAttach";
 import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 import { ShelfBookFileDetach } from "@/components/ShelfBookFileDetach";
@@ -73,12 +77,34 @@ export function MosshollowLibrary({
   );
   const [book, setBook] = useState<ClubBook | null>(featuredBook);
   const [shuffleDays, setShuffleDays] = useState(daysUntilShuffle);
+  const [summaryBook, setSummaryBook] = useState<BookSummaryInfo | null>(null);
 
   const curiosity = featuredCuriosity();
   const mystery = featuredMystery();
   const thought = featuredThought();
   const challenges = weeklyChallenges();
   const returnTo = `/library?tab=${tab}`;
+
+  function openBookSummary(next: BookSummaryInfo) {
+    setSummaryBook(next);
+  }
+
+  function applySummaryEdit(next: BookSummaryInfo) {
+    const text = next.description || "";
+    setShelfClub((prev) =>
+      prev.map((b) => (b.id === next.id ? { ...b, description: text } : b))
+    );
+    setShelfList((prev) =>
+      prev.map((b) => (b.id === next.id ? { ...b, description: text } : b))
+    );
+    setMemberClub((prev) =>
+      prev.map((b) => (b.id === next.id ? { ...b, description: text } : b))
+    );
+    setBook((prev) =>
+      prev && prev.id === next.id ? { ...prev, description: text } : prev
+    );
+    setSummaryBook(next);
+  }
 
   async function refreshShelves() {
     const res = await fetch(
@@ -272,9 +298,23 @@ export function MosshollowLibrary({
             </p>
             {book ? (
             <article className="mh-book-feature">
-              <div
-                className={`mh-cover${book.coverUrl ? " has-image" : ""}`}
-                aria-hidden
+              <button
+                type="button"
+                className={`mh-cover mh-cover-button${book.coverUrl ? " has-image" : ""}`}
+                onClick={() =>
+                  openBookSummary({
+                    id: book.id,
+                    title: book.title,
+                    author: book.author,
+                    description: book.description,
+                    coverEmoji: book.coverEmoji,
+                    coverUrl: book.coverUrl,
+                    fileUrl: book.fileUrl,
+                    fileName: book.fileName,
+                    minutes: book.minutes,
+                  })
+                }
+                aria-label={`Open summary for ${book.title}`}
               >
                 {book.coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -283,7 +323,7 @@ export function MosshollowLibrary({
                   <span>{book.coverEmoji}</span>
                 )}
                 {!book.coverUrl ? <strong>{book.title}</strong> : null}
-              </div>
+              </button>
               <div>
                 <h3>{book.title}</h3>
                 <p className="muted">by {book.author}</p>
@@ -489,6 +529,25 @@ export function MosshollowLibrary({
                         </span>
                       </button>
                       <div className="mh-shelf-actions">
+                        <button
+                          type="button"
+                          className="btn-secondary mh-attach-btn"
+                          onClick={() =>
+                            openBookSummary({
+                              id: b.id,
+                              title: b.title,
+                              author: b.author,
+                              description: b.description,
+                              coverEmoji: b.coverEmoji,
+                              coverUrl: b.coverUrl,
+                              fileUrl: b.fileUrl,
+                              fileName: b.fileName,
+                              minutes: b.minutes,
+                            })
+                          }
+                        >
+                          Summary
+                        </button>
                         {b.fileUrl ? (
                           <Link
                             href={`/library/read/${encodeURIComponent(b.id)}`}
@@ -571,9 +630,23 @@ export function MosshollowLibrary({
                 const view = getBookProgressView(progress, b.id);
                 return (
                   <article key={b.id} className="mh-card">
-                    <div
-                      className={`mh-card-cover${b.coverUrl ? " has-image" : ""}`}
-                      aria-hidden
+                    <button
+                      type="button"
+                      className={`mh-card-cover mh-cover-button${b.coverUrl ? " has-image" : ""}`}
+                      onClick={() =>
+                        openBookSummary({
+                          id: b.id,
+                          title: b.title,
+                          author: b.author,
+                          description: b.description || "",
+                          coverEmoji: b.coverEmoji,
+                          coverUrl: b.coverUrl,
+                          fileUrl: b.fileUrl,
+                          fileName: b.fileName,
+                          metaLine: `${b.category} · ${b.difficulty} · ${b.length} · ${b.mood}`,
+                        })
+                      }
+                      aria-label={`Open summary for ${b.title}`}
                     >
                       {b.coverUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -581,8 +654,28 @@ export function MosshollowLibrary({
                       ) : (
                         <span>{b.coverEmoji || "📖"}</span>
                       )}
-                    </div>
-                    <h3>{b.title}</h3>
+                    </button>
+                    <h3>
+                      <button
+                        type="button"
+                        className="mh-title-link"
+                        onClick={() =>
+                          openBookSummary({
+                            id: b.id,
+                            title: b.title,
+                            author: b.author,
+                            description: b.description || "",
+                            coverEmoji: b.coverEmoji,
+                            coverUrl: b.coverUrl,
+                            fileUrl: b.fileUrl,
+                            fileName: b.fileName,
+                            metaLine: `${b.category} · ${b.difficulty} · ${b.length} · ${b.mood}`,
+                          })
+                        }
+                      >
+                        {b.title}
+                      </button>
+                    </h3>
                     <p className="muted">{b.author}</p>
                     <p className="mh-meta">
                       {b.category} · {b.difficulty} · {b.length} · {b.mood}
@@ -1131,6 +1224,15 @@ export function MosshollowLibrary({
             onChanged={() => void refreshShelves()}
           />
         </div>
+      ) : null}
+
+      {summaryBook ? (
+        <BookSummaryModal
+          book={summaryBook}
+          isOwner={user.isOwner}
+          onClose={() => setSummaryBook(null)}
+          onSaved={applySummaryEdit}
+        />
       ) : null}
     </div>
   );
