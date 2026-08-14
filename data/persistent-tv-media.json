@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T14:57:58.620Z",
+  "updatedAt": "2026-08-14T15:33:43.899Z",
   "clips": [
     {
       "title": "Franklin- Franklin plays the game",
@@ -9,8 +9,8 @@
       "sizeBytes": 61965906,
       "durationMs": 1377152,
       "channelTitle": "Cottage Cartoons",
-      "villageId": "moonmere",
-      "isGlobal": false
+      "villageId": null,
+      "isGlobal": true
     },
     {
       "title": "Peter Rabbit",
@@ -19,8 +19,8 @@
       "sizeBytes": 208342523,
       "durationMs": 1401139,
       "channelTitle": "Cottage Cartoons",
-      "villageId": "moonmere",
-      "isGlobal": false
+      "villageId": null,
+      "isGlobal": true
     },
     {
       "title": "Winnie the pooh- Prize piglet - fast friends",
@@ -29,8 +29,8 @@
       "sizeBytes": 734803948,
       "durationMs": 1393546,
       "channelTitle": "Cottage Cartoons",
-      "villageId": "moonmere",
-      "isGlobal": false
+      "villageId": null,
+      "isGlobal": true
     }
   ]
 }
