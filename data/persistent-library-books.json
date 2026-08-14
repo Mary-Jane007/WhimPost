@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T20:17:23.151Z",
+  "updatedAt": "2026-08-14T20:33:59.734Z",
   "books": [
     {
       "id": "princess",
@@ -241,6 +241,28 @@
       "length": "Medium",
       "mood": "Contemplative",
       "themesJson": "[\"stoicism\",\"duty\",\"impermanence\"]",
+      "rating": 4.5,
+      "published": true
+    },
+    {
+      "id": "lib-99217b21-c1c4-4efe-b7f6-f7f1ae5cb0db",
+      "shelf": "readinglist",
+      "title": "Northanger Abbey",
+      "author": "Jane Austen",
+      "description": "Northanger Abbey\" by Jane Austen is a coming-of-age novel and satire of Gothic fiction completed in 1799 and published posthumously in 1817. The story follows naïve seventeen-year-old Catherine Morland, whose active imagination and fondness for Gothic novels distort her view of reality. When she visits Bath and later stays at the mysterious Northanger Abbey, Catherine's romantic fantasies collide with everyday life, leading to misunderstandings and revelations. Through social entanglements and misjudgments, she must learn to distinguish fiction from reality.",
+      "minutes": 420,
+      "coverEmoji": "📖",
+      "coverUrl": null,
+      "fileUrl": null,
+      "fileName": null,
+      "fileMime": null,
+      "quotesJson": "[]",
+      "reflectionsJson": "[]",
+      "category": "Classic Literature",
+      "difficulty": "Steady",
+      "length": "Long",
+      "mood": "Cozy Gothic | playful | romantic",
+      "themesJson": "[]",
       "rating": 4.5,
       "published": true
     },
