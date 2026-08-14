@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T20:37:40.152Z",
+  "updatedAt": "2026-08-14T20:37:50.109Z",
   "books": [
     {
       "id": "princess",
@@ -253,9 +253,9 @@
       "minutes": 420,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/4e3f0e4d-527d-409d-90a4-b90dff827ab5.jpg",
-      "fileUrl": null,
-      "fileName": null,
-      "fileMime": null,
+      "fileUrl": "/api/uploads/3944fb71-47c5-481f-95c4-142fc2ed1a64.epub",
+      "fileName": "Northanger Abbey by Jane Austen.epub",
+      "fileMime": "application/epub+zip",
       "quotesJson": "[]",
       "reflectionsJson": "[]",
       "category": "Classic Literature",
