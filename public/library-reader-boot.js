@@ -297,7 +297,7 @@
             new Promise(function (_, reject) {
               setTimeout(function () {
                 reject(new Error("resume timeout"));
-              }, 1800);
+              }, 4500);
             }),
           ]);
         } catch (_) {
