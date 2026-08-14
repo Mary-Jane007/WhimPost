@@ -192,7 +192,17 @@ export async function GET(
     });
   }
 
-  if (!fs.existsSync(filePath) || (isVideo && !resolvePlayableUploadPath(filename))) {
+  let resolvedPath = filePath;
+  if (
+    !fs.existsSync(resolvedPath) ||
+    isLfsPointerFile(resolvedPath) ||
+    (isVideo && !resolvePlayableUploadPath(filename))
+  ) {
+    const restored = ensureMediaReleaseAsset(filename);
+    if (restored) resolvedPath = restored;
+  }
+
+  if (!fs.existsSync(resolvedPath) || isLfsPointerFile(resolvedPath)) {
     return jsonError(
       isVideo
         ? "Clip file missing — re-upload it from the channel shelf"
@@ -201,11 +211,11 @@ export async function GET(
     );
   }
 
-  const stat = fs.statSync(filePath);
+  const stat = fs.statSync(resolvedPath);
   const contentType = MIME[ext] || "application/octet-stream";
 
   if (!isVideo) {
-    const bytes = fs.readFileSync(filePath);
+    const bytes = fs.readFileSync(resolvedPath);
     return new NextResponse(bytes, {
       headers: {
         "Content-Type": contentType,
@@ -239,8 +249,8 @@ export async function GET(
       });
     }
 
-    return fileStreamResponse(filePath, contentType, start, end);
+    return fileStreamResponse(resolvedPath, contentType, start, end);
   }
 
-  return fileStreamResponse(filePath, contentType);
+  return fileStreamResponse(resolvedPath, contentType);
 }

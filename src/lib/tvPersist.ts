@@ -16,10 +16,12 @@ import { exportPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
 import {
   exportPersistentMoonSounds,
+  importPersistentMoonSounds,
   moonSoundAbsolutePath,
   moonSoundReleaseName,
   PERSISTENT_MOON_SOUNDS_PATH,
 } from "@/lib/persistentMoonSounds";
+import { PERSISTENT_SITE_UPLOADS_PATH } from "@/lib/persistentSiteUploads";
 import {
   isLfsPointerFile,
   isPlayableMediaFile,
@@ -97,6 +99,29 @@ function listCatalogUploadPaths() {
         const abs = moonSoundAbsolutePath(filename);
         if (!fs.existsSync(abs)) continue;
         paths.add(path.join("data", "uploads", "moon-sounds", filename));
+      }
+    }
+  } catch {
+    // ignore
+  }
+  try {
+    if (fs.existsSync(PERSISTENT_SITE_UPLOADS_PATH)) {
+      const raw = fs.readFileSync(PERSISTENT_SITE_UPLOADS_PATH, "utf8");
+      const parsed = JSON.parse(raw) as {
+        files?: Array<{ filename?: string }>;
+      };
+      for (const file of parsed.files || []) {
+        const filename = String(file.filename || "").trim();
+        if (
+          !filename ||
+          filename.includes("..") ||
+          !/^[a-f0-9-]+\.(jpe?g|png|webp|gif|pdf|epub)$/i.test(filename)
+        ) {
+          continue;
+        }
+        const abs = path.join(UPLOAD_DIR, filename);
+        if (!fs.existsSync(abs)) continue;
+        paths.add(path.join("data", "uploads", filename));
       }
     }
   } catch {
@@ -208,6 +233,13 @@ export function scheduleEnsureTvUploadBytes() {
   setTimeout(() => {
     try {
       ensureTvUploadBytes();
+      // Celestial audio may land after the first import — re-bind rows now.
+      try {
+        const { getDb } = require("@/lib/db") as typeof import("@/lib/db");
+        importPersistentMoonSounds(getDb());
+      } catch (err) {
+        console.warn("[persistent-moon-sounds] post-restore import failed:", err);
+      }
     } catch (err) {
       console.warn("[persistent-tv] background media restore failed:", err);
     }
@@ -350,6 +382,7 @@ export async function runDurableTvGitSync(): Promise<{
         "data/persistent-tv-media.json",
         "data/persistent-library-books.json",
         "data/persistent-moon-sounds.json",
+        "data/persistent-site-uploads.json",
         "data/persistent-accounts.json",
         "data/persistent-welcome-letters.json",
         ...uploadPaths,
@@ -387,7 +420,9 @@ export async function runDurableTvGitSync(): Promise<{
             line === "data/persistent-tv-media.json" ||
             line === "data/persistent-library-books.json" ||
             line === "data/persistent-moon-sounds.json" ||
+            line === "data/persistent-site-uploads.json" ||
             line === "data/persistent-accounts.json" ||
+            line === "data/persistent-welcome-letters.json" ||
             (line.startsWith("data/uploads/") &&
               !line.includes("/.incoming/") &&
               !line.includes("/.media-release-staging/"))

@@ -4,6 +4,7 @@ import { Readable } from "stream";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import { ensureMoonSoundAsset } from "@/lib/mediaRelease";
 import { MOON_SOUND_DIR } from "@/lib/moon";
 
 export const runtime = "nodejs";
@@ -35,8 +36,14 @@ export async function GET(
     .get(filename) as { playlist_id: string } | undefined;
   if (!row) return jsonError("Sound not found", 404);
 
-  const filePath = path.join(MOON_SOUND_DIR, filename);
-  if (!fs.existsSync(filePath)) return jsonError("Sound not found", 404);
+  let filePath = path.join(MOON_SOUND_DIR, filename);
+  if (!fs.existsSync(filePath) || fs.statSync(filePath).size < 256) {
+    const restored = ensureMoonSoundAsset(filename);
+    if (restored) filePath = restored;
+  }
+  if (!fs.existsSync(filePath) || fs.statSync(filePath).size < 256) {
+    return jsonError("Sound not found", 404);
+  }
 
   const ext = filename.split(".").pop()?.toLowerCase() || "mp3";
   const contentType = MIME[ext] || "application/octet-stream";

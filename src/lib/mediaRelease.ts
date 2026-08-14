@@ -138,6 +138,31 @@ function listCatalogEntries(): MediaShelfEntry[] {
     // ignore
   }
 
+  try {
+    const sitePath = path.join(ROOT, "data", "persistent-site-uploads.json");
+    if (fs.existsSync(sitePath)) {
+      const parsed = JSON.parse(fs.readFileSync(sitePath, "utf8")) as {
+        files?: Array<{ filename?: string }>;
+      };
+      for (const file of parsed.files || []) {
+        const filename = String(file.filename || "").trim();
+        if (
+          !filename ||
+          filename.includes("..") ||
+          !/^[a-f0-9-]+\.(jpe?g|png|webp|gif|pdf|epub)$/i.test(filename)
+        ) {
+          continue;
+        }
+        byRelease.set(filename, {
+          releaseName: filename,
+          destPath: path.join(UPLOAD_DIR, filename),
+        });
+      }
+    }
+  } catch {
+    // ignore
+  }
+
   return [...byRelease.values()];
 }
 
@@ -378,35 +403,47 @@ export function ensureMediaReleaseBytes() {
 }
 
 /**
- * Restore one upload from the release shelf (library EPUB/PDF, TV clip, etc.).
+ * Restore one upload from the release shelf (library EPUB/PDF, TV clip,
+ * celestial audio, letter images, etc.).
  * Returns the local path when playable bytes are present afterward.
  */
 export function ensureMediaReleaseAsset(filename: string): string | null {
-  const safe = path.basename(String(filename || "").trim());
-  if (!safe || safe !== filename || filename.includes("..")) return null;
+  const raw = String(filename || "").trim();
+  if (!raw || raw.includes("..") || raw.includes("/") || raw.includes("\\")) {
+    return null;
+  }
+  const safe = path.basename(raw);
+  if (!safe || safe !== raw) return null;
 
-  const dest = path.join(UPLOAD_DIR, safe);
+  // Celestial Sounds live under data/uploads/moon-sounds/ with a prefixed
+  // release asset name (moon-sounds--<file>).
+  const isMoonSound = /^[a-f0-9-]+\.(mp3|wav|ogg|webm|m4a|aac)$/i.test(safe);
+  const dest = isMoonSound
+    ? moonSoundAbsolutePath(safe)
+    : path.join(UPLOAD_DIR, safe);
+  const releaseName = isMoonSound ? moonSoundReleaseName(safe) : safe;
+
   if (isPlayableMediaFile(dest)) return dest;
 
   const repo = repoSlug();
   if (!repo) return isPlayableMediaFile(dest) ? dest : null;
 
   const available = listReleaseAssetNames(repo);
-  if (!available.has(safe)) {
+  if (!available.has(releaseName)) {
     return isPlayableMediaFile(dest) ? dest : null;
   }
 
   fs.mkdirSync(path.dirname(dest), { recursive: true });
-  const url = releaseAssetUrl(repo, safe);
+  const url = releaseAssetUrl(repo, releaseName);
   try {
     downloadToFile(url, dest);
   } catch (publicErr) {
     try {
       if (!ghAvailable()) throw publicErr;
-      downloadReleaseAssetViaGh(repo, safe, dest);
+      downloadReleaseAssetViaGh(repo, releaseName, dest);
     } catch (err) {
       console.warn(
-        `[media-release] on-demand restore failed for ${safe}:`,
+        `[media-release] on-demand restore failed for ${releaseName}:`,
         err instanceof Error ? err.message : err
       );
       return isPlayableMediaFile(dest) ? dest : null;
@@ -414,6 +451,11 @@ export function ensureMediaReleaseAsset(filename: string): string | null {
   }
 
   return isPlayableMediaFile(dest) ? dest : null;
+}
+
+/** Convenience wrapper for Observatory playlist audio. */
+export function ensureMoonSoundAsset(filename: string): string | null {
+  return ensureMediaReleaseAsset(path.basename(filename));
 }
 
 function ensureReleaseExists(repo: string) {
