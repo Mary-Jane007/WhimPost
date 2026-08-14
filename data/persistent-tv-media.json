@@ -1,5 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-13T00:00:00.000Z",
-  "clips": []
+  "updatedAt": "2026-08-14T00:48:34.727Z",
+  "clips": [
+    {
+      "title": "Blue Reel",
+      "filename": "968cce1d-b694-4b5e-88cf-fb47d5ba4038.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 4477,
+      "durationMs": 4000,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Green Reel",
+      "filename": "79ba66ff-a1d5-468e-af4d-1a24518b733e.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 3768,
+      "durationMs": 3000,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    }
+  ]
 }
