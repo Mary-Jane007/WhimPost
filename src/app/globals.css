@@ -11341,3 +11341,614 @@ button.mh-card-cover {
   width: 100%;
   font-size: 0.86rem;
 }
+
+
+/* ——— Owner Analytics Dashboard ——— */
+.oa-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+}
+
+.oa-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.oa-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3.5vw, 2.55rem);
+  margin: 0.15rem 0 0.35rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.oa-kicker {
+  margin: 0;
+  font-family: var(--font-stamp);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--moss);
+}
+
+.oa-lede,
+.oa-section-lede {
+  margin: 0;
+  max-width: 42rem;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  line-height: 1.45;
+}
+
+.oa-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  align-items: end;
+  padding: 0.75rem 0.9rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--cream) 88%, var(--village-soft, #d9e6d2));
+  border: 1px solid color-mix(in srgb, var(--moss) 22%, transparent);
+}
+
+.oa-range,
+.oa-custom-range label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
+}
+
+.oa-range select,
+.oa-custom-range input,
+.oa-refresh {
+  font: inherit;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--moss) 28%, transparent);
+  background: color-mix(in srgb, #fff 70%, var(--cream));
+  color: var(--ink);
+  padding: 0.4rem 0.55rem;
+}
+
+.oa-custom-range {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.oa-refresh {
+  cursor: pointer;
+  background: color-mix(in srgb, var(--moss) 18%, var(--cream));
+}
+
+.oa-refresh:hover {
+  background: color-mix(in srgb, var(--moss) 28%, var(--cream));
+}
+
+.oa-gen {
+  font-size: 0.78rem;
+  margin-left: auto;
+}
+
+.oa-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.oa-layout.nav-closed {
+  grid-template-columns: 1fr;
+}
+
+.oa-nav {
+  position: sticky;
+  top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--cream) 82%, #fff);
+  border: 1px solid color-mix(in srgb, var(--moss) 20%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.oa-nav-title {
+  margin: 0.35rem 0 0.45rem;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--moss);
+}
+
+.oa-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.oa-nav button,
+.oa-nav-toggle {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.42rem 0.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.oa-nav button:hover,
+.oa-nav button.active {
+  background: color-mix(in srgb, var(--moss) 16%, transparent);
+}
+
+.oa-nav-toggle {
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+  background: color-mix(in srgb, var(--moss) 10%, transparent);
+}
+
+.oa-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.oa-section h2 {
+  font-family: var(--font-display);
+  margin: 0 0 0.35rem;
+  font-size: 1.45rem;
+}
+
+.oa-subhead {
+  font-family: var(--font-display);
+  margin: 1.25rem 0 0.5rem;
+}
+
+.oa-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.65rem;
+  margin: 0.85rem 0 1rem;
+}
+
+.oa-kpi {
+  padding: 0.7rem 0.75rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, #fff 55%, var(--cream));
+  border: 1px solid color-mix(in srgb, var(--moss) 16%, transparent);
+}
+
+.oa-kpi h3 {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+
+.oa-kpi-value {
+  margin: 0.2rem 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.oa-hint,
+.oa-muted {
+  margin: 0.2rem 0 0;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--ink) 58%, transparent);
+  line-height: 1.35;
+}
+
+.oa-delta {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.oa-delta.up {
+  color: color-mix(in srgb, #2f6b3a 85%, var(--ink));
+}
+
+.oa-delta.down {
+  color: color-mix(in srgb, #8a3a2a 85%, var(--ink));
+}
+
+.oa-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.oa-panel {
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, #fff 62%, var(--cream));
+  border: 1px solid color-mix(in srgb, var(--moss) 18%, transparent);
+}
+
+.oa-panel h3 {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.oa-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.oa-panel-head h3 {
+  margin: 0;
+}
+
+.oa-seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.15rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--moss) 10%, transparent);
+}
+
+.oa-seg button {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.oa-seg button.active {
+  background: color-mix(in srgb, #fff 80%, var(--cream));
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+.oa-stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.55rem;
+  margin: 0.75rem 0;
+}
+
+.oa-stat-row > div {
+  padding: 0.55rem 0.65rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cream) 70%, #fff);
+  border: 1px solid color-mix(in srgb, var(--moss) 14%, transparent);
+}
+
+.oa-stat-row em {
+  display: block;
+  font-style: normal;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+}
+
+.oa-stat-row strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.oa-bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.oa-bars-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+}
+
+.oa-bars-track {
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--moss) 12%, transparent);
+  overflow: hidden;
+}
+
+.oa-bars-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--moss) 70%, var(--gold, #c4a35a)),
+    color-mix(in srgb, var(--village-accent, var(--moss)) 65%, #fff)
+  );
+}
+
+.oa-spark {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.oa-spark-line {
+  stroke: var(--moss);
+  stroke-width: 2.2;
+}
+
+.oa-spark-area {
+  fill: color-mix(in srgb, var(--moss) 18%, transparent);
+}
+
+.oa-empty-chart {
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+  font-size: 0.85rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--moss) 6%, transparent);
+}
+
+.oa-village-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.65rem;
+  margin: 0.75rem 0;
+}
+
+.oa-village-card {
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--moss) 18%, transparent);
+  background: color-mix(in srgb, #fff 58%, var(--cream));
+  padding: 0.75rem;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.oa-village-card:hover {
+  border-color: color-mix(in srgb, var(--moss) 40%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.oa-village-card h3 {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-display);
+}
+
+.oa-village-card p {
+  margin: 0.15rem 0;
+  font-size: 0.84rem;
+}
+
+.oa-funnel {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.oa-funnel-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.86rem;
+}
+
+.oa-funnel-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--moss) 12%, transparent);
+  overflow: hidden;
+  margin-top: 0.2rem;
+}
+
+.oa-funnel-bar > span {
+  display: block;
+  height: 100%;
+  background: color-mix(in srgb, var(--gold, #c4a35a) 55%, var(--moss));
+}
+
+.oa-funnel-drop {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+.oa-heat {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.oa-heat-cell {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--moss) 8%, transparent);
+}
+
+.oa-heat-cell > span {
+  position: absolute;
+  inset: 0;
+  background: var(--moss);
+}
+
+.oa-heat-cell > em {
+  position: absolute;
+  inset: auto 0 2px;
+  text-align: center;
+  font-style: normal;
+  font-size: 0.58rem;
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
+  z-index: 1;
+}
+
+.oa-callout {
+  margin: 0.5rem 0;
+  padding: 0.65rem 0.8rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--gold, #c4a35a) 16%, var(--cream));
+  border: 1px solid color-mix(in srgb, var(--gold, #c4a35a) 35%, transparent);
+  font-size: 0.9rem;
+}
+
+.oa-rank {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.oa-rank li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--moss) 18%, transparent);
+  font-size: 0.88rem;
+}
+
+.oa-insight-list,
+.oa-priority-list {
+  list-style: none;
+  margin: 0 0 0.65rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.oa-insight-list li,
+.oa-priority-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.88rem;
+}
+
+.oa-sev {
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.oa-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+.oa-insight {
+  padding: 0.85rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--moss) 18%, transparent);
+  background: color-mix(in srgb, #fff 60%, var(--cream));
+}
+
+.oa-insight.kind-caution {
+  border-color: color-mix(in srgb, #a85b3c 35%, transparent);
+  background: color-mix(in srgb, #a85b3c 8%, var(--cream));
+}
+
+.oa-insight h3 {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.oa-insight p {
+  margin: 0 0 0.55rem;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.oa-linkish {
+  border: 0;
+  background: transparent;
+  color: var(--moss);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.oa-error {
+  color: #8a2f22;
+  background: color-mix(in srgb, #8a2f22 10%, var(--cream));
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+}
+
+.oa-table-wrap {
+  overflow: auto;
+  margin-top: 0.65rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--moss) 16%, transparent);
+}
+
+.oa-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.oa-table th,
+.oa-table td {
+  text-align: left;
+  padding: 0.45rem 0.55rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--moss) 12%, transparent);
+  vertical-align: top;
+}
+
+.oa-table th {
+  background: color-mix(in srgb, var(--moss) 10%, transparent);
+  font-weight: 600;
+}
+
+@media (max-width: 860px) {
+  .oa-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .oa-nav {
+    position: static;
+  }
+
+  .oa-nav ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .oa-two {
+    grid-template-columns: 1fr;
+  }
+
+  .oa-heat {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .oa-nav ul {
+    grid-template-columns: 1fr;
+  }
+}

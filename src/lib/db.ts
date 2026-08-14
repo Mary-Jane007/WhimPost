@@ -510,6 +510,44 @@ function migrate(db: Database.Database) {
     "shared INTEGER NOT NULL DEFAULT 0"
   );
 
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS analytics_events (
+      id TEXT PRIMARY KEY,
+      event_name TEXT NOT NULL,
+      user_id TEXT,
+      village_id TEXT,
+      path TEXT,
+      referrer TEXT,
+      source TEXT,
+      device TEXT,
+      browser TEXT,
+      country TEXT,
+      session_id TEXT,
+      duration_ms INTEGER,
+      meta_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_analytics_events_name_time
+      ON analytics_events(event_name, created_at);
+    CREATE INDEX IF NOT EXISTS idx_analytics_events_user_time
+      ON analytics_events(user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_analytics_events_session
+      ON analytics_events(session_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS analytics_errors (
+      id TEXT PRIMARY KEY,
+      kind TEXT NOT NULL,
+      message TEXT NOT NULL,
+      path TEXT,
+      status_code INTEGER,
+      user_id TEXT,
+      meta_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_analytics_errors_time
+      ON analytics_errors(created_at);
+  `);
+
   // Fresh-start TV Corner uses a flat clip shelf (no auto-channels).
 }
 

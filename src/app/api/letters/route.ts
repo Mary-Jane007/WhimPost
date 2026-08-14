@@ -4,6 +4,7 @@ import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { areFriends, toLetterView } from "@/lib/letters";
 import { rewardLetterSent } from "@/lib/villageProgress";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import type {
   EnvelopeStyle,
   LetterFont,
@@ -202,6 +203,13 @@ export async function POST(req: NextRequest) {
   );
 
   rewardLetterSent(db, user.id, letterBody.length);
+  trackAnalyticsEvent({
+    event: "letter_sent",
+    userId: user.id,
+    villageId: user.villageId || null,
+    path: "/compose",
+    meta: { hasRecipient: true },
+  });
 
   const row = db.prepare(`SELECT * FROM letters WHERE id = ?`).get(id) as LetterRecord;
   const letter = toLetterView(row);

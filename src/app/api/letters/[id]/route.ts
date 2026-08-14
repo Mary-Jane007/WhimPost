@@ -9,6 +9,7 @@ import {
 } from "@/lib/requestBody";
 import type { LetterRecord } from "@/lib/types";
 import { markLetterRead } from "@/lib/welcomeLetters";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 
 export async function GET(
   _req: NextRequest,
@@ -31,6 +32,12 @@ export async function GET(
   if (row.recipient_id === user.id && !row.is_read) {
     markLetterRead(db, id, user.id);
     row.is_read = 1;
+    trackAnalyticsEvent({
+      event: "letter_opened",
+      userId: user.id,
+      villageId: user.villageId || null,
+      path: `/inbox`,
+    });
   }
 
   const letter = toLetterView(row);

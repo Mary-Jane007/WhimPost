@@ -15,6 +15,7 @@ import {
   deliverWelcomeLetter,
   isSystemUsername,
 } from "@/lib/welcomeLetters";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -73,6 +74,18 @@ export async function POST(req: NextRequest) {
   claimOwnerIfUnset(db, id);
   deliverWelcomeLetter(db, id, villageId);
   exportPersistentAccounts(db);
+  trackAnalyticsEvent({
+    event: "user_registered",
+    userId: id,
+    villageId,
+    path: "/register",
+  });
+  trackAnalyticsEvent({
+    event: "village_joined",
+    userId: id,
+    villageId,
+    path: "/register",
+  });
 
   const user = db
     .prepare(
