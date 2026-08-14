@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T02:01:02.211Z",
+  "updatedAt": "2026-08-14T02:10:30.723Z",
   "accounts": [
     {
       "id": "system-bramblewood",
@@ -67,7 +67,7 @@
       "username": "moonmere_moth",
       "display_name": "Moonmere",
       "email": "system+moonmere@whimpost.local",
-      "password_hash": "$2b$10$Yu34Wui/N3XgjCDw5MD49uyKQQOk82zTMgWMa7Qf7e9GgeiAIZ15S",
+      "password_hash": "$2b$10$AfQMw3GDrGfy4wlts56Fk.OjkRIvaj58.pOT.X2A.bfMKcwOLMKKu",
       "bio": "Where dreams become letters.",
       "forest_name": "The Moon Dock",
       "is_owner": 0,
