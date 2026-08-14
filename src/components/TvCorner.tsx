@@ -1336,7 +1336,11 @@ export function TvCorner({
                           multiple
                           disabled={busy || uploading}
                           onChange={(e) => {
-                            const files = e.target.files;
+                            // FileList is live — copy before clearing the input
+                            // or the selection becomes empty and upload aborts.
+                            const files = e.target.files
+                              ? Array.from(e.target.files)
+                              : [];
                             e.target.value = "";
                             void onUploadClips(files, channel.id);
                           }}
