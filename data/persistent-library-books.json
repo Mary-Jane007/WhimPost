@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:04:06.875Z",
+  "updatedAt": "2026-08-14T19:05:52.759Z",
   "books": [
     {
       "id": "princess",
@@ -187,9 +187,9 @@
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/029219ef-78f5-4d5f-aaa8-da295531c07b.jpg",
-      "fileUrl": null,
-      "fileName": null,
-      "fileMime": null,
+      "fileUrl": "/api/uploads/5bdc843b-a0fa-4b2e-bcc1-1826bdc7d15b.epub",
+      "fileName": "And Then There Were None (1).epub",
+      "fileMime": "application/epub+zip",
       "quotesJson": "[]",
       "reflectionsJson": "[]",
       "category": "Mystery",
