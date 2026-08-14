@@ -1,20 +1,10 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T01:38:53.197Z",
+  "updatedAt": "2026-08-14T01:40:22.112Z",
   "clips": [
     {
       "title": "ErrTest",
       "filename": "155267a0-e155-4d77-a979-21379b7ab9e4.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 200024,
-      "durationMs": 120000,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": "moonmere",
-      "isGlobal": false
-    },
-    {
-      "title": "tiny",
-      "filename": "b12866a1-685b-40f6-b209-a52fefc37da1.mp4",
       "mime": "video/mp4",
       "sizeBytes": 200024,
       "durationMs": 120000,
