@@ -17,7 +17,7 @@ export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
     colorSoft: "#6b8f71",
     accent: "#c4a574",
     cream: "#e8dcc8",
-    ink: "#121612",
+    ink: "#1f2a1e",
     gold: "#c9a227",
     bgGlow:
       "radial-gradient(ellipse at 16% 10%, rgba(95, 127, 101, 0.38), transparent 48%), radial-gradient(ellipse at 88% 8%, rgba(201, 162, 39, 0.12), transparent 38%), radial-gradient(ellipse at 50% 100%, rgba(18, 28, 22, 0.95), transparent 55%), linear-gradient(165deg, #0c120e 0%, #152019 30%, #1a2a22 58%, #0e1510 100%)",
@@ -27,7 +27,7 @@ export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
     colorSoft: "#f2c4d0",
     accent: "#a8c4a8",
     cream: "#fff4f7",
-    ink: "#2a181e",
+    ink: "#5c3a44",
     gold: "#e8a0b5",
     bgGlow:
       "radial-gradient(ellipse at 18% 8%, rgba(242, 196, 208, 0.55), transparent 45%), radial-gradient(ellipse at 85% 10%, rgba(168, 196, 168, 0.28), transparent 40%), radial-gradient(ellipse at 50% 100%, rgba(120, 70, 90, 0.45), transparent 55%), linear-gradient(165deg, #3a2430 0%, #4a2f3a 32%, #5c3a48 62%, #3a2430 100%)",
@@ -37,7 +37,7 @@ export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
     colorSoft: "#8a9b88",
     accent: "#7a8fa8",
     cream: "#ebe4d4",
-    ink: "#12141a",
+    ink: "#2a241c",
     gold: "#c4a574",
     bgGlow:
       "radial-gradient(ellipse at 16% 8%, rgba(138, 155, 136, 0.28), transparent 46%), radial-gradient(ellipse at 88% 12%, rgba(122, 143, 168, 0.22), transparent 42%), radial-gradient(ellipse at 50% 100%, rgba(18, 22, 32, 0.92), transparent 55%), linear-gradient(165deg, #12161e 0%, #1a2230 30%, #243040 58%, #10141c 100%)",
@@ -47,7 +47,7 @@ export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
     colorSoft: "#f0a868",
     accent: "#f08a3a",
     cream: "#fff1e0",
-    ink: "#1a100a",
+    ink: "#3a1f12",
     gold: "#ffc857",
     bgGlow:
       "radial-gradient(ellipse at 14% 8%, rgba(240, 168, 104, 0.42), transparent 46%), radial-gradient(ellipse at 86% 12%, rgba(224, 112, 32, 0.28), transparent 42%), radial-gradient(ellipse at 50% 100%, rgba(42, 22, 12, 0.9), transparent 55%), linear-gradient(165deg, #2a160c 0%, #3d2214 28%, #5a3218 58%, #1f120a 100%)",
@@ -57,7 +57,7 @@ export const VILLAGE_THEMES: Partial<Record<VillageId, VillageThemeTokens>> = {
     colorSoft: "#e2c39a",
     accent: "#d4783a",
     cream: "#f3e6d4",
-    ink: "#14100c",
+    ink: "#2c1e14",
     gold: "#e8b86d",
     bgGlow:
       "radial-gradient(ellipse at 18% 10%, rgba(232, 184, 109, 0.38), transparent 46%), radial-gradient(ellipse at 82% 14%, rgba(212, 120, 58, 0.28), transparent 42%), radial-gradient(ellipse at 50% 100%, rgba(44, 30, 20, 0.92), transparent 55%), linear-gradient(165deg, #2c1e14 0%, #4a3224 30%, #6b4226 58%, #241810 100%)",
