@@ -25,6 +25,39 @@ export type PersistentTvMediaClip = {
   isGlobal?: boolean;
 };
 
+/** Channels that should always play in every village lounge. */
+export function isSharedTvChannelTitle(title: string) {
+  return title.trim().toLowerCase() === "cottage cartoons";
+}
+
+/**
+ * Promote shared channels (Cottage Cartoons) to every-village and clear
+ * village locks on their clips so all lounges can tune in.
+ */
+export function ensureSharedTvChannelsGlobal(db: Database) {
+  const channels = db
+    .prepare(`SELECT id, title, is_global FROM tv_channels`)
+    .all() as Array<{ id: string; title: string; is_global: number }>;
+
+  let changed = 0;
+  for (const ch of channels) {
+    if (!isSharedTvChannelTitle(ch.title)) continue;
+    if (!ch.is_global) {
+      db.prepare(`UPDATE tv_channels SET is_global = 1 WHERE id = ?`).run(ch.id);
+      changed += 1;
+    }
+    const locked = db
+      .prepare(
+        `UPDATE tv_videos
+         SET village_id = NULL
+         WHERE channel_id = ? AND village_id IS NOT NULL`
+      )
+      .run(ch.id).changes;
+    changed += locked;
+  }
+  return changed;
+}
+
 type PersistentTvMediaFile = {
   version: 1;
   updatedAt: string;
@@ -183,7 +216,8 @@ export function importPersistentTvMedia(db: Database) {
         clip.sizeBytes > 0 ? clip.sizeBytes : fs.statSync(filePath).size;
       const villageId =
         String(clip.villageId || "mosshollow").trim() || "mosshollow";
-      const isGlobal = Boolean(clip.isGlobal);
+      const isGlobal =
+        Boolean(clip.isGlobal) || isSharedTvChannelTitle(channelTitle);
       const durationMs =
         clip.durationMs && clip.durationMs > 0
           ? Math.floor(clip.durationMs)
@@ -200,6 +234,10 @@ export function importPersistentTvMedia(db: Database) {
           villageId,
           uploaderId,
           isGlobal ? 1 : 0
+        );
+      } else if (isGlobal) {
+        db.prepare(`UPDATE tv_channels SET is_global = 1 WHERE id = ?`).run(
+          channelId
         );
       }
 
@@ -281,4 +319,6 @@ export function importPersistentTvMedia(db: Database) {
   } else if (restored > 0) {
     console.info(`[persistent-tv-media] restored ${restored} uploaded clip(s)`);
   }
+
+  ensureSharedTvChannelsGlobal(db);
 }

@@ -5,7 +5,7 @@ import { importPersistentAccounts } from "@/lib/persistentAccounts";
 import { importPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
-import { importPersistentTvMedia } from "@/lib/persistentTvMedia";
+import { importPersistentTvMedia, ensureSharedTvChannelsGlobal, exportPersistentTvMedia } from "@/lib/persistentTvMedia";
 import { importPersistentWelcomeLetters } from "@/lib/persistentWelcomeLetters";
 import { backfillVisitedVillagesFromLetters } from "@/lib/welcomeLetters";
 import {
@@ -578,6 +578,13 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-tv-media] import failed:", err);
   }
+  try {
+    if (ensureSharedTvChannelsGlobal(db) > 0) {
+      exportPersistentTvMedia(db);
+    }
+  } catch (err) {
+    console.error("[persistent-tv-media] shared channel promote failed:", err);
+  }
   // Restore owner-uploaded library books when bytes are already present locally.
   try {
     importPersistentLibraryBooks(db);
@@ -618,6 +625,16 @@ export function getDb() {
         importPersistentTvMedia(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-tv-media] import failed:", err);
+      }
+      try {
+        if (ensureSharedTvChannelsGlobal(globalForDb.whimpostDb) > 0) {
+          exportPersistentTvMedia(globalForDb.whimpostDb);
+        }
+      } catch (err) {
+        console.error(
+          "[persistent-tv-media] shared channel promote failed:",
+          err
+        );
       }
       try {
         importPersistentLibraryBooks(globalForDb.whimpostDb);

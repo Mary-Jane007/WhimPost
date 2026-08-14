@@ -1185,7 +1185,15 @@ export function TvCorner({
                   type="text"
                   name="channelTitle"
                   value={channelTitle}
-                  onChange={(e) => setChannelTitle(e.target.value)}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setChannelTitle(next);
+                    if (
+                      next.trim().toLowerCase() === "cottage cartoons"
+                    ) {
+                      setChannelGlobal(true);
+                    }
+                  }}
                   placeholder="Cottage Cartoons"
                   maxLength={80}
                   required
