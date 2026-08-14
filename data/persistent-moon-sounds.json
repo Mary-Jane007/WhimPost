@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T14:56:56.754Z",
+  "updatedAt": "2026-08-14T14:57:29.671Z",
   "sounds": [
     {
       "playlistId": "campfire",
@@ -19,6 +19,12 @@
       "filename": "e8115767-4c71-4d6d-8a56-0bcc2d5bf7d0.mp3",
       "originalName": "dragon-studio-cozy-midnight-rain-07-448572.mp3",
       "sizeBytes": 960768
+    },
+    {
+      "playlistId": "ocean-waves",
+      "filename": "af62ecb5-083a-4036-a825-2ac41279b339.mp3",
+      "originalName": "dragon-studio-gentle-ocean-shore-waves-499665.mp3",
+      "sizeBytes": 1966848
     }
   ]
 }
