@@ -292,9 +292,8 @@ export function reshuffleAllChannelSchedules(): {
 
 /**
  * Build or repair the channel lineup.
- * Every clip on the channel is always in the schedule. Brand-new clips trigger
- * a full reshuffle (via addVideoToChannelSchedule); this path only rebuilds an
- * empty/broken order without resetting a healthy epoch.
+ * Every clip on the channel is always in the schedule. Brand-new clips are
+ * appended without resetting the epoch (see addVideoToChannelSchedule).
  */
 export function ensureChannelSchedule(channelId: string): {
   epochMs: number;
@@ -345,8 +344,10 @@ export function ensureChannelSchedule(channelId: string): {
     order = seededShuffle(knownIds, epochMs);
     dirty = true;
   } else if (missing.length > 0) {
-    // New clips that skipped addVideoToChannelSchedule — full reshuffle now.
-    return reshuffleChannelSchedule(channelId);
+    // Append stragglers at the end — do not reshuffle or restart the airing.
+    order = [...order, ...missing];
+    if (!epochMs) epochMs = Date.now();
+    dirty = true;
   }
 
   if (!epochMs) {
@@ -366,11 +367,49 @@ export function ensureChannelSchedule(channelId: string): {
 }
 
 /**
- * Put a freshly uploaded clip into the channel schedule by reshuffling the
- * whole lineup (including the new clip) and starting the clock now.
+ * Add a freshly uploaded clip to the channel schedule WITHOUT interrupting
+ * whatever is currently on air. Keeps the wall-clock epoch and existing order;
+ * the new clip is appended after the current cycle's remaining lineup.
  */
-export function addVideoToChannelSchedule(channelId: string, _videoId: string) {
-  reshuffleChannelSchedule(channelId);
+export function addVideoToChannelSchedule(channelId: string, videoId: string) {
+  const db = getDb();
+  const channel = db
+    .prepare(
+      `SELECT schedule_epoch_ms, schedule_order_json FROM tv_channels WHERE id = ?`
+    )
+    .get(channelId) as
+    | { schedule_epoch_ms: number | null; schedule_order_json: string | null }
+    | undefined;
+  if (!channel) return;
+
+  const rows = listChannelVideoRows(channelId);
+  const knownIds = new Set(rows.map((r) => r.id));
+  if (!knownIds.has(videoId)) return;
+
+  let order = parseOrderJson(channel.schedule_order_json).filter((id) =>
+    knownIds.has(id)
+  );
+  if (order.includes(videoId)) {
+    // Already queued — leave the live airing alone.
+    return;
+  }
+
+  let epochMs = parseEpoch(channel.schedule_epoch_ms);
+
+  if (order.length === 0) {
+    // First clip on an empty channel — start the clock now.
+    epochMs = Date.now();
+    order = [videoId];
+    writeChannelSchedule(channelId, epochMs, order);
+    return;
+  }
+
+  if (!epochMs) epochMs = Date.now();
+
+  // Keep epoch + current order intact so mid-show join math stays put.
+  // New uploads wait their turn after the clips already lined up.
+  order = [...order, videoId];
+  writeChannelSchedule(channelId, epochMs, order);
 }
 
 /**

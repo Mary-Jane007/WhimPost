@@ -555,22 +555,34 @@ export function TvCorner({
         }
       }
 
-      // Refresh the live guide if this channel is already tuned — new clips
-      // are already in the shuffle either way.
+      // Soft-refresh the guide so the new clip shows up without retuning
+      // (retuning must never interrupt the clip already on air).
       if (
         room.id &&
         scope === "village" &&
         ok > 0 &&
         room.currentChannelId === targetChannelId
       ) {
-        await patchRoom({ channelId: targetChannelId });
+        try {
+          const res = await fetch(`/api/tv/room/${room.id}`);
+          if (res.ok) {
+            const data = (await res.json()) as {
+              room?: typeof room;
+              channels?: typeof channels;
+            };
+            if (data.room) setRoom(data.room);
+            if (data.channels) setChannels(data.channels);
+          }
+        } catch {
+          // Poll will catch up.
+        }
       }
 
       if (ok && !errors.length) {
         reportUploadProgress(
           ok === 1
-            ? `Added to ${channelName}’s schedule — rename anytime.`
-            : `Added ${ok} clips to ${channelName}’s schedule.`,
+            ? `Queued on ${channelName} — now playing stays put.`
+            : `Queued ${ok} clips on ${channelName} — now playing stays put.`,
           100
         );
       } else if (ok) {
