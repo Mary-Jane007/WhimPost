@@ -38,9 +38,27 @@ type LivePlace = {
   reliable: boolean;
 };
 
+type EpubNavItem = {
+  id?: string;
+  label?: string;
+  href?: string;
+  subitems?: EpubNavItem[];
+};
+
+type TocItem = {
+  id: string;
+  label: string;
+  href: string;
+  depth: number;
+};
+
 type EpubBookApi = {
   destroy: () => void;
   ready: Promise<unknown>;
+  navigation?: { toc?: EpubNavItem[] };
+  loaded: {
+    navigation: Promise<{ toc?: EpubNavItem[] }>;
+  };
   locations: {
     generate: (chars: number) => Promise<unknown>;
     percentageFromCfi: (cfi: string) => number;
@@ -68,6 +86,29 @@ type EpubBookApi = {
     };
   };
 };
+
+function flattenToc(
+  items: EpubNavItem[] | undefined,
+  depth = 0,
+  out: TocItem[] = []
+): TocItem[] {
+  for (const item of items || []) {
+    const href = (item.href || "").trim();
+    const label = (item.label || "").replace(/\s+/g, " ").trim() || "Untitled";
+    if (href) {
+      out.push({
+        id: item.id || `${depth}-${out.length}-${href}`,
+        label,
+        href,
+        depth,
+      });
+    }
+    if (item.subitems?.length) {
+      flattenToc(item.subitems, depth + 1, out);
+    }
+  }
+  return out;
+}
 
 /** Stretch the iframe to the chapter's real content height so nothing is clipped. */
 function expandChapterToFullHeight(host: HTMLElement) {
@@ -327,26 +368,35 @@ export function LibraryBookReader({
   const navRef = useRef<{
     next: () => void;
     prev: () => void;
-    display: (cfi: string) => void;
+    display: (href?: string) => void;
     resize: () => void;
   } | null>(null);
-  const resumeCfi = usableResumeCfi(initialPosition);
+  const initialResumeCfi = usableResumeCfi(initialPosition);
+  const resumeCfiRef = useRef<string | undefined>(initialResumeCfi);
+  const [resumeCfi, setResumeCfi] = useState<string | undefined>(
+    initialResumeCfi
+  );
   const placeRef = useRef<LivePlace>({
-    cfi: resumeCfi || null,
-    percent: resumeCfi ? initialPosition?.percent || 0 : 0,
-    page: resumeCfi ? initialPosition?.page ?? null : null,
-    total: resumeCfi ? initialPosition?.total ?? null : null,
-    label: resumeCfi ? initialPosition?.label || "" : "",
-    reliable: Boolean(resumeCfi && (initialPosition?.percent || 0) > 0),
+    cfi: initialResumeCfi || null,
+    percent: initialResumeCfi ? initialPosition?.percent || 0 : 0,
+    page: initialResumeCfi ? initialPosition?.page ?? null : null,
+    total: initialResumeCfi ? initialPosition?.total ?? null : null,
+    label: initialResumeCfi ? initialPosition?.label || "" : "",
+    reliable: Boolean(
+      initialResumeCfi && (initialPosition?.percent || 0) > 0
+    ),
   });
   const saveTimer = useRef<number | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(kind === "epub");
   const [locationLabel, setLocationLabel] = useState(
-    resumeCfi ? initialPosition?.label || "" : ""
+    initialResumeCfi ? initialPosition?.label || "" : ""
   );
   const [saveHint, setSaveHint] = useState("");
   const [notesOpen, setNotesOpen] = useState(false);
+  const [tocOpen, setTocOpen] = useState(false);
+  const [tocItems, setTocItems] = useState<TocItem[]>([]);
+  const [restartBusy, setRestartBusy] = useState(false);
   const [annotations, setAnnotations] = useState<LibraryAnnotation[]>([]);
   const [noteBody, setNoteBody] = useState("");
   const [noteInk, setNoteInk] = useState<AnnotationInk>("moss");
@@ -452,6 +502,72 @@ export function LibraryBookReader({
     window.requestAnimationFrame(() => navRef.current?.resize());
   }
 
+  function openToc() {
+    setTocOpen(true);
+  }
+
+  function closeToc() {
+    setTocOpen(false);
+    window.requestAnimationFrame(() => navRef.current?.resize());
+  }
+
+  function jumpToTocHref(href: string) {
+    navRef.current?.display(href);
+    closeToc();
+  }
+
+  async function restartReading() {
+    if (kind !== "epub" || restartBusy) return;
+    const ok = window.confirm(
+      "Start this book over from the beginning? Your saved place will be cleared."
+    );
+    if (!ok) return;
+    setRestartBusy(true);
+    try {
+      if (saveTimer.current) {
+        window.clearTimeout(saveTimer.current);
+        saveTimer.current = null;
+      }
+      await fetch("/api/library/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "resetReadingProgress",
+          bookId,
+        }),
+      });
+      setResumeCfi(undefined);
+      resumeCfiRef.current = undefined;
+      placeRef.current = {
+        cfi: null,
+        percent: 0,
+        page: null,
+        total: null,
+        label: "Beginning",
+        reliable: true,
+      };
+      setLocationLabel("Beginning");
+      setSaveHint("Place cleared");
+      window.setTimeout(() => setSaveHint(""), 1200);
+      onProgressSaved?.({
+        bookId,
+        percent: 0,
+        position: {
+          cfi: null,
+          percent: 0,
+          page: null,
+          total: null,
+          label: "Beginning",
+          updatedAt: new Date().toISOString(),
+        },
+      });
+      navRef.current?.display();
+      setTocOpen(false);
+    } finally {
+      setRestartBusy(false);
+    }
+  }
+
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -501,6 +617,10 @@ export function LibraryBookReader({
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         e.preventDefault();
+        if (tocOpen) {
+          closeToc();
+          return;
+        }
         if (notesOpen) {
           closeNotes();
           return;
@@ -508,7 +628,7 @@ export function LibraryBookReader({
         onClose();
         return;
       }
-      if (notesOpen) return;
+      if (notesOpen || tocOpen) return;
       if (kind !== "epub") return;
       // Page keys scroll within the chapter; arrows move between chapters.
       if (e.key === "ArrowRight") {
@@ -549,7 +669,7 @@ export function LibraryBookReader({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [kind, onClose, notesOpen]);
+  }, [kind, onClose, notesOpen, tocOpen]);
 
   useEffect(() => {
     if (kind !== "epub") return;
@@ -612,6 +732,18 @@ export function LibraryBookReader({
       if (!stillMine()) {
         abandonBook();
         return null;
+      }
+
+      try {
+        const nav =
+          book.navigation?.toc != null
+            ? book.navigation
+            : await book.loaded.navigation;
+        if (stillMine()) {
+          setTocItems(flattenToc(nav?.toc));
+        }
+      } catch {
+        if (stillMine()) setTocItems([]);
       }
 
       await new Promise<void>((resolve) =>
@@ -700,6 +832,7 @@ export function LibraryBookReader({
     async function openEpub() {
       setLoading(true);
       setError("");
+      setTocItems([]);
       try {
         const ePub = await loadVendorEpub();
         if (!stillMine()) return;
@@ -782,8 +915,8 @@ export function LibraryBookReader({
             void rendition!.prev();
             window.setTimeout(() => expandChapterToFullHeight(mount), 80);
           },
-          display: (cfi: string) => {
-            void rendition!.display(cfi);
+          display: (href?: string) => {
+            void (href ? rendition!.display(href) : rendition!.display());
             window.setTimeout(() => expandChapterToFullHeight(mount), 80);
           },
           resize: doResize,
@@ -792,11 +925,11 @@ export function LibraryBookReader({
         setLoading(false);
         doResize();
 
-        const resumeCfi = usableResumeCfi(initialPosition);
-        if (resumeCfi) {
+        const cfiToResume = resumeCfiRef.current;
+        if (cfiToResume) {
           try {
             await Promise.race([
-              rendition.display(resumeCfi),
+              rendition.display(cfiToResume),
               new Promise<void>((resolve) => {
                 window.setTimeout(resolve, 2000);
               }),
@@ -982,6 +1115,16 @@ export function LibraryBookReader({
             <span className="mh-reader-loc" aria-live="polite">
               {locationLabel || " "}
             </span>
+            {kind === "epub" ? (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => void restartReading()}
+                disabled={loading || Boolean(error) || restartBusy}
+              >
+                {restartBusy ? "Restarting…" : "Restart"}
+              </button>
+            ) : null}
             <button
               type="button"
               className="btn-secondary"
@@ -1019,11 +1162,18 @@ export function LibraryBookReader({
               onClick={() => navRef.current?.prev()}
               disabled={loading || Boolean(error)}
             >
-              ← Previous chapter
+              ← Previous
             </button>
-            <span className="muted">
-              Scroll to read the full chapter · arrows change chapter
-            </span>
+            <button
+              type="button"
+              className="btn-secondary"
+              data-reader-nav="toc"
+              onClick={() => (tocOpen ? closeToc() : openToc())}
+              disabled={loading || Boolean(error)}
+              aria-pressed={tocOpen}
+            >
+              Contents
+            </button>
             <button
               type="button"
               className="btn-secondary"
@@ -1031,8 +1181,11 @@ export function LibraryBookReader({
               onClick={() => navRef.current?.next()}
               disabled={loading || Boolean(error)}
             >
-              Next chapter →
+              Next →
             </button>
+            <span className="muted">
+              Scroll to read · Contents jumps chapters · arrows change chapter
+            </span>
           </div>
         ) : null}
 
@@ -1060,7 +1213,7 @@ export function LibraryBookReader({
                 className="mh-reader-epub"
                 data-file-url={fileUrl}
                 data-book-id={bookId}
-                data-resume-cfi={usableResumeCfi(initialPosition) || ""}
+                data-resume-cfi={resumeCfi || ""}
               />
             ) : null}
 
@@ -1202,6 +1355,64 @@ export function LibraryBookReader({
                     ))}
                   </ul>
                 </aside>
+              </div>
+            ) : null}
+
+            {/* TOC overlay — open/close alone does not change reading place. */}
+            {tocOpen ? (
+              <div
+                className="mh-toc-overlay"
+                role="dialog"
+                aria-label="Table of contents"
+              >
+                <aside className="mh-toc-panel">
+                  <div className="mh-margin-header">
+                    <div className="mh-margin-header-row">
+                      <div>
+                        <p className="mh-reader-kicker">Chapters</p>
+                        <h3>Contents</h3>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-secondary mh-attach-btn"
+                        onClick={closeToc}
+                      >
+                        Close
+                      </button>
+                    </div>
+                    <p className="muted">
+                      Jump to a chapter — closing without a pick keeps your
+                      place.
+                    </p>
+                  </div>
+                  <ul className="mh-toc-list">
+                    {tocItems.length === 0 ? (
+                      <li className="mh-margin-empty">
+                        This book has no table of contents.
+                      </li>
+                    ) : null}
+                    {tocItems.map((item) => (
+                      <li key={item.id} className="mh-toc-item">
+                        <button
+                          type="button"
+                          className="mh-toc-link"
+                          style={{
+                            paddingLeft: `${0.65 + item.depth * 0.85}rem`,
+                          }}
+                          onClick={() => jumpToTocHref(item.href)}
+                        >
+                          {item.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </aside>
+                <button
+                  type="button"
+                  className="mh-margin-scrim"
+                  aria-label="Close contents"
+                  onClick={closeToc}
+                />
               </div>
             ) : null}
           </div>
