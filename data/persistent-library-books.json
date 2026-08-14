@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T19:29:59.188Z",
+  "updatedAt": "2026-08-14T20:17:23.151Z",
   "books": [
     {
       "id": "princess",
@@ -264,6 +264,28 @@
       "mood": "Witty",
       "themesJson": "[\"pride\",\"love\",\"society\"]",
       "rating": 4.6,
+      "published": true
+    },
+    {
+      "id": "lib-e2241fc2-e583-4588-98fe-1b112f420a05",
+      "shelf": "readinglist",
+      "title": "The borrowers",
+      "author": "Mary Norton",
+      "description": "The Borrowers\" by Mary Norton is a classic fantasy novel that tells the story of the Clock family—small, resourceful people who live hidden in the walls and furnishings of a human house. Narrated through a story-within-a-story format, the tale begins with Mrs.",
+      "minutes": 180,
+      "coverEmoji": "📖",
+      "coverUrl": "/api/uploads/cbfa3640-840b-4503-961a-0b07c7ce8b6e.jpg",
+      "fileUrl": "/api/uploads/44d714e0-ade1-4a16-891b-83b610dfd76f.epub",
+      "fileName": "The Borrowers By Mary Norton.epub",
+      "fileMime": "application/epub+zip",
+      "quotesJson": "[]",
+      "reflectionsJson": "[]",
+      "category": "Fantasy",
+      "difficulty": "Gentle",
+      "length": "Medium",
+      "mood": "Cozy",
+      "themesJson": "[]",
+      "rating": 4.5,
       "published": true
     },
     {
