@@ -1,16 +1,5 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T01:08:33.354Z",
-  "clips": [
-    {
-      "title": "Green Reel",
-      "filename": "79ba66ff-a1d5-468e-af4d-1a24518b733e.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 3768,
-      "durationMs": 3000,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
-    }
-  ]
+  "updatedAt": "2026-08-14T01:08:37.517Z",
+  "clips": []
 }
