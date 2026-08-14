@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T15:53:02.877Z",
+  "updatedAt": "2026-08-14T16:20:39.986Z",
   "letters": [
+    {
+      "id": "0cd42e2a-4662-40bb-8695-f9db2fc83925",
+      "villageId": "bramblewood",
+      "recipientId": "6f6cdd06-16fb-4677-8b80-987ce3310511",
+      "senderId": "system-bramblewood",
+      "subject": "Welcome to Bramblewood",
+      "body": "**Greetings, explorer,**\n\nWe were beginning to wonder when you'd find us.\n\nThe foxes insisted you'd taken the longer trail.\n\nThe ravens claimed you were distracted by something interesting.\n\nAs usual, they were probably both right.\n\nWelcome to **Bramblewood**, where every winding path hides a story, every forgotten ruin whispers a mystery, and every letter is the beginning of another adventure.\n\nBefore setting off, we've packed a travel satchel for you — the first pieces of your Bramblewood collection.\n\nInside you'll find:\n\n* ![Fox Tails](/stickers/collectibles/bramblewood/bramble-fox-tails.png) A soft fox tail for luck on every trail.\n* ![Maple Leaves](/stickers/collectibles/bramblewood/bramble-maple.png) A pressed maple leaf from the dens.\n* ![Hello Fall Candles](/stickers/collectibles/bramblewood/bramble-candles.png) A Hello Fall candle to warm your satchel.\n* ![Wonder Compasses](/stickers/collectibles/bramblewood/bramble-compasses.png) A compass that occasionally points toward wonder instead of north.\n\nThese are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the trails. Your cottage will fill as your collection grows.\n\nShould you stumble upon something extraordinary, write about it.\n\nThe village has always loved a good tale.\n\nAnd remember—\n\nThe finest adventures are rarely planned.\n\nWelcome to **Bramblewood**.\n\n*May curiosity always know the way.*",
+      "paperStyle": "parchment",
+      "envelopeStyle": "kraft",
+      "waxSeal": "spiral",
+      "stampStyle": "fox-seated",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-fox\",\"kind\":\"bramble-fox-sitting\",\"x\":92,\"y\":8,\"scale\":0.68,\"rotation\":10},{\"id\":\"welcome-maple\",\"kind\":\"bramble-maple-leaf\",\"x\":8,\"y\":10,\"scale\":0.58,\"rotation\":-14},{\"id\":\"welcome-compass\",\"kind\":\"bramble-compass\",\"x\":9,\"y\":88,\"scale\":0.55,\"rotation\":-6},{\"id\":\"welcome-mushroom\",\"kind\":\"bramble-mushroom\",\"x\":93,\"y\":92,\"scale\":0.55,\"rotation\":8}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":6,\"scale\":0.5,\"rotation\":-8}]",
+      "isRead": true,
+      "sentAt": "2026-08-14 16:02:03",
+      "createdAt": "2026-08-14 16:02:03"
+    },
     {
       "id": "3cb66e53-c2ee-4f59-87df-ee6776e4d5f1",
       "villageId": "clovermeadow",
@@ -19,6 +37,24 @@
       "isRead": true,
       "sentAt": "2026-08-14 00:23:40",
       "createdAt": "2026-08-14 00:23:40"
+    },
+    {
+      "id": "e3186b1a-3bb1-479e-8ed7-a3fd6a376fbe",
+      "villageId": "hearthwick",
+      "recipientId": "6f6cdd06-16fb-4677-8b80-987ce3310511",
+      "senderId": "system-hearthwick",
+      "subject": "Welcome to Hearthwick",
+      "body": "**Dear neighbor,**\n\nThe kettle has been waiting for you.\n\nNot for long—just long enough to brew the perfect cup.\n\nWelcome to **Hearthwick**, where windows glow warmly at dusk, fresh bread cools on every windowsill, and no one stays a stranger for very long.\n\nYou'll soon discover that letters here travel with more than words.\n\nThey carry recipes.\nStories.\nLaughter.\nComfort.\n\nSometimes they simply arrive to remind someone they are not alone.\n\nOn your kitchen table, we've left a small welcome basket.\n\nInside you'll find:\n\n* ![Hearth Muffins](/stickers/collectibles/hearthwick/hearth-muffins.png) A loaf of warm honey bread.\n* ![Recipes](/stickers/collectibles/hearthwick/hearth-recipes.png) A sprig of lavender.\n* ![Knit Blankets](/stickers/collectibles/hearthwick/hearth-blankets.png) A cozy blanket stitched by village hands.\n* ![Fireside Notes](/stickers/collectibles/hearthwick/hearth-letters.png) And a bundle of handmade stationery, ready for the conversations waiting ahead.\n\nWhen evening falls, you'll always find someone by the hearth with an empty chair beside them.\n\nWe hope you'll pull it a little closer to the fire.\n\nWelcome to **Hearthwick**.\n\n*May every letter you send feel like coming home.*",
+      "paperStyle": "cream",
+      "envelopeStyle": "kraft",
+      "waxSeal": "heart",
+      "stampStyle": "mushroom-amanita",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-pie\",\"kind\":\"pie\",\"x\":92,\"y\":8,\"scale\":0.62,\"rotation\":8},{\"id\":\"welcome-candle\",\"kind\":\"candle-jar\",\"x\":8,\"y\":10,\"scale\":0.58,\"rotation\":-12},{\"id\":\"welcome-honey\",\"kind\":\"honey-jar\",\"x\":9,\"y\":88,\"scale\":0.55,\"rotation\":-6},{\"id\":\"welcome-jam\",\"kind\":\"jam-jar\",\"x\":93,\"y\":92,\"scale\":0.55,\"rotation\":10}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":6,\"scale\":0.5,\"rotation\":-8}]",
+      "isRead": true,
+      "sentAt": "2026-08-14 16:00:55",
+      "createdAt": "2026-08-14 16:00:55"
     },
     {
       "id": "6d98d6e7-5015-4130-9ddc-54cf2041fea8",
