@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T18:58:20.686Z",
+  "updatedAt": "2026-08-14T18:58:34.451Z",
   "books": [
     {
       "id": "princess",
@@ -275,9 +275,9 @@
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/1c20cccc-6904-4a53-aa98-0d8f133ccf31.jpg",
-      "fileUrl": "/api/uploads/d762d181-735e-4ef9-ab64-f789f8060478.epub",
-      "fileName": "The Name of the Rose - Umberto Eco _Worldfreebooks.com_.epub",
-      "fileMime": "application/epub+zip",
+      "fileUrl": null,
+      "fileName": null,
+      "fileMime": null,
       "quotesJson": "[]",
       "reflectionsJson": "[]",
       "category": "Mystery",
