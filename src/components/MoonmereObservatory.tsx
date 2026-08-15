@@ -11,19 +11,23 @@ import type { UserPublic } from "@/lib/types";
 import type { MoonProgress } from "@/lib/moon";
 import {
   CELESTIAL_PLAYLISTS,
-  CONSTELLATIONS,
+  NIGHT_STARS,
+  PLANETS,
   DREAM_THEME_LABELS,
   MOON_ART,
   MOON_TABS,
   NIGHT_CREATURES,
   SKY_FACTS,
   dailyRituals,
-  todaysConstellation,
+  spaceEventsHappeningNow,
+  todaysBrightStar,
   todaysCreature,
   todaysInspiration,
   todaysJournalPrompt,
   todaysMoonPhase,
+  todaysPlanet,
   todaysSkyFact,
+  upcomingSpaceEvents,
   type DreamTheme,
   type MoonTabId,
 } from "@/lib/moonContent";
@@ -43,10 +47,9 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
   const [dreamBody, setDreamBody] = useState("");
   const [dreamTheme, setDreamTheme] = useState<DreamTheme>("flying");
   const [dreamFilter, setDreamFilter] = useState<DreamTheme | "all">("all");
-  const [selectedConstellation, setSelectedConstellation] = useState<
-    string | null
-  >(null);
+  const [selectedStar, setSelectedStar] = useState<string | null>(null);
   const [selectedCreature, setSelectedCreature] = useState<string | null>(null);
+  const [selectedPlanet, setSelectedPlanet] = useState<string | null>(null);
   const [listeningId, setListeningId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [uploadPercent, setUploadPercent] = useState<number | null>(null);
@@ -54,12 +57,15 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
 
   const rituals = dailyRituals();
   const moon = todaysMoonPhase();
-  const constellation = todaysConstellation();
+  const brightStar = todaysBrightStar();
+  const planet = todaysPlanet();
   const creature = todaysCreature();
   const fact = todaysSkyFact();
   const prompt = todaysJournalPrompt();
   const inspiration = todaysInspiration();
   const dayKey = Math.floor(Date.now() / 86_400_000);
+  const happeningNow = spaceEventsHappeningNow();
+  const upcomingEvents = upcomingSpaceEvents(new Date(), 10);
 
   useEffect(() => {
     if (!toast) return;
@@ -100,21 +106,26 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
     }
   }
 
-  const openConstellation =
-    CONSTELLATIONS.find((c) => c.id === selectedConstellation) ||
-    constellation;
+  const openStar =
+    NIGHT_STARS.find((s) => s.id === selectedStar) || brightStar;
 
   const openCreature =
     NIGHT_CREATURES.find((c) => c.id === selectedCreature) || creature;
+
+  const openPlanet =
+    PLANETS.find((p) => p.id === selectedPlanet) || planet;
 
   const filteredDreams = useMemo(() => {
     if (dreamFilter === "all") return progress.dreams;
     return progress.dreams.filter((d) => d.theme === dreamFilter);
   }, [progress.dreams, dreamFilter]);
 
-  const inspConstellation =
-    CONSTELLATIONS.find((c) => c.id === inspiration.constellationId) ||
-    constellation;
+  const inspStar =
+    NIGHT_STARS.find(
+      (s) => s.id === (inspiration.brightStarId || inspiration.constellationId)
+    ) || brightStar;
+  const inspPlanet =
+    PLANETS.find((p) => p.id === inspiration.planetId) || planet;
   const inspFact =
     SKY_FACTS.find((f) => f.id === inspiration.factId) || fact;
   const inspCreature =
@@ -310,10 +321,10 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
             <h2>Welcome to the Observatory</h2>
             <p className="mm-section-lead">
               A circular room with a giant telescope beneath an opening dome.
-              Celestial maps, constellation charts, moon journals, brass
-              instruments, star globes, hanging lanterns, hourglasses, and soft
-              cushions wait beside warm blankets. Everything here revolves around
-              watching the night sky and reflecting quietly.
+              Star charts, planet cards, moon journals, brass instruments, sky
+              calendars, hanging lanterns, hourglasses, and soft cushions wait
+              beside warm blankets. Everything here revolves around real night
+              skies — stars, planets, and quiet watching.
             </p>
             <div className="mm-grid">
               <article className="mm-card">
@@ -330,18 +341,24 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
               </article>
               <article className="mm-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={constellation.image} alt="" className="mm-card-img" />
-                <h3>Today&apos;s Constellation · {constellation.name}</h3>
-                <p>{constellation.mythology}</p>
+                <img src={brightStar.image} alt="" className="mm-card-img" />
+                <h3>
+                  Tonight&apos;s brightest star · {brightStar.emoji}{" "}
+                  {brightStar.name}
+                </h3>
+                <p className="mm-meta">
+                  {brightStar.constellationHome} · {brightStar.distanceLy}
+                </p>
+                <p>{brightStar.summary}</p>
                 <button
                   type="button"
                   className="btn-secondary"
                   onClick={() => {
-                    setSelectedConstellation(constellation.id);
+                    setSelectedStar(brightStar.id);
                     setTab("atlas");
                   }}
                 >
-                  Open Star Atlas
+                  Open Bright Stars
                 </button>
               </article>
               <article className="mm-card">
@@ -358,6 +375,43 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                   onClick={() => setTab("dreams")}
                 >
                   Browse dreams
+                </button>
+              </article>
+              <article className="mm-card">
+                <h3>🪐 Today&apos;s planet · {planet.name}</h3>
+                <p className="mm-meta">{planet.type}</p>
+                <p>{planet.summary}</p>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => {
+                    setSelectedPlanet(planet.id);
+                    setTab("facts");
+                  }}
+                >
+                  Planet facts
+                </button>
+              </article>
+              <article className="mm-card">
+                <h3>📅 Sky Calendar</h3>
+                {happeningNow.length ? (
+                  <p>
+                    Happening now: {happeningNow.map((e) => e.title).join(" · ")}
+                  </p>
+                ) : (
+                  <p>
+                    Next up: {upcomingEvents[0]?.title || "Check the calendar"}{" "}
+                    {upcomingEvents[0]?.peakNote
+                      ? `(${upcomingEvents[0].peakNote})`
+                      : ""}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setTab("calendar")}
+                >
+                  Open schedule
                 </button>
               </article>
             </div>
@@ -419,47 +473,40 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
 
         {tab === "atlas" && (
           <section className="mm-section">
-            <h2>Star Atlas</h2>
+            <h2>Bright Stars</h2>
             <p className="mm-section-lead">
-              An interactive constellation encyclopedia — mythology, visibility,
-              and the brightest lights.
+              Real stars for tonight&apos;s sky — distance, type, and when to
+              look. No astrology, only astronomy.
             </p>
             <div className="mm-chip-row">
-              {CONSTELLATIONS.map((c) => (
+              {NIGHT_STARS.map((s) => (
                 <button
-                  key={c.id}
+                  key={s.id}
                   type="button"
-                  className={
-                    openConstellation.id === c.id ? "active" : ""
-                  }
-                  onClick={() => setSelectedConstellation(c.id)}
+                  className={openStar.id === s.id ? "active" : ""}
+                  onClick={() => setSelectedStar(s.id)}
                 >
-                  {c.emoji} {c.name}
+                  {s.emoji} {s.name}
                 </button>
               ))}
             </div>
             <article className="mm-feature-card mm-constellation-card">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={openConstellation.image}
-                alt=""
-                className="mm-feature-img"
-              />
+              <img src={openStar.image} alt="" className="mm-feature-img" />
               <div>
                 <h3>
-                  {openConstellation.emoji} {openConstellation.name}
+                  {openStar.emoji} {openStar.name}
                 </h3>
-                <p className="mm-meta">Visibility · {openConstellation.visibility}</p>
-                <p>{openConstellation.mythology}</p>
-                <h4>Brightest stars</h4>
-                <ul className="mm-ing">
-                  {openConstellation.brightestStars.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
-                <h4>Interesting facts</h4>
+                <p className="mm-meta">
+                  Home · {openStar.constellationHome} · {openStar.distanceLy} ·{" "}
+                  {openStar.spectralType}
+                </p>
+                <p>{openStar.summary}</p>
+                <h4>When to look</h4>
+                <p>{openStar.whenToLook}</p>
+                <h4>Facts</h4>
                 <ul className="mm-steps">
-                  {openConstellation.facts.map((f) => (
+                  {openStar.facts.map((f) => (
                     <li key={f}>{f}</li>
                   ))}
                 </ul>
@@ -588,8 +635,8 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
           <section className="mm-section">
             <h2>Night Sky Facts</h2>
             <p className="mm-section-lead">
-              Daily astronomy wonders — moons, meteors, galaxies, and quiet
-              discoveries.
+              Astronomy wonders — stars, planets, moons, meteors, and quiet
+              discoveries. Science only.
             </p>
             <article className="mm-feature-card">
               <div>
@@ -600,6 +647,36 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                 <p>{fact.body}</p>
               </div>
             </article>
+
+            <h3 className="mm-subhead">Planet guide</h3>
+            <div className="mm-chip-row">
+              {PLANETS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={openPlanet.id === p.id ? "active" : ""}
+                  onClick={() => setSelectedPlanet(p.id)}
+                >
+                  {p.emoji} {p.name}
+                </button>
+              ))}
+            </div>
+            <article className="mm-feature-card">
+              <div>
+                <h3>
+                  {openPlanet.emoji} {openPlanet.name}
+                </h3>
+                <p className="mm-meta">{openPlanet.type}</p>
+                <p>{openPlanet.summary}</p>
+                <ul className="mm-steps">
+                  {openPlanet.facts.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+
+            <h3 className="mm-subhead">More sky facts</h3>
             <div className="mm-grid">
               {SKY_FACTS.map((f) => (
                 <article key={f.id} className="mm-card">
@@ -608,6 +685,61 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                   </h3>
                   <p className="mm-meta">{f.category}</p>
                   <p>{f.body}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {tab === "calendar" && (
+          <section className="mm-section">
+            <h2>Sky Calendar</h2>
+            <p className="mm-section-lead">
+              Real upcoming space events — meteor showers, eclipses, and planet
+              tips. Dates are UTC calendar guides; check a local almanac for exact
+              timing where you stand.
+            </p>
+            {happeningNow.length ? (
+              <article className="mm-feature-card">
+                <div>
+                  <p className="mm-meta">Happening now</p>
+                  <ul className="mm-steps">
+                    {happeningNow.map((ev) => (
+                      <li key={ev.id}>
+                        <strong>
+                          {ev.emoji} {ev.title}
+                        </strong>{" "}
+                        — {ev.body}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            ) : null}
+            <div className="mm-grid">
+              {upcomingEvents.map((ev) => (
+                <article key={ev.id} className="mm-card">
+                  <h3>
+                    {ev.emoji} {ev.title}
+                  </h3>
+                  <p className="mm-meta">
+                    {ev.startDate === ev.endDate
+                      ? ev.startDate
+                      : `${ev.startDate} → ${ev.endDate}`}
+                    {ev.peakNote ? ` · ${ev.peakNote}` : ""}
+                  </p>
+                  <p className="mm-meta">
+                    {ev.kind === "meteor-shower"
+                      ? "Meteor shower"
+                      : ev.kind === "lunar-eclipse"
+                        ? "Lunar eclipse"
+                        : ev.kind === "solar-eclipse"
+                          ? "Solar eclipse"
+                          : ev.kind === "planet"
+                            ? "Planet tip"
+                            : "Sky event"}
+                  </p>
+                  <p>{ev.body}</p>
                 </article>
               ))}
             </div>
@@ -779,11 +911,22 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                 <p>{inspiration.moon.detail}</p>
               </article>
               <article className="mm-card">
-                <h3>Today&apos;s Constellation</h3>
+                <h3>Tonight&apos;s brightest star</h3>
                 <p>
-                  {inspConstellation.emoji} {inspConstellation.name}
+                  {inspStar.emoji} {inspStar.name}
                 </p>
-                <p>{inspConstellation.mythology}</p>
+                <p className="mm-meta">
+                  {inspStar.constellationHome} · {inspStar.distanceLy}
+                </p>
+                <p>{inspStar.summary}</p>
+              </article>
+              <article className="mm-card">
+                <h3>Today&apos;s planet</h3>
+                <p>
+                  {inspPlanet.emoji} {inspPlanet.name}
+                </p>
+                <p className="mm-meta">{inspPlanet.type}</p>
+                <p>{inspPlanet.summary}</p>
               </article>
               <article className="mm-card">
                 <h3>Today&apos;s Dream Prompt</h3>
