@@ -9362,6 +9362,88 @@ button.mh-card-cover {
   border: 1px solid rgba(197, 206, 221, 0.22);
 }
 
+/* Moonmere village — Sky Calendar event alert */
+.mm-sky-alert-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 78;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(42, 53, 72, 0.55), rgba(8, 12, 18, 0.82));
+  backdrop-filter: blur(3px);
+}
+
+.mm-sky-alert {
+  width: min(100%, 26rem);
+  padding: 1.45rem 1.35rem 1.5rem;
+  border: 1px solid rgba(138, 155, 136, 0.4);
+  border-radius: var(--frame-cloud);
+  background:
+    linear-gradient(165deg, #ebe4d4 0%, #d8cdb8 55%, #c9bda6 100%);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.4);
+  color: #2a241c;
+  text-align: center;
+}
+
+.mm-sky-alert-kicker {
+  margin: 0;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(42, 53, 72, 0.72);
+}
+
+.mm-sky-alert-title {
+  margin: 0.4rem 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  font-weight: 500;
+  color: #2a3548;
+  line-height: 1.25;
+}
+
+.mm-sky-alert-peak {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-stamp);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: rgba(42, 36, 28, 0.68);
+}
+
+.mm-sky-alert-body {
+  margin: 0 auto 1rem;
+  max-width: 22rem;
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: rgba(42, 36, 28, 0.82);
+}
+
+.mm-sky-alert-more {
+  margin: 0 auto 1rem;
+  padding: 0;
+  list-style: none;
+  max-width: 22rem;
+  text-align: left;
+  font-size: 0.9rem;
+  color: rgba(42, 36, 28, 0.78);
+}
+
+.mm-sky-alert-more li {
+  padding: 0.35rem 0;
+  border-top: 1px solid rgba(42, 53, 72, 0.12);
+}
+
+.mm-sky-alert-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
+}
+
 .mm-error, .mm-toast {
   position: relative;
   z-index: 1;

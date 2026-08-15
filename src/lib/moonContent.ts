@@ -945,6 +945,14 @@ export function spaceEventsHappeningNow(now = new Date()): SpaceEvent[] {
   });
 }
 
+/**
+ * Dated sky events for Moonmere village alerts — excludes ongoing planet tips
+ * so the village only notifies when a real calendar window is active.
+ */
+export function villageSkyAlertEvents(now = new Date()): SpaceEvent[] {
+  return spaceEventsHappeningNow(now).filter((ev) => ev.kind !== "planet");
+}
+
 /* ─── Moon Journal ─── */
 
 export type JournalPrompt = {

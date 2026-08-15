@@ -40,6 +40,8 @@ import {
   listClubBooks,
   listReadingListBooks,
 } from "@/lib/libraryBooks";
+import { villageSkyAlertEvents } from "@/lib/moonContent";
+import { MoonmereSkyEventPopup } from "@/components/MoonmereSkyEventPopup";
 
 export default async function VillagePage() {
   const user = await getCurrentUser();
@@ -143,6 +145,11 @@ export default async function VillagePage() {
     "Special building glow",
   ];
 
+  const moonmereSkyAlerts =
+    village.id === "moonmere" && user.villageId === "moonmere" && !welcomeLetter
+      ? villageSkyAlertEvents()
+      : [];
+
   return (
     <main
       className="app-main forest-panel village-page"
@@ -192,6 +199,9 @@ export default async function VillagePage() {
         }
       />
       {welcomeLetter ? <WelcomeLetterModal letter={welcomeLetter} /> : null}
+      {moonmereSkyAlerts.length ? (
+        <MoonmereSkyEventPopup events={moonmereSkyAlerts} />
+      ) : null}
 
       <header className="village-hero">
         <VillageMascot village={village} size="lg" />
