@@ -359,7 +359,7 @@ export const NIGHT_STARS: NightStar[] = [
       "Sirius B is a white dwarf: a Earth-sized remnant of a once-larger star.",
       "Its name comes from Greek for “scorching,” not from any zodiac sign.",
     ],
-    image: "/moon/constellations/orion.jpg",
+    image: "/moon/stars/sirius.jpg",
   },
   {
     id: "canopus",
@@ -378,7 +378,7 @@ export const NIGHT_STARS: NightStar[] = [
       "Used historically for spacecraft navigation attitude sensors.",
       "Far more luminous than Sirius, but much farther away.",
     ],
-    image: "/moon/constellations/orion.jpg",
+    image: "/moon/stars/canopus.jpg",
   },
   {
     id: "arcturus",
@@ -397,7 +397,7 @@ export const NIGHT_STARS: NightStar[] = [
       "An aging giant that has left the main sequence.",
       "One of the fastest-moving bright stars across our sky.",
     ],
-    image: "/moon/constellations/ursa-major.jpg",
+    image: "/moon/stars/arcturus.jpg",
   },
   {
     id: "vega",
@@ -416,7 +416,7 @@ export const NIGHT_STARS: NightStar[] = [
       "Was Earth's north pole star about 12,000 years ago due to axial precession.",
       "Surrounded by a dusty debris disk — a young planetary system under study.",
     ],
-    image: "/moon/constellations/lyra.jpg",
+    image: "/moon/stars/vega.jpg",
   },
   {
     id: "capella",
@@ -435,7 +435,7 @@ export const NIGHT_STARS: NightStar[] = [
       "The brightest star in Auriga.",
       "Its yellow tint comes from cool giant components similar in color to the Sun, but much larger.",
     ],
-    image: "/moon/constellations/cassiopeia.jpg",
+    image: "/moon/stars/capella.jpg",
   },
   {
     id: "rigel",
@@ -453,7 +453,7 @@ export const NIGHT_STARS: NightStar[] = [
       "Hundreds of thousands of times more luminous than the Sun.",
       "A multiple-star system; telescopes reveal fainter companions.",
     ],
-    image: "/moon/constellations/orion.jpg",
+    image: "/moon/stars/rigel.jpg",
   },
   {
     id: "procyon",
@@ -472,7 +472,7 @@ export const NIGHT_STARS: NightStar[] = [
       "Has a white-dwarf companion like Sirius.",
       "Name means “before the dog,” rising ahead of Sirius.",
     ],
-    image: "/moon/constellations/orion.jpg",
+    image: "/moon/stars/procyon.jpg",
   },
   {
     id: "betelgeuse",
@@ -490,7 +490,7 @@ export const NIGHT_STARS: NightStar[] = [
       "Will someday explode as a supernova (on astronomical timescales).",
       "Its 2019–2020 “Great Dimming” was studied worldwide.",
     ],
-    image: "/moon/constellations/orion.jpg",
+    image: "/moon/stars/betelgeuse.jpg",
   },
   {
     id: "altair",
@@ -508,7 +508,7 @@ export const NIGHT_STARS: NightStar[] = [
       "Rotates in under 10 hours — so fast it bulges at the equator.",
       "One of the closest naked-eye A-type stars.",
     ],
-    image: "/moon/constellations/cygnus.jpg",
+    image: "/moon/stars/altair.jpg",
   },
   {
     id: "aldebaran",
@@ -527,7 +527,7 @@ export const NIGHT_STARS: NightStar[] = [
       "Appears among the Hyades cluster but is a foreground star.",
       "The Moon and planets often pass nearby along the ecliptic.",
     ],
-    image: "/moon/constellations/pegasus.jpg",
+    image: "/moon/stars/aldebaran.jpg",
   },
   {
     id: "antares",
@@ -546,7 +546,7 @@ export const NIGHT_STARS: NightStar[] = [
       "A red supergiant with a fainter hot companion.",
       "Sits near the Milky Way's rich southern star clouds.",
     ],
-    image: "/moon/constellations/scorpius.jpg",
+    image: "/moon/stars/antares.jpg",
   },
   {
     id: "spica",
@@ -565,7 +565,7 @@ export const NIGHT_STARS: NightStar[] = [
       "A close binary of two hot massive stars.",
       "Often visited by the Moon and planets.",
     ],
-    image: "/moon/constellations/ursa-major.jpg",
+    image: "/moon/stars/spica.jpg",
   },
 ];
 
@@ -594,6 +594,7 @@ export type PlanetGuide = {
   type: string;
   summary: string;
   facts: string[];
+  image: string;
 };
 
 export const PLANETS: PlanetGuide[] = [
@@ -601,6 +602,7 @@ export const PLANETS: PlanetGuide[] = [
     id: "mercury",
     name: "Mercury",
     emoji: "☿️",
+    image: "/moon/planets/mercury.jpg",
     type: "Rocky inner planet",
     summary: "The Sun's closest world — swift, cratered, and extreme in temperature.",
     facts: [
@@ -613,6 +615,7 @@ export const PLANETS: PlanetGuide[] = [
     id: "venus",
     name: "Venus",
     emoji: "♀️",
+    image: "/moon/planets/venus.jpg",
     type: "Rocky inner planet",
     summary: "Earth's cloudy twin — often the brightest planet after sunset or before sunrise.",
     facts: [
@@ -625,6 +628,7 @@ export const PLANETS: PlanetGuide[] = [
     id: "earth",
     name: "Earth",
     emoji: "🌍",
+    image: "/moon/planets/earth.jpg",
     type: "Rocky inner planet",
     summary: "Our observatory's home — the only world known to host liquid-water oceans and life.",
     facts: [
@@ -637,6 +641,7 @@ export const PLANETS: PlanetGuide[] = [
     id: "mars",
     name: "Mars",
     emoji: "♂️",
+    image: "/moon/planets/mars.jpg",
     type: "Rocky outer-inner planet",
     summary: "The red planet — deserts, volcanoes, polar ice, and a thin carbon-dioxide air.",
     facts: [
@@ -649,6 +654,7 @@ export const PLANETS: PlanetGuide[] = [
     id: "jupiter",
     name: "Jupiter",
     emoji: "♃",
+    image: "/moon/planets/jupiter.jpg",
     type: "Gas giant",
     summary: "The giant of the Solar System — striped clouds and a family of many moons.",
     facts: [
@@ -661,6 +667,7 @@ export const PLANETS: PlanetGuide[] = [
     id: "saturn",
     name: "Saturn",
     emoji: "♄",
+    image: "/moon/planets/saturn.jpg",
     type: "Gas giant",
     summary: "The ringed world — ice and rock particles circling in a thin, dazzling disk.",
     facts: [
@@ -673,6 +680,7 @@ export const PLANETS: PlanetGuide[] = [
     id: "uranus",
     name: "Uranus",
     emoji: "♅",
+    image: "/moon/planets/uranus.jpg",
     type: "Ice giant",
     summary: "A tipped-over ice giant — pale blue-green from methane in its atmosphere.",
     facts: [
@@ -685,6 +693,7 @@ export const PLANETS: PlanetGuide[] = [
     id: "neptune",
     name: "Neptune",
     emoji: "♆",
+    image: "/moon/planets/neptune.jpg",
     type: "Ice giant",
     summary: "The farthest major planet — deep blue, windy, and home to Triton.",
     facts: [
