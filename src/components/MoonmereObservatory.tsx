@@ -378,7 +378,11 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                 </button>
               </article>
               <article className="mm-card">
-                <h3>🪐 Today&apos;s planet · {planet.name}</h3>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={planet.image} alt="" className="mm-card-img" />
+                <h3>
+                  Today&apos;s planet · {planet.emoji} {planet.name}
+                </h3>
                 <p className="mm-meta">{planet.type}</p>
                 <p>{planet.summary}</p>
                 <button
@@ -662,6 +666,12 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
               ))}
             </div>
             <article className="mm-feature-card">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={openPlanet.image}
+                alt=""
+                className="mm-feature-img"
+              />
               <div>
                 <h3>
                   {openPlanet.emoji} {openPlanet.name}
@@ -911,6 +921,8 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                 <p>{inspiration.moon.detail}</p>
               </article>
               <article className="mm-card">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={inspStar.image} alt="" className="mm-card-img" />
                 <h3>Tonight&apos;s brightest star</h3>
                 <p>
                   {inspStar.emoji} {inspStar.name}
@@ -921,6 +933,8 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                 <p>{inspStar.summary}</p>
               </article>
               <article className="mm-card">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={inspPlanet.image} alt="" className="mm-card-img" />
                 <h3>Today&apos;s planet</h3>
                 <p>
                   {inspPlanet.emoji} {inspPlanet.name}
