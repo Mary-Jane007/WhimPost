@@ -12037,3 +12037,9 @@ button.mh-card-cover {
   max-width: 38rem;
   line-height: 1.4;
 }
+
+.mm-subhead {
+  font-family: var(--font-display);
+  margin: 1.25rem 0 0.55rem;
+  font-size: 1.15rem;
+}
