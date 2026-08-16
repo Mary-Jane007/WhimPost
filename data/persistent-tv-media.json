@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T12:36:52.509Z",
+  "updatedAt": "2026-08-16T12:58:41.199Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -28,6 +28,16 @@
       "mime": "video/mp4",
       "sizeBytes": 80159520,
       "durationMs": 1212058,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Set Up a Campsite- Rei",
+      "filename": "5899947e-39ed-457a-b6d9-5fd879f6f2eb.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 25499530,
+      "durationMs": 323593,
       "channelTitle": "Bramblewood Exclusive",
       "villageId": "bramblewood",
       "isGlobal": false
