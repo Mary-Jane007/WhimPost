@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T17:13:16.903Z",
+  "updatedAt": "2026-08-16T17:13:20.737Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -258,6 +258,16 @@
       "mime": "video/mp4",
       "sizeBytes": 27439319,
       "durationMs": 401310,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Make Butter – The Victorian Way",
+      "filename": "d2f99ca9-bdc5-48fe-a9db-fc3dc1efd269.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 18497004,
+      "durationMs": 488734,
       "channelTitle": "Heartwick Exclusive",
       "villageId": "hearthwick",
       "isGlobal": false
