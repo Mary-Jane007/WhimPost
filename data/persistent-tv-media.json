@@ -1,7 +1,17 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T12:34:15.893Z",
+  "updatedAt": "2026-08-16T12:36:52.509Z",
   "clips": [
+    {
+      "title": "A Fox's Tale- Survival in the Alpine Wild",
+      "filename": "5eb75a0c-6792-4b2f-a11a-7eca133015e4.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 191594433,
+      "durationMs": 3084864,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
     {
       "title": "Fantastic Mr. Fox",
       "filename": "ea3c7de8-6f8e-4901-b547-acf1c455525f.mp4",
