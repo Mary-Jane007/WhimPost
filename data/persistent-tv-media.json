@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T12:31:43.648Z",
+  "updatedAt": "2026-08-16T12:34:15.893Z",
   "clips": [
     {
       "title": "Fantastic Mr. Fox",
@@ -18,6 +18,16 @@
       "mime": "video/mp4",
       "sizeBytes": 80159520,
       "durationMs": 1212058,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Use a Compass - REI",
+      "filename": "274bc8e1-f6b9-4253-9188-6b12896ff7df.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 19717749,
+      "durationMs": 435165,
       "channelTitle": "Bramblewood Exclusive",
       "villageId": "bramblewood",
       "isGlobal": false
