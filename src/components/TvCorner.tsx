@@ -33,14 +33,17 @@ function estimatedPositionMs(room: {
   return room.positionMs + Math.max(0, Date.now() - started);
 }
 
+/** Format an absolute air time in the viewer's local timezone (client-only). */
 function formatGuideTime(iso: string) {
   try {
-    return new Date(iso).toLocaleTimeString([], {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleTimeString(undefined, {
       hour: "numeric",
       minute: "2-digit",
     });
   } catch {
-    return "";
+    return "—";
   }
 }
 
@@ -139,6 +142,11 @@ export function TvCorner({
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.__whimTvFormatGuideTimes?.();
+  }, [hydrated, room.schedule]);
 
   useEffect(() => {
     function onFullscreenChange() {
@@ -1104,7 +1112,7 @@ export function TvCorner({
                     <h2>{activeChannel?.title || "Channel guide"}</h2>
                     <p>
                       Every clip plays in shuffled order — neighbors see the same
-                      schedule.
+                      schedule. Times are in your local time.
                     </p>
                   </div>
                   <ul className="tv-guide-list">
@@ -1113,8 +1121,12 @@ export function TvCorner({
                         key={`${slot.videoId}-${slot.startsAt}`}
                         className={slot.isCurrent ? "now" : ""}
                       >
-                        <time dateTime={slot.startsAt}>
-                          {formatGuideTime(slot.startsAt)}
+                        <time
+                          dateTime={slot.startsAt}
+                          data-tv-guide-time=""
+                          suppressHydrationWarning
+                        >
+                          {hydrated ? formatGuideTime(slot.startsAt) : "···"}
                         </time>
                         <strong>{slot.title}</strong>
                         <span>{slot.isCurrent ? "Now playing" : "Up next"}</span>

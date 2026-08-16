@@ -54,6 +54,7 @@ export default async function RootLayout({
           afterInteractive keeps TV unmute working without killing React.
         */}
         <Script src="/tv-sound-boot.js" strategy="afterInteractive" />
+        <Script src="/tv-guide-local.js" strategy="afterInteractive" />
         <div className="forest-backdrop" aria-hidden />
         <div className="page-shell">
           <SiteForestStickers villageId={villageId} />
