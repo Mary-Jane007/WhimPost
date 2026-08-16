@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T17:24:18.618Z",
+  "updatedAt": "2026-08-16T17:28:57.003Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -118,6 +118,16 @@
       "mime": "video/mp4",
       "sizeBytes": 37296337,
       "durationMs": 469484,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Springwatch 2024 Episode 1",
+      "filename": "da3ef970-cbc0-4f99-a9d2-cbecad69121f.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 244636639,
+      "durationMs": 3545896,
       "channelTitle": "Clovermeadow Exclusive",
       "villageId": "clovermeadow",
       "isGlobal": false
