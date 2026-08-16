@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T16:52:08.214Z",
+  "updatedAt": "2026-08-16T16:52:44.951Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -201,6 +201,16 @@
       "channelTitle": "Cottage Cartoons",
       "villageId": null,
       "isGlobal": true
+    },
+    {
+      "title": "A Tour of Hobbiton - New Zealand",
+      "filename": "6e6a05d2-d7a1-420a-b343-e1a356c52c90.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 178690152,
+      "durationMs": 2353366,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
     },
     {
       "title": "Brambly Hedge - A Winter Story",
