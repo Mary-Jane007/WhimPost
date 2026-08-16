@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T16:57:55.452Z",
+  "updatedAt": "2026-08-16T17:02:13.555Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -248,6 +248,16 @@
       "mime": "video/mp4",
       "sizeBytes": 29308977,
       "durationMs": 386705,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Jane Austen House",
+      "filename": "28ab1208-391d-47d5-aaab-5641c8a87b33.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 65538560,
+      "durationMs": 1297252,
       "channelTitle": "Heartwick Exclusive",
       "villageId": "hearthwick",
       "isGlobal": false
