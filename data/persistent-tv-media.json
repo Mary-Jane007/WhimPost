@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T17:02:13.555Z",
+  "updatedAt": "2026-08-16T17:13:16.903Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -248,6 +248,26 @@
       "mime": "video/mp4",
       "sizeBytes": 29308977,
       "durationMs": 386705,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Make Apple and Crumb Pudding — The Vic…",
+      "filename": "0136b0a3-1ad7-48fe-a6db-5532ef59ba60.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 27439319,
+      "durationMs": 401310,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to make carrot cake - The Victorian Way",
+      "filename": "d9df1d97-20cb-4a4d-8db1-e09404e7d32a.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 17200710,
+      "durationMs": 454136,
       "channelTitle": "Heartwick Exclusive",
       "villageId": "hearthwick",
       "isGlobal": false
