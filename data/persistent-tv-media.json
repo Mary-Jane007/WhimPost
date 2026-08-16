@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T14:03:31.720Z",
+  "updatedAt": "2026-08-16T14:03:43.984Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -208,6 +208,16 @@
       "mime": "video/mp4",
       "sizeBytes": 3444991,
       "durationMs": 55635,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Mrs. Apple's recipe — Strawberry cake",
+      "filename": "2314bb00-c07c-4f0e-b721-52ddb5a9c12f.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 6338482,
+      "durationMs": 93437,
       "channelTitle": "Heartwick Exclusive",
       "villageId": "hearthwick",
       "isGlobal": false
