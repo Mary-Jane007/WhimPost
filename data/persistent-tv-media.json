@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T12:21:16.083Z",
+  "updatedAt": "2026-08-16T12:31:43.648Z",
   "clips": [
     {
       "title": "Fantastic Mr. Fox",
@@ -18,6 +18,16 @@
       "mime": "video/mp4",
       "sizeBytes": 80159520,
       "durationMs": 1212058,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "ow to Pack a Backpack - REI Experts",
+      "filename": "55eeaa3a-27d4-4636-9673-ab0342c2325a.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 7113783,
+      "durationMs": 97176,
       "channelTitle": "Bramblewood Exclusive",
       "villageId": "bramblewood",
       "isGlobal": false
