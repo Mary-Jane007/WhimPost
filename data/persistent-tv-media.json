@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T15:20:30.039Z",
+  "updatedAt": "2026-08-16T15:24:06.907Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -208,6 +208,16 @@
       "mime": "video/mp4",
       "sizeBytes": 170545510,
       "durationMs": 2999995,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Game of Wool The Cast Off - Episode 2",
+      "filename": "dee1ea6c-7f0b-48d1-976f-aa61f49b82e6.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 29308977,
+      "durationMs": 386705,
       "channelTitle": "Heartwick Exclusive",
       "villageId": "hearthwick",
       "isGlobal": false
