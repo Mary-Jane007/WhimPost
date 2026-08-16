@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T14:03:43.984Z",
+  "updatedAt": "2026-08-16T14:39:48.426Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -218,6 +218,16 @@
       "mime": "video/mp4",
       "sizeBytes": 6338482,
       "durationMs": 93437,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "The secret life of Hedgehogs",
+      "filename": "1400a663-2940-460c-9123-dcb4ce48c878.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 260156179,
+      "durationMs": 2964200,
       "channelTitle": "Heartwick Exclusive",
       "villageId": "hearthwick",
       "isGlobal": false
