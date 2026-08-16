@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T17:28:57.003Z",
+  "updatedAt": "2026-08-16T17:30:29.130Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -128,6 +128,16 @@
       "mime": "video/mp4",
       "sizeBytes": 244636639,
       "durationMs": 3545896,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "The Birdwatchers",
+      "filename": "6614b3d4-3239-4c56-9cec-2093dc78788d.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 35210679,
+      "durationMs": 821011,
       "channelTitle": "Clovermeadow Exclusive",
       "villageId": "clovermeadow",
       "isGlobal": false
