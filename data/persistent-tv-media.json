@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T16:52:44.951Z",
+  "updatedAt": "2026-08-16T16:57:55.452Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -208,6 +208,16 @@
       "mime": "video/mp4",
       "sizeBytes": 178690152,
       "durationMs": 2353366,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Baking Cinnamon Buns, Painting",
+      "filename": "a65bdaef-37ec-4ffd-849a-e2959aacf04d.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 103822653,
+      "durationMs": 1210387,
       "channelTitle": "Heartwick Exclusive",
       "villageId": "hearthwick",
       "isGlobal": false
