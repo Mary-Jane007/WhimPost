@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T12:15:38.887Z",
+  "updatedAt": "2026-08-16T12:21:16.083Z",
   "clips": [
     {
       "title": "Fantastic Mr. Fox",
@@ -18,6 +18,16 @@
       "mime": "video/mp4",
       "sizeBytes": 80159520,
       "durationMs": 1212058,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "The Repair Shop  Season 1 Episode 1",
+      "filename": "de815586-ce20-4e00-b3db-45e51b90c250.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 110702676,
+      "durationMs": 1709383,
       "channelTitle": "Bramblewood Exclusive",
       "villageId": "bramblewood",
       "isGlobal": false
