@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T17:13:20.737Z",
+  "updatedAt": "2026-08-16T17:23:44.178Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -88,6 +88,16 @@
       "mime": "video/mp4",
       "sizeBytes": 71348323,
       "durationMs": 1377454,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Gardeners' World 2026 - Episode 1",
+      "filename": "5ab73dcb-0dce-41fd-8fd8-f08b1f454d1c.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 266787760,
+      "durationMs": 3763978,
       "channelTitle": "Clovermeadow Exclusive",
       "villageId": "clovermeadow",
       "isGlobal": false
