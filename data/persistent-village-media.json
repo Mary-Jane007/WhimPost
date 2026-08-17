@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:52:21.241Z",
+  "updatedAt": "2026-08-17T14:52:27.385Z",
   "images": {
     "garden:visitor:agouti": "/api/uploads/c50c8229-8b6d-4e6e-b603-5797767be5b1.jpg",
     "garden:visitor:anole-lizard": "/api/uploads/32c6d9ef-2c33-4748-a29a-6b5311b8270b.jpg",
@@ -20,6 +20,7 @@
     "garden:visitor:honey-bee": "/api/uploads/874b43b3-f31b-4ff6-9ebc-f5608e998597.jpg",
     "garden:visitor:house-gecko": "/api/uploads/ffb8a86c-ee38-4092-a30e-eff1583d49a5.jpg",
     "garden:visitor:hoverfly": "/api/uploads/556444bb-0efa-4bab-8973-339806444545.jpg",
+    "garden:visitor:julia": "/api/uploads/14123fcd-456c-44b9-8a59-12938631d968.jpg",
     "garden:visitor:ladybug": "/api/uploads/6a516275-000e-43cf-bfdb-0069fb64f42f.jpg",
     "garden:visitor:leafcutter-ant": "/api/uploads/ab9f5d47-dca9-41e6-ab76-df35a28e191a.jpg",
     "garden:visitor:luna-moth": "/api/uploads/901c4402-07ad-4de5-a439-30da4068effe.jpg",
