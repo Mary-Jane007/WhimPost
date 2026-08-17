@@ -7246,6 +7246,7 @@ button.mh-card-cover {
 .mh-attach .form-success {
   margin: 0.35rem 0 0;
   font-size: 0.85rem;
+  flex-basis: 100%;
 }
 
 .owner-image-attach {
@@ -7255,10 +7256,6 @@ button.mh-card-cover {
 .owner-image-attach .mh-attach-btn {
   font-size: 0.82rem;
   padding: 0.35rem 0.7rem;
-}
-  margin: 0.35rem 0 0;
-  font-size: 0.85rem;
-  flex-basis: 100%;
 }
 
 .mh-actions form {
