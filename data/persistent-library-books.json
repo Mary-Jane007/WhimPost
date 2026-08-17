@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:02:36.009Z",
+  "updatedAt": "2026-08-17T15:03:17.024Z",
   "books": [
     {
       "id": "princess",
@@ -73,7 +73,7 @@
       "shelf": "club",
       "title": "The Secret Garden",
       "author": "Frances Hodgson Burnett",
-      "description": "A neglected garden awakens with a lonely girl, a boy who speaks to earth, and the quiet miracle of tending what was forgotten.",
+      "description": "The Secret Garden follows Mary Lennox, a lonely and spoiled orphan who moves to a mysterious manor in England. There, she discovers a hidden, neglected garden and slowly brings it back to life with the help of new friends.\r\n\r\nAs the garden changes, Mary and those around her begin to change too, discovering friendship, nature, and happiness.",
       "minutes": 280,
       "coverEmoji": "🌹",
       "coverUrl": "/api/uploads/86aaf27c-4b79-415d-bcc8-67b878cc4cee.webp",
