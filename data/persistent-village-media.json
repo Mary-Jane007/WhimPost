@@ -1,8 +1,10 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:47:39.748Z",
+  "updatedAt": "2026-08-17T14:47:54.189Z",
   "images": {
     "garden:visitor:fireflies-night": "/api/uploads/c13a9785-2e3b-4120-a6d8-5450642d8764.jpg",
+    "garden:visitor:luna-moth": "/api/uploads/901c4402-07ad-4de5-a439-30da4068effe.jpg",
+    "garden:visitor:nectar-bat": "/api/uploads/e4e74705-5a44-4c62-a499-a3462e04421b.jpg",
     "moon:star:antares": "/api/uploads/2e7b9067-7483-483e-b936-6bfab0874d54.webp",
     "moon:star:arcturus": "/api/uploads/7d2145a7-f9a9-485b-8291-6075688371e3.png",
     "moon:star:betelgeuse": "/api/uploads/bae1eecd-e6a5-4b65-a82d-c69c7e589271.jpg",
