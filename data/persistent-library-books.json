@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:59:51.625Z",
+  "updatedAt": "2026-08-17T15:00:29.863Z",
   "books": [
     {
       "id": "princess",
@@ -293,7 +293,7 @@
       "shelf": "readinglist",
       "title": "Walden",
       "author": "Henry David Thoreau",
-      "description": "",
+      "description": "Walden describes Thoreau’s experience of living simply in a small cabin near Walden Pond. He reflects on nature, solitude, work, society, and what people truly need to live a meaningful life. The book encourages readers to slow down and live more deliberately.",
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/1e65d73c-d74a-443c-9da2-bbf9a157a954.jpg",
