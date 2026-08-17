@@ -177,8 +177,9 @@ select {
   gap: 0.28rem;
   min-height: 1.9rem;
   padding: 0.28rem 0.7rem;
-  border: 1px solid transparent;
+  border: 1px solid rgba(243, 230, 208, 0.16);
   border-radius: 999px;
+  background: rgba(18, 24, 18, 0.22);
   color: color-mix(in srgb, var(--cream) 82%, transparent);
   text-decoration: none;
   opacity: 1;
