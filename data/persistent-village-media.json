@@ -1,10 +1,11 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:50:56.089Z",
+  "updatedAt": "2026-08-17T14:51:02.047Z",
   "images": {
     "garden:visitor:agouti": "/api/uploads/c50c8229-8b6d-4e6e-b603-5797767be5b1.jpg",
     "garden:visitor:anole-lizard": "/api/uploads/32c6d9ef-2c33-4748-a29a-6b5311b8270b.jpg",
     "garden:visitor:barn-owl": "/api/uploads/6205c831-93bd-4457-bd66-a6df1b1f6a43.jpg",
+    "garden:visitor:curacao-whiptail": "/api/uploads/eeba717d-58f9-4846-b733-6dad7820a6d3.jpg",
     "garden:visitor:dragonfly": "/api/uploads/4256b70c-3757-4fd7-99ca-73d6069f0903.jpg",
     "garden:visitor:european-hedgehog": "/api/uploads/54fa6c5c-9af6-4001-912d-ab95824f12fe.jpg",
     "garden:visitor:european-rabbit": "/api/uploads/3b4a8512-3b06-4560-8e83-495430df6c97.jpg",
