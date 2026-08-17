@@ -1,12 +1,18 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T16:06:56.702Z",
+  "updatedAt": "2026-08-17T16:07:18.337Z",
   "files": [
     {
       "filename": "029219ef-78f5-4d5f-aaa8-da295531c07b.jpg",
       "mime": "image/jpeg",
       "sizeBytes": 29143,
       "uploadedAt": "2026-08-14T16:23:55.418Z"
+    },
+    {
+      "filename": "0b3de785-0701-45d9-b402-901bc6fce627.jpg",
+      "mime": "image/jpeg",
+      "sizeBytes": 57175,
+      "uploadedAt": "2026-08-17T16:07:18.337Z"
     },
     {
       "filename": "0b4911d3-9e78-42cc-b3d7-e5a262215282.jpg",
