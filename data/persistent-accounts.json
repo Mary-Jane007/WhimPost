@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:14:18.943Z",
+  "updatedAt": "2026-08-17T15:57:26.710Z",
   "accounts": [
     {
       "id": "system-bramblewood",
@@ -56,7 +56,7 @@
       "bio": "",
       "forest_name": "mosshollow",
       "is_owner": 1,
-      "village_id": "mosshollow",
+      "village_id": "hearthwick",
       "reputation": 0,
       "collectibles_json": "{\"mushrooms\":1,\"leaves\":1,\"feathers\":1,\"lost-pages\":1,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":1,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":1,\"clover-cherries\":0,\"clover-honey\":1,\"clover-blossoms\":1,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":1,\"moon-lanterns\":1,\"moon-lilies\":1,\"moon-dreams\":1,\"moon-dust\":0,\"bramble-fox-tails\":1,\"bramble-maple\":1,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":1,\"bramble-compasses\":1,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":1,\"hearth-muffins\":1,\"hearth-recipes\":1,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":1}",
       "visited_villages_json": "[\"bramblewood\",\"clovermeadow\",\"hearthwick\",\"moonmere\",\"mosshollow\"]",
