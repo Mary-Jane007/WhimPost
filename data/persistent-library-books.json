@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:01:20.016Z",
+  "updatedAt": "2026-08-17T15:01:55.776Z",
   "books": [
     {
       "id": "princess",
@@ -227,7 +227,7 @@
       "shelf": "readinglist",
       "title": "Pride and Prejudice",
       "author": "Jane Austen",
-      "description": "",
+      "description": "Pride and Prejudice follows Elizabeth Bennet, a witty young woman whose first impressions of the proud Mr. Darcy are far from favorable. As they get to know each other, both must overcome their assumptions and learn to see each other more clearly.",
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/68144e71-2ff3-4824-bb65-02925fcde53d.jpg",
