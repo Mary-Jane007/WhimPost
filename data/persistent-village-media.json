@@ -1,9 +1,10 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T02:00:39.574Z",
+  "updatedAt": "2026-08-17T02:00:52.373Z",
   "images": {
     "moon:star:antares": "/api/uploads/2e7b9067-7483-483e-b936-6bfab0874d54.webp",
     "moon:star:betelgeuse": "/api/uploads/bae1eecd-e6a5-4b65-a82d-c69c7e589271.jpg",
+    "moon:star:rigel": "/api/uploads/9bb3b8fd-29b0-41fe-9a81-221d4c290194.webp",
     "moon:star:spica": "/api/uploads/bd61ed3f-2fc1-4807-a244-f4dafadc564e.jpg"
   }
 }
