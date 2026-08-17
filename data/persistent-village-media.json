@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T16:06:33.954Z",
+  "updatedAt": "2026-08-17T16:06:56.793Z",
   "images": {
     "garden:visitor:agouti": "/api/uploads/c50c8229-8b6d-4e6e-b603-5797767be5b1.jpg",
     "garden:visitor:anole-lizard": "/api/uploads/32c6d9ef-2c33-4748-a29a-6b5311b8270b.jpg",
@@ -41,6 +41,7 @@
     "hearth:herb:cinnamon": "/api/uploads/6db92020-14cc-4344-8c0c-283fa4074631.jpg",
     "hearth:herb:clove": "/api/uploads/ca8b04ba-92b6-4c29-afcc-1498aef79946.jpg",
     "hearth:herb:elderflower": "/api/uploads/d2aa4842-390b-4705-afcb-11b24e6e3a88.jpg",
+    "hearth:herb:ginger": "/api/uploads/4d1396f8-2160-4d33-ad08-ae75ba801c5d.jpg",
     "hearth:herb:hibiscus": "/api/uploads/6cba8620-916c-49d8-a80c-f34524aad336.jpg",
     "hearth:herb:lavender": "/api/uploads/7a90f0d4-04d5-4844-b834-035a3cd9bf24.jpg",
     "hearth:herb:lemon-balm": "/api/uploads/ba89dbfb-74b4-47ac-8ae8-ddc86cbd51d4.jpg",
