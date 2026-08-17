@@ -295,6 +295,11 @@ select {
   text-transform: inherit;
 }
 
+.nav-ghost-link {
+  border-color: rgba(243, 230, 208, 0.14);
+  background: rgba(18, 24, 18, 0.22);
+}
+
 .nav-cta {
   border: 1px solid rgba(212, 175, 55, 0.5) !important;
   background: rgba(212, 175, 55, 0.1) !important;
@@ -1920,6 +1925,20 @@ body.theme-clovermeadow .village-sticker-pack {
 
   .nav-links .nav-logout .nav-ghost {
     width: 100%;
+  }
+
+  .nav-account-guest {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .nav-menu-label {
+    display: none;
+  }
+
+  .nav-menu-toggle {
+    min-width: 2.35rem;
+    padding: 0.45rem 0.55rem;
   }
 
   .brand-text {
