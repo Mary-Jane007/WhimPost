@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:07:16.009Z",
+  "updatedAt": "2026-08-17T15:14:18.942Z",
   "books": [
     {
       "id": "princess",
@@ -220,6 +220,28 @@
       "mood": "Wonderstruck",
       "themesJson": "[\"space\",\"curiosity\",\"humanity\"]",
       "rating": 4.7,
+      "published": true
+    },
+    {
+      "id": "lib-eba15009-be62-46b9-805b-8a9f86308602",
+      "shelf": "readinglist",
+      "title": "Little Women",
+      "author": "Louisa May Alcott",
+      "description": "Little Women follows four sisters—Meg, Jo, Beth, and Amy March—as they grow up during the American Civil War. Each sister has a different personality and dream, and together they experience friendship, family struggles, love, loss, and the challenges of growing up.",
+      "minutes": 1100,
+      "coverEmoji": "📖",
+      "coverUrl": "/api/uploads/8a6860fe-62db-41e0-bb77-76ac2ec5217c.jpg",
+      "fileUrl": "/api/uploads/dc9a0cfc-6b0e-469f-9ba4-212c47837612.epub",
+      "fileName": "Little Women - Louisa May Alcott _Worldfreebooks.com_.epub",
+      "fileMime": "application/epub+zip",
+      "quotesJson": "[\"“I am not afraid of storms, for I am learning how to sail my ship.”\"]",
+      "reflectionsJson": "[]",
+      "category": "Classic Literature",
+      "difficulty": "Steady",
+      "length": "Medium",
+      "mood": "Cozy, wholesome, nostalgic, heartfelt, family-centered.",
+      "themesJson": "[]",
+      "rating": 4.5,
       "published": true
     },
     {
