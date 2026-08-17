@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:52:32.544Z",
+  "updatedAt": "2026-08-17T14:57:27.322Z",
   "books": [
     {
       "id": "princess",
@@ -183,7 +183,7 @@
       "shelf": "readinglist",
       "title": "And Then There Were None",
       "author": "Agatha Christie",
-      "description": "",
+      "description": "'And Then There Were None' by Agatha Christie follows ten strangers who are invited to a mysterious island. They soon discover that each of them is accused of causing someone's death in the past. When the guests begin dying one by one, they realize the killer must be among them.\r\n\r\nTrapped on the island and unable to trust anyone, the remaining guests desperately try to uncover the murderer before they become the next victim.",
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/029219ef-78f5-4d5f-aaa8-da295531c07b.jpg",
