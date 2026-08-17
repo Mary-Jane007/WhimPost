@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:51:12.782Z",
+  "updatedAt": "2026-08-17T14:51:20.526Z",
   "files": [
     {
       "filename": "029219ef-78f5-4d5f-aaa8-da295531c07b.jpg",
@@ -109,6 +109,12 @@
       "mime": "image/jpeg",
       "sizeBytes": 33763,
       "uploadedAt": "2026-08-17T14:50:07.420Z"
+    },
+    {
+      "filename": "556444bb-0efa-4bab-8973-339806444545.jpg",
+      "mime": "image/jpeg",
+      "sizeBytes": 27387,
+      "uploadedAt": "2026-08-17T14:51:20.525Z"
     },
     {
       "filename": "5a7f83ff-71e6-40e1-b6bf-4a3fff416cd3.epub",
