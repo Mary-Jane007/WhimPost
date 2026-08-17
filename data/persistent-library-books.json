@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:04:28.911Z",
+  "updatedAt": "2026-08-17T15:07:16.009Z",
   "books": [
     {
       "id": "princess",
@@ -98,7 +98,7 @@
       "description": "A stuffed rabbit learns that becoming Real takes love, time, and being worn soft by someone who needs you.",
       "minutes": 60,
       "coverEmoji": "🐇",
-      "coverUrl": "/api/uploads/0caf2e64-df23-44a8-b8c4-2dac1868bb50.jpg",
+      "coverUrl": "/api/uploads/44c01ac7-3c1e-4030-8a6a-f49ea4fcea6d.jpg",
       "fileUrl": null,
       "fileName": null,
       "fileMime": null,
