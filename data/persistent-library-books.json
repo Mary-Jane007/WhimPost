@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:03:51.941Z",
+  "updatedAt": "2026-08-17T15:04:28.911Z",
   "books": [
     {
       "id": "princess",
@@ -117,7 +117,7 @@
       "shelf": "club",
       "title": "The Wind in the Willows",
       "author": "Kenneth Grahame",
-      "description": "Riverbank friendship, reckless motorcars, and the soft music of home — a hymn to loyalty and the English countryside.",
+      "description": "The Wind in the Willows follows four animal friends—Mole, Rat, Badger, and the adventurous Toad—as they explore the English countryside. Their friendship leads them through peaceful river days, woodland adventures, and plenty of trouble caused by Toad’s wild personality.",
       "minutes": 260,
       "coverEmoji": "🚣",
       "coverUrl": "/api/uploads/635c9408-ad89-4a09-99e7-1d3667d33933.jpg",
