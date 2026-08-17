@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:03:17.024Z",
+  "updatedAt": "2026-08-17T15:03:51.941Z",
   "books": [
     {
       "id": "princess",
@@ -29,7 +29,7 @@
       "shelf": "club",
       "title": "Anne of Green Gables",
       "author": "L.M. Montgomery",
-      "description": "Orphan Anne Shirley arrives with an imagination large enough for Avonlea — and a red-haired insistence that beauty belongs everywhere.",
+      "description": "Anne of Green Gables follows Anne Shirley, an imaginative and talkative orphan who is unexpectedly adopted by siblings Matthew and Marilla Cuthbert. Moving to Green Gables, Anne turns her new home into an adventure filled with friendships, school, mischief, and dreams.",
       "minutes": 320,
       "coverEmoji": "🍒",
       "coverUrl": "/api/uploads/98077cb2-75b6-4eb6-a726-e41ac555abd2.jpg",
