@@ -7249,6 +7249,15 @@ button.mh-card-cover {
   flex-basis: 100%;
 }
 
+.owner-image-attach {
+  margin: 0.45rem 0 0.15rem;
+}
+
+.owner-image-attach .mh-attach-btn {
+  font-size: 0.82rem;
+  padding: 0.35rem 0.7rem;
+}
+
 .mh-actions form {
   display: inline;
   margin: 0;

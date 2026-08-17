@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getHearthProgress } from "@/lib/hearth";
+import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { HearthwickFireside } from "@/components/HearthwickFireside";
 import { PageCrest } from "@/components/PageCrest";
 
@@ -62,7 +63,11 @@ export default async function FiresidePage() {
           { village: "hearthwick", id: "herbal-jar" },
         ]}
       />
-      <HearthwickFireside user={user} initialProgress={progress} />
+      <HearthwickFireside
+        user={user}
+        initialProgress={progress}
+        initialMedia={getVillageMediaOverrides()}
+      />
     </main>
   );
 }
