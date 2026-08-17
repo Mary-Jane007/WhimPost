@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-16T13:08:04.797Z",
+  "updatedAt": "2026-08-16T17:30:29.130Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -93,11 +93,51 @@
       "isGlobal": false
     },
     {
+      "title": "Gardeners' World 2026 - Episode 1",
+      "filename": "5ab73dcb-0dce-41fd-8fd8-f08b1f454d1c.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 266787760,
+      "durationMs": 3763978,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Gardeners' World 2026-Episode 20",
+      "filename": "78588084-04f3-4b47-a430-60bb2c82242e.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 301813742,
+      "durationMs": 3727639,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
       "title": "Silly flowers symphony",
       "filename": "074dae13-d4f6-47b4-aa85-60265231f095.mp4",
       "mime": "video/mp4",
       "sizeBytes": 37296337,
       "durationMs": 469484,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Springwatch 2024 Episode 1",
+      "filename": "da3ef970-cbc0-4f99-a9d2-cbecad69121f.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 244636639,
+      "durationMs": 3545896,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "The Birdwatchers",
+      "filename": "6614b3d4-3239-4c56-9cec-2093dc78788d.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 35210679,
+      "durationMs": 821011,
       "channelTitle": "Clovermeadow Exclusive",
       "villageId": "clovermeadow",
       "isGlobal": false
@@ -201,6 +241,126 @@
       "channelTitle": "Cottage Cartoons",
       "villageId": null,
       "isGlobal": true
+    },
+    {
+      "title": "A Tour of Hobbiton - New Zealand",
+      "filename": "6e6a05d2-d7a1-420a-b343-e1a356c52c90.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 178690152,
+      "durationMs": 2353366,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Baking Cinnamon Buns, Painting",
+      "filename": "a65bdaef-37ec-4ffd-849a-e2959aacf04d.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 103822653,
+      "durationMs": 1210387,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Brambly Hedge - A Winter Story",
+      "filename": "bdfdb7a6-e972-4f74-9bf3-2a8da7cc6b65.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 8472263,
+      "durationMs": 61603,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Game of Wool Britains Best Knitter S01E01",
+      "filename": "c4939df0-c222-43bc-a703-70225524e4c4.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 170545510,
+      "durationMs": 2999995,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Game of Wool The Cast Off - Episode 2",
+      "filename": "dee1ea6c-7f0b-48d1-976f-aa61f49b82e6.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 29308977,
+      "durationMs": 386705,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Make Apple and Crumb Pudding — The Vic…",
+      "filename": "0136b0a3-1ad7-48fe-a6db-5532ef59ba60.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 27439319,
+      "durationMs": 401310,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Make Butter – The Victorian Way",
+      "filename": "d2f99ca9-bdc5-48fe-a9db-fc3dc1efd269.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 18497004,
+      "durationMs": 488734,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to make carrot cake - The Victorian Way",
+      "filename": "d9df1d97-20cb-4a4d-8db1-e09404e7d32a.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 17200710,
+      "durationMs": 454136,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Jane Austen House",
+      "filename": "28ab1208-391d-47d5-aaab-5641c8a87b33.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 65538560,
+      "durationMs": 1297252,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Mrs. Apple‘s recipe — Apple pie",
+      "filename": "21a93570-41fd-4b4f-adfb-49fa8a107cff.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 3444991,
+      "durationMs": 55635,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Mrs. Apple's recipe — Strawberry cake",
+      "filename": "2314bb00-c07c-4f0e-b721-52ddb5a9c12f.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 6338482,
+      "durationMs": 93437,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "The secret life of Hedgehogs",
+      "filename": "1400a663-2940-460c-9123-dcb4ce48c878.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 260156179,
+      "durationMs": 2964200,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
     },
     {
       "title": "Bambi",
