@@ -1,7 +1,8 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:48:15.011Z",
+  "updatedAt": "2026-08-17T14:48:20.565Z",
   "images": {
+    "garden:visitor:barn-owl": "/api/uploads/6205c831-93bd-4457-bd66-a6df1b1f6a43.jpg",
     "garden:visitor:fireflies-night": "/api/uploads/c13a9785-2e3b-4120-a6d8-5450642d8764.jpg",
     "garden:visitor:luna-moth": "/api/uploads/901c4402-07ad-4de5-a439-30da4068effe.jpg",
     "garden:visitor:nectar-bat": "/api/uploads/82fd264a-9484-4c54-99d7-b7472690a260.jpg",
