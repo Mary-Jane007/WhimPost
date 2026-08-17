@@ -116,10 +116,10 @@ select {
 
 .site-nav {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0.85rem 1.25rem;
   position: sticky;
   top: 0;
   z-index: 20;
@@ -128,6 +128,60 @@ select {
   backdrop-filter: blur(10px);
   background: linear-gradient(180deg, rgba(31, 42, 30, 0.92), rgba(31, 42, 30, 0.55));
   border-bottom: 1px solid rgba(243, 230, 208, 0.08);
+}
+
+.site-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.nav-menu-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(243, 230, 208, 0.22);
+  background: rgba(18, 24, 18, 0.35);
+  color: var(--cream);
+  border-radius: var(--frame-pill);
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nav-menu-bars {
+  display: inline-grid;
+  gap: 3px;
+  width: 1.05rem;
+}
+
+.nav-menu-bars i {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.site-nav.is-open .nav-menu-bars i:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.site-nav.is-open .nav-menu-bars i:nth-child(2) {
+  opacity: 0;
+}
+
+.site-nav.is-open .nav-menu-bars i:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+.nav-links-mobile {
+  display: none;
 }
 
 .brand-mark {
@@ -1704,13 +1758,74 @@ body.theme-clovermeadow .village-sticker-pack {
 
 @media (max-width: 640px) {
   .site-nav {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 0.7rem 0.9rem;
   }
 
-  .letter-paper {
+  .site-nav-bar {
+    gap: 0.65rem;
+  }
+
+  .nav-menu-toggle {
+    display: inline-flex;
+  }
+
+  .nav-links-desktop {
+    display: none;
+  }
+
+  .nav-links-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(243, 230, 208, 0.12);
+    max-height: min(70vh, 28rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-links-mobile[hidden] {
+    display: none !important;
+  }
+
+  .nav-links-mobile a,
+  .nav-links-mobile .nav-ghost,
+  .nav-links-mobile .nav-user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0.35rem;
+    font-size: 0.78rem;
+  }
+
+  .nav-links-mobile .nav-logout {
+    margin: 0.15rem 0;
+  }
+
+  .brand-text {
+    font-size: 1.3rem;
+  }
+
+  .letter-paper:not(.paper-mosshollow):not(.paper-clovermeadow):not(.paper-moonmere):not(.paper-bramblewood):not(.paper-hearthwick) {
     min-height: 28rem;
     padding: 1.35rem 1.1rem 2rem;
+  }
+
+  .paper-mosshollow,
+  .paper-clovermeadow,
+  .paper-moonmere,
+  .paper-bramblewood,
+  .paper-hearthwick {
+    min-height: 0;
+    padding: 1.75rem 1rem 5.5rem;
+  }
+
+  .letter-mascot img {
+    width: 3.75rem;
+    height: 3.75rem;
   }
 
   .palette-tabs {
@@ -2418,7 +2533,13 @@ a.feature-chip:hover {
 .collectible-grid {
   display: grid;
   gap: 0.55rem;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 420px) {
+  .collectible-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (min-width: 800px) {
@@ -4995,7 +5116,15 @@ button.linkish:hover {
 
 @media (max-width: 640px) {
   .tv-upload-banner {
-    top: 7.25rem;
+    top: 0.75rem;
+  }
+
+  .tv-upload-banner-top {
+    flex-wrap: wrap;
+  }
+
+  .tv-upload-banner-actions {
+    flex-wrap: wrap;
   }
 }
 
@@ -5931,7 +6060,7 @@ button.linkish:hover {
 .bw-inspire-grid {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
 }
 .bw-inspire h3 {
   margin: 0 0 0.35rem;
@@ -6381,7 +6510,13 @@ button.linkish:hover {
 .bw-weeks {
   display: grid;
   gap: 0.65rem;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 480px) {
+  .bw-weeks {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (min-width: 800px) {
@@ -7820,7 +7955,13 @@ button.mh-card-cover {
 .mh-admin-row {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .mh-admin-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .mh-admin-list {
@@ -9083,10 +9224,16 @@ button.mh-card-cover {
 .hw-herb-shelf {
   display: grid;
   gap: 0.45rem;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   align-content: start;
   max-height: 28rem;
   overflow: auto;
+}
+
+@media (min-width: 480px) {
+  .hw-herb-shelf {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .hw-herb-jar {
@@ -9534,7 +9681,7 @@ button.mh-card-cover {
 
 .mm-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
   gap: 0.9rem;
 }
 
@@ -12133,4 +12280,201 @@ button.mh-card-cover {
   font-family: var(--font-display);
   margin: 1.25rem 0 0.55rem;
   font-size: 1.15rem;
+}
+
+/* —— Sitewide responsive polish (phones / small tablets) —— */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 800px) {
+  .forest-stickers-site .decor-leaf-ml,
+  .forest-stickers-site .decor-butterfly-mr,
+  .forest-stickers-site .decor-sun-tr2,
+  .forest-stickers-site .decor-flower-br2,
+  .forest-stickers-site .decor-moon-tr {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-main {
+    width: calc(100% - 1.25rem);
+    padding: 1.15rem 0 3rem;
+  }
+
+  .app-main.forest-panel {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .page-header h1,
+  .village-hero h1,
+  .tv-nook-header h1 {
+    font-size: clamp(1.7rem, 8vw, 2.35rem);
+    overflow-wrap: anywhere;
+  }
+
+  .tv-nook-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tv-nook-crest {
+    width: 3.5rem;
+    align-self: flex-end;
+  }
+
+  .tv-cabinet {
+    padding: 0.75rem 0.65rem 0.6rem;
+  }
+
+  .tv-controls-bar {
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tv-speaker {
+    max-width: 7.5rem;
+  }
+
+  .tv-speaker i {
+    height: 1.5rem;
+  }
+
+  .tv-guide-list li {
+    grid-template-columns: 3.75rem minmax(0, 1fr);
+    gap: 0.45rem 0.55rem;
+  }
+
+  .recipient-pick {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+
+  .sticker-grid,
+  .tiny-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .compose-toolbar,
+  .bw-actions,
+  .mm-actions,
+  .hw-actions,
+  .cm-actions,
+  .mh-actions {
+    flex-wrap: wrap;
+  }
+
+  .bw-tabs,
+  .cm-tabs,
+  .hw-tabs,
+  .mm-tabs,
+  .mh-tabs {
+    gap: 0.35rem;
+  }
+
+  .bw-tabs button,
+  .cm-tabs button,
+  .hw-tabs button,
+  .mm-tabs button,
+  .mh-tabs button {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.65rem;
+  }
+
+  .bw-hero-atelier .fox,
+  .bw-hero-atelier .maple {
+    display: none;
+  }
+
+  .mm-feature-card {
+    grid-template-columns: 1fr;
+  }
+
+  .mm-feature-img {
+    max-height: 12rem;
+  }
+
+  .welcome-modal,
+  .mm-sky-alert,
+  .lc-discover-card {
+    width: min(100%, 26rem);
+    max-height: calc(100vh - 2rem);
+  }
+
+  .oa-owner-launch,
+  .village-panel,
+  .forest-panel {
+    overflow-wrap: anywhere;
+  }
+
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 480px) {
+  .forest-stickers-site .forest-sticker:not(.decor-fern-tl):not(.decor-mushroom-tr):not(.decor-fox-bl):not(.decor-moth-br) {
+    display: none;
+  }
+
+  .forest-sticker {
+    width: 2rem;
+    height: 2rem;
+    opacity: 0.4;
+  }
+
+  .hw-todays-herb-row {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .cm-meadow {
+    height: 14rem;
+  }
+
+  .cottage-room {
+    height: min(70vw, 340px);
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: auto;
+    max-width: 100%;
+  }
+
+  .owner-image-attach,
+  .mh-attach {
+    width: 100%;
+  }
+
+  .owner-image-attach .mh-attach-btn,
+  .mh-attach-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-main {
+    width: calc(100% - 0.75rem);
+  }
+
+  .brand-text {
+    font-size: 1.15rem;
+  }
+
+  .nav-menu-label {
+    display: none;
+  }
 }
