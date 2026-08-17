@@ -1,5 +1,17 @@
 import fs from "fs";
 import path from "path";
+import {
+  isValidVillageMediaKey,
+  isValidVillageMediaUrl,
+  type VillageMediaMap,
+} from "@/lib/villageMediaShared";
+
+export type { VillageMediaMap };
+export {
+  villageMediaKey,
+  resolveVillageImage,
+  isValidVillageMediaKey,
+} from "@/lib/villageMediaShared";
 
 /**
  * Owner overrides for catalog images in village workshops
@@ -12,16 +24,11 @@ export const PERSISTENT_VILLAGE_MEDIA_PATH = path.join(
   "persistent-village-media.json"
 );
 
-export type VillageMediaMap = Record<string, string>;
-
 type VillageMediaFile = {
   version: 1;
   updatedAt: string;
   images: VillageMediaMap;
 };
-
-const SAFE_KEY = /^[a-z0-9][a-z0-9:_-]{1,120}$/i;
-const SAFE_URL = /^\/(api\/uploads\/[a-f0-9-]+\.(jpe?g|png|webp|gif)|[a-z0-9/_-]+\.(jpe?g|png|webp|gif))$/i;
 
 function readFile(): VillageMediaFile {
   try {
@@ -35,7 +42,11 @@ function readFile(): VillageMediaFile {
     }
     const images: VillageMediaMap = {};
     for (const [key, url] of Object.entries(parsed.images)) {
-      if (SAFE_KEY.test(key) && typeof url === "string" && SAFE_URL.test(url)) {
+      if (
+        isValidVillageMediaKey(key) &&
+        typeof url === "string" &&
+        isValidVillageMediaUrl(url)
+      ) {
         images[key] = url;
       }
     }
@@ -66,25 +77,13 @@ function writeFile(images: VillageMediaMap) {
   fs.renameSync(tmp, PERSISTENT_VILLAGE_MEDIA_PATH);
 }
 
-export function villageMediaKey(...parts: string[]) {
-  return parts.map((p) => String(p).trim()).filter(Boolean).join(":");
-}
-
 export function getVillageMediaOverrides(): VillageMediaMap {
   return { ...readFile().images };
 }
 
-export function resolveVillageImage(
-  overrides: VillageMediaMap,
-  key: string,
-  fallback: string
-) {
-  return overrides[key] || fallback;
-}
-
 export function setVillageMediaOverride(key: string, url: string) {
-  if (!SAFE_KEY.test(key)) throw new Error("Invalid media key");
-  if (!SAFE_URL.test(url)) throw new Error("Invalid image URL");
+  if (!isValidVillageMediaKey(key)) throw new Error("Invalid media key");
+  if (!isValidVillageMediaUrl(url)) throw new Error("Invalid image URL");
   const file = readFile();
   file.images[key] = url;
   writeFile(file.images);
@@ -92,14 +91,10 @@ export function setVillageMediaOverride(key: string, url: string) {
 }
 
 export function clearVillageMediaOverride(key: string) {
-  if (!SAFE_KEY.test(key)) throw new Error("Invalid media key");
+  if (!isValidVillageMediaKey(key)) throw new Error("Invalid media key");
   const file = readFile();
   if (!(key in file.images)) return false;
   delete file.images[key];
   writeFile(file.images);
   return true;
-}
-
-export function isValidVillageMediaKey(key: string) {
-  return SAFE_KEY.test(key);
 }

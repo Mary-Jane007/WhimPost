@@ -36,7 +36,7 @@ import {
   resolveVillageImage,
   villageMediaKey,
   type VillageMediaMap,
-} from "@/lib/villageMedia";
+} from "@/lib/villageMediaShared";
 
 type Props = {
   user: UserPublic;

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { uploadFormData } from "@/lib/clientUpload";
-import type { VillageMediaMap } from "@/lib/villageMedia";
+import type { VillageMediaMap } from "@/lib/villageMediaShared";
 
 /** Owner-only control to attach/replace a catalog image on village workshop cards. */
 export function OwnerImageAttach({
