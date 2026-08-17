@@ -212,12 +212,12 @@ select {
 }
 
 .nav-links {
-  display: flex;
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   flex: 1 1 0;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 0.35rem 0.5rem;
+  align-items: start;
+  column-gap: 0.75rem;
+  row-gap: 0.35rem;
   min-width: 0;
   font-family: var(--font-stamp);
   font-size: 0.72rem;
@@ -228,21 +228,23 @@ select {
 .nav-primary {
   display: flex;
   flex-wrap: wrap;
-  flex: 1 1 auto;
   align-items: center;
   align-content: flex-start;
   justify-content: flex-start;
   gap: 0.35rem;
   min-width: 0;
+  grid-column: 1;
 }
 
 .nav-account {
   display: inline-flex;
-  flex: 0 0 auto;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.35rem;
-  margin-left: auto;
-  align-self: flex-start;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: start;
 }
 
 .nav-links a,
@@ -313,7 +315,9 @@ select {
 }
 
 .nav-account-guest {
-  margin-left: auto;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
 }
 
 .nav-user-name {
@@ -1843,6 +1847,7 @@ body.theme-clovermeadow .village-sticker-pack {
   .nav-links {
     display: none;
     flex: 1 1 100%;
+    grid-template-columns: 1fr;
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
@@ -1873,10 +1878,12 @@ body.theme-clovermeadow .village-sticker-pack {
     align-items: stretch;
     width: 100%;
     gap: 0.18rem;
+    grid-column: auto;
+    grid-row: auto;
+    justify-self: stretch;
   }
 
   .nav-account {
-    margin-left: 0;
     align-self: stretch;
     padding-top: 0.35rem;
     border-top: 1px solid rgba(243, 230, 208, 0.12);
@@ -1890,9 +1897,9 @@ body.theme-clovermeadow .village-sticker-pack {
   }
 
   .nav-account-guest {
-    margin-left: 0;
     border-top: none;
     padding-top: 0;
+    justify-self: stretch;
   }
 
   .nav-links a,
