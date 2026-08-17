@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T16:02:26.247Z",
+  "updatedAt": "2026-08-17T16:02:57.470Z",
   "images": {
     "garden:visitor:agouti": "/api/uploads/c50c8229-8b6d-4e6e-b603-5797767be5b1.jpg",
     "garden:visitor:anole-lizard": "/api/uploads/32c6d9ef-2c33-4748-a29a-6b5311b8270b.jpg",
@@ -42,6 +42,7 @@
     "hearth:herb:lemon-balm": "/api/uploads/ba89dbfb-74b4-47ac-8ae8-ddc86cbd51d4.jpg",
     "hearth:herb:mint": "/api/uploads/fac251cc-860a-40e5-b1b9-fa26572b59d3.jpg",
     "hearth:herb:rosemary": "/api/uploads/f784f765-dc64-42ed-8350-1b5c6346bdac.jpg",
+    "hearth:herb:thyme": "/api/uploads/d0a77cdc-1152-455d-9441-2a95f771c157.jpg",
     "moon:star:antares": "/api/uploads/2e7b9067-7483-483e-b936-6bfab0874d54.webp",
     "moon:star:arcturus": "/api/uploads/7d2145a7-f9a9-485b-8291-6075688371e3.png",
     "moon:star:betelgeuse": "/api/uploads/bae1eecd-e6a5-4b65-a82d-c69c7e589271.jpg",
