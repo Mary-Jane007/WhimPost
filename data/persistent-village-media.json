@@ -1,8 +1,9 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T02:01:03.636Z",
+  "updatedAt": "2026-08-17T02:01:13.288Z",
   "images": {
     "moon:star:antares": "/api/uploads/2e7b9067-7483-483e-b936-6bfab0874d54.webp",
+    "moon:star:arcturus": "/api/uploads/7d2145a7-f9a9-485b-8291-6075688371e3.png",
     "moon:star:betelgeuse": "/api/uploads/bae1eecd-e6a5-4b65-a82d-c69c7e589271.jpg",
     "moon:star:capella": "/api/uploads/2b188d4d-3342-4be8-a59f-d7100c15f975.webp",
     "moon:star:rigel": "/api/uploads/9bb3b8fd-29b0-41fe-9a81-221d4c290194.webp",
