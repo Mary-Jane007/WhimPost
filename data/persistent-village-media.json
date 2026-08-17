@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:52:17.108Z",
+  "updatedAt": "2026-08-17T14:52:21.241Z",
   "images": {
     "garden:visitor:agouti": "/api/uploads/c50c8229-8b6d-4e6e-b603-5797767be5b1.jpg",
     "garden:visitor:anole-lizard": "/api/uploads/32c6d9ef-2c33-4748-a29a-6b5311b8270b.jpg",
@@ -16,6 +16,7 @@
     "garden:visitor:fireflies-night": "/api/uploads/c13a9785-2e3b-4120-a6d8-5450642d8764.jpg",
     "garden:visitor:firefly": "/api/uploads/982b35d8-a1c7-430a-a032-2834948a377a.jpg",
     "garden:visitor:green-iguana": "/api/uploads/d026a42d-29ab-4467-8ce3-681bbf836e76.jpg",
+    "garden:visitor:gulf-fritillary": "/api/uploads/f7922745-ab96-43a2-b997-23bd742ace30.jpg",
     "garden:visitor:honey-bee": "/api/uploads/874b43b3-f31b-4ff6-9ebc-f5608e998597.jpg",
     "garden:visitor:house-gecko": "/api/uploads/ffb8a86c-ee38-4092-a30e-eff1583d49a5.jpg",
     "garden:visitor:hoverfly": "/api/uploads/556444bb-0efa-4bab-8973-339806444545.jpg",
