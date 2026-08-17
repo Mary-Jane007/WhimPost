@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:01:55.776Z",
+  "updatedAt": "2026-08-17T15:02:36.009Z",
   "books": [
     {
       "id": "princess",
@@ -249,7 +249,7 @@
       "shelf": "readinglist",
       "title": "The Name of the Rose",
       "author": "Umberto Eco",
-      "description": "",
+      "description": "The Name of the Rose follows Brother William of Baskerville and his young assistant as they investigate a series of mysterious deaths at a secluded medieval monastery. Their investigation leads them into the monastery’s secretive library and a web of religious conflict, forbidden knowledge, and hidden truths.",
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/1c20cccc-6904-4a53-aa98-0d8f133ccf31.jpg",
