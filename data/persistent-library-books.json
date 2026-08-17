@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T15:00:29.863Z",
+  "updatedAt": "2026-08-17T15:01:20.016Z",
   "books": [
     {
       "id": "princess",
@@ -205,7 +205,7 @@
       "shelf": "readinglist",
       "title": "Cosmos",
       "author": "Carl Sagan",
-      "description": "",
+      "description": "Cosmos explores the universe, from planets and stars to the origins of life and humanity. Carl Sagan combines science, history, and philosophy to show how small we are in the universe while emphasizing how remarkable human curiosity and discovery can be.",
       "minutes": 120,
       "coverEmoji": "📖",
       "coverUrl": "/api/uploads/91a9708a-5177-4bd1-b757-c30bbc0007ce.jpg",
