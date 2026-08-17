@@ -215,6 +215,11 @@ select {
   text-transform: uppercase;
 }
 
+.nav-links-desktop {
+  flex: 1;
+  justify-content: flex-end;
+}
+
 .nav-links a,
 .nav-ghost {
   opacity: 0.78;
@@ -12350,6 +12355,10 @@ svg {
   .tv-guide-list li {
     grid-template-columns: 3.75rem minmax(0, 1fr);
     gap: 0.45rem 0.55rem;
+  }
+
+  .tv-guide-list li span {
+    grid-column: 2;
   }
 
   .recipient-pick {
