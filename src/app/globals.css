@@ -116,9 +116,11 @@ select {
 
 .site-nav {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
   padding: 0.85rem 1.25rem;
   position: sticky;
   top: 0;
@@ -135,7 +137,8 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  width: 100%;
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .nav-menu-toggle {
@@ -180,10 +183,6 @@ select {
   transform: translateY(-5px) rotate(-45deg);
 }
 
-.nav-links-mobile {
-  display: none;
-}
-
 .brand-mark {
   display: inline-flex;
   align-items: center;
@@ -207,17 +206,15 @@ select {
 .nav-links {
   display: flex;
   flex-wrap: wrap;
+  flex: 1 1 auto;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.75rem 1rem;
+  min-width: 0;
   font-family: var(--font-stamp);
   font-size: 0.82rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-
-.nav-links-desktop {
-  flex: 1;
-  justify-content: flex-end;
 }
 
 .nav-links a,
@@ -1763,10 +1760,13 @@ body.theme-clovermeadow .village-sticker-pack {
 
 @media (max-width: 640px) {
   .site-nav {
+    flex-direction: column;
+    align-items: stretch;
     padding: 0.7rem 0.9rem;
   }
 
   .site-nav-bar {
+    width: 100%;
     gap: 0.65rem;
   }
 
@@ -1774,17 +1774,15 @@ body.theme-clovermeadow .village-sticker-pack {
     display: inline-flex;
   }
 
-  .nav-links-desktop {
+  .nav-links {
     display: none;
-  }
-
-  .nav-links-mobile {
-    display: flex;
+    flex: 1 1 100%;
     flex-direction: column;
     align-items: stretch;
+    justify-content: flex-start;
     gap: 0.35rem;
     width: 100%;
-    margin-top: 0.75rem;
+    margin-top: 0.15rem;
     padding-top: 0.75rem;
     border-top: 1px solid rgba(243, 230, 208, 0.12);
     max-height: min(70vh, 28rem);
@@ -1792,13 +1790,14 @@ body.theme-clovermeadow .village-sticker-pack {
     -webkit-overflow-scrolling: touch;
   }
 
-  .nav-links-mobile[hidden] {
-    display: none !important;
+  .site-nav.is-open .nav-links,
+  .nav-links[data-open="true"] {
+    display: flex;
   }
 
-  .nav-links-mobile a,
-  .nav-links-mobile .nav-ghost,
-  .nav-links-mobile .nav-user {
+  .nav-links a,
+  .nav-links .nav-ghost,
+  .nav-links .nav-user {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1806,7 +1805,7 @@ body.theme-clovermeadow .village-sticker-pack {
     font-size: 0.78rem;
   }
 
-  .nav-links-mobile .nav-logout {
+  .nav-links .nav-logout {
     margin: 0.15rem 0;
   }
 

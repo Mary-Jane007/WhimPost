@@ -38,104 +38,35 @@ export function SiteNav({
     href: string;
     label: string;
     badgeKey?: keyof NavBadges;
-  }> = [
-    { href: "/village", label: "Village", badgeKey: "unlocks" },
-    ...(user?.villageId === "bramblewood"
-      ? [{ href: "/workshop", label: "Workshop" }]
-      : []),
-    ...(user?.villageId === "mosshollow"
-      ? [{ href: "/library", label: "Library" }]
-      : []),
-    ...(user?.villageId === "clovermeadow"
-      ? [{ href: "/garden", label: "Garden" }]
-      : []),
-    ...(user?.villageId === "hearthwick"
-      ? [{ href: "/fireside", label: "Fireside" }]
-      : []),
-    ...(user?.villageId === "moonmere"
-      ? [{ href: "/observatory", label: "Observatory" }]
-      : []),
-    { href: "/tv-corner", label: "TV Corner" },
-    { href: "/meeting-bench", label: "Meeting Bench" },
-    ...(user?.isOwner
-      ? [{ href: "/admin/analytics", label: "Owner Analytics" }]
-      : []),
-    { href: "/inbox", label: "Inbox", badgeKey: "inbox" },
-    { href: "/sent", label: "Sent" },
-    { href: "/compose", label: "Write" },
-    { href: "/friends", label: "Friends", badgeKey: "friends" },
-    { href: "/profile", label: "Profile" },
-  ];
-
-  function renderLinks(guest = false) {
-    if (guest) {
-      return (
-        <>
-          <Link href="/login" onClick={() => setMenuOpen(false)}>
-            Sign in
-          </Link>
-          <Link
-            href="/register"
-            className="nav-cta"
-            onClick={() => setMenuOpen(false)}
-          >
-            Join the post
-          </Link>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {links.map((link) => {
-          const count = link.badgeKey ? badges[link.badgeKey] : 0;
-          const badge = formatBadge(count);
-          const title =
-            link.badgeKey === "inbox" && count
-              ? `${count} unread letter${count === 1 ? "" : "s"}`
-              : link.badgeKey === "friends" && count
-                ? `${count} friend request${count === 1 ? "" : "s"}`
-                : link.badgeKey === "unlocks" && count
-                  ? `${count} new cottage unlock${count === 1 ? "" : "s"}`
-                  : undefined;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={pathname.startsWith(link.href) ? "active" : ""}
-              title={title}
-              aria-label={badge ? `${link.label}, ${title}` : undefined}
-              onClick={() => setMenuOpen(false)}
-            >
-              <span>{link.label}</span>
-              {badge ? (
-                <span className="nav-badge" aria-hidden>
-                  {badge}
-                </span>
-              ) : null}
-            </Link>
-          );
-        })}
-        <form action="/api/auth/logout" method="post" className="nav-logout">
-          <button type="submit" className="nav-ghost">
-            Sign out
-          </button>
-        </form>
-        {user ? (
-          <Link
-            href={`/profile/${user.username}`}
-            className={
-              pathname.startsWith("/profile") ? "nav-user active" : "nav-user"
-            }
-            onClick={() => setMenuOpen(false)}
-          >
-            {user.displayName}
-            {user.isOwner ? <span className="owner-badge">Owner</span> : null}
-          </Link>
-        ) : null}
-      </>
-    );
-  }
+  }> = user
+    ? [
+        { href: "/village", label: "Village", badgeKey: "unlocks" },
+        ...(user.villageId === "bramblewood"
+          ? [{ href: "/workshop", label: "Workshop" }]
+          : []),
+        ...(user.villageId === "mosshollow"
+          ? [{ href: "/library", label: "Library" }]
+          : []),
+        ...(user.villageId === "clovermeadow"
+          ? [{ href: "/garden", label: "Garden" }]
+          : []),
+        ...(user.villageId === "hearthwick"
+          ? [{ href: "/fireside", label: "Fireside" }]
+          : []),
+        ...(user.villageId === "moonmere"
+          ? [{ href: "/observatory", label: "Observatory" }]
+          : []),
+        { href: "/tv-corner", label: "TV Corner" },
+        { href: "/meeting-bench", label: "Meeting Bench" },
+        ...(user.isOwner
+          ? [{ href: "/admin/analytics", label: "Owner Analytics" }]
+          : []),
+        { href: "/inbox", label: "Inbox", badgeKey: "inbox" },
+        { href: "/sent", label: "Sent" },
+        { href: "/compose", label: "Write" },
+        { href: "/friends", label: "Friends", badgeKey: "friends" },
+      ]
+    : [];
 
   return (
     <header className={`site-nav${menuOpen ? " is-open" : ""}`}>
@@ -171,19 +102,75 @@ export function SiteNav({
           </span>
           <span className="nav-menu-label">{menuOpen ? "Close" : "Menu"}</span>
         </button>
-
-        <nav className="nav-links nav-links-desktop" aria-label="Main">
-          {user ? renderLinks(false) : renderLinks(true)}
-        </nav>
       </div>
 
       <nav
         id="site-nav-menu"
-        className="nav-links nav-links-mobile"
+        className="nav-links"
         aria-label="Main"
-        hidden={!menuOpen}
+        data-open={menuOpen ? "true" : "false"}
       >
-        {user ? renderLinks(false) : renderLinks(true)}
+        {user ? (
+          <>
+            {links.map((link) => {
+              const count = link.badgeKey ? badges[link.badgeKey] : 0;
+              const badge = formatBadge(count);
+              const title =
+                link.badgeKey === "inbox" && count
+                  ? `${count} unread letter${count === 1 ? "" : "s"}`
+                  : link.badgeKey === "friends" && count
+                    ? `${count} friend request${count === 1 ? "" : "s"}`
+                    : link.badgeKey === "unlocks" && count
+                      ? `${count} new cottage unlock${count === 1 ? "" : "s"}`
+                      : undefined;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={pathname.startsWith(link.href) ? "active" : ""}
+                  title={title}
+                  aria-label={badge ? `${link.label}, ${title}` : undefined}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span>{link.label}</span>
+                  {badge ? (
+                    <span className="nav-badge" aria-hidden>
+                      {badge}
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
+            <Link
+              href={`/profile/${user.username}`}
+              className={
+                pathname.startsWith("/profile") ? "nav-user active" : "nav-user"
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              {user.displayName}
+              {user.isOwner ? <span className="owner-badge">Owner</span> : null}
+            </Link>
+            <form action="/api/auth/logout" method="post" className="nav-logout">
+              <button type="submit" className="nav-ghost">
+                Sign out
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <Link href="/login" onClick={() => setMenuOpen(false)}>
+              Sign in
+            </Link>
+            <Link
+              href="/register"
+              className="nav-cta"
+              onClick={() => setMenuOpen(false)}
+            >
+              Join the post
+            </Link>
+          </>
+        )}
       </nav>
     </header>
   );
