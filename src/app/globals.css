@@ -181,11 +181,60 @@ select {
   transform: translateY(-5px) rotate(-45deg);
 }
 
+.nav-links {
+  display: contents;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.nav-primary,
+.nav-account {
+  display: contents;
+}
+
+.site-nav > a,
+.site-nav .nav-ghost,
+.site-nav .nav-ghost-link,
+.nav-links a,
+.nav-ghost,
+.nav-ghost-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  min-height: 1.9rem;
+  padding: 0.28rem 0.62rem;
+  border: 1px solid transparent;
+  border-radius: var(--frame-pill);
+  color: color-mix(in srgb, var(--cream) 82%, transparent);
+  text-decoration: none;
+  opacity: 1;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
 .brand-mark {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   flex: 0 0 auto;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
   line-height: 1;
 }
 
@@ -203,45 +252,9 @@ select {
   color: var(--cream);
 }
 
-.nav-links {
-  display: flex;
-  flex-wrap: wrap;
-  flex: 1 1 12rem;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.35rem;
-  min-width: 0;
-  font-family: var(--font-stamp);
-  font-size: 0.72rem;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.nav-primary,
-.nav-account {
-  display: contents;
-}
-
-.nav-links a,
-.nav-ghost,
-.nav-ghost-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.28rem;
-  min-height: 1.9rem;
-  padding: 0.28rem 0.62rem;
-  border: 1px solid transparent;
-  border-radius: var(--frame-pill);
-  color: color-mix(in srgb, var(--cream) 82%, transparent);
-  text-decoration: none;
-  opacity: 1;
-  transition:
-    color 0.18s ease,
-    background 0.18s ease,
-    border-color 0.18s ease;
-}
-
+.site-nav > a:hover,
+.site-nav .nav-ghost:hover,
+.site-nav .nav-ghost-link:hover,
 .nav-links a:hover,
 .nav-ghost:hover,
 .nav-ghost-link:hover {
@@ -250,7 +263,18 @@ select {
   border-color: rgba(243, 230, 208, 0.12);
 }
 
-.nav-links a.active {
+.brand-mark:hover {
+  background: transparent;
+  border-color: transparent;
+  color: inherit;
+}
+
+.brand-mark:hover .brand-text {
+  color: var(--gold);
+}
+
+.nav-links a.active,
+.site-nav a.active {
   color: var(--gold);
   background: rgba(212, 175, 55, 0.12);
   border-color: rgba(212, 175, 55, 0.28);
@@ -1832,6 +1856,10 @@ body.theme-clovermeadow .village-sticker-pack {
     max-height: min(70vh, 28rem);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    font-family: var(--font-stamp);
+    font-size: 0.72rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
   }
 
   .site-nav.is-open .nav-links,
