@@ -70,40 +70,38 @@ export function SiteNav({
 
   return (
     <header className={`site-nav${menuOpen ? " is-open" : ""}`}>
-      <div className="site-nav-bar">
-        <Link href={user ? "/village" : "/"} className="brand-mark">
-          <span className="brand-icon" aria-hidden>
-            {user?.villageId === "mosshollow"
-              ? "🦉"
-              : user?.villageId === "clovermeadow"
-                ? "🐝"
-                : user?.villageId === "moonmere"
-                  ? "🦋"
-                  : user?.villageId === "bramblewood"
-                    ? "🦊"
-                    : user?.villageId === "hearthwick"
-                      ? "🦔"
-                      : "✿"}
-          </span>
-          <span className="brand-text">WhimPost</span>
-        </Link>
+      <Link href={user ? "/village" : "/"} className="brand-mark">
+        <span className="brand-icon" aria-hidden>
+          {user?.villageId === "mosshollow"
+            ? "🦉"
+            : user?.villageId === "clovermeadow"
+              ? "🐝"
+              : user?.villageId === "moonmere"
+                ? "🦋"
+                : user?.villageId === "bramblewood"
+                  ? "🦊"
+                  : user?.villageId === "hearthwick"
+                    ? "🦔"
+                    : "✿"}
+        </span>
+        <span className="brand-text">WhimPost</span>
+      </Link>
 
-        <button
-          type="button"
-          className="nav-menu-toggle"
-          aria-expanded={menuOpen}
-          aria-controls="site-nav-menu"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          onClick={() => setMenuOpen((o) => !o)}
-        >
-          <span className="nav-menu-bars" aria-hidden>
-            <i />
-            <i />
-            <i />
-          </span>
-          <span className="nav-menu-label">{menuOpen ? "Close" : "Menu"}</span>
-        </button>
-      </div>
+      <button
+        type="button"
+        className="nav-menu-toggle"
+        aria-expanded={menuOpen}
+        aria-controls="site-nav-menu"
+        aria-label={menuOpen ? "Close menu" : "Open menu"}
+        onClick={() => setMenuOpen((o) => !o)}
+      >
+        <span className="nav-menu-bars" aria-hidden>
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="nav-menu-label">{menuOpen ? "Close" : "Menu"}</span>
+      </button>
 
       <nav
         id="site-nav-menu"
