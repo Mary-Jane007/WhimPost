@@ -1,7 +1,8 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T01:59:12.076Z",
+  "updatedAt": "2026-08-17T02:00:16.618Z",
   "images": {
+    "moon:star:antares": "/api/uploads/86263b56-8bac-476f-8876-ed602ce67b95.webp",
     "moon:star:spica": "/api/uploads/bd61ed3f-2fc1-4807-a244-f4dafadc564e.jpg"
   }
 }
