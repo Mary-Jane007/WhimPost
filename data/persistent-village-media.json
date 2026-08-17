@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:49:01.756Z",
+  "updatedAt": "2026-08-17T14:49:11.485Z",
   "images": {
     "garden:visitor:barn-owl": "/api/uploads/6205c831-93bd-4457-bd66-a6df1b1f6a43.jpg",
     "garden:visitor:dragonfly": "/api/uploads/4256b70c-3757-4fd7-99ca-73d6069f0903.jpg",
@@ -10,6 +10,7 @@
     "garden:visitor:leafcutter-ant": "/api/uploads/ab9f5d47-dca9-41e6-ab76-df35a28e191a.jpg",
     "garden:visitor:luna-moth": "/api/uploads/901c4402-07ad-4de5-a439-30da4068effe.jpg",
     "garden:visitor:nectar-bat": "/api/uploads/82fd264a-9484-4c54-99d7-b7472690a260.jpg",
+    "garden:visitor:nine-banded-armadillo": "/api/uploads/30c72dad-e8e2-4b22-838c-d1c940f608fa.jpg",
     "garden:visitor:praying-mantis": "/api/uploads/9f9a1699-b357-4bde-8169-83607625062a.jpg",
     "garden:visitor:spectacled-owl": "/api/uploads/deb13be1-667d-4da5-9f76-fcb0ed9e5123.jpg",
     "garden:visitor:walking-stick": "/api/uploads/421e01d3-cd99-45ae-84bd-b426824bec37.jpg",
