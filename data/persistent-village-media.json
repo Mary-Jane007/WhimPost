@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:51:20.618Z",
+  "updatedAt": "2026-08-17T14:51:25.662Z",
   "images": {
     "garden:visitor:agouti": "/api/uploads/c50c8229-8b6d-4e6e-b603-5797767be5b1.jpg",
     "garden:visitor:anole-lizard": "/api/uploads/32c6d9ef-2c33-4748-a29a-6b5311b8270b.jpg",
@@ -22,6 +22,7 @@
     "garden:visitor:praying-mantis": "/api/uploads/9f9a1699-b357-4bde-8169-83607625062a.jpg",
     "garden:visitor:red-squirrel": "/api/uploads/8af4f99f-6b65-42ef-8a2f-1c884571c577.jpg",
     "garden:visitor:spectacled-owl": "/api/uploads/deb13be1-667d-4da5-9f76-fcb0ed9e5123.jpg",
+    "garden:visitor:stingless-bee": "/api/uploads/adf39d4d-5c36-4a0d-8aaf-63df4b7d67c1.jpg",
     "garden:visitor:tiny-tree-frog": "/api/uploads/367f8fe6-178a-458e-8d96-aa40340d302b.jpg",
     "garden:visitor:walking-stick": "/api/uploads/421e01d3-cd99-45ae-84bd-b426824bec37.jpg",
     "moon:star:antares": "/api/uploads/2e7b9067-7483-483e-b936-6bfab0874d54.webp",
