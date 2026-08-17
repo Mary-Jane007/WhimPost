@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-17T14:57:27.322Z",
+  "updatedAt": "2026-08-17T14:59:51.625Z",
   "books": [
     {
       "id": "princess",
@@ -267,28 +267,6 @@
       "published": true
     },
     {
-      "id": "rl-gaiman",
-      "shelf": "readinglist",
-      "title": "The Ocean at the End of the Lane",
-      "author": "Neil Gaiman",
-      "description": "",
-      "minutes": 120,
-      "coverEmoji": "📖",
-      "coverUrl": "/api/uploads/1a31d94c-bcd9-42eb-b697-0972aabeaa69.jpg",
-      "fileUrl": "/api/uploads/7e7e39bf-9e21-44bd-8c39-f8f0ffed0c1d.epub",
-      "fileName": "The Ocean at the End of the Lan - Neil Gaiman.epub",
-      "fileMime": "application/epub+zip",
-      "quotesJson": "[]",
-      "reflectionsJson": "[]",
-      "category": "Fantasy",
-      "difficulty": "Gentle",
-      "length": "Short",
-      "mood": "Dreamlike",
-      "themesJson": "[\"memory\",\"childhood\",\"myth\"]",
-      "rating": 4.7,
-      "published": true
-    },
-    {
       "id": "lib-de16fbfc-7d01-4e19-b72e-08a3cb1d2475",
       "shelf": "readinglist",
       "title": "The Secret History",
@@ -362,6 +340,7 @@
     "neverending",
     "rl-Carson",
     "rl-frankl",
+    "rl-gaiman",
     "rl-le-guin",
     "rl-marcus",
     "rl-oliver",
