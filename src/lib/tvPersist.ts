@@ -420,6 +420,7 @@ export async function runDurableTvGitSync(): Promise<{
         "data/persistent-library-books.json",
         "data/persistent-moon-sounds.json",
         "data/persistent-site-uploads.json",
+        "data/persistent-village-media.json",
         "data/persistent-accounts.json",
         "data/persistent-welcome-letters.json",
         "data/persistent-meeting-bench.json",
@@ -459,6 +460,7 @@ export async function runDurableTvGitSync(): Promise<{
             line === "data/persistent-library-books.json" ||
             line === "data/persistent-moon-sounds.json" ||
             line === "data/persistent-site-uploads.json" ||
+            line === "data/persistent-village-media.json" ||
             line === "data/persistent-accounts.json" ||
             line === "data/persistent-welcome-letters.json" ||
             line === "data/persistent-meeting-bench.json" ||

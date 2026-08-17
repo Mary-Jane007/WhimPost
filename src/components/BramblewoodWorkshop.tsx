@@ -18,10 +18,17 @@ import {
   todaysWoodlandInspiration,
   type WorkshopTabId,
 } from "@/lib/workshopContent";
+import { OwnerImageAttach } from "@/components/OwnerImageAttach";
+import {
+  resolveVillageImage,
+  villageMediaKey,
+  type VillageMediaMap,
+} from "@/lib/villageMedia";
 
 type Props = {
   user: UserPublic;
   initialProgress: WorkshopProgress;
+  initialMedia?: VillageMediaMap;
 };
 
 async function uploadPhoto(
@@ -44,9 +51,14 @@ async function uploadPhoto(
   return url;
 }
 
-export function BramblewoodWorkshop({ user, initialProgress }: Props) {
+export function BramblewoodWorkshop({
+  user,
+  initialProgress,
+  initialMedia = {},
+}: Props) {
   const [tab, setTab] = useState<WorkshopTabId>("inspiration");
   const [progress, setProgress] = useState(initialProgress);
+  const [media, setMedia] = useState<VillageMediaMap>(initialMedia);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +94,14 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
   const inspiration = useMemo(() => todaysWoodlandInspiration(), []);
   const expedition = useMemo(() => featuredExpedition(), []);
   const weeklyDiy = useMemo(() => WOODLAND_DIY[weekDiyIndex()], []);
+
+  function catalogImage(kind: string, id: string, fallback: string) {
+    return resolveVillageImage(
+      media,
+      villageMediaKey("workshop", kind, id),
+      fallback
+    );
+  }
 
   const todayAnimal =
     LOCAL_WILDLIFE.find((w) => w.id === inspiration.animalId) || LOCAL_WILDLIFE[0];
@@ -565,8 +585,20 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
               {weeklyDiy.image ? (
                 <figure className="bw-recipe-example">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={weeklyDiy.image} alt="" />
+                  <img
+                    src={catalogImage("diy", weeklyDiy.id, weeklyDiy.image)}
+                    alt=""
+                  />
                   <figcaption>Inspiration</figcaption>
+                  {user.isOwner ? (
+                    <OwnerImageAttach
+                      mediaKey={villageMediaKey("workshop", "diy", weeklyDiy.id)}
+                      hasImage={Boolean(
+                        media[villageMediaKey("workshop", "diy", weeklyDiy.id)]
+                      )}
+                      onChanged={setMedia}
+                    />
+                  ) : null}
                 </figure>
               ) : (
                 <div className="bw-diy-plate" aria-hidden>
@@ -583,12 +615,25 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                   <article key={diy.id} className="bw-card craft-card">
                     {diy.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={diy.image} alt="" className="bw-diy-thumb" />
+                      <img
+                        src={catalogImage("diy", diy.id, diy.image)}
+                        alt=""
+                        className="bw-diy-thumb"
+                      />
                     ) : (
                       <div className="bw-diy-plate small" aria-hidden>
                         🪵
                       </div>
                     )}
+                    {user.isOwner && diy.image ? (
+                      <OwnerImageAttach
+                        mediaKey={villageMediaKey("workshop", "diy", diy.id)}
+                        hasImage={Boolean(
+                          media[villageMediaKey("workshop", "diy", diy.id)]
+                        )}
+                        onChanged={setMedia}
+                      />
+                    ) : null}
                     <h3>{diy.title}</h3>
                     <p className="bw-meta">
                       {diy.difficulty} · {diy.time}
@@ -694,10 +739,19 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                     <figure className="bw-recipe-example">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={r.image}
+                        src={catalogImage("recipe", r.id, r.image)}
                         alt={`Example of finished dish: ${r.title}`}
                       />
                       <figcaption>Inspiration · finished dish</figcaption>
+                      {user.isOwner ? (
+                        <OwnerImageAttach
+                          mediaKey={villageMediaKey("workshop", "recipe", r.id)}
+                          hasImage={Boolean(
+                            media[villageMediaKey("workshop", "recipe", r.id)]
+                          )}
+                          onChanged={setMedia}
+                        />
+                      ) : null}
                     </figure>
                   </article>
                 );
@@ -722,7 +776,10 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                     <figure className="bw-bird-figure">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={photo || w.image}
+                        src={
+                          photo ||
+                          catalogImage("wildlife", w.id, w.image)
+                        }
                         alt={photo ? `Your photo of a ${w.name}` : w.name}
                         className="bw-bird-image"
                         onError={(e) => {
@@ -735,6 +792,21 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                       <figcaption>
                         {spotted ? "Logged in your guide" : "Field guide plate"}
                       </figcaption>
+                      {user.isOwner ? (
+                        <OwnerImageAttach
+                          mediaKey={villageMediaKey(
+                            "workshop",
+                            "wildlife",
+                            w.id
+                          )}
+                          hasImage={Boolean(
+                            media[
+                              villageMediaKey("workshop", "wildlife", w.id)
+                            ]
+                          )}
+                          onChanged={setMedia}
+                        />
+                      ) : null}
                     </figure>
                     <h3>
                       {w.emoji} {w.name}
@@ -794,7 +866,7 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                   <figure className="bw-bird-figure">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={p.image}
+                      src={catalogImage("flora", p.id, p.image)}
                       alt={p.name}
                       className="bw-bird-image"
                       onError={(e) => {
@@ -805,6 +877,15 @@ export function BramblewoodWorkshop({ user, initialProgress }: Props) {
                       {p.emoji}
                     </div>
                     <figcaption>Botanical plate</figcaption>
+                    {user.isOwner ? (
+                      <OwnerImageAttach
+                        mediaKey={villageMediaKey("workshop", "flora", p.id)}
+                        hasImage={Boolean(
+                          media[villageMediaKey("workshop", "flora", p.id)]
+                        )}
+                        onChanged={setMedia}
+                      />
+                    ) : null}
                   </figure>
                   <h3>
                     {p.emoji} {p.name}

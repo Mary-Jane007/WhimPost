@@ -26,15 +26,27 @@ import {
   type GardenTabId,
   type VisitorCategory,
 } from "@/lib/gardenContent";
+import { OwnerImageAttach } from "@/components/OwnerImageAttach";
+import {
+  resolveVillageImage,
+  villageMediaKey,
+  type VillageMediaMap,
+} from "@/lib/villageMedia";
 
 type Props = {
   user: UserPublic;
   initialProgress: GardenProgress;
+  initialMedia?: VillageMediaMap;
 };
 
-export function BloomkeeperGarden({ user, initialProgress }: Props) {
+export function BloomkeeperGarden({
+  user,
+  initialProgress,
+  initialMedia = {},
+}: Props) {
   const [tab, setTab] = useState<GardenTabId>("overview");
   const [progress, setProgress] = useState(initialProgress);
+  const [media, setMedia] = useState<VillageMediaMap>(initialMedia);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -49,6 +61,14 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
   const [dailyPhotos, setDailyPhotos] = useState<Record<string, string>>({});
   const [dailyNotes, setDailyNotes] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState(false);
+
+  function catalogImage(kind: string, id: string, fallback: string) {
+    return resolveVillageImage(
+      media,
+      villageMediaKey("garden", kind, id),
+      fallback
+    );
+  }
 
   const daily = dailyTasksForDay();
   const kindness = weeklyKindness();
@@ -463,7 +483,20 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
               {SPOT_FLOWERS.filter((f) => f.id === spotId).map((f) => (
                 <div key={f.id} className="cm-flower-facts">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={f.image} alt={f.name} className="cm-flower-plate" />
+                  <img
+                    src={catalogImage("flower", f.id, f.image)}
+                    alt={f.name}
+                    className="cm-flower-plate"
+                  />
+                  {user.isOwner ? (
+                    <OwnerImageAttach
+                      mediaKey={villageMediaKey("garden", "flower", f.id)}
+                      hasImage={Boolean(
+                        media[villageMediaKey("garden", "flower", f.id)]
+                      )}
+                      onChanged={setMedia}
+                    />
+                  ) : null}
                   <p>{f.facts}</p>
                   <p className="cm-meta">
                     Season · {f.season} · Pollinators · {f.pollinators}
@@ -715,10 +748,25 @@ export function BloomkeeperGarden({ user, initialProgress }: Props) {
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={v.image}
+                            src={catalogImage("visitor", v.id, v.image)}
                             alt={v.name}
                             className="cm-visitor-img"
                           />
+                          {user.isOwner ? (
+                            <OwnerImageAttach
+                              mediaKey={villageMediaKey(
+                                "garden",
+                                "visitor",
+                                v.id
+                              )}
+                              hasImage={Boolean(
+                                media[
+                                  villageMediaKey("garden", "visitor", v.id)
+                                ]
+                              )}
+                              onChanged={setMedia}
+                            />
+                          ) : null}
                           <h3>
                             <span aria-hidden>{v.emoji}</span> {v.name}
                           </h3>

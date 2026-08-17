@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getWorkshopProgress } from "@/lib/workshop";
+import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { BramblewoodWorkshop } from "@/components/BramblewoodWorkshop";
 import { PageCrest } from "@/components/PageCrest";
 
@@ -51,6 +52,7 @@ export default async function WorkshopPage() {
   }
 
   const progress = getWorkshopProgress(user.id);
+  const media = getVillageMediaOverrides();
 
   return (
     <main className="app-main forest-panel bw-workshop-page village-bramblewood">
@@ -62,7 +64,11 @@ export default async function WorkshopPage() {
           { village: "bramblewood", id: "maple-branch" },
         ]}
       />
-      <BramblewoodWorkshop user={user} initialProgress={progress} />
+      <BramblewoodWorkshop
+        user={user}
+        initialProgress={progress}
+        initialMedia={media}
+      />
     </main>
   );
 }

@@ -31,15 +31,27 @@ import {
   type DreamTheme,
   type MoonTabId,
 } from "@/lib/moonContent";
+import { OwnerImageAttach } from "@/components/OwnerImageAttach";
+import {
+  resolveVillageImage,
+  villageMediaKey,
+  type VillageMediaMap,
+} from "@/lib/villageMedia";
 
 type Props = {
   user: UserPublic;
   initialProgress: MoonProgress;
+  initialMedia?: VillageMediaMap;
 };
 
-export function MoonmereObservatory({ user, initialProgress }: Props) {
+export function MoonmereObservatory({
+  user,
+  initialProgress,
+  initialMedia = {},
+}: Props) {
   const [tab, setTab] = useState<MoonTabId>("overview");
   const [progress, setProgress] = useState(initialProgress);
+  const [media, setMedia] = useState<VillageMediaMap>(initialMedia);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -54,6 +66,14 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  function catalogImage(kind: string, id: string, fallback: string) {
+    return resolveVillageImage(
+      media,
+      villageMediaKey("moon", kind, id),
+      fallback
+    );
+  }
 
   const rituals = dailyRituals();
   const moon = todaysMoonPhase();
@@ -341,7 +361,20 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
               </article>
               <article className="mm-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={brightStar.image} alt="" className="mm-card-img" />
+                <img
+                  src={catalogImage("star", brightStar.id, brightStar.image)}
+                  alt=""
+                  className="mm-card-img"
+                />
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("moon", "star", brightStar.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("moon", "star", brightStar.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>
                   Tonight&apos;s brightest star · {brightStar.emoji}{" "}
                   {brightStar.name}
@@ -379,7 +412,20 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
               </article>
               <article className="mm-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={planet.image} alt="" className="mm-card-img" />
+                <img
+                  src={catalogImage("planet", planet.id, planet.image)}
+                  alt=""
+                  className="mm-card-img"
+                />
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("moon", "planet", planet.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("moon", "planet", planet.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>
                   Today&apos;s planet · {planet.emoji} {planet.name}
                 </h3>
@@ -496,8 +542,21 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
             </div>
             <article className="mm-feature-card mm-constellation-card">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={openStar.image} alt="" className="mm-feature-img" />
+              <img
+                src={catalogImage("star", openStar.id, openStar.image)}
+                alt=""
+                className="mm-feature-img"
+              />
               <div>
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("moon", "star", openStar.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("moon", "star", openStar.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>
                   {openStar.emoji} {openStar.name}
                 </h3>
@@ -668,11 +727,20 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
             <article className="mm-feature-card">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={openPlanet.image}
+                src={catalogImage("planet", openPlanet.id, openPlanet.image)}
                 alt=""
                 className="mm-feature-img"
               />
               <div>
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("moon", "planet", openPlanet.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("moon", "planet", openPlanet.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>
                   {openPlanet.emoji} {openPlanet.name}
                 </h3>
@@ -777,8 +845,31 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
             </div>
             <article className="mm-feature-card">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={openCreature.image} alt="" className="mm-feature-img" />
+              <img
+                src={catalogImage(
+                  "creature",
+                  openCreature.id,
+                  openCreature.image
+                )}
+                alt=""
+                className="mm-feature-img"
+              />
               <div>
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey(
+                      "moon",
+                      "creature",
+                      openCreature.id
+                    )}
+                    hasImage={Boolean(
+                      media[
+                        villageMediaKey("moon", "creature", openCreature.id)
+                      ]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>
                   {openCreature.emoji} {openCreature.name}
                 </h3>
@@ -816,7 +907,20 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
                     className={on ? "mm-card mm-listening" : "mm-card"}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={pl.image} alt="" className="mm-card-img" />
+                    <img
+                      src={catalogImage("playlist", pl.id, pl.image)}
+                      alt=""
+                      className="mm-card-img"
+                    />
+                    {user.isOwner ? (
+                      <OwnerImageAttach
+                        mediaKey={villageMediaKey("moon", "playlist", pl.id)}
+                        hasImage={Boolean(
+                          media[villageMediaKey("moon", "playlist", pl.id)]
+                        )}
+                        onChanged={setMedia}
+                      />
+                    ) : null}
                     <h3>
                       {pl.emoji} {pl.name}
                     </h3>
@@ -922,7 +1026,20 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
               </article>
               <article className="mm-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={inspStar.image} alt="" className="mm-card-img" />
+                <img
+                  src={catalogImage("star", inspStar.id, inspStar.image)}
+                  alt=""
+                  className="mm-card-img"
+                />
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("moon", "star", inspStar.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("moon", "star", inspStar.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>Tonight&apos;s brightest star</h3>
                 <p>
                   {inspStar.emoji} {inspStar.name}
@@ -934,7 +1051,20 @@ export function MoonmereObservatory({ user, initialProgress }: Props) {
               </article>
               <article className="mm-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={inspPlanet.image} alt="" className="mm-card-img" />
+                <img
+                  src={catalogImage("planet", inspPlanet.id, inspPlanet.image)}
+                  alt=""
+                  className="mm-card-img"
+                />
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("moon", "planet", inspPlanet.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("moon", "planet", inspPlanet.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>Today&apos;s planet</h3>
                 <p>
                   {inspPlanet.emoji} {inspPlanet.name}

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getMoonProgress } from "@/lib/moon";
+import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { MoonmereObservatory } from "@/components/MoonmereObservatory";
 import { PageCrest } from "@/components/PageCrest";
 
@@ -62,7 +63,11 @@ export default async function ObservatoryPage() {
           { village: "moonmere", id: "fairy-moon" },
         ]}
       />
-      <MoonmereObservatory user={user} initialProgress={progress} />
+      <MoonmereObservatory
+        user={user}
+        initialProgress={progress}
+        initialMedia={getVillageMediaOverrides()}
+      />
     </main>
   );
 }

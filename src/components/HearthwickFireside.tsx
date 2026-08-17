@@ -21,15 +21,27 @@ import {
   type KnitDifficulty,
   type RecipeCategory,
 } from "@/lib/hearthContent";
+import { OwnerImageAttach } from "@/components/OwnerImageAttach";
+import {
+  resolveVillageImage,
+  villageMediaKey,
+  type VillageMediaMap,
+} from "@/lib/villageMedia";
 
 type Props = {
   user: UserPublic;
   initialProgress: HearthProgress;
+  initialMedia?: VillageMediaMap;
 };
 
-export function HearthwickFireside({ user, initialProgress }: Props) {
+export function HearthwickFireside({
+  user,
+  initialProgress,
+  initialMedia = {},
+}: Props) {
   const [tab, setTab] = useState<HearthTabId>("overview");
   const [progress, setProgress] = useState(initialProgress);
+  const [media, setMedia] = useState<VillageMediaMap>(initialMedia);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -40,6 +52,14 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
   const [knitDiff, setKnitDiff] = useState<KnitDifficulty | "all">("all");
   const [selectedHerb, setSelectedHerb] = useState<string | null>(null);
   const [showKindlingOnly, setShowKindlingOnly] = useState(false);
+
+  function catalogImage(kind: string, id: string, fallback: string) {
+    return resolveVillageImage(
+      media,
+      villageMediaKey("hearth", kind, id),
+      fallback
+    );
+  }
 
   const rituals = dailyRituals();
   const herbToday = todaysHerb();
@@ -188,7 +208,20 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
             <div className="hw-grid">
               <article className="hw-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={herbToday.image} alt="" className="hw-card-img" />
+                <img
+                  src={catalogImage("herb", herbToday.id, herbToday.image)}
+                  alt=""
+                  className="hw-card-img"
+                />
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("hearth", "herb", herbToday.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("hearth", "herb", herbToday.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>Today&apos;s Herb · {herbToday.name}</h3>
                 <p>{herbToday.description}</p>
                 <button
@@ -303,7 +336,10 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
               <p className="hw-eyebrow">Today&apos;s Herb</p>
               <div className="hw-todays-herb-row">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={herbToday.image} alt={herbToday.name} />
+                <img
+                  src={catalogImage("herb", herbToday.id, herbToday.image)}
+                  alt={herbToday.name}
+                />
                 <div>
                   <h3>
                     {herbToday.emoji} {herbToday.name}
@@ -312,6 +348,19 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
                   <p className="hw-meta">
                     Pairs with {herbToday.teaPairing}. {herbToday.folklore}
                   </p>
+                  {user.isOwner ? (
+                    <OwnerImageAttach
+                      mediaKey={villageMediaKey(
+                        "hearth",
+                        "herb",
+                        herbToday.id
+                      )}
+                      hasImage={Boolean(
+                        media[villageMediaKey("hearth", "herb", herbToday.id)]
+                      )}
+                      onChanged={setMedia}
+                    />
+                  ) : null}
                 </div>
               </div>
             </article>
@@ -359,7 +408,10 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
                     onClick={() => setSelectedHerb(h.id)}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={h.image} alt="" />
+                    <img
+                      src={catalogImage("herb", h.id, h.image)}
+                      alt=""
+                    />
                     <span>
                       {h.emoji} {h.name}
                     </span>
@@ -368,7 +420,19 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
               </div>
               <article className="hw-card hw-herb-page">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={openHerb.image} alt={openHerb.name} />
+                <img
+                  src={catalogImage("herb", openHerb.id, openHerb.image)}
+                  alt={openHerb.name}
+                />
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("hearth", "herb", openHerb.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("hearth", "herb", openHerb.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>
                   {openHerb.emoji} {openHerb.name}
                 </h3>
@@ -437,7 +501,20 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
                 return (
                   <article key={r.id} className="hw-card">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={r.image} alt="" className="hw-card-img" />
+                    <img
+                      src={catalogImage("recipe", r.id, r.image)}
+                      alt=""
+                      className="hw-card-img"
+                    />
+                    {user.isOwner ? (
+                      <OwnerImageAttach
+                        mediaKey={villageMediaKey("hearth", "recipe", r.id)}
+                        hasImage={Boolean(
+                          media[villageMediaKey("hearth", "recipe", r.id)]
+                        )}
+                        onChanged={setMedia}
+                      />
+                    ) : null}
                     <h3>
                       <span aria-hidden>{r.emoji}</span> {r.name}
                     </h3>
@@ -491,7 +568,20 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
               {CANDLE_CRAFTS.map((c) => (
                 <article key={c.id} className="hw-card">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.image} alt="" className="hw-card-img" />
+                  <img
+                    src={catalogImage("candle", c.id, c.image)}
+                    alt=""
+                    className="hw-card-img"
+                  />
+                  {user.isOwner ? (
+                    <OwnerImageAttach
+                      mediaKey={villageMediaKey("hearth", "candle", c.id)}
+                      hasImage={Boolean(
+                        media[villageMediaKey("hearth", "candle", c.id)]
+                      )}
+                      onChanged={setMedia}
+                    />
+                  ) : null}
                   <h3>
                     <span aria-hidden>{c.emoji}</span> {c.name}
                   </h3>
@@ -554,7 +644,20 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
               {filteredKnits.map((k) => (
                 <article key={k.id} className="hw-card hw-knit-card">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={k.image} alt="" className="hw-card-img" />
+                  <img
+                    src={catalogImage("knit", k.id, k.image)}
+                    alt=""
+                    className="hw-card-img"
+                  />
+                  {user.isOwner ? (
+                    <OwnerImageAttach
+                      mediaKey={villageMediaKey("hearth", "knit", k.id)}
+                      hasImage={Boolean(
+                        media[villageMediaKey("hearth", "knit", k.id)]
+                      )}
+                      onChanged={setMedia}
+                    />
+                  ) : null}
                   <h3>
                     <span aria-hidden>{k.emoji}</span> {k.name}
                   </h3>
@@ -689,7 +792,20 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
               </article>
               <article className="hw-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={inspHerb.image} alt="" className="hw-card-img" />
+                <img
+                  src={catalogImage("herb", inspHerb.id, inspHerb.image)}
+                  alt=""
+                  className="hw-card-img"
+                />
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey("hearth", "herb", inspHerb.id)}
+                    hasImage={Boolean(
+                      media[villageMediaKey("hearth", "herb", inspHerb.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>Today&apos;s Herb</h3>
                 <p>
                   {inspHerb.emoji} {inspHerb.name} — {inspHerb.aroma}
@@ -697,7 +813,24 @@ export function HearthwickFireside({ user, initialProgress }: Props) {
               </article>
               <article className="hw-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={inspRecipe.image} alt="" className="hw-card-img" />
+                <img
+                  src={catalogImage("recipe", inspRecipe.id, inspRecipe.image)}
+                  alt=""
+                  className="hw-card-img"
+                />
+                {user.isOwner ? (
+                  <OwnerImageAttach
+                    mediaKey={villageMediaKey(
+                      "hearth",
+                      "recipe",
+                      inspRecipe.id
+                    )}
+                    hasImage={Boolean(
+                      media[villageMediaKey("hearth", "recipe", inspRecipe.id)]
+                    )}
+                    onChanged={setMedia}
+                  />
+                ) : null}
                 <h3>Today&apos;s Recipe</h3>
                 <p>
                   {inspRecipe.emoji} {inspRecipe.name}

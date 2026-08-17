@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getGardenProgress } from "@/lib/garden";
+import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { BloomkeeperGarden } from "@/components/BloomkeeperGarden";
 import { PageCrest } from "@/components/PageCrest";
 
@@ -59,7 +60,11 @@ export default async function GardenPage() {
           "clover-orchid",
         ]}
       />
-      <BloomkeeperGarden user={user} initialProgress={progress} />
+      <BloomkeeperGarden
+        user={user}
+        initialProgress={progress}
+        initialMedia={getVillageMediaOverrides()}
+      />
     </main>
   );
 }
