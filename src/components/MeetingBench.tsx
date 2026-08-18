@@ -92,19 +92,23 @@ function EditBtn({
 
 function BenchHeroArt() {
   return (
-    <div className="mb-hero-art" aria-hidden>
-      <div className="mb-hero-sky" />
-      <div className="mb-hero-hedge" />
-      <div className="mb-hero-bench">
-        <div className="mb-hero-blanket" />
-        <div className="mb-hero-seat" />
-        <div className="mb-hero-back" />
-        <div className="mb-hero-leg mb-hero-leg-l" />
-        <div className="mb-hero-leg mb-hero-leg-r" />
-        <div className="mb-hero-mug" />
-      </div>
-      <div className="mb-hero-flowers" />
-    </div>
+    <figure className="mb-hero-art">
+      <picture>
+        <source
+          srcSet="/images/meeting-bench-hero.webp"
+          type="image/webp"
+        />
+        <img
+          src="/images/meeting-bench-hero.jpg"
+          alt="A weathered wooden garden bench under blossoming trees, with a watering can, gloves, and soft wildflowers in the mist."
+          width={1600}
+          height={1067}
+          decoding="async"
+          fetchPriority="high"
+        />
+      </picture>
+      <div className="mb-hero-mist" aria-hidden />
+    </figure>
   );
 }
 
