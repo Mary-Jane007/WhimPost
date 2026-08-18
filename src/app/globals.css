@@ -10848,12 +10848,15 @@ body:has(.meeting-bench-page) .site-nav {
 }
 
 body:has(.meeting-bench-page) .site-nav a,
-body:has(.meeting-bench-page) .site-nav .brand,
+body:has(.meeting-bench-page) .site-nav .brand-mark,
+body:has(.meeting-bench-page) .site-nav .brand-text,
+body:has(.meeting-bench-page) .site-nav .nav-ghost,
 body:has(.meeting-bench-page) .nav-links a {
   color: #4a3d34;
 }
 
-body:has(.meeting-bench-page) .nav-links a:hover {
+body:has(.meeting-bench-page) .nav-links a:hover,
+body:has(.meeting-bench-page) .site-nav .nav-ghost:hover {
   color: color-mix(in srgb, #6f7d62 65%, #c9a4a0);
 }
 
