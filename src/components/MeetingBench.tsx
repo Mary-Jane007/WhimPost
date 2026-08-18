@@ -15,8 +15,6 @@ export type MeetingBenchBoard = {
   communityEvents: BenchItem[];
 };
 
-const NOTE_AVATARS = ["🦔", "🐿️", "🦊", "🦉", "🐝", "🦋", "🐸", "🐰"];
-
 function villageNames(villages: VillageId[] | "all") {
   if (villages === "all") return "All villages";
   return villages
@@ -39,34 +37,54 @@ function formatWhen(iso: string | null) {
   }
 }
 
-function formatDateBox(iso: string | null) {
-  if (!iso) return { month: "Soon", day: "—" };
-  try {
-    const d = new Date(iso);
-    return {
-      month: d.toLocaleString(undefined, { month: "short" }).toUpperCase(),
-      day: String(d.getDate()),
-    };
-  } catch {
-    return { month: "Soon", day: "—" };
-  }
+function statusLabel(status: string) {
+  if (status === "active") return "Happening now";
+  if (status === "upcoming") return "Coming up";
+  if (status === "finished") return "Finished";
+  if (status === "published") return "Pinned";
+  return status;
 }
 
-function formatTimeAgo(iso: string) {
-  const then = new Date(iso).getTime();
-  if (Number.isNaN(then)) return "";
-  const mins = Math.max(0, Math.round((Date.now() - then) / 60000));
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.round(mins / 60);
-  if (hours < 48) return `${hours}h ago`;
-  const days = Math.round(hours / 24);
-  return `${days}d ago`;
+function SeasonDecor({ season }: { season: string }) {
+  const glyphs =
+    season === "spring"
+      ? ["🌿", "🌸", "💧", "🐦"]
+      : season === "summer"
+        ? ["☀️", "🌊", "🍑", "🌅"]
+        : season === "autumn"
+          ? ["🍂", "🍄", "🌧️", "📖"]
+          : ["❄️", "🕯️", "🧣", "⭐"];
+  return (
+    <div className="mb-season-decor" aria-hidden>
+      {glyphs.map((g) => (
+        <span key={g}>{g}</span>
+      ))}
+    </div>
+  );
 }
 
-function excerpt(text: string, n = 110) {
-  const clean = text.replace(/\s+/g, " ").trim();
-  if (clean.length <= n) return clean;
-  return `${clean.slice(0, n).trim()}…`;
+function OwnerBar({
+  isOwner,
+  onEdit,
+  onAdd,
+  kind,
+}: {
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
+  onAdd?: (kind: BenchItemKind) => void;
+  kind?: BenchItemKind;
+  itemId?: string;
+}) {
+  if (!isOwner) return null;
+  return (
+    <div className="mb-owner-bar">
+      {onAdd && kind ? (
+        <button type="button" className="nav-ghost" onClick={() => onAdd(kind)}>
+          + Add
+        </button>
+      ) : null}
+    </div>
+  );
 }
 
 function EditBtn({
@@ -90,21 +108,189 @@ function EditBtn({
   );
 }
 
-function BenchHeroArt() {
+function NoticeSlip({
+  item,
+  isOwner,
+  onEdit,
+}: {
+  item: BenchItem;
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
+}) {
   return (
-    <div className="mb-hero-art" aria-hidden>
-      <div className="mb-hero-sky" />
-      <div className="mb-hero-hedge" />
-      <div className="mb-hero-bench">
-        <div className="mb-hero-blanket" />
-        <div className="mb-hero-seat" />
-        <div className="mb-hero-back" />
-        <div className="mb-hero-leg mb-hero-leg-l" />
-        <div className="mb-hero-leg mb-hero-leg-r" />
-        <div className="mb-hero-mug" />
+    <article className={`mb-slip ${item.pinned ? "is-pinned" : ""}`}>
+      {item.pinned ? <span className="mb-pin" aria-hidden /> : null}
+      <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEdit} />
+      <h3>{item.title}</h3>
+      <p>{item.body}</p>
+      <div className="mb-slip-meta">
+        <span>{villageNames(item.villages)}</span>
+        {item.ctaHref ? (
+          <Link href={item.ctaHref} className="btn-secondary">
+            {item.ctaLabel || "Take a look"}
+          </Link>
+        ) : null}
       </div>
-      <div className="mb-hero-flowers" />
-    </div>
+    </article>
+  );
+}
+
+function GatheringCard({
+  item,
+  onRsvp,
+  busy,
+  isOwner,
+  onEdit,
+}: {
+  item: BenchItem;
+  onRsvp: (id: string) => void;
+  busy: boolean;
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
+}) {
+  const when = formatWhen(item.startsAt);
+  return (
+    <article className={`mb-gathering status-${item.status}`}>
+      <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEdit} />
+      <div className="mb-gathering-top">
+        <span className="mb-status">{statusLabel(item.status)}</span>
+        {item.activityType ? (
+          <span className="mb-type">{item.activityType}</span>
+        ) : null}
+      </div>
+      <h3>{item.title}</h3>
+      {when ? <p className="mb-when">{when}</p> : null}
+      <p>{item.body}</p>
+      <p className="mb-villages">{villageNames(item.villages)}</p>
+      <div className="mb-gathering-actions">
+        <button
+          type="button"
+          className={item.userJoined ? "btn-primary" : "btn-secondary"}
+          disabled={busy || item.status === "finished"}
+          onClick={() => onRsvp(item.id)}
+        >
+          {item.userJoined
+            ? "You're going"
+            : item.ctaLabel || "I'll be there"}
+        </button>
+        <em>
+          {item.rsvpCount || 0} villager
+          {(item.rsvpCount || 0) === 1 ? "" : "s"} saving a seat
+        </em>
+        {item.ctaHref ? (
+          <Link href={item.ctaHref} className="nav-ghost">
+            Details
+          </Link>
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
+function ChronicleStory({
+  item,
+  isOwner,
+  onEdit,
+}: {
+  item: BenchItem;
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
+}) {
+  return (
+    <article className="mb-chronicle-story">
+      <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEdit} />
+      <h3>{item.title}</h3>
+      <p>
+        <em>{item.body}</em>
+      </p>
+      <span className="mb-villages">{villageNames(item.villages)}</span>
+    </article>
+  );
+}
+
+function CommunityEvent({
+  item,
+  onRsvp,
+  busy,
+  isOwner,
+  onEdit,
+}: {
+  item: BenchItem;
+  onRsvp: (id: string) => void;
+  busy: boolean;
+  isOwner?: boolean;
+  onEdit?: (id: string) => void;
+}) {
+  const tasks =
+    item.meta &&
+    typeof item.meta.villageTasks === "object" &&
+    item.meta.villageTasks
+      ? (item.meta.villageTasks as Record<string, string>)
+      : {};
+
+  return (
+    <article className="mb-community">
+      <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEdit} />
+      <div className="mb-gathering-top">
+        <span className="mb-status">{statusLabel(item.status)}</span>
+        {item.season ? <span className="mb-type">{item.season}</span> : null}
+      </div>
+      <h3>{item.title}</h3>
+      <p>{item.body}</p>
+      {Object.keys(tasks).length > 0 ? (
+        <ul className="mb-village-tasks">
+          {VILLAGES.map((v) => {
+            const task = tasks[v.id];
+            if (!task) return null;
+            return (
+              <li key={v.id}>
+                <strong>
+                  {v.mascot} {v.name}
+                </strong>
+                <span>{task}</span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+      <div className="mb-gathering-actions">
+        <button
+          type="button"
+          className={item.userJoined ? "btn-primary" : "btn-secondary"}
+          disabled={busy || item.status === "finished"}
+          onClick={() => onRsvp(item.id)}
+        >
+          {item.userJoined
+            ? "Joined the gathering"
+            : item.ctaLabel || "Join in"}
+        </button>
+        <em>{item.rsvpCount || 0} across the villages</em>
+      </div>
+    </article>
+  );
+}
+
+function SectionHead({
+  title,
+  lead,
+  kind,
+  isOwner,
+  onAdd,
+}: {
+  title: string;
+  lead: string;
+  kind: BenchItemKind;
+  isOwner?: boolean;
+  onAdd?: (kind: BenchItemKind) => void;
+}) {
+  return (
+    <header className="mb-section-head">
+      <div>
+        <h2>{title}</h2>
+        <p>{lead}</p>
+      </div>
+      <OwnerBar isOwner={isOwner} onAdd={onAdd} kind={kind} />
+    </header>
   );
 }
 
@@ -140,19 +326,6 @@ export function MeetingBench({
     ),
   };
 
-  const notices = board.notices.slice(0, 3);
-  const whatsNew = [
-    ...board.seasonal.slice(0, 2),
-    ...board.communityEvents.slice(0, 2),
-  ].slice(0, 4);
-  const highlight =
-    board.chronicles[0] ||
-    board.notices[0] ||
-    board.seasonal[0] ||
-    null;
-  const meetings = board.gatherings.slice(0, 4);
-  const recentNotes = board.chronicles.slice(0, 4);
-
   async function rsvp(itemId: string) {
     if (!canRsvp) return;
     setBusyId(itemId);
@@ -181,358 +354,167 @@ export function MeetingBench({
   }
 
   return (
-    <div className={`meeting-bench mb-cottage season-${board.season}`}>
-      <section className="mb-cottage-hero" aria-labelledby="mb-hero-title">
-        <div className="mb-cottage-hero-copy">
-          <p className="mb-cottage-kicker">
-            Shared by every village · {board.seasonLabel}
+    <div className={`meeting-bench season-${board.season}`}>
+      <section className="mb-scene" aria-label="The wooden bench">
+        <div className="mb-board-frame">
+          <div className="mb-board-header">
+            <span>Community notice board · every village</span>
+            <SeasonDecor season={board.season} />
+          </div>
+          <p className="mb-scene-lead">
+            It is <strong>{board.seasonLabel}</strong> across WhimPost. This
+            board is shared by every village — papers shift with the wind;
+            someone has left a calendar under a stone.
           </p>
-          <h2 id="mb-hero-title" className="mb-cottage-title">
-            <span className="mb-leaf" aria-hidden>
-              ❧
-            </span>
-            The Meeting Bench
-            <span className="mb-leaf" aria-hidden>
-              ❧
-            </span>
-          </h2>
-          <p className="mb-cottage-lead">
-            Come sit for a moment. Notices flutter on the board, gatherings are
-            pencilled on the calendar, and soft stories gather here from every
-            WhimPost village.
-          </p>
-          <a href="#mb-meetings" className="mb-take-seat">
-            Take a seat
-          </a>
         </div>
-
-        <div className="mb-cottage-hero-visual">
-          <BenchHeroArt />
-          <nav className="mb-wood-signs" aria-label="Bench paths">
-            <a href="#mb-share" className="mb-wood-sign">
-              Share
-            </a>
-            <a href="#mb-listen" className="mb-wood-sign">
-              Listen
-            </a>
-            <a href="#mb-grow" className="mb-wood-sign">
-              Grow
-            </a>
-          </nav>
+        <div className="mb-bench-illustration" aria-hidden>
+          <div className="mb-bench-wood">
+            <span className="mb-bench-slat" />
+            <span className="mb-bench-slat" />
+            <span className="mb-bench-slat" />
+          </div>
+          <div className="mb-bench-legs" />
+          <div className="mb-under-bench">
+            <em>a tucked-away letter</em>
+          </div>
         </div>
       </section>
 
       {error ? <p className="form-error">{error}</p> : null}
 
-      <div className="mb-cottage-grid">
-        <section id="mb-listen" className="mb-panel">
-          <header className="mb-panel-head">
-            <h3>Village Announcements</h3>
-            {isOwner && onAddKind ? (
-              <button
-                type="button"
-                className="mb-panel-add"
-                onClick={() => onAddKind("notice")}
-              >
-                + Add
-              </button>
-            ) : null}
-          </header>
-          {notices.length === 0 ? (
-            <p className="mb-empty">The board is clear for now.</p>
-          ) : (
-            <ul className="mb-announce-list">
-              {notices.map((item, i) => (
-                <li key={item.id}>
-                  <span className={`mb-thumb mb-thumb-${(i % 3) + 1}`} aria-hidden />
-                  <div>
-                    <strong>{item.title}</strong>
-                    <p>{excerpt(item.body, 90)}</p>
-                    {item.ctaHref ? (
-                      <Link href={item.ctaHref} className="mb-inline-link">
-                        Read more →
-                      </Link>
-                    ) : (
-                      <span className="mb-inline-meta">
-                        {villageNames(item.villages)}
-                      </span>
-                    )}
-                  </div>
-                  <EditBtn
-                    isOwner={isOwner}
-                    itemId={item.id}
-                    onEdit={onEditItem}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-          <a href="#notices-full" className="mb-panel-cta">
-            View all announcements
-          </a>
-        </section>
-
-        <section id="mb-grow" className="mb-panel">
-          <header className="mb-panel-head">
-            <h3>What’s New?</h3>
-            {isOwner && onAddKind ? (
-              <button
-                type="button"
-                className="mb-panel-add"
-                onClick={() => onAddKind("seasonal")}
-              >
-                + Add
-              </button>
-            ) : null}
-          </header>
-          {whatsNew.length === 0 ? (
-            <p className="mb-empty">The season is still waking up.</p>
-          ) : (
-            <ul className="mb-leaf-list">
-              {whatsNew.map((item) => (
-                <li key={item.id}>
-                  <span aria-hidden>🍃</span>
-                  <div>
-                    <strong>{item.title}</strong>
-                    <p>{excerpt(item.body, 80)}</p>
-                  </div>
-                  <EditBtn
-                    isOwner={isOwner}
-                    itemId={item.id}
-                    onEdit={onEditItem}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="mb-panel-foot">
-            <Link href="/village" className="mb-panel-cta">
-              Explore now
-            </Link>
-            <span className="mb-basket" aria-hidden>
-              🧺
-            </span>
-          </div>
-        </section>
-
-        <section className="mb-panel mb-panel-highlight">
-          <header className="mb-panel-head">
-            <h3>Village Highlights</h3>
-          </header>
-          {highlight ? (
-            <figure className="mb-polaroid">
-              <div className="mb-polaroid-tape" aria-hidden />
-              <div className="mb-polaroid-photo" aria-hidden>
-                <span>🌿</span>
-              </div>
-              <figcaption>
-                <strong>{highlight.title}</strong>
-                <span>♡ {villageNames(highlight.villages)}</span>
-              </figcaption>
-              <EditBtn
+      <section id="notices" className="mb-section mb-notices">
+        <SectionHead
+          title="📌 Village Notices"
+          lead="Important whispers from the living world of WhimPost."
+          kind="notice"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
+        {board.notices.length === 0 ? (
+          <p className="muted">The board is clear for now. Check back soon.</p>
+        ) : (
+          <div className="mb-slip-grid">
+            {board.notices.map((item) => (
+              <NoticeSlip
+                key={item.id}
+                item={item}
                 isOwner={isOwner}
-                itemId={highlight.id}
                 onEdit={onEditItem}
               />
-            </figure>
-          ) : (
-            <p className="mb-empty">No highlight pinned yet.</p>
-          )}
-          <a href="#mb-notes" className="mb-panel-cta">
-            See more moments
-          </a>
-        </section>
-
-        <section id="mb-meetings" className="mb-panel">
-          <header className="mb-panel-head">
-            <h3>Upcoming Meetings</h3>
-            {isOwner && onAddKind ? (
-              <button
-                type="button"
-                className="mb-panel-add"
-                onClick={() => onAddKind("gathering")}
-              >
-                + Add
-              </button>
-            ) : null}
-          </header>
-          {meetings.length === 0 ? (
-            <p className="mb-empty">No gatherings pencilled in yet.</p>
-          ) : (
-            <ul className="mb-meeting-list">
-              {meetings.map((item) => {
-                const box = formatDateBox(item.startsAt);
-                const when = formatWhen(item.startsAt);
-                return (
-                  <li key={item.id}>
-                    <div className="mb-date-box" aria-hidden>
-                      <span>{box.month}</span>
-                      <strong>{box.day}</strong>
-                    </div>
-                    <div className="mb-meeting-copy">
-                      <strong>{item.title}</strong>
-                      <p>{excerpt(item.body, 70)}</p>
-                      {when ? <em>{when}</em> : null}
-                      <button
-                        type="button"
-                        className={
-                          item.userJoined ? "mb-mini-primary" : "mb-mini-ghost"
-                        }
-                        disabled={busyId === item.id || item.status === "finished"}
-                        onClick={() => rsvp(item.id)}
-                      >
-                        {item.userJoined
-                          ? "You're going"
-                          : item.ctaLabel || "I'll be there"}
-                      </button>
-                    </div>
-                    <EditBtn
-                      isOwner={isOwner}
-                      itemId={item.id}
-                      onEdit={onEditItem}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-          <a href="#gatherings-full" className="mb-panel-cta">
-            View full schedule
-          </a>
-        </section>
-
-        <section id="mb-share" className="mb-panel mb-panel-share">
-          <header className="mb-panel-head">
-            <h3>Share Your Thoughts</h3>
-          </header>
-          <div className="mb-journal" aria-hidden>
-            <span className="mb-journal-book">📔</span>
-            <span className="mb-journal-pen">✒️</span>
+            ))}
           </div>
-          <p className="mb-share-lead">
-            Leave a soft note for the villages — a wish, a thank-you, or a tiny
-            story from your path.
-          </p>
-          <Link href="/compose" className="mb-take-seat mb-take-seat-sm">
-            Leave a note
-          </Link>
-          <blockquote className="mb-quote-chip">
-            Every voice makes our village stronger.
-          </blockquote>
-        </section>
+        )}
+      </section>
 
-        <section id="mb-notes" className="mb-panel">
-          <header className="mb-panel-head">
-            <h3>Recent Notes</h3>
-            {isOwner && onAddKind ? (
-              <button
-                type="button"
-                className="mb-panel-add"
-                onClick={() => onAddKind("chronicle")}
-              >
-                + Add
-              </button>
-            ) : null}
-          </header>
-          {recentNotes.length === 0 ? (
-            <p className="mb-empty">The Chronicle is quiet today.</p>
+      <section id="gatherings" className="mb-section">
+        <SectionHead
+          title="🗓️ Gatherings"
+          lead="Upcoming activities where villages meet in the middle."
+          kind="gathering"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
+        {board.gatherings.length === 0 ? (
+          <p className="muted">No gatherings pencilled in yet.</p>
+        ) : (
+          <div className="mb-gathering-grid">
+            {board.gatherings.map((item) => (
+              <GatheringCard
+                key={item.id}
+                item={item}
+                busy={busyId === item.id}
+                onRsvp={rsvp}
+                isOwner={isOwner}
+                onEdit={onEditItem}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section id="seasonal" className="mb-section mb-seasonal">
+        <SectionHead
+          title="🌱 Seasonal Activities"
+          lead={`Celebrating the feel of ${board.seasonLabel.toLowerCase()} — weather, plants, light, and quiet outdoor (or fireside) traditions.`}
+          kind="seasonal"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
+        {board.seasonal.length === 0 ? (
+          <p className="muted">The season is still finding its activities.</p>
+        ) : (
+          <div className="mb-slip-grid">
+            {board.seasonal.map((item) => (
+              <article key={item.id} className="mb-slip mb-season-card">
+                <EditBtn
+                  isOwner={isOwner}
+                  itemId={item.id}
+                  onEdit={onEditItem}
+                />
+                <span className="mb-type">{item.season || board.season}</span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+                {item.ctaHref ? (
+                  <Link href={item.ctaHref} className="btn-secondary">
+                    {item.ctaLabel || "Join the season"}
+                  </Link>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section id="chronicle" className="mb-section mb-chronicle">
+        <SectionHead
+          title="📰 The WhimPost Chronicle"
+          lead="A tiny village newspaper of discoveries and soft mysteries."
+          kind="chronicle"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
+        <div className="mb-chronicle-paper">
+          <p className="mb-chronicle-masthead">THE WHIMPOST CHRONICLE</p>
+          {board.chronicles.length === 0 ? (
+            <p className="muted">The press is quiet today.</p>
           ) : (
-            <ul className="mb-notes-list">
-              {recentNotes.map((item, i) => (
-                <li key={item.id}>
-                  <span className="mb-note-avatar" aria-hidden>
-                    {NOTE_AVATARS[i % NOTE_AVATARS.length]}
-                  </span>
-                  <div>
-                    <div className="mb-note-meta">
-                      <strong>{item.title}</strong>
-                      <time dateTime={item.updatedAt}>
-                        {formatTimeAgo(item.updatedAt)}
-                      </time>
-                    </div>
-                    <p>{excerpt(item.body, 95)}</p>
-                  </div>
-                  <EditBtn
-                    isOwner={isOwner}
-                    itemId={item.id}
-                    onEdit={onEditItem}
-                  />
-                </li>
-              ))}
-            </ul>
+            board.chronicles.map((item) => (
+              <ChronicleStory
+                key={item.id}
+                item={item}
+                isOwner={isOwner}
+                onEdit={onEditItem}
+              />
+            ))
           )}
-          <a href="#chronicle-full" className="mb-panel-cta">
-            Read more notes
-          </a>
-        </section>
-      </div>
-
-      <section className="mb-together" aria-label="We're better together">
-        <div className="mb-together-deco mb-together-left" aria-hidden>
-          <span>🪴</span>
-          <span>🏮</span>
-        </div>
-        <h3>We’re better together.</h3>
-        <div className="mb-together-deco mb-together-right" aria-hidden>
-          <span>🧺</span>
-          <span>🕯️</span>
         </div>
       </section>
 
-      <p className="mb-footer-line">
-        Every meeting, every note, every idea… helps our story grow.{" "}
-        <span aria-hidden>♡</span>
-      </p>
-
-      {/* Full lists kept for deep links / owner browsing */}
-      <details id="notices-full" className="mb-full-details">
-        <summary>All village notices</summary>
-        <div className="mb-full-stack">
-          {board.notices.map((item) => (
-            <article key={item.id} className="mb-full-card">
-              <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEditItem} />
-              <h4>{item.title}</h4>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </details>
-
-      <details id="gatherings-full" className="mb-full-details">
-        <summary>Full gathering schedule</summary>
-        <div className="mb-full-stack">
-          {board.gatherings.map((item) => (
-            <article key={item.id} className="mb-full-card">
-              <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEditItem} />
-              <h4>{item.title}</h4>
-              <p>{item.body}</p>
-              <button
-                type="button"
-                className="mb-mini-primary"
-                disabled={busyId === item.id}
-                onClick={() => rsvp(item.id)}
-              >
-                {item.userJoined ? "You're going" : "I'll be there"}
-              </button>
-            </article>
-          ))}
-        </div>
-      </details>
-
-      <details id="chronicle-full" className="mb-full-details">
-        <summary>Full Chronicle</summary>
-        <div className="mb-full-stack">
-          {board.chronicles.map((item) => (
-            <article key={item.id} className="mb-full-card">
-              <EditBtn isOwner={isOwner} itemId={item.id} onEdit={onEditItem} />
-              <h4>{item.title}</h4>
-              <p>
-                <em>{item.body}</em>
-              </p>
-            </article>
-          ))}
-        </div>
-      </details>
+      <section id="community" className="mb-section">
+        <SectionHead
+          title="🌍 Community-Wide Events"
+          lead="Occasional gatherings that give every village its own piece of a shared story."
+          kind="community_event"
+          isOwner={isOwner}
+          onAdd={onAddKind}
+        />
+        {board.communityEvents.length === 0 ? (
+          <p className="muted">No community-wide event is stirring yet.</p>
+        ) : (
+          <div className="mb-community-list">
+            {board.communityEvents.map((item) => (
+              <CommunityEvent
+                key={item.id}
+                item={item}
+                busy={busyId === item.id}
+                onRsvp={rsvp}
+                isOwner={isOwner}
+                onEdit={onEditItem}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
