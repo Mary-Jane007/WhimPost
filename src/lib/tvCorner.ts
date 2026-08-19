@@ -749,8 +749,8 @@ export const TV_MIME_EXT: Record<string, string> = {
 };
 
 export const TV_ALLOWED_MIME = new Set(Object.keys(TV_MIME_EXT));
-export const TV_MAX_BYTES = 5 * 1024 * 1024 * 1024; // 5GB movies
-export const TV_MAX_LABEL = "5GB";
+export const TV_MAX_BYTES = 10 * 1024 * 1024 * 1024; // 10GB movies
+export const TV_MAX_LABEL = "10GB";
 
 const EXT_MIME: Record<string, string> = {
   mp4: "video/mp4",
