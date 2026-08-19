@@ -3,13 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
-import {
-  TV_MAX_BYTES,
-  TV_MAX_LABEL,
-  type TvChannel,
-  type TvRoomState,
-  type TvVideo,
-} from "@/lib/tvCorner";
+import type { TvChannel, TvRoomState, TvVideo } from "@/lib/tvCorner";
+import { TV_MAX_BYTES, TV_MAX_LABEL } from "@/lib/tvUploadLimits";
 
 type Props = {
   user: UserPublic;
