@@ -10236,6 +10236,7 @@ button.mh-card-cover {
   position: relative;
   display: grid;
   grid-template-columns: 0.55rem 2.6rem minmax(0, 1fr);
+  align-items: stretch;
   width: 100%;
   height: min(32rem, 72vh);
   max-height: min(72vh, 40rem);
@@ -10446,7 +10447,8 @@ button.mh-card-cover {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-top: auto;
+  flex: 0 0 auto;
+  margin-top: 0;
   padding-top: 0.65rem;
   border-top: 1px solid rgba(120, 85, 40, 0.18);
 }
@@ -10804,10 +10806,12 @@ button.mh-card-cover {
   .lc-cover { min-height: 22.5rem; }
   .lc-open-book {
     grid-template-columns: 0.45rem minmax(0, 1fr);
-    min-height: 26rem;
+    height: min(28rem, 70vh);
+    max-height: min(70vh, 34rem);
+    min-height: 0;
   }
   .lc-open-left { display: none; }
-  .lc-leaf { min-height: 26rem; padding-right: 1.15rem; }
+  .lc-leaf { min-height: 0; padding-right: 1.15rem; }
 }
 
 
