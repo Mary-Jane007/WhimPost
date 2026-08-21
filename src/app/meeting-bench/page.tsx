@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { isSiteOwner } from "@/lib/owner";
 import { getMeetingBenchBoard } from "@/lib/meetingBench";
 import { MeetingBenchWorkspace } from "@/components/MeetingBenchWorkspace";
+import { PageCrest } from "@/components/PageCrest";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -19,15 +20,34 @@ export default async function MeetingBenchPage() {
 
   return (
     <main
-      className={`app-main meeting-bench-page mb-cottage-page season-${board.season}`}
+      className={`app-main forest-panel meeting-bench-page season-${board.season}`}
     >
-      {isOwner ? (
-        <p className="mb-owner-banner">
-          You&apos;re the board keeper — use{" "}
-          <a href="#mb-owner-desk">Edit Meeting Bench</a> below, or open{" "}
-          <Link href="/admin/analytics">Owner Analytics</Link>.
+      <PageCrest kinds={["mushroom-amanita", "fox-seated", "jam-jar"]} />
+      <header className="page-header meeting-bench-header">
+        <p className="meeting-bench-kicker">Shared by every village</p>
+        <h1>🪑 The Meeting Bench</h1>
+        <p>
+          Come sit for a moment. This is one bench for the whole of WhimPost —
+          Mosshollow, Clovermeadow, Moonmere, Bramblewood, and Hearthwick all
+          gather here. Notices flutter on the board, gatherings are pencilled on
+          the calendar, and the Chronicle keeps little stories of what the woods
+          have been up to — even while you were away.
         </p>
-      ) : null}
+        <p className="muted">
+          Looking for neighbor posts and crafts? That&apos;s the{" "}
+          <Link href="/village">Village Square</Link> in your own village.
+        </p>
+        {isOwner ? (
+          <p className="mb-owner-banner">
+            You&apos;re the board keeper — use{" "}
+            <a href="#mb-owner-desk">Edit Meeting Bench</a> to add notices,
+            gatherings, seasonal activities, Chronicle stories, and community
+            events, or tap <strong>Edit</strong> on any paper below. For the full
+            WhimPost picture, open{" "}
+            <Link href="/admin/analytics">Owner Analytics</Link>.
+          </p>
+        ) : null}
+      </header>
 
       <MeetingBenchWorkspace initialBoard={board} isOwner={isOwner} />
     </main>
