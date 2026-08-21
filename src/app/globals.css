@@ -13175,3 +13175,180 @@ svg {
     font-size: 1.15rem;
   }
 }
+
+/* Owner village hub tasks + villager task board */
+.vt-admin {
+  margin-top: 0.5rem;
+}
+
+.vt-admin-village {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.75rem 0 1rem;
+  font-weight: 600;
+}
+
+.vt-admin-village select {
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 18%, transparent);
+  background: color-mix(in srgb, #fff 70%, transparent);
+}
+
+.vt-admin-list {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.vt-admin-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 12%, transparent);
+  background: color-mix(in srgb, #fff 55%, transparent);
+}
+
+.vt-admin-list > li.vt-inactive {
+  opacity: 0.65;
+}
+
+.vt-admin-list p {
+  margin: 0.35rem 0 0;
+}
+
+.vt-reward-line {
+  font-size: 0.92rem;
+}
+
+.vt-admin-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.vt-reward-fieldset {
+  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 14%, transparent);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem 1rem;
+  margin: 0.5rem 0 0;
+}
+
+.vt-reward-fieldset legend {
+  padding: 0 0.35rem;
+  font-weight: 650;
+}
+
+.vt-reward-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.vt-reward-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.vt-reward-grid label.on {
+  border-color: color-mix(in srgb, var(--ink, #2a241c) 22%, transparent);
+  background: color-mix(in srgb, #fff 70%, transparent);
+}
+
+.vt-board {
+  margin: 0.75rem 0 1.25rem;
+  padding: 1rem 1.1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 12%, transparent);
+  background: color-mix(in srgb, #fff8ef 78%, transparent);
+}
+
+.vt-board-head h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+}
+
+.vt-board-head p {
+  margin: 0;
+}
+
+.vt-board-status {
+  margin: 0.65rem 0 0;
+  color: color-mix(in srgb, #2f5d3a 85%, #000);
+}
+
+.vt-board-list {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.vt-board-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 10%, transparent);
+  background: color-mix(in srgb, #fff 72%, transparent);
+}
+
+.vt-board-list > li.done {
+  opacity: 0.82;
+}
+
+.vt-board-copy {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.vt-board-copy strong {
+  display: block;
+}
+
+.vt-board-copy p {
+  margin: 0.3rem 0 0;
+}
+
+.vt-board-rewards {
+  list-style: none;
+  margin: 0.45rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
+  font-size: 0.92rem;
+}
+
+.vt-board-done {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: color-mix(in srgb, #2f5d3a 90%, #000);
+}
+
+@media (max-width: 640px) {
+  .vt-admin-list > li,
+  .vt-board-list > li {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

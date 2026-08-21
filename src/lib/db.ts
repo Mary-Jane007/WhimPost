@@ -478,6 +478,29 @@ function migrate(db: Database.Database) {
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       PRIMARY KEY (item_id, user_id)
     );
+
+    CREATE TABLE IF NOT EXISTS village_tasks (
+      id TEXT PRIMARY KEY,
+      village_id TEXT NOT NULL,
+      hub TEXT NOT NULL,
+      title TEXT NOT NULL,
+      detail TEXT NOT NULL DEFAULT '',
+      rewards_json TEXT NOT NULL DEFAULT '[]',
+      sort_order INTEGER NOT NULL DEFAULT 50,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      created_by TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_village_tasks_hub
+      ON village_tasks(village_id, hub, active, sort_order);
+
+    CREATE TABLE IF NOT EXISTS village_task_completions (
+      task_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      completed_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (task_id, user_id)
+    );
   `);
 
   // Column backfills must run after CREATE TABLE so fresh DBs don't fail.

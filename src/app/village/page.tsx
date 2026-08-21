@@ -26,6 +26,7 @@ import { WelcomeLetterEditor } from "@/components/WelcomeLetterEditor";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
 import { LostChronicles } from "@/components/LostChronicles";
 import { ChronicleAdminEditor } from "@/components/ChronicleAdminEditor";
+import { VillageTasksAdminEditor } from "@/components/VillageTasksAdminEditor";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { MeetingBenchTeaser } from "@/components/MeetingBenchTeaser";
 import { VillageMascot } from "@/components/VillageMascot";
@@ -433,6 +434,11 @@ export default async function VillagePage() {
           <WelcomeLetterEditor
             initialVillageId={stats.villageId as VillageId}
           />
+          <div style={{ marginTop: "0.75rem" }}>
+            <VillageTasksAdminEditor
+              initialVillageId={stats.villageId as VillageId}
+            />
+          </div>
           <div style={{ marginTop: "0.75rem" }}>
             <ChronicleAdminEditor
               initialVillageId={stats.villageId as VillageId}

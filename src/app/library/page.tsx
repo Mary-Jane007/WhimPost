@@ -8,6 +8,7 @@ import {
   listReadingListBooks,
 } from "@/lib/libraryBooks";
 import { MosshollowLibrary } from "@/components/MosshollowLibrary";
+import { VillageTasksBoard } from "@/components/VillageTasksBoard";
 import { PageCrest } from "@/components/PageCrest";
 import {
   LIBRARY_TABS,
@@ -89,6 +90,7 @@ export default async function LibraryPage({ searchParams }: Props) {
           "candle-jar",
         ]}
       />
+      <VillageTasksBoard villageId="mosshollow" hub="library" />
       <MosshollowLibrary
         user={user}
         initialProgress={progress}

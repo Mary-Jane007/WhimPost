@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getWorkshopProgress } from "@/lib/workshop";
 import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { BramblewoodWorkshop } from "@/components/BramblewoodWorkshop";
+import { VillageTasksBoard } from "@/components/VillageTasksBoard";
 import { PageCrest } from "@/components/PageCrest";
 
 export default async function WorkshopPage() {
@@ -65,6 +66,7 @@ export default async function WorkshopPage() {
           { village: "bramblewood", id: "maple-branch" },
         ]}
       />
+      <VillageTasksBoard villageId="bramblewood" hub="workshop" />
       <BramblewoodWorkshop
         user={user}
         initialProgress={progress}

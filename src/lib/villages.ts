@@ -540,6 +540,8 @@ export const REP_REWARDS = {
   welcomeFriend: 5,
   longLetter: 2,
   weeklyPrompt: 2,
+  /** Owner-authored village hub task completion. */
+  villageTask: 2,
 } as const;
 
 export function getVillage(id: string | null | undefined): VillageInfo | null {

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getHearthProgress } from "@/lib/hearth";
 import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { HearthwickFireside } from "@/components/HearthwickFireside";
+import { VillageTasksBoard } from "@/components/VillageTasksBoard";
 import { PageCrest } from "@/components/PageCrest";
 
 export default async function FiresidePage() {
@@ -64,6 +65,7 @@ export default async function FiresidePage() {
           { village: "hearthwick", id: "herbal-jar" },
         ]}
       />
+      <VillageTasksBoard villageId="hearthwick" hub="fireside" />
       <HearthwickFireside
         user={user}
         initialProgress={progress}

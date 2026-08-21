@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getMoonProgress } from "@/lib/moon";
 import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { MoonmereObservatory } from "@/components/MoonmereObservatory";
+import { VillageTasksBoard } from "@/components/VillageTasksBoard";
 import { PageCrest } from "@/components/PageCrest";
 
 export default async function ObservatoryPage() {
@@ -64,6 +65,7 @@ export default async function ObservatoryPage() {
           { village: "moonmere", id: "fairy-moon" },
         ]}
       />
+      <VillageTasksBoard villageId="moonmere" hub="observatory" />
       <MoonmereObservatory
         user={user}
         initialProgress={progress}

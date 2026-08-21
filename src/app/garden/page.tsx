@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getGardenProgress } from "@/lib/garden";
 import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { BloomkeeperGarden } from "@/components/BloomkeeperGarden";
+import { VillageTasksBoard } from "@/components/VillageTasksBoard";
 import { PageCrest } from "@/components/PageCrest";
 
 export default async function GardenPage() {
@@ -61,6 +62,7 @@ export default async function GardenPage() {
           "clover-orchid",
         ]}
       />
+      <VillageTasksBoard villageId="clovermeadow" hub="garden" />
       <BloomkeeperGarden
         user={user}
         initialProgress={progress}
