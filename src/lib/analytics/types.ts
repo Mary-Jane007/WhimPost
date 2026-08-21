@@ -7,6 +7,8 @@ export const ANALYTICS_EVENTS = [
   "user_registered",
   "user_login",
   "village_joined",
+  "village_visited",
+  "home_village_set",
   "letter_started",
   "letter_sent",
   "letter_opened",

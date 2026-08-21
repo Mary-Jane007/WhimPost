@@ -6,44 +6,54 @@ import { VillageMascot } from "@/components/VillageMascot";
 
 export function VillageJoinPicker({
   currentVillageId = null,
+  homeVillageId = null,
   mode = "join",
 }: {
   currentVillageId?: VillageId | null;
+  homeVillageId?: VillageId | null;
   mode?: "join" | "change";
 }) {
+  const resolvedHome = homeVillageId || currentVillageId;
   const [villageId, setVillageId] = useState<VillageId | "">(
     currentVillageId || ""
   );
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<"visit" | "makeHome" | null>(null);
   const changing = mode === "change";
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    // Progressive enhancement: without JS the form POSTs and redirects.
-    if (typeof window === "undefined") return;
-    e.preventDefault();
+  async function submit(intent: "visit" | "makeHome") {
     if (!villageId) {
       setError("Pick a village first");
       return;
     }
-    if (changing && villageId === currentVillageId) {
-      setError("You're already settled here");
+    if (intent === "visit" && villageId === currentVillageId) {
+      setError("You're already visiting here");
       return;
     }
-    setLoading(true);
+    if (intent === "makeHome" && villageId === resolvedHome) {
+      setError("That's already your home village");
+      return;
+    }
+    setLoading(intent);
     setError("");
     const res = await fetch("/api/village/join", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ villageId }),
+      body: JSON.stringify({ villageId, intent }),
     });
     const data = await res.json().catch(() => ({}));
-    setLoading(false);
+    setLoading(null);
     if (!res.ok) {
-      setError(data.error || "Could not join village");
+      setError(data.error || "Could not update village");
       return;
     }
     window.location.assign("/village");
+  }
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    if (typeof window === "undefined") return;
+    e.preventDefault();
+    await submit(changing ? "visit" : "makeHome");
   }
 
   return (
@@ -53,29 +63,31 @@ export function VillageJoinPicker({
       method="post"
       onSubmit={onSubmit}
     >
+      <input type="hidden" name="intent" value={changing ? "visit" : "makeHome"} />
       {!changing ? (
         <>
-          <h1>Choose your village</h1>
+          <h1>Choose your home village</h1>
           <p className="lede">
             Every WhimPost soul belongs somewhere. Pick the place that feels like
-            home.
+            home — you can still visit the others later.
           </p>
         </>
       ) : (
         <p className="lede village-change-lead">
-          Your belongings travel with you. Reputation stays yours; the new
-          village will greet you in its own way.
+          Visit another woodland for a while, or remake a place your permanent
+          home. Your quiz belonging stays clear either way.
         </p>
       )}
       <div className="village-picker-grid">
         {VILLAGES.map((v) => {
-          const isCurrent = currentVillageId === v.id;
+          const isHere = currentVillageId === v.id;
+          const isHome = resolvedHome === v.id;
           return (
             <label
               key={v.id}
               className={`village-card ${villageId === v.id ? "selected" : ""} ${
-                isCurrent ? "current" : ""
-              }`}
+                isHome ? "is-home" : ""
+              } ${isHere && !isHome ? "is-visiting" : ""}`}
               style={
                 {
                   "--village-color": v.color,
@@ -94,31 +106,58 @@ export function VillageJoinPicker({
               <VillageMascot village={v} size="md" />
               <strong>{v.name}</strong>
               <em>{v.motto}</em>
-              {isCurrent ? (
-                <span className="village-current-tag">Home</span>
+              {isHome ? (
+                <span className="village-current-tag village-home-tag">
+                  Home
+                </span>
+              ) : isHere ? (
+                <span className="village-current-tag village-visiting-tag">
+                  Visiting
+                </span>
               ) : null}
             </label>
           );
         })}
       </div>
       {error && <p className="form-error">{error}</p>}
-      <button
-        type="submit"
-        className="btn-primary"
-        disabled={
-          !villageId ||
-          loading ||
-          (changing && villageId === currentVillageId)
-        }
-      >
-        {loading
-          ? changing
-            ? "Moving…"
-            : "Arriving…"
-          : changing
-            ? "Move to this village"
-            : "Enter the village"}
-      </button>
+      {!changing ? (
+        <button
+          type="submit"
+          className="btn-primary"
+          disabled={!villageId || loading !== null}
+        >
+          {loading ? "Arriving…" : "Enter my home village"}
+        </button>
+      ) : (
+        <div className="village-join-actions">
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={
+              !villageId ||
+              loading !== null ||
+              villageId === currentVillageId
+            }
+            onClick={() => submit("visit")}
+          >
+            {loading === "visit" ? "Traveling…" : "Visit this village"}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={
+              !villageId ||
+              loading !== null ||
+              villageId === resolvedHome
+            }
+            onClick={() => submit("makeHome")}
+          >
+            {loading === "makeHome"
+              ? "Settling…"
+              : "Make this my home"}
+          </button>
+        </div>
+      )}
     </form>
   );
 }

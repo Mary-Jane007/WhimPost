@@ -2716,6 +2716,79 @@ a.feature-chip:hover {
   padding: 0.15rem 0.35rem;
 }
 
+.village-home-tag {
+  color: #f3e6d0;
+  background: color-mix(in srgb, var(--village-color, #c9a227) 55%, rgba(20, 28, 18, 0.75));
+}
+
+.village-visiting-tag {
+  color: rgba(243, 230, 208, 0.9);
+  background: rgba(243, 230, 208, 0.12);
+}
+
+.village-home-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.35rem 0 0.65rem;
+}
+
+.village-status-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-stamp);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(243, 230, 208, 0.22);
+}
+
+.village-status-chip.home {
+  color: #f7f1e4;
+  background: color-mix(in srgb, var(--village-color, #c9a227) 45%, rgba(18, 24, 18, 0.7));
+}
+
+.village-status-chip.visiting {
+  color: rgba(243, 230, 208, 0.92);
+  background: rgba(243, 230, 208, 0.1);
+}
+
+.village-join-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+
+.village-return-row {
+  margin: 0 0 0.85rem;
+}
+
+.belonging-retake-panel {
+  margin-top: 1rem;
+}
+
+.belonging-retake-wrap {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.nav-visiting-cue {
+  margin-left: 0.45rem;
+  font-family: var(--font-stamp);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(243, 230, 208, 0.78);
+  border: 1px solid rgba(243, 230, 208, 0.22);
+  border-radius: 999px;
+  padding: 0.12rem 0.4rem;
+  align-self: center;
+}
+
 /* Letter photo upload */
 .photo-upload {
   display: grid !important;

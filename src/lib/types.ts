@@ -231,7 +231,10 @@ export interface UserPublic {
   forestName: string;
   createdAt: string;
   isOwner: boolean;
+  /** Where the villager is right now (home or visiting). */
   villageId: string | null;
+  /** Permanent belonging from the signup quiz (or a later retake). */
+  homeVillageId: string | null;
   reputation: number;
 }
 

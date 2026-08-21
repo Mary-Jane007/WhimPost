@@ -19,6 +19,7 @@ export type PersistentAccount = {
   forest_name: string;
   is_owner: number;
   village_id: string | null;
+  home_village_id?: string | null;
   reputation: number;
   collectibles_json: string;
   /** Villages this account has already received a welcome letter for. */
@@ -64,7 +65,7 @@ function listUsersFromDb(db: Database): PersistentAccount[] {
   return db
     .prepare(
       `SELECT id, username, display_name, email, password_hash, bio, forest_name,
-              is_owner, village_id, reputation, collectibles_json,
+              is_owner, village_id, home_village_id, reputation, collectibles_json,
               COALESCE(visited_villages_json, '[]') AS visited_villages_json,
               created_at
        FROM users`
@@ -98,11 +99,11 @@ export function importPersistentAccounts(db: Database) {
   const insert = db.prepare(
     `INSERT INTO users (
       id, username, display_name, email, password_hash, bio, forest_name,
-      is_owner, village_id, reputation, collectibles_json, visited_villages_json,
+      is_owner, village_id, home_village_id, reputation, collectibles_json, visited_villages_json,
       created_at
     ) VALUES (
       @id, @username, @display_name, @email, @password_hash, @bio, @forest_name,
-      @is_owner, @village_id, @reputation, @collectibles_json, @visited_villages_json,
+      @is_owner, @village_id, @home_village_id, @reputation, @collectibles_json, @visited_villages_json,
       @created_at
     )`
   );
@@ -117,6 +118,7 @@ export function importPersistentAccounts(db: Database) {
       forest_name = @forest_name,
       is_owner = @is_owner,
       village_id = @village_id,
+      home_village_id = @home_village_id,
       reputation = @reputation,
       collectibles_json = @collectibles_json,
       visited_villages_json = @visited_villages_json
@@ -156,6 +158,8 @@ export function importPersistentAccounts(db: Database) {
         forest_name: account.forest_name ?? "",
         is_owner: account.is_owner ? 1 : 0,
         village_id: account.village_id,
+        home_village_id:
+          account.home_village_id || account.village_id || null,
         reputation: account.reputation ?? 0,
         collectibles_json: account.collectibles_json || "{}",
         visited_villages_json: visited,

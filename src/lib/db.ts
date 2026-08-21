@@ -71,6 +71,13 @@ function migrate(db: Database.Database) {
     "visited_villages_json",
     "visited_villages_json TEXT NOT NULL DEFAULT '[]'"
   );
+  ensureColumn(db, "users", "home_village_id", "home_village_id TEXT");
+  // Quiz / belonging home — backfill from current membership for existing accounts.
+  db.exec(`
+    UPDATE users
+    SET home_village_id = village_id
+    WHERE home_village_id IS NULL AND village_id IS NOT NULL
+  `);
   ensureColumn(db, "letters", "image_url", "image_url TEXT");
   ensureColumn(db, "letters", "image_json", "image_json TEXT");
   ensureColumn(

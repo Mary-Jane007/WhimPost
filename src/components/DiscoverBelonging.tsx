@@ -321,8 +321,8 @@ export function DiscoverBelonging({
               </div>
             </dl>
             <p className="belonging-result-note">
-              You can change villages later from your village page — but this is
-              where your story begins.
+              This becomes your home village. You can visit other places anytime,
+              or retake the quiz later if your belonging shifts.
             </p>
             <button type="button" className="btn-primary" onClick={finish}>
               Settle in {BELONGING_TRAITS[result.villageId].label}

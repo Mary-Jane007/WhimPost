@@ -26,9 +26,10 @@ function parseTab(raw: string | undefined): LibraryTabId {
 export default async function LibraryPage({ searchParams }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  const homeVillageId = user.homeVillageId || user.villageId;
   const sp = (await searchParams) || {};
   const initialTab = parseTab(sp.tab);
-  if (!user.villageId) {
+  if (!homeVillageId) {
     return (
       <main className="app-main forest-panel">
         <PageCrest
@@ -46,7 +47,7 @@ export default async function LibraryPage({ searchParams }: Props) {
     );
   }
 
-  if (user.villageId !== "mosshollow") {
+  if (homeVillageId !== "mosshollow") {
     return (
       <main className="app-main forest-panel">
         <PageCrest
