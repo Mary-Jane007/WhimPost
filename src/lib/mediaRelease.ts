@@ -228,7 +228,7 @@ function downloadToFile(url: string, destPath: string) {
       "--connect-timeout",
       "8",
       "--max-time",
-      "120",
+      "7200",
       "--retry",
       "2",
       "--retry-delay",
@@ -237,7 +237,7 @@ function downloadToFile(url: string, destPath: string) {
       tmp,
       url,
     ],
-    { cwd: ROOT, stdio: "pipe", timeout: 130_000 }
+    { cwd: ROOT, stdio: "pipe", timeout: 7_300_000 }
   );
   assertPlayableDownload(tmp, url);
   fs.renameSync(tmp, destPath);
@@ -285,7 +285,7 @@ function downloadReleaseAssetViaGh(
       "--connect-timeout",
       "8",
       "--max-time",
-      "120",
+      "7200",
       "--retry",
       "2",
       "--retry-delay",
@@ -300,7 +300,7 @@ function downloadReleaseAssetViaGh(
       tmp,
       `https://api.github.com/repos/${repo}/releases/assets/${assetId}`,
     ],
-    { cwd: ROOT, stdio: "pipe", timeout: 130_000 }
+    { cwd: ROOT, stdio: "pipe", timeout: 7_300_000 }
   );
   assertPlayableDownload(tmp, `gh:${filename}`);
   fs.renameSync(tmp, destPath);

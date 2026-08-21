@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import type { TvChannel, TvRoomState, TvVideo } from "@/lib/tvCorner";
+import { TV_MAX_BYTES, TV_MAX_LABEL } from "@/lib/tvUploadLimits";
 
 type Props = {
   user: UserPublic;
@@ -439,8 +440,8 @@ export function TvCorner({
     if (file.size <= 0) {
       throw new Error(`${shortName} looks empty`);
     }
-    if (file.size > 5 * 1024 * 1024 * 1024) {
-      throw new Error(`${shortName} is over 5GB`);
+    if (file.size > TV_MAX_BYTES) {
+      throw new Error(`${shortName} is over ${TV_MAX_LABEL}`);
     }
 
     const clipName =
