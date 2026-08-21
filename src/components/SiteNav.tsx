@@ -19,25 +19,26 @@ export function SiteNav({
 }) {
   const pathname = usePathname();
 
+  const homeId = user?.homeVillageId || user?.villageId || null;
   const links: Array<{
     href: string;
     label: string;
     badgeKey?: keyof NavBadges;
   }> = [
     { href: "/village", label: "Village", badgeKey: "unlocks" },
-    ...(user?.villageId === "bramblewood"
+    ...(homeId === "bramblewood"
       ? [{ href: "/workshop", label: "Workshop" }]
       : []),
-    ...(user?.villageId === "mosshollow"
+    ...(homeId === "mosshollow"
       ? [{ href: "/library", label: "Library" }]
       : []),
-    ...(user?.villageId === "clovermeadow"
+    ...(homeId === "clovermeadow"
       ? [{ href: "/garden", label: "Garden" }]
       : []),
-    ...(user?.villageId === "hearthwick"
+    ...(homeId === "hearthwick"
       ? [{ href: "/fireside", label: "Fireside" }]
       : []),
-    ...(user?.villageId === "moonmere"
+    ...(homeId === "moonmere"
       ? [{ href: "/observatory", label: "Observatory" }]
       : []),
     { href: "/tv-corner", label: "TV Corner" },
@@ -56,19 +57,26 @@ export function SiteNav({
     <header className="site-nav">
       <Link href={user ? "/village" : "/"} className="brand-mark">
         <span className="brand-icon" aria-hidden>
-          {user?.villageId === "mosshollow"
+          {homeId === "mosshollow"
             ? "🦉"
-            : user?.villageId === "clovermeadow"
+            : homeId === "clovermeadow"
               ? "🐝"
-              : user?.villageId === "moonmere"
+              : homeId === "moonmere"
                 ? "🦋"
-                : user?.villageId === "bramblewood"
+                : homeId === "bramblewood"
                   ? "🦊"
-                  : user?.villageId === "hearthwick"
+                  : homeId === "hearthwick"
                     ? "🦔"
                     : "✿"}
         </span>
         <span className="brand-text">WhimPost</span>
+        {user?.villageId &&
+        user.homeVillageId &&
+        user.villageId !== user.homeVillageId ? (
+          <span className="nav-visiting-cue" title="Currently visiting">
+            Visiting
+          </span>
+        ) : null}
       </Link>
 
       {user ? (

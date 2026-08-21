@@ -9,8 +9,9 @@ import { PageCrest } from "@/components/PageCrest";
 export default async function GardenPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  const homeVillageId = user.homeVillageId || user.villageId;
 
-  if (!user.villageId) {
+  if (!homeVillageId) {
     return (
       <main className="app-main forest-panel">
         <PageCrest
@@ -28,7 +29,7 @@ export default async function GardenPage() {
     );
   }
 
-  if (user.villageId !== "clovermeadow") {
+  if (homeVillageId !== "clovermeadow") {
     return (
       <main className="app-main forest-panel">
         <PageCrest

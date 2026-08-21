@@ -23,7 +23,12 @@ export default async function ProfilePage({
   if (!profile) notFound();
 
   const isSelf = viewer.id === profile.id;
-  const village = getVillage(profile.villageId);
+  const homeVillageId = profile.homeVillageId || profile.villageId;
+  const village = getVillage(homeVillageId);
+  const visitingVillage =
+    profile.villageId && profile.villageId !== homeVillageId
+      ? getVillage(profile.villageId)
+      : null;
   const stats = getUserVillageStats(getDb(), profile.id);
   const relation = isSelf
     ? ({ status: "none" } as const)
@@ -35,14 +40,16 @@ export default async function ProfilePage({
       <CottageProfile
         profile={profile}
         village={village}
+        visitingVillage={visitingVillage}
         collectibles={stats.collectibles}
         isSelf={isSelf}
         relation={relation}
         shareVillage={Boolean(
           !isSelf &&
-            viewer.villageId &&
-            profile.villageId &&
-            viewer.villageId === profile.villageId
+            (viewer.homeVillageId || viewer.villageId) &&
+            (profile.homeVillageId || profile.villageId) &&
+            (viewer.homeVillageId || viewer.villageId) ===
+              (profile.homeVillageId || profile.villageId)
         )}
       />
     </main>

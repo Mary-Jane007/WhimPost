@@ -9,8 +9,9 @@ import { PageCrest } from "@/components/PageCrest";
 export default async function ObservatoryPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  const homeVillageId = user.homeVillageId || user.villageId;
 
-  if (!user.villageId) {
+  if (!homeVillageId) {
     return (
       <main className="app-main forest-panel">
         <PageCrest
@@ -33,7 +34,7 @@ export default async function ObservatoryPage() {
     );
   }
 
-  if (user.villageId !== "moonmere") {
+  if (homeVillageId !== "moonmere") {
     return (
       <main className="app-main forest-panel">
         <PageCrest kinds={["moon-crescent", "moon-full", "dragonfly"]} />

@@ -59,8 +59,8 @@ export async function POST(req: NextRequest) {
   db.prepare(
     `INSERT INTO users (
       id, username, display_name, email, password_hash, forest_name,
-      is_owner, village_id, reputation, collectibles_json
-    ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, 0, '{}')`
+      is_owner, village_id, home_village_id, reputation, collectibles_json
+    ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 0, '{}')`
   ).run(
     id,
     username,
@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
     email,
     hashSync(password, 10),
     forestName,
+    villageId,
     villageId
   );
 
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
   const user = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, reputation
+              village_id, home_village_id, reputation
        FROM users WHERE id = ?`
     )
     .get(id) as {
@@ -102,6 +103,7 @@ export async function POST(req: NextRequest) {
     created_at: string;
     is_owner: number;
     village_id: string;
+    home_village_id: string;
     reputation: number;
   };
 

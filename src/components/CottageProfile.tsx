@@ -21,6 +21,7 @@ import { VillageMascot } from "@/components/VillageMascot";
 export function CottageProfile({
   profile,
   village,
+  visitingVillage = null,
   collectibles,
   isSelf,
   relation,
@@ -28,6 +29,7 @@ export function CottageProfile({
 }: {
   profile: UserPublic;
   village: VillageInfo | null;
+  visitingVillage?: VillageInfo | null;
   collectibles: Record<CollectibleKind, number>;
   isSelf: boolean;
   relation: FriendshipRelation;
@@ -164,9 +166,12 @@ export function CottageProfile({
           </button>
 
           {village && (
-            <div className="cottage-village-badge">
+            <div className="cottage-village-badge" title="Home village">
               <VillageMascot village={village} size="sm" />
-              <span>{village.name}</span>
+              <span>
+                Home · {village.name}
+                {visitingVillage ? ` · visiting ${visitingVillage.name}` : ""}
+              </span>
             </div>
           )}
         </div>

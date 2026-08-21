@@ -18,6 +18,7 @@ import {
 } from "@/lib/villages";
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
 import { VillageChangePanel } from "@/components/VillageChangePanel";
+import { BelongingRetakePanel } from "@/components/BelongingRetakePanel";
 import { NoticeBoard } from "@/components/NoticeBoard";
 import { CollectibleIcon } from "@/components/CollectibleIcon";
 import { PageCrest } from "@/components/PageCrest";
@@ -60,6 +61,9 @@ export default async function VillagePage() {
   }
 
   const village = getVillage(stats.villageId)!;
+  const homeVillageId = (stats.homeVillageId || stats.villageId) as VillageId;
+  const homeVillage = getVillage(homeVillageId)!;
+  const isAway = homeVillageId !== stats.villageId;
   deliverWelcomeLetter(db, user.id, stats.villageId);
   // Re-read after welcome gifts so collectibles (and cottage unlocks) are current.
   const liveStats = getUserVillageStats(db, user.id);
@@ -78,7 +82,7 @@ export default async function VillagePage() {
   const neighbors = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, reputation
+              village_id, home_village_id, reputation
        FROM users
        WHERE village_id = ? AND id != ?
        ORDER BY reputation DESC, display_name COLLATE NOCASE
@@ -93,6 +97,7 @@ export default async function VillagePage() {
     created_at: string;
     is_owner: number;
     village_id: string | null;
+    home_village_id: string | null;
     reputation: number;
   }>;
 
@@ -146,7 +151,7 @@ export default async function VillagePage() {
   ];
 
   const moonmereSkyAlerts =
-    village.id === "moonmere" && user.villageId === "moonmere" && !welcomeLetter
+    village.id === "moonmere" && homeVillageId === "moonmere" && !welcomeLetter
       ? villageSkyAlertEvents()
       : [];
 
@@ -206,10 +211,24 @@ export default async function VillagePage() {
       <header className="village-hero">
         <VillageMascot village={village} size="lg" />
         <div>
-          <p className="hero-postmark">{village.mascotName} watches over you</p>
-          <h1>
-            {village.name}
-          </h1>
+          <p className="hero-postmark">
+            {isAway
+              ? `Visiting · home is ${homeVillage.name}`
+              : `${village.mascotName} watches over your home`}
+          </p>
+          <h1>{village.name}</h1>
+          <p className="village-home-badge-row" aria-label="Belonging">
+            {isAway ? (
+              <>
+                <span className="village-status-chip visiting">Visiting</span>
+                <span className="village-status-chip home">
+                  Home · {homeVillage.name}
+                </span>
+              </>
+            ) : (
+              <span className="village-status-chip home">Your home village</span>
+            )}
+          </p>
           <p className="village-motto">“{village.motto}”</p>
           <p>{village.theme}</p>
         </div>
@@ -266,35 +285,35 @@ export default async function VillagePage() {
             </span>
           ))}
         </div>
-        {village.id === "bramblewood" && user.villageId === "bramblewood" ? (
+        {village.id === "bramblewood" && homeVillageId === "bramblewood" ? (
           <p className="muted" style={{ marginTop: "0.85rem" }}>
             <Link href="/workshop" className="btn-primary">
               Enter The Woodland Workshop
             </Link>
           </p>
         ) : null}
-        {village.id === "mosshollow" && user.villageId === "mosshollow" ? (
+        {village.id === "mosshollow" && homeVillageId === "mosshollow" ? (
           <p className="muted" style={{ marginTop: "0.85rem" }}>
             <Link href="/library" className="btn-primary">
               Enter The Grand Library
             </Link>
           </p>
         ) : null}
-        {village.id === "clovermeadow" && user.villageId === "clovermeadow" ? (
+        {village.id === "clovermeadow" && homeVillageId === "clovermeadow" ? (
           <p className="muted" style={{ marginTop: "0.85rem" }}>
             <Link href="/garden" className="btn-primary">
               Enter The Bloomkeeper&apos;s Garden
             </Link>
           </p>
         ) : null}
-        {village.id === "hearthwick" && user.villageId === "hearthwick" ? (
+        {village.id === "hearthwick" && homeVillageId === "hearthwick" ? (
           <p className="muted" style={{ marginTop: "0.85rem" }}>
             <Link href="/fireside" className="btn-primary">
               Enter The Fireside
             </Link>
           </p>
         ) : null}
-        {village.id === "moonmere" && user.villageId === "moonmere" ? (
+        {village.id === "moonmere" && homeVillageId === "moonmere" ? (
           <p className="muted" style={{ marginTop: "0.85rem" }}>
             <Link href="/observatory" className="btn-primary">
               Enter The Observatory
@@ -432,8 +451,12 @@ export default async function VillagePage() {
 
       <VillageChangePanel
         currentVillageId={stats.villageId as VillageId}
+        homeVillageId={homeVillageId}
         currentVillageName={village.name}
+        homeVillageName={homeVillage.name}
+        isAway={isAway}
       />
+      <BelongingRetakePanel homeVillageName={homeVillage.name} />
     </main>
   );
 }

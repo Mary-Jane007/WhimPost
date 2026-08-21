@@ -227,8 +227,9 @@ export function RegisterForm() {
         </h2>
         <p className="belonging-lead">
           Your mailbox will open in <strong>{trait.label}</strong> as{" "}
-          <strong>{displayName || username}</strong>. You can change villages
-          later whenever the path calls.
+          <strong>{displayName || username}</strong>. That becomes your{" "}
+          <strong>home village</strong> — you can visit others or retake the
+          quiz later without losing your belonging.
         </p>
         {error && <p className="form-error">{error}</p>}
         <button
@@ -237,7 +238,7 @@ export function RegisterForm() {
           disabled={loading}
           onClick={createMailbox}
         >
-          {loading ? "Planting your mailbox…" : "Move into my village"}
+          {loading ? "Planting your mailbox…" : "Make this my home"}
         </button>
         <button
           type="button"

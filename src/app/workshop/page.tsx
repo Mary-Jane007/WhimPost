@@ -9,8 +9,9 @@ import { PageCrest } from "@/components/PageCrest";
 export default async function WorkshopPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  const homeVillageId = user.homeVillageId || user.villageId;
 
-  if (!user.villageId) {
+  if (!homeVillageId) {
     return (
       <main className="app-main forest-panel">
         <PageCrest
@@ -33,7 +34,7 @@ export default async function WorkshopPage() {
     );
   }
 
-  if (user.villageId !== "bramblewood") {
+  if (homeVillageId !== "bramblewood") {
     return (
       <main className="app-main forest-panel">
         <PageCrest kinds={["fox-seated", "leafy-branch", "candle-jar"]} />

@@ -39,11 +39,12 @@ type UserRow = {
   created_at: string;
   is_owner: number;
   village_id: string | null;
+  home_village_id: string | null;
   reputation: number;
 };
 
 const USER_SELECT = `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, reputation
+              village_id, home_village_id, reputation
        FROM users`;
 
 export function getUserById(id: string): UserPublic | null {
@@ -174,7 +175,7 @@ export function listFriends(userId: string): UserPublic[] {
   const rows = db
     .prepare(
       `SELECT u.id, u.username, u.display_name, u.bio, u.forest_name, u.created_at, u.is_owner,
-              u.village_id, u.reputation
+              u.village_id, u.home_village_id, u.reputation
        FROM friendships f
        JOIN users u ON u.id = CASE
          WHEN f.requester_id = ? THEN f.addressee_id
@@ -193,6 +194,7 @@ export function listFriends(userId: string): UserPublic[] {
     created_at: string;
     is_owner: number;
     village_id: string | null;
+    home_village_id: string | null;
     reputation: number;
   }>;
   return rows.map(mapUser);

@@ -103,11 +103,12 @@ export function getVillageMemberCount(db: Database, villageId: VillageId) {
 export function getUserVillageStats(db: Database, userId: string) {
   const row = db
     .prepare(
-      `SELECT village_id, reputation, collectibles_json FROM users WHERE id = ?`
+      `SELECT village_id, home_village_id, reputation, collectibles_json FROM users WHERE id = ?`
     )
     .get(userId) as
     | {
         village_id: string | null;
+        home_village_id: string | null;
         reputation: number;
         collectibles_json: string;
       }
@@ -116,6 +117,7 @@ export function getUserVillageStats(db: Database, userId: string) {
   if (!row) {
     return {
       villageId: null as VillageId | null,
+      homeVillageId: null as VillageId | null,
       reputation: 0,
       collectibles: emptyCollectibles(),
       rank: rankFromRep(0),
@@ -123,8 +125,12 @@ export function getUserVillageStats(db: Database, userId: string) {
   }
 
   const reputation = Number(row.reputation) || 0;
+  const villageId = (row.village_id as VillageId) || null;
+  const homeVillageId =
+    (row.home_village_id as VillageId) || villageId || null;
   return {
-    villageId: (row.village_id as VillageId) || null,
+    villageId,
+    homeVillageId,
     reputation,
     collectibles: parseCollectibles(row.collectibles_json),
     rank: rankFromRep(reputation),
