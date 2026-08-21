@@ -201,42 +201,44 @@ export function LostChronicles({ villageId, initialProgress = null }: Props) {
                 </span>
               </header>
 
-              {current.unlocked ? (
-                <>
-                  {current.illustrationUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={current.illustrationUrl}
-                      alt=""
-                      className="lc-page-illustration"
-                    />
-                  ) : null}
-                  <h3 className="lc-page-title">{current.title}</h3>
-                  <p className="lc-page-body">
-                    <span className="lc-dropcap">
-                      {current.body.trim().charAt(0)}
+              <div className="lc-leaf-scroll">
+                {current.unlocked ? (
+                  <>
+                    {current.illustrationUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={current.illustrationUrl}
+                        alt=""
+                        className="lc-page-illustration"
+                      />
+                    ) : null}
+                    <h3 className="lc-page-title">{current.title}</h3>
+                    <p className="lc-page-body">
+                      <span className="lc-dropcap">
+                        {current.body.trim().charAt(0)}
+                      </span>
+                      {current.body.trim().slice(1)}
+                    </p>
+                  </>
+                ) : (
+                  <div className="lc-leaf-mystery">
+                    <span className="lc-mystery-mark" aria-hidden>
+                      ❓
                     </span>
-                    {current.body.trim().slice(1)}
-                  </p>
-                </>
-              ) : (
-                <div className="lc-leaf-mystery">
-                  <span className="lc-mystery-mark" aria-hidden>
-                    ❓
-                  </span>
-                  <h3 className="lc-page-title">Unknown</h3>
-                  <p>
-                    This leaf is faded, torn, and waiting. Keep tending your
-                    village — the ink will return.
-                  </p>
-                  <div className="lc-mystery-lines" aria-hidden>
-                    <span />
-                    <span />
-                    <span />
-                    <span />
+                    <h3 className="lc-page-title">Unknown</h3>
+                    <p>
+                      This leaf is faded, torn, and waiting. Keep tending your
+                      village — the ink will return.
+                    </p>
+                    <div className="lc-mystery-lines" aria-hidden>
+                      <span />
+                      <span />
+                      <span />
+                      <span />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
               <footer className="lc-leaf-nav">
                 <button

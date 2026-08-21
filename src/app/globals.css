@@ -10237,7 +10237,9 @@ button.mh-card-cover {
   display: grid;
   grid-template-columns: 0.55rem 2.6rem minmax(0, 1fr);
   width: 100%;
-  min-height: 28rem;
+  height: min(32rem, 72vh);
+  max-height: min(72vh, 40rem);
+  min-height: 0;
   border-radius: 0.25rem 0.55rem 0.55rem 0.25rem;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--lc-spine) 60%, transparent);
@@ -10320,7 +10322,10 @@ button.mh-card-cover {
   flex-direction: column;
   gap: 0.5rem;
   padding: 1.15rem 1.05rem 1rem 1.2rem;
-  min-height: 28rem;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
   color: #3a2818;
   background:
     linear-gradient(90deg, rgba(90, 60, 30, 0.1), transparent 1rem),
@@ -10367,12 +10372,35 @@ button.mh-card-cover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex: 0 0 auto;
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #8a6a40;
   border-bottom: 1px solid rgba(120, 85, 40, 0.22);
   padding-bottom: 0.45rem;
+}
+
+.lc-leaf-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-right: 0.2rem;
+  scrollbar-gutter: stable;
+}
+
+.lc-leaf-scroll::-webkit-scrollbar {
+  width: 0.45rem;
+}
+.lc-leaf-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(120, 85, 40, 0.35);
+}
+.lc-leaf-scroll::-webkit-scrollbar-track {
+  background: rgba(90, 60, 30, 0.08);
 }
 .lc-leaf-mystery {
   flex: 1;
