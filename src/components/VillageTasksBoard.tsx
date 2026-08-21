@@ -74,7 +74,7 @@ export function VillageTasksBoard({ villageId, hub }: Props) {
   if (loading) {
     return (
       <section className="vt-board" aria-label="Village tasks">
-        <p className="muted">Loading village tasks…</p>
+        <p className="vt-board-lead">Loading village tasks…</p>
       </section>
     );
   }
@@ -87,7 +87,7 @@ export function VillageTasksBoard({ villageId, hub }: Props) {
     <section className="vt-board" aria-label="Village tasks">
       <header className="vt-board-head">
         <h2>Village tasks</h2>
-        <p className="muted">
+        <p className="vt-board-lead">
           Owner quests for this hub — complete one to earn the listed
           collectibles.
         </p>
@@ -109,7 +109,7 @@ export function VillageTasksBoard({ villageId, hub }: Props) {
                   ))}
                 </ul>
               ) : (
-                <p className="muted">No collectible reward set.</p>
+                <p className="vt-board-lead">No collectible reward set.</p>
               )}
             </div>
             {task.completed ? (

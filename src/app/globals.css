@@ -11592,11 +11592,15 @@ button.mh-card-cover {
 .mb-admin {
   margin: 0 0 1.75rem;
   padding: 1.1rem 1.2rem;
-  border: 1px solid rgba(107, 74, 46, 0.35);
-  background:
-    linear-gradient(180deg, rgba(243, 230, 208, 0.12), transparent 55%),
-    rgba(40, 28, 18, 0.35);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 22%, transparent);
   border-radius: 0.85rem;
+  color: var(--village-color, #1a3d2e);
+}
+
+.mb-admin-lead {
+  margin: 0.35rem 0 0;
+  color: color-mix(in srgb, var(--village-color, #1a3d2e) 78%, var(--village-soft, #6b8f71));
 }
 
 .mb-admin-head {
@@ -11609,6 +11613,7 @@ button.mh-card-cover {
 
 .mb-admin-head h3 {
   margin: 0;
+  color: var(--village-color, #1a3d2e);
 }
 
 .mb-admin-layout {
@@ -11643,9 +11648,9 @@ button.mh-card-cover {
 
 .mb-admin-list li > button:first-child {
   text-align: left;
-  border: 1px solid rgba(243, 230, 208, 0.18);
-  background: rgba(243, 230, 208, 0.06);
-  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 14%, transparent);
+  color: var(--village-color, #1a3d2e);
   border-radius: 0.55rem;
   padding: 0.45rem 0.55rem;
   cursor: pointer;
@@ -11653,8 +11658,8 @@ button.mh-card-cover {
 
 .mb-admin-list li > button:first-child.active,
 .mb-admin-list li > button:first-child:hover {
-  border-color: color-mix(in srgb, var(--mb-accent, #8a6340) 55%, white);
-  background: rgba(243, 230, 208, 0.12);
+  border-color: color-mix(in srgb, var(--village-color, #6b8f71) 55%, white);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 28%, transparent);
 }
 
 .mb-admin-list li strong,
@@ -11664,8 +11669,9 @@ button.mh-card-cover {
 
 .mb-admin-list li span {
   font-size: 0.78rem;
-  opacity: 0.75;
+  opacity: 0.85;
   margin-top: 0.15rem;
+  color: color-mix(in srgb, var(--village-color, #1a3d2e) 80%, var(--village-soft, #6b8f71));
 }
 
 .mb-admin-form {
@@ -11677,15 +11683,16 @@ button.mh-card-cover {
   display: grid;
   gap: 0.28rem;
   font-size: 0.9rem;
+  color: var(--village-color, #1a3d2e);
 }
 
 .mb-admin-form input,
 .mb-admin-form textarea,
 .mb-admin-form select {
   width: 100%;
-  border: 1px solid rgba(243, 230, 208, 0.25);
-  background: rgba(20, 14, 10, 0.35);
-  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 16%, transparent);
+  color: var(--village-color, #1a3d2e);
   border-radius: 0.45rem;
   padding: 0.45rem 0.55rem;
   font: inherit;
@@ -11704,12 +11711,13 @@ button.mh-card-cover {
 }
 
 .mb-admin-villages {
-  border: 1px dashed rgba(243, 230, 208, 0.25);
+  border: 1px dashed color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
   border-radius: 0.55rem;
   padding: 0.65rem 0.75rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem 0.9rem;
+  color: var(--village-color, #1a3d2e);
 }
 
 .mb-admin-check {
@@ -12159,9 +12167,9 @@ button.mh-card-cover {
   margin-bottom: 0.65rem;
 }
 .mb-admin-filters button {
-  border: 1px solid rgba(243, 230, 208, 0.2);
-  background: rgba(243, 230, 208, 0.05);
-  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 12%, transparent);
+  color: var(--village-color, #1a3d2e);
   border-radius: 999px;
   padding: 0.25rem 0.55rem;
   font: inherit;
@@ -12170,8 +12178,8 @@ button.mh-card-cover {
 }
 .mb-admin-filters button.active,
 .mb-admin-filters button:hover {
-  background: rgba(243, 230, 208, 0.14);
-  border-color: rgba(243, 230, 208, 0.4);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 28%, transparent);
+  border-color: color-mix(in srgb, var(--village-color, #6b8f71) 50%, transparent);
 }
 
 .mb-admin-item-actions {
@@ -12188,7 +12196,7 @@ button.mh-card-cover {
   gap: 0.75rem;
   margin-bottom: 0.25rem;
 }
-.mb-admin-form-title h4 { margin: 0; }
+.mb-admin-form-title h4 { margin: 0; color: var(--village-color, #1a3d2e); }
 
 .mb-admin-row-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -12209,11 +12217,12 @@ button.mh-card-cover {
 }
 
 .mb-admin-tasks {
-  border: 1px dashed rgba(243, 230, 208, 0.25);
+  border: 1px dashed color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
   border-radius: 0.55rem;
   padding: 0.7rem 0.8rem;
   display: grid;
   gap: 0.55rem;
+  color: var(--village-color, #1a3d2e);
 }
 .mb-admin-tasks label {
   display: grid;
@@ -13176,9 +13185,31 @@ svg {
   }
 }
 
-/* Owner village hub tasks + villager task board */
+/* Owner village hub tasks + villager task board (village colors, no beige) */
 .vt-admin {
   margin-top: 0.5rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 22%, transparent);
+  color: var(--village-color, #1a3d2e);
+}
+
+.vt-admin-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vt-admin-head h3 {
+  margin: 0;
+  color: var(--village-color, #1a3d2e);
+}
+
+.vt-admin-lead {
+  margin: 0.45rem 0 0;
+  color: color-mix(in srgb, var(--village-color, #1a3d2e) 78%, var(--village-soft, #6b8f71));
 }
 
 .vt-admin-village {
@@ -13186,14 +13217,39 @@ svg {
   gap: 0.35rem;
   margin: 0.75rem 0 1rem;
   font-weight: 600;
+  color: var(--village-color, #1a3d2e);
 }
 
-.vt-admin-village select {
+.vt-admin-village select,
+.vt-admin-form input,
+.vt-admin-form textarea,
+.vt-admin-form select {
   font: inherit;
   padding: 0.45rem 0.6rem;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 18%, transparent);
-  background: color-mix(in srgb, #fff 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 18%, transparent);
+  color: var(--village-color, #1a3d2e);
+}
+
+.vt-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 0.75rem;
+}
+
+.vt-admin-form h4 {
+  margin: 0;
+  color: var(--village-color, #1a3d2e);
+}
+
+.vt-admin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.88rem;
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-admin-list {
@@ -13212,8 +13268,9 @@ svg {
   align-items: flex-start;
   padding: 0.75rem 0.85rem;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 12%, transparent);
-  background: color-mix(in srgb, #fff 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 16%, transparent);
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-admin-list > li.vt-inactive {
@@ -13226,6 +13283,7 @@ svg {
 
 .vt-reward-line {
   font-size: 0.92rem;
+  color: color-mix(in srgb, var(--village-color, #1a3d2e) 85%, var(--village-soft, #6b8f71));
 }
 
 .vt-admin-row-actions {
@@ -13234,16 +13292,24 @@ svg {
   gap: 0.35rem;
 }
 
+.vt-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .vt-reward-fieldset {
-  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 30%, transparent);
   border-radius: 10px;
   padding: 0.75rem 0.9rem 1rem;
   margin: 0.5rem 0 0;
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-reward-fieldset legend {
   padding: 0 0.35rem;
   font-weight: 650;
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-reward-grid {
@@ -13263,33 +13329,38 @@ svg {
   border: 1px solid transparent;
   font-weight: 500;
   cursor: pointer;
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-reward-grid label.on {
-  border-color: color-mix(in srgb, var(--ink, #2a241c) 22%, transparent);
-  background: color-mix(in srgb, #fff 70%, transparent);
+  border-color: color-mix(in srgb, var(--village-color, #6b8f71) 45%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 28%, transparent);
 }
 
 .vt-board {
   margin: 0.75rem 0 1.25rem;
   padding: 1rem 1.1rem 1.15rem;
   border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 12%, transparent);
-  background: color-mix(in srgb, #fff8ef 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 20%, transparent);
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-board-head h2 {
   margin: 0 0 0.25rem;
   font-size: 1.2rem;
+  color: var(--village-color, #1a3d2e);
 }
 
-.vt-board-head p {
+.vt-board-head p,
+.vt-board-lead {
   margin: 0;
+  color: color-mix(in srgb, var(--village-color, #1a3d2e) 78%, var(--village-soft, #6b8f71));
 }
 
 .vt-board-status {
   margin: 0.65rem 0 0;
-  color: color-mix(in srgb, #2f5d3a 85%, #000);
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-board-list {
@@ -13308,8 +13379,9 @@ svg {
   align-items: center;
   padding: 0.8rem 0.9rem;
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--ink, #2a241c) 10%, transparent);
-  background: color-mix(in srgb, #fff 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 14%, transparent);
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-board-list > li.done {
@@ -13323,10 +13395,12 @@ svg {
 
 .vt-board-copy strong {
   display: block;
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-board-copy p {
   margin: 0.3rem 0 0;
+  color: color-mix(in srgb, var(--village-color, #1a3d2e) 82%, var(--village-soft, #6b8f71));
 }
 
 .vt-board-rewards {
@@ -13337,12 +13411,13 @@ svg {
   flex-wrap: wrap;
   gap: 0.4rem 0.75rem;
   font-size: 0.92rem;
+  color: var(--village-color, #1a3d2e);
 }
 
 .vt-board-done {
   font-size: 0.9rem;
   font-weight: 600;
-  color: color-mix(in srgb, #2f5d3a 90%, #000);
+  color: var(--village-color, #1a3d2e);
 }
 
 @media (max-width: 640px) {

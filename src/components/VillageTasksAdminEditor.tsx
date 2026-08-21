@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { CollectibleKind, VillageId } from "@/lib/villages";
+import { useEffect, useState, type CSSProperties } from "react";
+import { VILLAGE_MAP, type CollectibleKind, type VillageId } from "@/lib/villages";
 import type { VillageHubId, VillageTask } from "@/lib/villageTasks";
 
 type VillageOption = {
@@ -189,22 +189,31 @@ export function VillageTasksAdminEditor({
   }
 
   return (
-    <section className="vt-admin lc-admin" aria-label="Village hub tasks admin">
-      <div className="lc-admin-head">
+    <section
+      className="vt-admin"
+      aria-label="Village hub tasks admin"
+      style={
+        {
+          "--village-color": VILLAGE_MAP[villageId].color,
+          "--village-soft": VILLAGE_MAP[villageId].colorSoft,
+        } as CSSProperties
+      }
+    >
+      <div className="vt-admin-head">
         <h3>Village hub tasks</h3>
         <button type="button" className="nav-ghost" onClick={() => setOpen(false)}>
           Close
         </button>
       </div>
-      <p className="muted">
+      <p className="vt-admin-lead">
         Add tasks for each village specialty hub (Workshop, Garden, Fireside,
         Observatory, Library). Choose which collectibles villagers earn when
         they mark a task complete.
       </p>
 
-      {loading ? <p className="muted">Loading tasks…</p> : null}
+      {loading ? <p className="vt-admin-lead">Loading tasks…</p> : null}
       {error ? <p className="form-error">{error}</p> : null}
-      {status ? <p className="muted">{status}</p> : null}
+      {status ? <p className="vt-admin-lead">{status}</p> : null}
 
       <label className="vt-admin-village">
         Village / hub
@@ -225,16 +234,16 @@ export function VillageTasksAdminEditor({
 
       <ul className="vt-admin-list">
         {tasks.length === 0 ? (
-          <li className="muted">No tasks yet for this hub.</li>
+          <li className="vt-admin-lead">No tasks yet for this hub.</li>
         ) : (
           tasks.map((task) => (
             <li key={task.id} className={!task.active ? "vt-inactive" : ""}>
               <div>
                 <strong>{task.title}</strong>
                 {!task.active ? (
-                  <span className="muted"> (inactive)</span>
+                  <span className="vt-admin-lead"> (inactive)</span>
                 ) : null}
-                {task.detail ? <p className="muted">{task.detail}</p> : null}
+                {task.detail ? <p className="vt-admin-lead">{task.detail}</p> : null}
                 <p className="vt-reward-line">
                   Rewards:{" "}
                   {task.rewards.length
@@ -273,7 +282,7 @@ export function VillageTasksAdminEditor({
         )}
       </ul>
 
-      <form className="lc-admin-form" onSubmit={save}>
+      <form className="vt-admin-form" onSubmit={save}>
         <h4>{editingId ? "Edit task" : "Add a new task"}</h4>
         <label>
           Title
@@ -308,7 +317,7 @@ export function VillageTasksAdminEditor({
 
         <fieldset className="vt-reward-fieldset">
           <legend>Collectibles earned on complete</legend>
-          <p className="muted">
+          <p className="vt-admin-lead">
             Pick one or more keepsakes from{" "}
             {currentVillage?.name || "this village"}&apos;s collection.
           </p>
@@ -330,7 +339,7 @@ export function VillageTasksAdminEditor({
           </div>
         </fieldset>
 
-        <div className="lc-admin-actions">
+        <div className="vt-admin-actions">
           <button type="submit" className="btn-primary" disabled={saving}>
             {saving
               ? "Saving…"

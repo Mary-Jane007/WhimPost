@@ -370,7 +370,7 @@ export function MeetingBenchAdmin({
         >
           Edit Meeting Bench
         </button>
-        <p className="muted mb-admin-launch-hint">
+        <p className="mb-admin-lead mb-admin-launch-hint">
           Add notices, gatherings, seasonal activities, Chronicle stories, and
           community events — only you can edit this board.
         </p>
@@ -383,7 +383,7 @@ export function MeetingBenchAdmin({
       <div className="mb-admin-head">
         <div>
           <h3>Edit Meeting Bench</h3>
-          <p className="muted">
+          <p className="mb-admin-lead">
             This board is global — every village sees the same papers. Add and
             rewrite notices, gatherings, seasonal activities, Chronicle stories,
             and community events. Drafts stay private to you; villagers see
@@ -433,7 +433,7 @@ export function MeetingBenchAdmin({
             })}
           </div>
 
-          {loading ? <p className="muted">Loading…</p> : null}
+          {loading ? <p className="mb-admin-lead">Loading…</p> : null}
 
           <ul>
             {filtered.map((item) => (
@@ -484,7 +484,7 @@ export function MeetingBenchAdmin({
               </li>
             ))}
             {!loading && filtered.length === 0 ? (
-              <li className="muted">Nothing in this section yet.</li>
+              <li className="mb-admin-lead">Nothing in this section yet.</li>
             ) : null}
           </ul>
         </aside>
@@ -663,7 +663,7 @@ export function MeetingBenchAdmin({
 
           <fieldset className="mb-admin-villages">
             <legend>Which villages does this mention?</legend>
-            <p className="muted mb-admin-villages-hint">
+            <p className="mb-admin-lead mb-admin-villages-hint">
               The Meeting Bench itself is shared by everyone. Use this to tag
               which village(s) a paper is about — leave “All villages” for
               world-wide news.
@@ -760,7 +760,7 @@ export function MeetingBenchAdmin({
           {form.kind === "community_event" ? (
             <fieldset className="mb-admin-tasks">
               <legend>Per-village tasks</legend>
-              <p className="muted">
+              <p className="mb-admin-lead">
                 Each village can get its own piece of the shared gathering.
               </p>
               {VILLAGES.map((v) => (
