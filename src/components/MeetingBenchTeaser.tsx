@@ -12,8 +12,8 @@ export function MeetingBenchTeaser({
     <section className={`village-panel mb-teaser season-${teaser.season}`}>
       <h2>🪑 The Meeting Bench</h2>
       <p className="section-lead">
-        Come sit for a moment. There might be something happening — this bench
-        is shared by every village.
+        Come sit for a little while — the keeper may have left something new to
+        discover.
       </p>
 
       <ul className="mb-teaser-list">

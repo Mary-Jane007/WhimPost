@@ -602,10 +602,18 @@ export function MeetingBenchAdmin({
                 <option value="recipe" />
                 <option value="lore" />
                 <option value="feature" />
+                <option value="poll" />
+                <option value="question" />
+                <option value="discovery" />
                 <option value="community" />
                 <option value="cozy" />
                 <option value="outdoors" />
               </datalist>
+              <span className="mb-admin-lead">
+                Tip: use <code>poll</code> / <code>question</code> for the Question
+                Jar (put choices as bullet lines in the body), or{" "}
+                <code>discovery</code> for a hidden spark under the bench.
+              </span>
             </label>
           </div>
 

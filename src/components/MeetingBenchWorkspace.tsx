@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { BenchItemKind } from "@/lib/meetingBench";
+import type { VillageId } from "@/lib/villages";
 import {
   MeetingBench,
   type MeetingBenchBoard,
@@ -11,9 +12,11 @@ import { MeetingBenchAdmin } from "@/components/MeetingBenchAdmin";
 export function MeetingBenchWorkspace({
   initialBoard,
   isOwner,
+  villageId = null,
 }: {
   initialBoard: MeetingBenchBoard;
   isOwner: boolean;
+  villageId?: VillageId | null;
 }) {
   const [board, setBoard] = useState(initialBoard);
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
@@ -59,6 +62,7 @@ export function MeetingBenchWorkspace({
       <MeetingBench
         initialBoard={initialBoard}
         board={board}
+        villageId={villageId}
         canRsvp
         isOwner={isOwner}
         onEditItem={isOwner ? editItem : undefined}
