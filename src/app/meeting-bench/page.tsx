@@ -31,7 +31,6 @@ export default async function MeetingBenchPage() {
   const pageStyle = {
     "--village-color": village.color,
     "--village-soft": village.colorSoft,
-    color: "#000000",
   } as CSSProperties;
 
   return (

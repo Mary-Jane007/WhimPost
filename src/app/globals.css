@@ -10873,47 +10873,9 @@ button.mh-card-cover {
   --mb-photo-filter: none;
   --mb-photo-warmth: transparent;
   --mb-season-tint: transparent;
-  color: #000000 !important;
-}
-
-.meeting-bench-page .muted,
-.meeting-bench-page p,
-.meeting-bench-page h1,
-.meeting-bench-page h2,
-.meeting-bench-page h3,
-.meeting-bench-page h4,
-.meeting-bench-page li,
-.meeting-bench-page label,
-.meeting-bench-page span,
-.meeting-bench-page strong,
-.meeting-bench-page em,
-.meeting-bench-page a,
-.meeting-bench-page button,
-.meeting-bench-page legend,
-.meeting-bench-page input,
-.meeting-bench-page textarea,
-.meeting-bench-page select {
-  color: #000000;
-}
-
-.meeting-bench-page .muted,
-.meeting-bench-page .mb-admin-lead,
-.meeting-bench-page .mb-jar-lead,
-.meeting-bench-page .mb-scene-hint,
-.meeting-bench-page .mb-journal-head p,
-.meeting-bench-page .mb-reveal-when,
-.meeting-bench-page .mb-reveal-status,
-.meeting-bench-page .mb-reveal-meta,
-.meeting-bench-page .mb-reveal-kicker,
-.meeting-bench-page .mb-jar-kicker,
-.meeting-bench-page .mb-journal-when,
-.meeting-bench-page .mb-bench-caption,
-.meeting-bench-page .meeting-bench-kicker,
-.meeting-bench-page .mb-scene-kicker,
-.meeting-bench-page .mb-journal-type,
-.meeting-bench-page .mb-object-label {
-  color: #1a1a1a !important;
-  opacity: 1;
+  --mb-light-text: #f5f0e6;
+  --mb-dark-text: #000000;
+  color: var(--mb-light-text);
 }
 
 /* Per-village Meeting Bench atmospheres */
@@ -11748,127 +11710,161 @@ button.mh-card-cover {
 }
 
 
-/* Meeting Bench: every light surface gets dark type */
+/* Meeting Bench: font contrast only — dark bg → light text, light bg → dark text */
+
+/* Dark forest-panel chrome (page header sits on dark background) */
 .meeting-bench-page,
-.meeting-bench-page .mb-living,
-.meeting-bench-page .mb-scene-stage,
-.meeting-bench-page .mb-admin,
-.meeting-bench-page .mb-question-jar,
-.meeting-bench-page .mb-journal,
-.meeting-bench-page .mb-reveal-panel,
-.meeting-bench-page .mb-owner-banner,
-.meeting-bench-page .page-header,
-.meeting-bench-page .meeting-bench-header {
-  color: #000000 !important;
+.meeting-bench-page > .page-header,
+.meeting-bench-page > .meeting-bench-header,
+.meeting-bench-page > .page-header p,
+.meeting-bench-page > .page-header h1,
+.meeting-bench-page > .page-header a,
+.meeting-bench-page > .meeting-bench-header p,
+.meeting-bench-page > .meeting-bench-header h1,
+.meeting-bench-page > .meeting-bench-header a,
+.meeting-bench-page > .meeting-bench-header .muted,
+.meeting-bench-page > .meeting-bench-header .meeting-bench-kicker,
+.meeting-bench-page > .meeting-bench-header .mb-living-sub {
+  color: #f5f0e6 !important;
 }
 
-.meeting-bench-page p,
-.meeting-bench-page h1,
-.meeting-bench-page h2,
-.meeting-bench-page h3,
-.meeting-bench-page h4,
-.meeting-bench-page h5,
-.meeting-bench-page li,
-.meeting-bench-page label,
-.meeting-bench-page legend,
-.meeting-bench-page span,
-.meeting-bench-page strong,
-.meeting-bench-page em,
-.meeting-bench-page small,
-.meeting-bench-page code,
-.meeting-bench-page a,
-.meeting-bench-page button,
-.meeting-bench-page input,
-.meeting-bench-page textarea,
-.meeting-bench-page select,
-.meeting-bench-page option,
-.meeting-bench-page .muted,
-.meeting-bench-page .section-lead,
-.meeting-bench-page .mb-admin-lead,
-.meeting-bench-page .mb-jar-lead,
-.meeting-bench-page .mb-jar-status,
-.meeting-bench-page .mb-jar-saved,
+.meeting-bench-page > .meeting-bench-header .muted,
+.meeting-bench-page > .page-header .muted {
+  color: rgba(245, 240, 230, 0.82) !important;
+}
+
+/* Light surfaces → black text */
+.meeting-bench-page .mb-scene-stage,
+.meeting-bench-page .mb-scene-stage p,
+.meeting-bench-page .mb-scene-stage h2,
+.meeting-bench-page .mb-scene-stage h3,
+.meeting-bench-page .mb-scene-stage span,
+.meeting-bench-page .mb-scene-stage strong,
+.meeting-bench-page .mb-scene-stage button,
+.meeting-bench-page .mb-scene-stage a,
 .meeting-bench-page .mb-scene-kicker,
 .meeting-bench-page .mb-scene-title,
 .meeting-bench-page .mb-scene-sub,
 .meeting-bench-page .mb-scene-hint,
-.meeting-bench-page .mb-living-sub,
-.meeting-bench-page .meeting-bench-kicker,
 .meeting-bench-page .mb-bench-caption,
 .meeting-bench-page .mb-object-label,
+.meeting-bench-page .mb-object,
+.meeting-bench-page .mb-discovery-nudge,
+.meeting-bench-page .mb-scene-owner-row,
+.meeting-bench-page .mb-scene-owner-row p,
+.meeting-bench-page .mb-admin,
+.meeting-bench-page .mb-admin p,
+.meeting-bench-page .mb-admin h3,
+.meeting-bench-page .mb-admin h4,
+.meeting-bench-page .mb-admin label,
+.meeting-bench-page .mb-admin legend,
+.meeting-bench-page .mb-admin li,
+.meeting-bench-page .mb-admin span,
+.meeting-bench-page .mb-admin strong,
+.meeting-bench-page .mb-admin a,
+.meeting-bench-page .mb-admin button,
+.meeting-bench-page .mb-admin input,
+.meeting-bench-page .mb-admin textarea,
+.meeting-bench-page .mb-admin select,
+.meeting-bench-page .mb-admin-lead,
+.meeting-bench-page .mb-question-jar,
+.meeting-bench-page .mb-question-jar p,
+.meeting-bench-page .mb-question-jar h2,
+.meeting-bench-page .mb-question-jar label,
+.meeting-bench-page .mb-question-jar span,
+.meeting-bench-page .mb-question-jar strong,
+.meeting-bench-page .mb-question-jar button,
+.meeting-bench-page .mb-jar-kicker,
+.meeting-bench-page .mb-jar-lead,
+.meeting-bench-page .mb-jar-status,
+.meeting-bench-page .mb-jar-saved,
+.meeting-bench-page .mb-journal,
+.meeting-bench-page .mb-journal p,
+.meeting-bench-page .mb-journal h2,
+.meeting-bench-page .mb-journal span,
+.meeting-bench-page .mb-journal strong,
+.meeting-bench-page .mb-journal button,
 .meeting-bench-page .mb-journal-when,
 .meeting-bench-page .mb-journal-type,
 .meeting-bench-page .mb-journal-empty,
+.meeting-bench-page .mb-owner-banner,
+.meeting-bench-page .mb-owner-banner p,
+.meeting-bench-page .mb-owner-banner a,
+.meeting-bench-page .mb-owner-banner strong,
+.meeting-bench-page .mb-reveal-panel,
+.meeting-bench-page .mb-reveal-panel p,
+.meeting-bench-page .mb-reveal-panel h2,
+.meeting-bench-page .mb-reveal-panel span,
+.meeting-bench-page .mb-reveal-panel strong,
+.meeting-bench-page .mb-reveal-panel a,
+.meeting-bench-page .mb-reveal-panel button,
+.meeting-bench-page .mb-reveal-panel li,
 .meeting-bench-page .mb-reveal-kicker,
 .meeting-bench-page .mb-reveal-when,
 .meeting-bench-page .mb-reveal-status,
 .meeting-bench-page .mb-reveal-meta,
 .meeting-bench-page .mb-reveal-body,
 .meeting-bench-page .mb-reveal-body p,
+.meeting-bench-page .mb-admin-launch,
+.meeting-bench-page .mb-admin-launch p,
 .meeting-bench-page .form-error,
 .meeting-bench-page .form-success {
   color: #000000 !important;
-  opacity: 1 !important;
+  opacity: 1;
 }
 
-/* Cream/light button styles become dark on this page's light panels */
-.meeting-bench-page .btn-secondary,
-.meeting-bench-page a.btn-secondary,
-.meeting-bench-page button.btn-secondary,
-.meeting-bench-page .nav-ghost,
-.meeting-bench-page button.nav-ghost,
-.meeting-bench-page .mb-edit-btn,
+.meeting-bench-page .mb-scene-stage .btn-secondary,
+.meeting-bench-page .mb-scene-stage .nav-ghost,
+.meeting-bench-page .mb-admin .btn-secondary,
+.meeting-bench-page .mb-admin .nav-ghost,
+.meeting-bench-page .mb-admin .btn-primary,
+.meeting-bench-page .mb-question-jar .btn-primary,
+.meeting-bench-page .mb-question-jar .btn-secondary,
+.meeting-bench-page .mb-journal .nav-ghost,
+.meeting-bench-page .mb-reveal-panel .btn-primary,
+.meeting-bench-page .mb-reveal-panel .btn-secondary,
+.meeting-bench-page .mb-reveal-panel .nav-ghost,
+.meeting-bench-page .mb-owner-banner a,
 .meeting-bench-page .mb-admin-list li > button,
 .meeting-bench-page .mb-admin-filters button,
 .meeting-bench-page .mb-journal-item > button,
-.meeting-bench-page .mb-discovery-nudge,
 .meeting-bench-page .mb-jar-options label,
+.meeting-bench-page .mb-discovery-nudge,
 .meeting-bench-page .mb-object {
   color: #000000 !important;
-  border-color: color-mix(in srgb, var(--village-color, #333333) 45%, #000000) !important;
-  background-color: color-mix(in srgb, #ffffff 88%, var(--village-soft, #cccccc)) !important;
 }
 
-.meeting-bench-page .btn-secondary:hover,
-.meeting-bench-page .nav-ghost:hover,
-.meeting-bench-page .mb-admin-filters button.active,
-.meeting-bench-page .mb-admin-filters button:hover,
-.meeting-bench-page .mb-admin-list li > button.active,
-.meeting-bench-page .mb-admin-list li > button:hover,
-.meeting-bench-page .mb-jar-options label.on {
+.meeting-bench-page .mb-admin input,
+.meeting-bench-page .mb-admin textarea,
+.meeting-bench-page .mb-admin select,
+.meeting-bench-page .mb-admin ::placeholder {
   color: #000000 !important;
-  background-color: color-mix(in srgb, #ffffff 72%, var(--village-soft, #cccccc)) !important;
-  border-color: color-mix(in srgb, var(--village-color, #333333) 60%, #000000) !important;
-}
-
-.meeting-bench-page .btn-primary,
-.meeting-bench-page a.btn-primary,
-.meeting-bench-page button.btn-primary {
-  color: #12100e !important;
-}
-
-.meeting-bench-page input,
-.meeting-bench-page textarea,
-.meeting-bench-page select {
-  color: #000000 !important;
-  background-color: #ffffff !important;
-  border-color: color-mix(in srgb, var(--village-color, #333333) 40%, #000000) !important;
-  caret-color: #000000;
-}
-
-.meeting-bench-page ::placeholder {
-  color: #333333 !important;
   opacity: 1 !important;
 }
 
-.meeting-bench-page .mb-object-emoji {
-  color: inherit;
-  background: color-mix(in srgb, #ffffff 86%, var(--village-soft, #cccccc)) !important;
-  border-color: color-mix(in srgb, var(--village-color, #333333) 35%, #000000) !important;
+.meeting-bench-page .mb-admin ::placeholder {
+  color: #333333 !important;
 }
 
-.meeting-bench-page .mb-reveal-backdrop {
-  color: #000000;
+/* Dark controls (gold primary on dark header area) keep dark ink on gold */
+.meeting-bench-page > .meeting-bench-header .btn-primary,
+.meeting-bench-page > .page-header .btn-primary {
+  color: #12100e !important;
+}
+
+/* Secondary/ghost on the dark page chrome → light text */
+.meeting-bench-page > .meeting-bench-header .btn-secondary,
+.meeting-bench-page > .meeting-bench-header .nav-ghost,
+.meeting-bench-page > .page-header .btn-secondary,
+.meeting-bench-page > .page-header .nav-ghost,
+.meeting-bench-page > .mb-admin-launch .btn-secondary,
+.meeting-bench-page > .mb-admin-launch .nav-ghost,
+.meeting-bench-page > .mb-admin-launch .btn-primary {
+  color: #f5f0e6 !important;
+}
+
+.meeting-bench-page > .mb-admin-launch .btn-primary {
+  color: #12100e !important;
 }
 
 /* ——— Owner Analytics Dashboard ——— */
