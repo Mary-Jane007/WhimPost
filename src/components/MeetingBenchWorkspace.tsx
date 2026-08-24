@@ -49,16 +49,6 @@ export function MeetingBenchWorkspace({
 
   return (
     <>
-      {isOwner ? (
-        <MeetingBenchAdmin
-          key={editorKey}
-          initialOpen
-          focusItemId={focusItemId}
-          focusKind={focusKind}
-          onBoardChange={setBoard}
-        />
-      ) : null}
-
       <MeetingBench
         initialBoard={initialBoard}
         board={board}
@@ -68,6 +58,16 @@ export function MeetingBenchWorkspace({
         onEditItem={isOwner ? editItem : undefined}
         onAddKind={isOwner ? addKind : undefined}
       />
+
+      {isOwner ? (
+        <MeetingBenchAdmin
+          key={editorKey}
+          initialOpen={Boolean(focusItemId || focusKind)}
+          focusItemId={focusItemId}
+          focusKind={focusKind}
+          onBoardChange={setBoard}
+        />
+      ) : null}
     </>
   );
 }
