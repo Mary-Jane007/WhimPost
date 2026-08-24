@@ -11747,6 +11747,130 @@ button.mh-card-cover {
   }
 }
 
+
+/* Meeting Bench: every light surface gets dark type */
+.meeting-bench-page,
+.meeting-bench-page .mb-living,
+.meeting-bench-page .mb-scene-stage,
+.meeting-bench-page .mb-admin,
+.meeting-bench-page .mb-question-jar,
+.meeting-bench-page .mb-journal,
+.meeting-bench-page .mb-reveal-panel,
+.meeting-bench-page .mb-owner-banner,
+.meeting-bench-page .page-header,
+.meeting-bench-page .meeting-bench-header {
+  color: #000000 !important;
+}
+
+.meeting-bench-page p,
+.meeting-bench-page h1,
+.meeting-bench-page h2,
+.meeting-bench-page h3,
+.meeting-bench-page h4,
+.meeting-bench-page h5,
+.meeting-bench-page li,
+.meeting-bench-page label,
+.meeting-bench-page legend,
+.meeting-bench-page span,
+.meeting-bench-page strong,
+.meeting-bench-page em,
+.meeting-bench-page small,
+.meeting-bench-page code,
+.meeting-bench-page a,
+.meeting-bench-page button,
+.meeting-bench-page input,
+.meeting-bench-page textarea,
+.meeting-bench-page select,
+.meeting-bench-page option,
+.meeting-bench-page .muted,
+.meeting-bench-page .section-lead,
+.meeting-bench-page .mb-admin-lead,
+.meeting-bench-page .mb-jar-lead,
+.meeting-bench-page .mb-jar-status,
+.meeting-bench-page .mb-jar-saved,
+.meeting-bench-page .mb-scene-kicker,
+.meeting-bench-page .mb-scene-title,
+.meeting-bench-page .mb-scene-sub,
+.meeting-bench-page .mb-scene-hint,
+.meeting-bench-page .mb-living-sub,
+.meeting-bench-page .meeting-bench-kicker,
+.meeting-bench-page .mb-bench-caption,
+.meeting-bench-page .mb-object-label,
+.meeting-bench-page .mb-journal-when,
+.meeting-bench-page .mb-journal-type,
+.meeting-bench-page .mb-journal-empty,
+.meeting-bench-page .mb-reveal-kicker,
+.meeting-bench-page .mb-reveal-when,
+.meeting-bench-page .mb-reveal-status,
+.meeting-bench-page .mb-reveal-meta,
+.meeting-bench-page .mb-reveal-body,
+.meeting-bench-page .mb-reveal-body p,
+.meeting-bench-page .form-error,
+.meeting-bench-page .form-success {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+/* Cream/light button styles become dark on this page's light panels */
+.meeting-bench-page .btn-secondary,
+.meeting-bench-page a.btn-secondary,
+.meeting-bench-page button.btn-secondary,
+.meeting-bench-page .nav-ghost,
+.meeting-bench-page button.nav-ghost,
+.meeting-bench-page .mb-edit-btn,
+.meeting-bench-page .mb-admin-list li > button,
+.meeting-bench-page .mb-admin-filters button,
+.meeting-bench-page .mb-journal-item > button,
+.meeting-bench-page .mb-discovery-nudge,
+.meeting-bench-page .mb-jar-options label,
+.meeting-bench-page .mb-object {
+  color: #000000 !important;
+  border-color: color-mix(in srgb, var(--village-color, #333333) 45%, #000000) !important;
+  background-color: color-mix(in srgb, #ffffff 88%, var(--village-soft, #cccccc)) !important;
+}
+
+.meeting-bench-page .btn-secondary:hover,
+.meeting-bench-page .nav-ghost:hover,
+.meeting-bench-page .mb-admin-filters button.active,
+.meeting-bench-page .mb-admin-filters button:hover,
+.meeting-bench-page .mb-admin-list li > button.active,
+.meeting-bench-page .mb-admin-list li > button:hover,
+.meeting-bench-page .mb-jar-options label.on {
+  color: #000000 !important;
+  background-color: color-mix(in srgb, #ffffff 72%, var(--village-soft, #cccccc)) !important;
+  border-color: color-mix(in srgb, var(--village-color, #333333) 60%, #000000) !important;
+}
+
+.meeting-bench-page .btn-primary,
+.meeting-bench-page a.btn-primary,
+.meeting-bench-page button.btn-primary {
+  color: #12100e !important;
+}
+
+.meeting-bench-page input,
+.meeting-bench-page textarea,
+.meeting-bench-page select {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  border-color: color-mix(in srgb, var(--village-color, #333333) 40%, #000000) !important;
+  caret-color: #000000;
+}
+
+.meeting-bench-page ::placeholder {
+  color: #333333 !important;
+  opacity: 1 !important;
+}
+
+.meeting-bench-page .mb-object-emoji {
+  color: inherit;
+  background: color-mix(in srgb, #ffffff 86%, var(--village-soft, #cccccc)) !important;
+  border-color: color-mix(in srgb, var(--village-color, #333333) 35%, #000000) !important;
+}
+
+.meeting-bench-page .mb-reveal-backdrop {
+  color: #000000;
+}
+
 /* ——— Owner Analytics Dashboard ——— */
 .oa-page {
   max-width: 1180px;
