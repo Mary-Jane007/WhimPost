@@ -10859,57 +10859,161 @@ button.mh-card-cover {
 /* ——— Meeting Bench ——— */
 /* ——— Meeting Bench (immersive living place) ——— */
 .meeting-bench-page {
+  --mb-ink: #000000;
+  --mb-muted: #1a1a1a;
   --mb-wood: color-mix(in srgb, var(--village-color, #6b4a2e) 55%, #5a3a22);
   --mb-wood-light: color-mix(in srgb, var(--village-soft, #8a6340) 70%, #a07850);
-  --mb-paper: color-mix(in srgb, var(--cream, #f3e6d0) 88%, #fff);
-  --mb-ink: var(--ink, #2a241c);
+  --mb-paper: color-mix(in srgb, var(--village-soft, #6b8f71) 16%, #ffffff);
   --mb-moss: color-mix(in srgb, var(--village-color, #4f6b4a) 65%, #3d5a40);
   --mb-pin: #b33a3a;
   --mb-glow: color-mix(in srgb, var(--village-soft, #6b8f71) 35%, transparent);
+  --mb-scene-top: color-mix(in srgb, var(--village-soft, #6b8f71) 28%, #ffffff);
+  --mb-scene-mid: color-mix(in srgb, var(--village-soft, #6b8f71) 12%, #ffffff);
+  --mb-scene-bot: color-mix(in srgb, var(--village-color, #6b8f71) 10%, #f4f4f4);
+  --mb-photo-filter: none;
+  --mb-photo-warmth: transparent;
+  --mb-season-tint: transparent;
+  color: #000000 !important;
 }
 
-.meeting-bench-page.season-spring { --mb-accent: #6a9a6a; --mb-wash: rgba(186, 220, 180, 0.18); }
-.meeting-bench-page.season-summer { --mb-accent: #c48a3a; --mb-wash: rgba(255, 214, 140, 0.16); }
-.meeting-bench-page.season-autumn { --mb-accent: #b65a2e; --mb-wash: rgba(220, 150, 90, 0.16); }
-.meeting-bench-page.season-winter { --mb-accent: #5a7388; --mb-wash: rgba(180, 205, 220, 0.18); }
+.meeting-bench-page .muted,
+.meeting-bench-page p,
+.meeting-bench-page h1,
+.meeting-bench-page h2,
+.meeting-bench-page h3,
+.meeting-bench-page h4,
+.meeting-bench-page li,
+.meeting-bench-page label,
+.meeting-bench-page span,
+.meeting-bench-page strong,
+.meeting-bench-page em,
+.meeting-bench-page a,
+.meeting-bench-page button,
+.meeting-bench-page legend,
+.meeting-bench-page input,
+.meeting-bench-page textarea,
+.meeting-bench-page select {
+  color: #000000;
+}
+
+.meeting-bench-page .muted,
+.meeting-bench-page .mb-admin-lead,
+.meeting-bench-page .mb-jar-lead,
+.meeting-bench-page .mb-scene-hint,
+.meeting-bench-page .mb-journal-head p,
+.meeting-bench-page .mb-reveal-when,
+.meeting-bench-page .mb-reveal-status,
+.meeting-bench-page .mb-reveal-meta,
+.meeting-bench-page .mb-reveal-kicker,
+.meeting-bench-page .mb-jar-kicker,
+.meeting-bench-page .mb-journal-when,
+.meeting-bench-page .mb-bench-caption,
+.meeting-bench-page .meeting-bench-kicker,
+.meeting-bench-page .mb-scene-kicker,
+.meeting-bench-page .mb-journal-type,
+.meeting-bench-page .mb-object-label {
+  color: #1a1a1a !important;
+  opacity: 1;
+}
+
+/* Per-village Meeting Bench atmospheres */
+.meeting-bench-page.village-bramblewood {
+  --village-color: #e07020;
+  --village-soft: #f0a868;
+  --mb-accent: #c45a18;
+  --mb-wash: rgba(224, 112, 32, 0.14);
+  --mb-scene-top: #fff1e4;
+  --mb-scene-mid: #ffe8d2;
+  --mb-scene-bot: #f3d2b0;
+  --mb-photo-filter: saturate(1.08) contrast(1.04) sepia(0.12);
+  --mb-photo-warmth: rgba(224, 112, 32, 0.12);
+}
+.meeting-bench-page.village-mosshollow {
+  --village-color: #1a3d2e;
+  --village-soft: #6b8f71;
+  --mb-accent: #3d6b4f;
+  --mb-wash: rgba(107, 143, 113, 0.16);
+  --mb-scene-top: #eaf1ea;
+  --mb-scene-mid: #e0ebe1;
+  --mb-scene-bot: #c9d9cb;
+  --mb-photo-filter: saturate(0.92) hue-rotate(-8deg) contrast(1.02);
+  --mb-photo-warmth: rgba(26, 61, 46, 0.1);
+}
+.meeting-bench-page.village-clovermeadow {
+  --village-color: #d4849a;
+  --village-soft: #f2c4d0;
+  --mb-accent: #c45f7a;
+  --mb-wash: rgba(242, 196, 208, 0.28);
+  --mb-scene-top: #fff5f8;
+  --mb-scene-mid: #ffeaf0;
+  --mb-scene-bot: #f6d5df;
+  --mb-photo-filter: saturate(1.05) brightness(1.03);
+  --mb-photo-warmth: rgba(212, 132, 154, 0.14);
+}
+.meeting-bench-page.village-moonmere {
+  --village-color: #2a3548;
+  --village-soft: #8a9b88;
+  --mb-accent: #5a7388;
+  --mb-wash: rgba(90, 115, 136, 0.18);
+  --mb-scene-top: #e8eef4;
+  --mb-scene-mid: #dde5ee;
+  --mb-scene-bot: #c5d0dc;
+  --mb-photo-filter: saturate(0.85) brightness(0.96) hue-rotate(12deg);
+  --mb-photo-warmth: rgba(42, 53, 72, 0.16);
+}
+.meeting-bench-page.village-hearthwick {
+  --village-color: #8b5a2b;
+  --village-soft: #e2c39a;
+  --mb-accent: #a06a35;
+  --mb-wash: rgba(226, 195, 154, 0.24);
+  --mb-scene-top: #fff7ec;
+  --mb-scene-mid: #f8ead6;
+  --mb-scene-bot: #ebd4b4;
+  --mb-photo-filter: saturate(1.06) contrast(1.03) sepia(0.08);
+  --mb-photo-warmth: rgba(139, 90, 43, 0.12);
+}
+
+.meeting-bench-page.season-spring { --mb-season-tint: rgba(186, 220, 180, 0.12); }
+.meeting-bench-page.season-summer { --mb-season-tint: rgba(255, 214, 140, 0.1); }
+.meeting-bench-page.season-autumn { --mb-season-tint: rgba(220, 150, 90, 0.1); }
+.meeting-bench-page.season-winter { --mb-season-tint: rgba(180, 205, 220, 0.12); }
 
 .meeting-bench-kicker {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 0.78rem;
-  opacity: 0.8;
   margin: 0 0 0.35rem;
   font-family: var(--font-stamp, inherit);
-  color: var(--mb-ink);
+  color: #000000;
 }
 
 .meeting-bench-header h1 {
   margin-bottom: 0.35rem;
-  color: var(--mb-ink);
+  color: #000000;
 }
 
 .mb-living-sub {
   font-family: var(--font-display, inherit);
   font-size: 1.15rem;
-  color: color-mix(in srgb, var(--village-color, #6b8f71) 70%, var(--mb-ink));
+  color: #000000;
   margin: 0 0 0.65rem;
 }
 
 .mb-owner-banner {
   margin-top: 0.85rem;
   padding: 0.7rem 0.9rem;
-  border: 1px dashed color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
   border-radius: 0.65rem;
-  background: color-mix(in srgb, var(--village-soft, #6b8f71) 18%, #ffffff);
-  color: var(--mb-ink);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 22%, #ffffff);
+  color: #000000;
 }
-.mb-owner-banner a { color: inherit; font-weight: 600; }
+.mb-owner-banner a { color: #000000; font-weight: 600; text-decoration: underline; }
 
 /* Owner admin desk — light panels, dark readable ink */
 .mb-admin-launch { margin: 0 0 1.25rem; }
 .mb-admin-lead {
   margin: 0.35rem 0 0;
-  color: color-mix(in srgb, var(--ink, #1f2a1e) 78%, #000);
+  color: #1a1a1a;
 }
 .mb-admin {
   margin: 0 0 1.75rem;
@@ -10917,7 +11021,7 @@ button.mh-card-cover {
   border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 38%, transparent);
   background: color-mix(in srgb, var(--village-soft, #6b8f71) 26%, #ffffff);
   border-radius: 0.85rem;
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-admin-head {
   display: flex;
@@ -10926,7 +11030,7 @@ button.mh-card-cover {
   gap: 0.75rem;
   margin-bottom: 0.35rem;
 }
-.mb-admin-head h3 { margin: 0; color: var(--ink, #1f2a1e); }
+.mb-admin-head h3 { margin: 0; color: #000000; }
 .mb-admin-layout {
   display: grid;
   grid-template-columns: minmax(12rem, 16rem) 1fr;
@@ -10955,7 +11059,7 @@ button.mh-card-cover {
   text-align: left;
   border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
   background: color-mix(in srgb, var(--village-soft, #6b8f71) 14%, #ffffff);
-  color: var(--ink, #1f2a1e);
+  color: #000000;
   border-radius: 0.55rem;
   padding: 0.45rem 0.55rem;
   cursor: pointer;
@@ -10977,7 +11081,7 @@ button.mh-card-cover {
   display: grid;
   gap: 0.28rem;
   font-size: 0.9rem;
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-admin-form input,
 .mb-admin-form textarea,
@@ -10985,7 +11089,7 @@ button.mh-card-cover {
   width: 100%;
   border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
   background: color-mix(in srgb, var(--village-soft, #6b8f71) 14%, #ffffff);
-  color: var(--ink, #1f2a1e);
+  color: #000000;
   border-radius: 0.45rem;
   padding: 0.45rem 0.55rem;
   font: inherit;
@@ -11005,7 +11109,7 @@ button.mh-card-cover {
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem 0.9rem;
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-admin-check {
   display: inline-flex !important;
@@ -11034,7 +11138,7 @@ button.mh-card-cover {
 .mb-admin-filters button {
   border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
   background: color-mix(in srgb, var(--village-soft, #6b8f71) 12%, #ffffff);
-  color: var(--ink, #1f2a1e);
+  color: #000000;
   border-radius: 999px;
   padding: 0.25rem 0.55rem;
   font: inherit;
@@ -11059,7 +11163,7 @@ button.mh-card-cover {
   gap: 0.75rem;
   margin-bottom: 0.25rem;
 }
-.mb-admin-form-title h4 { margin: 0; color: var(--ink, #1f2a1e); }
+.mb-admin-form-title h4 { margin: 0; color: #000000; }
 .mb-admin-row-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .mb-sort-row {
   display: grid;
@@ -11079,7 +11183,7 @@ button.mh-card-cover {
   padding: 0.7rem 0.8rem;
   display: grid;
   gap: 0.55rem;
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-admin-tasks label { display: grid; gap: 0.25rem; }
 .mb-admin-villages-hint { margin: 0.25rem 0 0.5rem; }
@@ -11088,21 +11192,22 @@ button.mh-card-cover {
 .meeting-bench.mb-living {
   display: grid;
   gap: 1.75rem;
-  color: var(--mb-ink);
+  color: #000000;
 }
 
 .mb-scene-stage {
   position: relative;
   overflow: hidden;
   border-radius: 1.35rem;
-  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 34%, transparent);
   background:
-    radial-gradient(ellipse at 50% 0%, var(--mb-wash), transparent 55%),
+    radial-gradient(ellipse at 50% 0%, var(--mb-wash, transparent), transparent 55%),
+    radial-gradient(ellipse at 82% 12%, var(--mb-season-tint, transparent), transparent 42%),
     radial-gradient(ellipse at 18% 80%, var(--mb-glow), transparent 45%),
     linear-gradient(180deg,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 18%, #f7f1e6) 0%,
-      color-mix(in srgb, var(--cream, #f3e6d0) 80%, #fff) 42%,
-      color-mix(in srgb, var(--village-color, #6b8f71) 12%, #e8dfd0) 100%);
+      var(--mb-scene-top) 0%,
+      var(--mb-scene-mid) 48%,
+      var(--mb-scene-bot) 100%);
   padding: 1.25rem 1.1rem 1.5rem;
   box-shadow: 0 18px 36px rgba(40, 28, 18, 0.08);
 }
@@ -11157,17 +11262,17 @@ button.mh-card-cover {
   margin: 0.25rem 0 0.2rem;
   font-family: var(--font-display, inherit);
   font-size: clamp(1.55rem, 3.5vw, 2.1rem);
-  color: var(--mb-ink);
+  color: #000000;
 }
 .mb-scene-sub {
   margin: 0;
   font-size: 1.05rem;
-  color: color-mix(in srgb, var(--village-color, #6b8f71) 75%, var(--mb-ink));
+  color: #000000;
 }
 .mb-scene-hint {
   margin: 0.55rem 0 0;
   font-size: 0.95rem;
-  color: color-mix(in srgb, var(--mb-ink) 78%, transparent);
+  color: #1a1a1a;
 }
 
 .mb-scene-ground {
@@ -11184,6 +11289,12 @@ button.mh-card-cover {
   margin: 0 auto;
 }
 
+.mb-bench-photo-wrap {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
 .mb-bench-photo {
   display: block;
   width: 100%;
@@ -11192,10 +11303,22 @@ button.mh-card-cover {
   object-fit: cover;
   object-position: center 58%;
   border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  filter: var(--mb-photo-filter, none);
   box-shadow:
     0 18px 40px rgba(40, 28, 18, 0.16),
     inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.mb-bench-photo-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, var(--mb-photo-warmth, transparent), transparent 42%),
+    linear-gradient(0deg, var(--mb-photo-warmth, transparent), transparent 28%);
+  mix-blend-mode: multiply;
 }
 
 .mb-bench-caption {
@@ -11204,7 +11327,7 @@ button.mh-card-cover {
   font-size: 0.78rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  opacity: 0.7;
+  color: #000000;
   font-family: var(--font-stamp, inherit);
 }
 
@@ -11222,7 +11345,7 @@ button.mh-card-cover {
   gap: 0.25rem;
   border: 0;
   background: transparent;
-  color: var(--mb-ink);
+  color: #000000;
   cursor: pointer;
   padding: 0.35rem;
   max-width: 7.5rem;
@@ -11268,14 +11391,14 @@ button.mh-card-cover {
   -webkit-box-orient: vertical;
 }
 
-.mb-place-seat-left { left: 18%; bottom: 8.6rem; }
-.mb-place-seat-mid { left: 50%; bottom: 9.2rem; transform: translateX(-50%); }
-.mb-place-seat-right { right: 18%; bottom: 8.6rem; }
-.mb-place-ground-left { left: 6%; bottom: 3.2rem; }
-.mb-place-ground-right { right: 6%; bottom: 3.2rem; }
-.mb-place-air-left { left: 10%; top: 1.2rem; }
-.mb-place-air-right { right: 10%; top: 1.5rem; }
-.mb-place-under { left: 50%; bottom: 0.35rem; transform: translateX(-50%); }
+.mb-place-seat-left { left: 22%; bottom: 38%; }
+.mb-place-seat-mid { left: 50%; bottom: 42%; transform: translateX(-50%); }
+.mb-place-seat-right { right: 22%; bottom: 38%; }
+.mb-place-ground-left { left: 8%; bottom: 14%; }
+.mb-place-ground-right { right: 8%; bottom: 14%; }
+.mb-place-air-left { left: 12%; top: 10%; }
+.mb-place-air-right { right: 12%; top: 12%; }
+.mb-place-under { left: 50%; bottom: 8%; transform: translateX(-50%); }
 
 .mb-place-seat-mid:hover,
 .mb-place-seat-mid:focus-visible,
@@ -11287,15 +11410,15 @@ button.mh-card-cover {
 .mb-discovery-nudge {
   position: absolute;
   left: 50%;
-  bottom: 0.2rem;
+  bottom: 6%;
   transform: translateX(-50%);
   z-index: 4;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   border: 1px dashed color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
-  background: color-mix(in srgb, #ffffff 70%, var(--village-soft, #6b8f71));
-  color: var(--mb-ink);
+  background: color-mix(in srgb, #ffffff 82%, var(--village-soft, #6b8f71));
+  color: #000000;
   border-radius: 999px;
   padding: 0.35rem 0.75rem;
   font: inherit;
@@ -11343,7 +11466,7 @@ button.mh-card-cover {
   border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--village-soft, #6b8f71) 16%, #fff), #fffaf3);
-  color: var(--ink, #1f2a1e);
+  color: #000000;
   padding: 1.15rem 1.2rem 1.3rem;
   position: relative;
   box-shadow: 0 24px 48px rgba(20, 14, 10, 0.28);
@@ -11380,7 +11503,7 @@ button.mh-card-cover {
   margin: 0.35rem 0 0.4rem;
   text-align: center;
   font-family: var(--font-display, inherit);
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-reveal-when,
 .mb-reveal-status,
@@ -11388,7 +11511,7 @@ button.mh-card-cover {
   text-align: center;
   margin: 0.2rem 0;
   font-size: 0.9rem;
-  color: color-mix(in srgb, var(--ink, #1f2a1e) 75%, #000);
+  color: #1a1a1a;
 }
 .mb-reveal-body {
   margin: 0.85rem 0 0.5rem;
@@ -11422,7 +11545,7 @@ button.mh-card-cover {
   border-radius: 1.1rem;
   border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 30%, transparent);
   background: color-mix(in srgb, var(--village-soft, #6b8f71) 18%, #ffffff);
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-jar-visual {
   position: relative;
@@ -11451,11 +11574,11 @@ button.mh-card-cover {
   margin: 0.2rem 0 0.35rem;
   font-family: var(--font-display, inherit);
   font-size: 1.25rem;
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-jar-lead {
   margin: 0 0 0.75rem;
-  color: color-mix(in srgb, var(--ink, #1f2a1e) 78%, #000);
+  color: #1a1a1a;
 }
 .mb-jar-saved {
   margin: 0 0 0.75rem;
@@ -11478,7 +11601,7 @@ button.mh-card-cover {
   border-radius: 0.65rem;
   border: 1px solid transparent;
   cursor: pointer;
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-jar-options label.on {
   border-color: color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
@@ -11493,16 +11616,16 @@ button.mh-card-cover {
   border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 26%, transparent);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--cream, #f3e6d0) 70%, #fff), color-mix(in srgb, var(--village-soft, #6b8f71) 12%, #fff));
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-journal-head h2 {
   margin: 0 0 0.25rem;
   font-family: var(--font-display, inherit);
-  color: var(--ink, #1f2a1e);
+  color: #000000;
 }
 .mb-journal-head p {
   margin: 0;
-  color: color-mix(in srgb, var(--ink, #1f2a1e) 75%, #000);
+  color: #1a1a1a;
 }
 .mb-journal-empty { margin: 0.85rem 0 0; }
 .mb-journal-list {
@@ -11536,7 +11659,7 @@ button.mh-card-cover {
   text-align: left;
   border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 18%, transparent);
   background: color-mix(in srgb, #ffffff 70%, transparent);
-  color: var(--ink, #1f2a1e);
+  color: #000000;
   border-radius: 0.75rem;
   padding: 0.65rem 0.75rem;
   cursor: pointer;
@@ -11558,7 +11681,7 @@ button.mh-card-cover {
 }
 .mb-journal-type {
   font-size: 0.8rem;
-  color: color-mix(in srgb, var(--village-color, #6b8f71) 70%, var(--ink, #1f2a1e));
+  color: #000000;
 }
 .mb-journal-item strong { font-size: 0.98rem; }
 .mb-journal-edit { font-size: 0.85rem; }
@@ -11602,15 +11725,15 @@ button.mh-card-cover {
 }
 
 @media (max-width: 720px) {
-  .mb-scene-ground { min-height: 26rem; }
-  .mb-bench-figure { width: min(86%, 18rem); bottom: 4.2rem; }
-  .mb-place-seat-left { left: 8%; bottom: 10.2rem; }
-  .mb-place-seat-mid { bottom: 10.8rem; }
-  .mb-place-seat-right { right: 8%; bottom: 10.2rem; }
-  .mb-place-air-left,
-  .mb-place-air-right { top: auto; bottom: 14.5rem; }
-  .mb-place-ground-left { left: 4%; bottom: 1.6rem; }
-  .mb-place-ground-right { right: 4%; bottom: 1.6rem; }
+  .mb-scene-ground { min-height: auto; }
+  .mb-bench-photo { max-height: min(48vh, 22rem); }
+  .mb-place-seat-left { left: 10%; bottom: 36%; }
+  .mb-place-seat-mid { bottom: 40%; }
+  .mb-place-seat-right { right: 10%; bottom: 36%; }
+  .mb-place-air-left { left: 6%; top: 8%; }
+  .mb-place-air-right { right: 6%; top: 10%; }
+  .mb-place-ground-left { left: 4%; bottom: 12%; }
+  .mb-place-ground-right { right: 4%; bottom: 12%; }
   .mb-object { max-width: 6.5rem; }
   .mb-object-emoji { width: 2.85rem; height: 2.85rem; font-size: 1.35rem; }
   .mb-question-jar {

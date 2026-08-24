@@ -152,14 +152,16 @@ export function MeetingBench({
           </div>
 
           <div className="mb-bench-figure" aria-hidden>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className="mb-bench-photo"
-              src="/meeting-bench/bench-nature.png"
-              alt=""
-              width={1280}
-              height={720}
-            />
+            <div className="mb-bench-photo-wrap">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="mb-bench-photo"
+                src="/meeting-bench/bench-nature.png"
+                alt=""
+                width={1280}
+                height={720}
+              />
+            </div>
             <p className="mb-bench-caption">{theme.benchLabel}</p>
           </div>
 

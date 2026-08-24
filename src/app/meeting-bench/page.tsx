@@ -7,7 +7,8 @@ import { getMeetingBenchBoard } from "@/lib/meetingBench";
 import { MeetingBenchWorkspace } from "@/components/MeetingBenchWorkspace";
 import { PageCrest } from "@/components/PageCrest";
 import { getBenchTheme } from "@/lib/meetingBenchScene";
-import { isVillageId, type VillageId } from "@/lib/villages";
+import { isVillageId, VILLAGE_MAP, type VillageId } from "@/lib/villages";
+import type { CSSProperties } from "react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -26,10 +27,17 @@ export default async function MeetingBenchPage() {
     (user.villageId && isVillageId(user.villageId) ? user.villageId : null) ||
     ("bramblewood" as VillageId);
   const theme = getBenchTheme(villageId);
+  const village = VILLAGE_MAP[villageId];
+  const pageStyle = {
+    "--village-color": village.color,
+    "--village-soft": village.colorSoft,
+    color: "#000000",
+  } as CSSProperties;
 
   return (
     <main
       className={`app-main forest-panel meeting-bench-page mb-living-page village-${villageId} season-${board.season}`}
+      style={pageStyle}
     >
       <PageCrest
         kinds={
