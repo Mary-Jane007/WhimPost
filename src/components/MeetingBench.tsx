@@ -152,15 +152,14 @@ export function MeetingBench({
           </div>
 
           <div className="mb-bench-figure" aria-hidden>
-            <div className="mb-bench-back" />
-            <div className="mb-bench-seat">
-              <span className="mb-bench-plank" />
-              <span className="mb-bench-plank" />
-            </div>
-            <div className="mb-bench-legs">
-              <span />
-              <span />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="mb-bench-photo"
+              src="/meeting-bench/bench-nature.png"
+              alt=""
+              width={1280}
+              height={720}
+            />
             <p className="mb-bench-caption">{theme.benchLabel}</p>
           </div>
 
