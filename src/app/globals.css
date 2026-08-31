@@ -10867,7 +10867,7 @@ button.mh-card-cover {
   --mb-wood: color-mix(in srgb, var(--village-color, #6b4a2e) 62%, #4a3420);
   --mb-wood-light: color-mix(in srgb, var(--village-soft, #8a6340) 55%, #c4a06a);
   --mb-paper: color-mix(in srgb, var(--village-soft, #6b8f71) 14%, #fffdf8);
-  --mb-pin: color-mix(in srgb, var(--village-color, #6b8f71) 50%, #7a3030);
+  --mb-pin: color-mix(in srgb, var(--village-color, #6b8f71) 72%, #4a2424);
   --mb-wash: color-mix(in srgb, var(--village-soft, #6b8f71) 26%, transparent);
   --mb-glow: color-mix(in srgb, var(--village-soft, #6b8f71) 30%, transparent);
   --mb-scene-top: color-mix(in srgb, var(--village-soft, #6b8f71) 20%, #ffffff);
@@ -11182,14 +11182,13 @@ button.mh-card-cover {
   padding: 1.2rem 1.05rem 1.4rem;
   border-radius: 1.7rem 2.3rem 1.35rem 2rem / 2rem 1.35rem 2.4rem 1.5rem;
   background:
-    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--village-soft, #6b8f71) 22%, transparent) 0 1.2rem, transparent 1.3rem),
-    radial-gradient(circle at 90% 24%, color-mix(in srgb, var(--village-soft, #6b8f71) 16%, transparent) 0 1rem, transparent 1.1rem),
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--village-soft, #6b8f71) 16%, transparent) 0 1.2rem, transparent 1.3rem),
     linear-gradient(
       150deg,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 22%, #f7ead2),
-      color-mix(in srgb, var(--village-color, #6b8f71) 10%, #e8d0a8)
+      color-mix(in srgb, var(--village-soft, #6b8f71) 14%, #f6f1e8),
+      color-mix(in srgb, var(--village-color, #6b8f71) 8%, #ebe3d6)
     );
-  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 22%, transparent);
   box-shadow:
     inset 0 0 0 8px color-mix(in srgb, var(--mb-wood, #5a3a22) 70%, #3d2818),
     inset 0 0 0 11px color-mix(in srgb, var(--mb-wood-light, #a07850) 45%, #8a6238),
@@ -11198,16 +11197,11 @@ button.mh-card-cover {
 
 .mb-board-rail {
   position: absolute;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--mb-wood, #5a3a22) 88%, #2a1810),
-    color-mix(in srgb, var(--mb-wood-light, #a07850) 70%, #7a5230),
-    color-mix(in srgb, var(--mb-wood, #5a3a22) 88%, #2a1810)
-  );
+  background: color-mix(in srgb, var(--mb-wood, #5a3a22) 82%, var(--village-color, #6b8f71));
   pointer-events: none;
   z-index: 2;
   border-radius: 999px;
-  opacity: 0.85;
+  opacity: 0.72;
 }
 .mb-board-rail-top,
 .mb-board-rail-bottom {
@@ -11243,7 +11237,7 @@ button.mh-card-cover {
   height: 5.8rem;
   left: -1.2rem;
   top: 16%;
-  background: color-mix(in srgb, var(--village-soft, #6b8f71) 70%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 42%, transparent);
   border-radius: 65% 35% 58% 42% / 42% 58% 42% 58%;
 }
 .mb-play-blob.b2 {
@@ -11251,7 +11245,7 @@ button.mh-card-cover {
   height: 7rem;
   right: -1rem;
   top: 34%;
-  background: color-mix(in srgb, var(--village-soft, #6b8f71) 55%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 34%, transparent);
   animation-delay: 1.4s;
   border-radius: 38% 62% 42% 58% / 58% 38% 62% 42%;
 }
@@ -11260,7 +11254,7 @@ button.mh-card-cover {
   height: 4.8rem;
   left: 32%;
   bottom: 5%;
-  background: color-mix(in srgb, var(--village-color, #6b8f71) 22%, transparent);
+  background: color-mix(in srgb, var(--village-color, #6b8f71) 14%, transparent);
   animation-delay: 2.2s;
   border-radius: 55% 45% 60% 40% / 40% 60% 40% 60%;
 }
@@ -11336,7 +11330,7 @@ button.mh-card-cover {
   transform: translateX(-50%);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 30%, #f2d6a0, var(--mb-pin, #8a3030) 55%, #5a1e1e);
+    radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--village-soft, #6b8f71) 55%, #fff), var(--mb-pin, #8a3030) 55%, color-mix(in srgb, var(--village-color, #6b8f71) 70%, #3a1818));
   box-shadow: 0 2px 4px rgba(40, 28, 18, 0.3);
 }
 .mb-scene-hero::after { content: none; }
@@ -11460,7 +11454,7 @@ button.mh-card-cover {
   height: 0.6rem;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 30%, #f0d090, var(--mb-pin, #8a3030) 58%, #5a1e1e);
+    radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--village-soft, #6b8f71) 50%, #fff), var(--mb-pin, #8a3030) 58%, color-mix(in srgb, var(--village-color, #6b8f71) 65%, #3a1818));
   box-shadow: 0 2px 3px rgba(40, 28, 18, 0.3);
   margin-bottom: -0.15rem;
   z-index: 2;
