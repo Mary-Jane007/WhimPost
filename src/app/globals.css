@@ -11163,6 +11163,13 @@ button.mh-card-cover {
   color: #1a1a1a;
 }
 
+/* Keep Meeting Bench stickers realistic — hide site-wide sketch forest decals here. */
+.page-shell:has(.meeting-bench-page) > .forest-stickers,
+.meeting-bench-page > .forest-stickers,
+.meeting-bench-page.forest-panel > .forest-stickers {
+  display: none !important;
+}
+
 .mb-scene-stage {
   position: relative;
   overflow: hidden;
@@ -11397,8 +11404,10 @@ button.mh-card-cover {
   background: transparent;
   color: #000000;
   cursor: pointer;
-  padding: 0.2rem;
-  max-width: 7.2rem;
+  padding: 0.35rem;
+  max-width: 7.8rem;
+  min-width: 4.2rem;
+  z-index: 6;
   transform: rotate(var(--mb-pin-rot, 0deg));
   transition: transform 0.25s ease, filter 0.25s ease;
 }

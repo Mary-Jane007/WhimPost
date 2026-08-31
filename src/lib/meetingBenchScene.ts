@@ -563,7 +563,7 @@ export function questionJarSticker(villageId: VillageId | null | undefined) {
     return "/stickers/jam-jar.png";
   }
   if (villageId === "moonmere") {
-    return "/stickers/villages/hearthwick/leaf-jar.png";
+    return "/stickers/honey-jar.png";
   }
   return "/stickers/jam-jar.png";
 }
