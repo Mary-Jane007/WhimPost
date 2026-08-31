@@ -269,13 +269,16 @@ export function scheduleEnsureTvUploadBytes() {
   setTimeout(() => {
     try {
       ensureTvUploadBytes();
-      // Celestial audio may land after the first import — re-bind rows now.
+      // Bytes may land after the first import — re-bind catalog rows now.
       try {
         const { getDb } = require("@/lib/db") as typeof import("@/lib/db");
+        const db = getDb();
         const moon = require("@/lib/persistentMoonSounds") as typeof import("@/lib/persistentMoonSounds");
-        moon.importPersistentMoonSounds(getDb());
+        moon.importPersistentMoonSounds(db);
+        const tvMedia = require("@/lib/persistentTvMedia") as typeof import("@/lib/persistentTvMedia");
+        tvMedia.importPersistentTvMedia(db);
       } catch (err) {
-        console.warn("[persistent-moon-sounds] post-restore import failed:", err);
+        console.warn("[persistent-tv] post-restore catalog import failed:", err);
       }
     } catch (err) {
       console.warn("[persistent-tv] background media restore failed:", err);

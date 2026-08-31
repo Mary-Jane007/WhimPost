@@ -2,8 +2,12 @@ import type { Database } from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import { isPlayableMediaFile } from "@/lib/lfsPointer";
 import { UPLOAD_DIR } from "@/lib/uploadPaths";
-import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/tvMediaPaths";
+import {
+  PERSISTENT_TV_MEDIA_PATH,
+  TV_CACHE_DIR,
+} from "@/lib/tvMediaPaths";
 
 /**
  * Git-tracked catalog of uploaded TV files (metadata only).
@@ -24,6 +28,18 @@ export type PersistentTvMediaClip = {
 /** Channels that should always play in every village lounge. */
 export function isSharedTvChannelTitle(title: string) {
   return title.trim().toLowerCase() === "cottage cartoons";
+}
+
+/**
+ * True when catalog bytes are watchable locally — either a real upload or a
+ * tv-cache stand-in (used when Git LFS / media-release bytes are unavailable).
+ */
+function clipBytesPresent(filename: string) {
+  const safe = path.basename(filename);
+  if (!safe || safe !== filename) return false;
+  const uploadPath = path.join(UPLOAD_DIR, safe);
+  if (fs.existsSync(uploadPath)) return true;
+  return isPlayableMediaFile(path.join(TV_CACHE_DIR, safe));
 }
 
 /**
@@ -202,14 +218,18 @@ export function importPersistentTvMedia(db: Database) {
       if (!filename || !title) continue;
       if (filename.startsWith("link-") || filename.includes("..")) continue;
 
-      const filePath = path.join(UPLOAD_DIR, filename);
-      if (!fs.existsSync(filePath)) {
+      if (!clipBytesPresent(filename)) {
         skippedMissing += 1;
         continue;
       }
 
+      const uploadPath = path.join(UPLOAD_DIR, filename);
       const sizeBytes =
-        clip.sizeBytes > 0 ? clip.sizeBytes : fs.statSync(filePath).size;
+        clip.sizeBytes > 0
+          ? clip.sizeBytes
+          : fs.existsSync(uploadPath)
+            ? fs.statSync(uploadPath).size
+            : 0;
       const villageId =
         String(clip.villageId || "mosshollow").trim() || "mosshollow";
       const isGlobal =
@@ -270,7 +290,7 @@ export function importPersistentTvMedia(db: Database) {
 
   sync(file.clips);
 
-  // Seed a shuffle order for each restored channel if empty.
+  // Seed / heal shuffle order so newly restored clips join the lineup.
   for (const channelId of touched) {
     const row = db
       .prepare(
@@ -287,24 +307,28 @@ export function importPersistentTvMedia(db: Database) {
         .all(channelId) as Array<{ id: string }>
     ).map((v) => v.id);
     if (ids.length === 0) continue;
-    const hasOrder =
-      Boolean(row?.schedule_order_json) &&
-      Array.isArray(
-        (() => {
-          try {
-            return JSON.parse(row?.schedule_order_json || "[]");
-          } catch {
-            return null;
-          }
-        })()
-      ) &&
-      (JSON.parse(row?.schedule_order_json || "[]") as unknown[]).length > 0;
-    if (!hasOrder || !row?.schedule_epoch_ms) {
+    let order: string[] = [];
+    try {
+      const parsed = JSON.parse(row?.schedule_order_json || "[]");
+      if (Array.isArray(parsed)) {
+        order = parsed.filter(
+          (id): id is string => typeof id === "string" && ids.includes(id)
+        );
+      }
+    } catch {
+      order = [];
+    }
+    const missing = ids.filter((id) => !order.includes(id));
+    if (order.length === 0 || !row?.schedule_epoch_ms) {
       db.prepare(
         `UPDATE tv_channels
          SET schedule_epoch_ms = ?, schedule_order_json = ?
          WHERE id = ?`
       ).run(Date.now(), JSON.stringify(shuffleIds(ids)), channelId);
+    } else if (missing.length > 0) {
+      db.prepare(
+        `UPDATE tv_channels SET schedule_order_json = ? WHERE id = ?`
+      ).run(JSON.stringify([...order, ...missing]), channelId);
     }
   }
 
