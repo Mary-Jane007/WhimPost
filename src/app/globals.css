@@ -10863,82 +10863,106 @@ button.mh-card-cover {
   --mb-muted: #1a1a1a;
   --mb-wood: color-mix(in srgb, var(--village-color, #6b4a2e) 55%, #5a3a22);
   --mb-wood-light: color-mix(in srgb, var(--village-soft, #8a6340) 70%, #a07850);
-  --mb-paper: color-mix(in srgb, var(--village-soft, #6b8f71) 16%, #ffffff);
+  --mb-paper: color-mix(in srgb, var(--village-soft, #6b8f71) 22%, #ffffff);
   --mb-moss: color-mix(in srgb, var(--village-color, #4f6b4a) 65%, #3d5a40);
-  --mb-pin: #b33a3a;
-  --mb-glow: color-mix(in srgb, var(--village-soft, #6b8f71) 35%, transparent);
-  --mb-scene-top: color-mix(in srgb, var(--village-soft, #6b8f71) 28%, #ffffff);
-  --mb-scene-mid: color-mix(in srgb, var(--village-soft, #6b8f71) 12%, #ffffff);
-  --mb-scene-bot: color-mix(in srgb, var(--village-color, #6b8f71) 10%, #f4f4f4);
+  --mb-pin: #e23d5b;
+  --mb-pin-alt: #3d8fd4;
+  --mb-pop: #ffc857;
+  --mb-pop-2: #7ad7c7;
+  --mb-glow: color-mix(in srgb, var(--village-soft, #6b8f71) 45%, transparent);
+  --mb-scene-top: color-mix(in srgb, var(--village-soft, #6b8f71) 34%, #ffffff);
+  --mb-scene-mid: color-mix(in srgb, var(--village-soft, #6b8f71) 18%, #ffffff);
+  --mb-scene-bot: color-mix(in srgb, var(--village-color, #6b8f71) 14%, #f7f3ea);
   --mb-photo-filter: none;
   --mb-photo-warmth: transparent;
   --mb-season-tint: transparent;
   --mb-light-text: #f5f0e6;
   --mb-dark-text: #000000;
+  --mb-dot: color-mix(in srgb, var(--mb-pop, #ffc857) 70%, var(--village-color, #6b8f71));
   color: var(--mb-light-text);
 }
 
-/* Per-village Meeting Bench atmospheres */
+/* Per-village Meeting Bench atmospheres — brighter, playful */
 .meeting-bench-page.village-bramblewood {
   --village-color: #e07020;
   --village-soft: #f0a868;
-  --mb-accent: #c45a18;
-  --mb-wash: rgba(224, 112, 32, 0.14);
-  --mb-scene-top: #fff1e4;
-  --mb-scene-mid: #ffe8d2;
-  --mb-scene-bot: #f3d2b0;
-  --mb-photo-filter: saturate(1.08) contrast(1.04) sepia(0.12);
-  --mb-photo-warmth: rgba(224, 112, 32, 0.12);
+  --mb-accent: #ff6b2c;
+  --mb-pop: #ffd166;
+  --mb-pop-2: #ff8fab;
+  --mb-pin: #e23d5b;
+  --mb-pin-alt: #2bb673;
+  --mb-wash: rgba(255, 140, 60, 0.22);
+  --mb-scene-top: #fff4e0;
+  --mb-scene-mid: #ffe0b8;
+  --mb-scene-bot: #ffc48a;
+  --mb-photo-filter: saturate(1.18) contrast(1.05) sepia(0.08);
+  --mb-photo-warmth: rgba(255, 120, 40, 0.16);
 }
 .meeting-bench-page.village-mosshollow {
   --village-color: #1a3d2e;
-  --village-soft: #6b8f71;
-  --mb-accent: #3d6b4f;
-  --mb-wash: rgba(107, 143, 113, 0.16);
-  --mb-scene-top: #eaf1ea;
-  --mb-scene-mid: #e0ebe1;
-  --mb-scene-bot: #c9d9cb;
-  --mb-photo-filter: saturate(0.92) hue-rotate(-8deg) contrast(1.02);
-  --mb-photo-warmth: rgba(26, 61, 46, 0.1);
+  --village-soft: #7fb38a;
+  --mb-accent: #3f9b62;
+  --mb-pop: #c5e063;
+  --mb-pop-2: #8fd3c8;
+  --mb-pin: #e07a3d;
+  --mb-pin-alt: #4c8fe0;
+  --mb-wash: rgba(127, 179, 138, 0.28);
+  --mb-scene-top: #f0f8ee;
+  --mb-scene-mid: #d9efd8;
+  --mb-scene-bot: #b5dcb8;
+  --mb-photo-filter: saturate(1.05) hue-rotate(-6deg) contrast(1.03);
+  --mb-photo-warmth: rgba(63, 155, 98, 0.12);
 }
 .meeting-bench-page.village-clovermeadow {
   --village-color: #d4849a;
-  --village-soft: #f2c4d0;
-  --mb-accent: #c45f7a;
-  --mb-wash: rgba(242, 196, 208, 0.28);
-  --mb-scene-top: #fff5f8;
-  --mb-scene-mid: #ffeaf0;
-  --mb-scene-bot: #f6d5df;
-  --mb-photo-filter: saturate(1.05) brightness(1.03);
-  --mb-photo-warmth: rgba(212, 132, 154, 0.14);
+  --village-soft: #f7c6d4;
+  --mb-accent: #ff6f91;
+  --mb-pop: #ffe066;
+  --mb-pop-2: #b8f2e6;
+  --mb-pin: #ff5c8a;
+  --mb-pin-alt: #7ec8e3;
+  --mb-wash: rgba(255, 150, 180, 0.32);
+  --mb-scene-top: #fff7fb;
+  --mb-scene-mid: #ffe3ee;
+  --mb-scene-bot: #ffc2d4;
+  --mb-photo-filter: saturate(1.14) brightness(1.04);
+  --mb-photo-warmth: rgba(255, 111, 145, 0.16);
 }
 .meeting-bench-page.village-moonmere {
   --village-color: #2a3548;
-  --village-soft: #8a9b88;
-  --mb-accent: #5a7388;
-  --mb-wash: rgba(90, 115, 136, 0.18);
-  --mb-scene-top: #e8eef4;
-  --mb-scene-mid: #dde5ee;
-  --mb-scene-bot: #c5d0dc;
-  --mb-photo-filter: saturate(0.85) brightness(0.96) hue-rotate(12deg);
-  --mb-photo-warmth: rgba(42, 53, 72, 0.16);
+  --village-soft: #9bb0c9;
+  --mb-accent: #5b8def;
+  --mb-pop: #c9a7ff;
+  --mb-pop-2: #7ad7c7;
+  --mb-pin: #ff6b9d;
+  --mb-pin-alt: #5b8def;
+  --mb-wash: rgba(91, 141, 239, 0.24);
+  --mb-scene-top: #eef4ff;
+  --mb-scene-mid: #d9e7fb;
+  --mb-scene-bot: #b8cdf0;
+  --mb-photo-filter: saturate(1.02) brightness(1.01) hue-rotate(8deg);
+  --mb-photo-warmth: rgba(91, 141, 239, 0.14);
 }
 .meeting-bench-page.village-hearthwick {
   --village-color: #8b5a2b;
-  --village-soft: #e2c39a;
-  --mb-accent: #a06a35;
-  --mb-wash: rgba(226, 195, 154, 0.24);
-  --mb-scene-top: #fff7ec;
-  --mb-scene-mid: #f8ead6;
-  --mb-scene-bot: #ebd4b4;
-  --mb-photo-filter: saturate(1.06) contrast(1.03) sepia(0.08);
-  --mb-photo-warmth: rgba(139, 90, 43, 0.12);
+  --village-soft: #ecc79a;
+  --mb-accent: #e89b3c;
+  --mb-pop: #ffb347;
+  --mb-pop-2: #f08080;
+  --mb-pin: #e25b3a;
+  --mb-pin-alt: #5aa9e6;
+  --mb-wash: rgba(255, 179, 71, 0.28);
+  --mb-scene-top: #fff8ec;
+  --mb-scene-mid: #ffe4bc;
+  --mb-scene-bot: #f5c98a;
+  --mb-photo-filter: saturate(1.12) contrast(1.04) sepia(0.06);
+  --mb-photo-warmth: rgba(232, 155, 60, 0.14);
 }
 
-.meeting-bench-page.season-spring { --mb-season-tint: rgba(186, 220, 180, 0.12); }
-.meeting-bench-page.season-summer { --mb-season-tint: rgba(255, 214, 140, 0.1); }
-.meeting-bench-page.season-autumn { --mb-season-tint: rgba(220, 150, 90, 0.1); }
-.meeting-bench-page.season-winter { --mb-season-tint: rgba(180, 205, 220, 0.12); }
+.meeting-bench-page.season-spring { --mb-season-tint: rgba(160, 230, 170, 0.2); }
+.meeting-bench-page.season-summer { --mb-season-tint: rgba(255, 210, 100, 0.18); }
+.meeting-bench-page.season-autumn { --mb-season-tint: rgba(255, 150, 80, 0.16); }
+.meeting-bench-page.season-winter { --mb-season-tint: rgba(160, 200, 240, 0.18); }
 
 .meeting-bench-kicker {
   letter-spacing: 0.08em;
@@ -10963,11 +10987,14 @@ button.mh-card-cover {
 
 .mb-owner-banner {
   margin-top: 0.85rem;
-  padding: 0.7rem 0.9rem;
-  border: 1px dashed color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
-  border-radius: 0.65rem;
-  background: color-mix(in srgb, var(--village-soft, #6b8f71) 22%, #ffffff);
+  padding: 0.75rem 1rem;
+  border: 2.5px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 50%, transparent);
+  border-radius: 1.4rem 0.8rem 1.6rem 1rem / 1rem 1.5rem 0.8rem 1.35rem;
+  background:
+    radial-gradient(circle at 8% 30%, color-mix(in srgb, var(--mb-pop, #ffc857) 40%, transparent), transparent 40%),
+    color-mix(in srgb, var(--village-soft, #6b8f71) 26%, #ffffff);
   color: #000000;
+  box-shadow: 4px 5px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 40%, transparent);
 }
 .mb-owner-banner a { color: #000000; font-weight: 600; text-decoration: underline; }
 
@@ -11173,71 +11200,141 @@ button.mh-card-cover {
 .mb-scene-stage {
   position: relative;
   overflow: hidden;
-  border-radius: 0.35rem;
-  border: 0;
+  border-radius: 2.4rem 1.2rem 2.8rem 1.6rem / 1.6rem 2.6rem 1.2rem 2.4rem;
+  border: 3px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, #fff);
   background:
+    radial-gradient(circle at 12% 18%, var(--mb-pop, #ffc857) 0 0.55rem, transparent 0.6rem),
+    radial-gradient(circle at 88% 22%, var(--mb-pop-2, #7ad7c7) 0 0.45rem, transparent 0.5rem),
+    radial-gradient(circle at 76% 86%, var(--mb-pin, #e23d5b) 0 0.4rem, transparent 0.45rem),
+    radial-gradient(circle at 18% 78%, var(--mb-pin-alt, #3d8fd4) 0 0.5rem, transparent 0.55rem),
     radial-gradient(ellipse at 50% 0%, var(--mb-wash, transparent), transparent 55%),
     radial-gradient(ellipse at 82% 12%, var(--mb-season-tint, transparent), transparent 42%),
-    linear-gradient(180deg,
+    linear-gradient(165deg,
       var(--mb-scene-top) 0%,
       var(--mb-scene-mid) 48%,
       var(--mb-scene-bot) 100%);
-  padding: 0.85rem 0.75rem 1.15rem;
-  box-shadow: 0 22px 44px rgba(40, 28, 18, 0.12);
+  padding: 1rem 0.85rem 1.25rem;
+  box-shadow:
+    0 22px 44px color-mix(in srgb, var(--village-color, #6b8f71) 22%, transparent),
+    inset 0 0 0 6px color-mix(in srgb, #fff 55%, transparent);
 }
 
 .mb-board-frame {
   position: relative;
   margin: 0 auto;
   max-width: 58rem;
-  padding: 1.1rem 1rem 1.35rem;
+  padding: 1.2rem 1.05rem 1.45rem;
+  border-radius: 1.8rem 2.6rem 1.4rem 2.2rem / 2.2rem 1.4rem 2.6rem 1.6rem;
   background:
-    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.16), transparent 28%),
-    radial-gradient(circle at 78% 68%, rgba(0, 0, 0, 0.08), transparent 34%),
+    radial-gradient(circle at 14% 16%, color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent) 0 1.1rem, transparent 1.15rem),
+    radial-gradient(circle at 86% 20%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 50%, transparent) 0 0.9rem, transparent 0.95rem),
+    radial-gradient(circle at 70% 78%, color-mix(in srgb, var(--mb-pin, #e23d5b) 40%, transparent) 0 1rem, transparent 1.05rem),
+    radial-gradient(circle at 22% 72%, color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 38%, transparent) 0 0.85rem, transparent 0.9rem),
     repeating-linear-gradient(
-      118deg,
-      color-mix(in srgb, var(--mb-wood, #5a3a22) 22%, #c4a574) 0 2px,
-      color-mix(in srgb, var(--mb-wood-light, #a07850) 35%, #d8b888) 2px 5px
+      -18deg,
+      transparent,
+      transparent 10px,
+      color-mix(in srgb, var(--village-soft, #6b8f71) 18%, transparent) 10px,
+      color-mix(in srgb, var(--village-soft, #6b8f71) 18%, transparent) 12px
+    ),
+    repeating-linear-gradient(
+      72deg,
+      color-mix(in srgb, var(--mb-wood-light, #a07850) 28%, #ffe8c8) 0 3px,
+      color-mix(in srgb, var(--village-soft, #6b8f71) 35%, #ffd9a8) 3px 7px
     ),
     linear-gradient(
-      160deg,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 28%, #c9a66b),
-      color-mix(in srgb, var(--village-color, #6b8f71) 18%, #a67c4a)
+      145deg,
+      color-mix(in srgb, var(--village-soft, #6b8f71) 42%, #ffe6b8),
+      color-mix(in srgb, var(--mb-accent, #ff6b2c) 22%, #f0c27a)
     );
-  border: 1px solid color-mix(in srgb, var(--mb-wood, #5a3a22) 55%, transparent);
+  border: 3px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 50%, var(--mb-wood, #5a3a22));
   box-shadow:
-    inset 0 0 0 10px color-mix(in srgb, var(--mb-wood, #5a3a22) 72%, #3d2818),
-    inset 0 0 0 12px color-mix(in srgb, var(--mb-wood-light, #a07850) 50%, #8a6238),
-    0 16px 34px rgba(40, 28, 18, 0.18);
+    inset 0 0 0 8px color-mix(in srgb, var(--mb-wood, #5a3a22) 55%, var(--mb-accent, #ff6b2c)),
+    inset 0 0 0 11px color-mix(in srgb, #fff 35%, var(--mb-pop, #ffc857)),
+    0 18px 36px color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
 }
 
 .mb-board-rail {
   position: absolute;
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--mb-wood, #5a3a22) 88%, #2a1810),
-    color-mix(in srgb, var(--mb-wood-light, #a07850) 70%, #7a5230),
-    color-mix(in srgb, var(--mb-wood, #5a3a22) 88%, #2a1810)
+    var(--mb-accent, #ff6b2c),
+    var(--mb-pop, #ffc857),
+    var(--mb-pop-2, #7ad7c7),
+    var(--mb-pin-alt, #3d8fd4),
+    var(--mb-accent, #ff6b2c)
   );
+  background-size: 220% 100%;
+  animation: mbRainbowSlide 10s linear infinite;
   pointer-events: none;
   z-index: 2;
+  border-radius: 999px;
+  opacity: 0.9;
+}
+@keyframes mbRainbowSlide {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 220% 50%; }
 }
 .mb-board-rail-top,
 .mb-board-rail-bottom {
-  left: 0.35rem;
-  right: 0.35rem;
-  height: 0.55rem;
+  left: 0.7rem;
+  right: 0.7rem;
+  height: 0.42rem;
 }
-.mb-board-rail-top { top: 0.35rem; }
-.mb-board-rail-bottom { bottom: 0.35rem; }
+.mb-board-rail-top { top: 0.55rem; }
+.mb-board-rail-bottom { bottom: 0.55rem; }
 .mb-board-rail-left,
 .mb-board-rail-right {
-  top: 0.35rem;
-  bottom: 0.35rem;
-  width: 0.55rem;
+  top: 0.7rem;
+  bottom: 0.7rem;
+  width: 0.42rem;
 }
-.mb-board-rail-left { left: 0.35rem; }
-.mb-board-rail-right { right: 0.35rem; }
+.mb-board-rail-left { left: 0.55rem; }
+.mb-board-rail-right { right: 0.55rem; }
+
+.mb-play-blobs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.mb-play-blob {
+  position: absolute;
+  border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
+  opacity: 0.38;
+  filter: blur(0.5px);
+  animation: mbBlobDrift 9s ease-in-out infinite;
+}
+.mb-play-blob.b1 {
+  width: 7rem;
+  height: 5.5rem;
+  left: -1rem;
+  top: 18%;
+  background: color-mix(in srgb, var(--mb-pop, #ffc857) 70%, transparent);
+}
+.mb-play-blob.b2 {
+  width: 5.5rem;
+  height: 6.2rem;
+  right: -0.8rem;
+  top: 36%;
+  background: color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 65%, transparent);
+  animation-delay: 1.4s;
+  border-radius: 40% 60% 40% 60% / 55% 40% 60% 45%;
+}
+.mb-play-blob.b3 {
+  width: 6rem;
+  height: 4.5rem;
+  left: 28%;
+  bottom: 6%;
+  background: color-mix(in srgb, var(--mb-pin, #e23d5b) 45%, transparent);
+  animation-delay: 2.2s;
+  border-radius: 55% 45% 60% 40% / 40% 60% 40% 60%;
+}
+@keyframes mbBlobDrift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate(8px, -10px) rotate(6deg) scale(1.06); }
+}
 
 .mb-board-ambient {
   position: absolute;
@@ -11274,7 +11371,9 @@ button.mh-card-cover {
   .mb-object,
   .mb-object-sticker-wrap,
   .mb-jar-glow,
-  .mb-reveal-sticker {
+  .mb-reveal-sticker,
+  .mb-board-rail,
+  .mb-play-blob {
     animation: none !important;
   }
   .mb-ambient-sticker {
@@ -11288,23 +11387,45 @@ button.mh-card-cover {
   max-width: 36rem;
   margin: 2.6rem auto 0.85rem;
   z-index: 4;
-  padding: 0.55rem 0.75rem 0.7rem;
-  background: color-mix(in srgb, #fffaf2 78%, var(--village-soft, #6b8f71));
-  border: 1px solid color-mix(in srgb, var(--mb-wood, #5a3a22) 28%, transparent);
-  box-shadow: 0 8px 18px rgba(40, 28, 18, 0.1);
+  padding: 0.75rem 1rem 0.9rem;
+  background:
+    radial-gradient(circle at 12% 20%, color-mix(in srgb, var(--mb-pop, #ffc857) 45%, transparent), transparent 40%),
+    radial-gradient(circle at 88% 80%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 40%, transparent), transparent 42%),
+    color-mix(in srgb, #fffaf2 82%, var(--village-soft, #6b8f71));
+  border: 2.5px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
+  border-radius: 1.6rem 2.4rem 1.2rem 2.8rem / 2.2rem 1.2rem 2.6rem 1.4rem;
+  box-shadow:
+    0 10px 22px color-mix(in srgb, var(--village-color, #6b8f71) 18%, transparent),
+    6px 8px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent);
+  transform: rotate(-1.2deg);
 }
 .mb-scene-hero::before {
   content: "";
   position: absolute;
-  top: -0.35rem;
-  left: 50%;
-  width: 0.7rem;
-  height: 0.7rem;
-  transform: translateX(-50%);
+  top: -0.55rem;
+  left: 18%;
+  width: 0.95rem;
+  height: 0.95rem;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 30%, #f2d6a0, #8a3030 55%, #5a1e1e);
-  box-shadow: 0 2px 4px rgba(40, 28, 18, 0.35);
+    radial-gradient(circle at 35% 30%, #fff3b0, var(--mb-pin, #e23d5b) 55%, #7a1e3a);
+  box-shadow:
+    0 2px 4px rgba(40, 28, 18, 0.35),
+    12rem 0.2rem 0 -0.12rem var(--mb-pin-alt, #3d8fd4),
+    22rem 0.05rem 0 -0.18rem var(--mb-pop, #ffc857);
+}
+.mb-scene-hero::after {
+  content: "";
+  position: absolute;
+  right: -0.55rem;
+  bottom: 18%;
+  width: 1.4rem;
+  height: 1.4rem;
+  background: var(--mb-pop-2, #7ad7c7);
+  border-radius: 40% 60% 55% 45% / 55% 40% 60% 45%;
+  transform: rotate(18deg);
+  box-shadow: -0.35rem 0.2rem 0 color-mix(in srgb, var(--mb-pop, #ffc857) 80%, transparent);
+  opacity: 0.9;
 }
 .mb-scene-kicker {
   margin: 0;
@@ -11312,7 +11433,7 @@ button.mh-card-cover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-family: var(--font-stamp, inherit);
-  color: #1a1a1a;
+  color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 70%, #000);
 }
 .mb-scene-title {
   margin: 0.25rem 0 0.2rem;
@@ -11320,6 +11441,7 @@ button.mh-card-cover {
   font-size: clamp(1.7rem, 4vw, 2.35rem);
   color: #000000;
   letter-spacing: -0.01em;
+  text-shadow: 2px 2px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent);
 }
 .mb-scene-sub {
   margin: 0;
@@ -11351,10 +11473,12 @@ button.mh-card-cover {
 .mb-bench-photo-wrap {
   position: relative;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--mb-wood, #5a3a22) 45%, transparent);
+  border: 3px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, #fff);
+  border-radius: 1.8rem 1.1rem 2.2rem 1.4rem / 1.3rem 2rem 1.1rem 1.8rem;
   box-shadow:
-    0 14px 28px rgba(40, 28, 18, 0.18),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    0 14px 28px color-mix(in srgb, var(--village-color, #6b8f71) 22%, transparent),
+    8px 10px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 55%, transparent),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .mb-bench-photo {
@@ -11374,8 +11498,10 @@ button.mh-card-cover {
   pointer-events: none;
   background:
     linear-gradient(180deg, var(--mb-photo-warmth, transparent), transparent 42%),
-    linear-gradient(0deg, var(--mb-photo-warmth, transparent), transparent 28%);
-  mix-blend-mode: multiply;
+    linear-gradient(0deg, var(--mb-photo-warmth, transparent), transparent 28%),
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--mb-pop, #ffc857) 28%, transparent), transparent 28%),
+    radial-gradient(circle at 88% 78%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 24%, transparent), transparent 30%);
+  mix-blend-mode: soft-light;
 }
 
 .mb-bench-caption {
@@ -11386,6 +11512,8 @@ button.mh-card-cover {
   text-transform: uppercase;
   color: #000000;
   font-family: var(--font-stamp, inherit);
+  display: inline-block;
+  width: 100%;
 }
 
 .mb-scene-objects {
@@ -11409,43 +11537,78 @@ button.mh-card-cover {
   min-width: 4.2rem;
   z-index: 6;
   transform: rotate(var(--mb-pin-rot, 0deg));
-  transition: transform 0.25s ease, filter 0.25s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
 }
 .mb-object:hover,
 .mb-object:focus-visible {
-  transform: rotate(var(--mb-pin-rot, 0deg)) translateY(-5px) scale(1.05);
+  transform: rotate(var(--mb-pin-rot, 0deg)) translateY(-7px) scale(1.08);
   outline: none;
-  filter: brightness(1.04);
-  z-index: 6;
+  filter: brightness(1.05);
+  z-index: 7;
 }
 .mb-object:focus-visible .mb-object-sticker-wrap {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--village-color, #6b8f71) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
 }
 .mb-object-pin {
-  width: 0.55rem;
-  height: 0.55rem;
+  width: 0.7rem;
+  height: 0.7rem;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 30%, #f0d090, var(--mb-pin, #b33a3a) 58%, #5a1e1e);
+    radial-gradient(circle at 35% 30%, #fff3b0, var(--mb-pin, #e23d5b) 58%, #7a1e3a);
   box-shadow: 0 2px 3px rgba(40, 28, 18, 0.35);
   margin-bottom: -0.15rem;
   z-index: 2;
 }
+.mb-object:nth-child(even) .mb-object-pin {
+  background:
+    radial-gradient(circle at 35% 30%, #e8f4ff, var(--mb-pin-alt, #3d8fd4) 58%, #1e4a7a);
+}
+.mb-object:nth-child(3n) .mb-object-pin {
+  background:
+    radial-gradient(circle at 35% 30%, #fff8d0, var(--mb-pop, #ffc857) 58%, #b07a10);
+}
 .mb-object-sticker-wrap {
   display: grid;
   place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  padding: 0.2rem;
-  background: color-mix(in srgb, #fffaf2 88%, var(--village-soft, #6b8f71));
-  border: 1px solid color-mix(in srgb, var(--mb-wood, #5a3a22) 22%, transparent);
-  box-shadow: 0 8px 16px rgba(40, 28, 18, 0.16);
+  width: 3.6rem;
+  height: 3.6rem;
+  padding: 0.25rem;
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb, #fff 88%, var(--mb-pop, #ffc857)),
+      color-mix(in srgb, #fffaf2 80%, var(--village-soft, #6b8f71)));
+  border: 2px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 45%, transparent);
+  border-radius: 1.15rem 0.55rem 1.35rem 0.75rem / 0.85rem 1.25rem 0.55rem 1.1rem;
+  box-shadow:
+    0 8px 16px rgba(40, 28, 18, 0.14),
+    3px 4px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 55%, transparent);
   animation: mbSoftFloat 5.5s ease-in-out infinite;
+}
+.mb-object:nth-child(2n) .mb-object-sticker-wrap {
+  border-radius: 50% 45% 55% 50% / 50% 55% 45% 50%;
+  background:
+    linear-gradient(160deg,
+      color-mix(in srgb, #fff 90%, var(--mb-pop-2, #7ad7c7)),
+      color-mix(in srgb, #fff 75%, var(--village-soft, #6b8f71)));
+  box-shadow:
+    0 8px 16px rgba(40, 28, 18, 0.14),
+    3px 4px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent);
+}
+.mb-object:nth-child(3n) .mb-object-sticker-wrap {
+  border-radius: 0.45rem 1.4rem 0.55rem 1.5rem / 1.3rem 0.5rem 1.4rem 0.55rem;
+  box-shadow:
+    0 8px 16px rgba(40, 28, 18, 0.14),
+    3px 4px 0 color-mix(in srgb, var(--mb-pin, #e23d5b) 40%, transparent);
+}
+.mb-object:nth-child(4n) .mb-object-sticker-wrap {
+  border-radius: 1.5rem 1.5rem 0.45rem 0.45rem;
+  border-style: dashed;
 }
 .mb-object.featured .mb-object-sticker-wrap {
   box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--mb-accent, #c48a3a) 50%, transparent),
-    0 10px 18px rgba(40, 28, 18, 0.18);
+    0 0 0 3px color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent),
+    0 10px 18px rgba(40, 28, 18, 0.16),
+    4px 5px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 65%, transparent);
 }
 .mb-object-sticker {
   width: 100%;
@@ -11457,9 +11620,10 @@ button.mh-card-cover {
   font-size: 0.7rem;
   line-height: 1.2;
   text-align: center;
-  background: color-mix(in srgb, #fffaf2 86%, transparent);
-  border: 1px solid color-mix(in srgb, var(--mb-wood, #5a3a22) 16%, transparent);
-  padding: 0.18rem 0.35rem;
+  background: color-mix(in srgb, #fff 88%, var(--mb-pop, #ffc857));
+  border: 1.5px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 35%, transparent);
+  border-radius: 0.85rem 1.2rem 0.7rem 1.1rem / 1rem 0.7rem 1.15rem 0.8rem;
+  padding: 0.2rem 0.4rem;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -11467,6 +11631,7 @@ button.mh-card-cover {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   font-family: var(--font-stamp, inherit);
+  box-shadow: 2px 2px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 
 .mb-place-pin-tl { left: 3%; top: 8%; }
@@ -11495,18 +11660,23 @@ button.mh-card-cover {
   position: absolute;
   left: 50%;
   bottom: 3%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(-2deg);
   z-index: 6;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  border: 1px dashed color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
-  background: color-mix(in srgb, #fffaf2 88%, var(--village-soft, #6b8f71));
+  border: 2px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
+  background:
+    linear-gradient(120deg,
+      color-mix(in srgb, #fff 85%, var(--mb-pop, #ffc857)),
+      color-mix(in srgb, #fff 80%, var(--mb-pop-2, #7ad7c7)));
   color: #000000;
-  padding: 0.35rem 0.75rem;
+  border-radius: 1.4rem 0.7rem 1.6rem 0.9rem / 0.9rem 1.5rem 0.7rem 1.3rem;
+  padding: 0.4rem 0.85rem;
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
+  box-shadow: 3px 4px 0 color-mix(in srgb, var(--mb-pin, #e23d5b) 40%, transparent);
 }
 .mb-discovery-nudge.seen { opacity: 0.72; }
 .mb-discovery-sticker {
@@ -11550,17 +11720,19 @@ button.mh-card-cover {
   width: min(100%, 32rem);
   max-height: min(88vh, 40rem);
   overflow: auto;
-  border-radius: 0.35rem;
-  border: 1px solid color-mix(in srgb, var(--mb-wood, #5a3a22) 40%, transparent);
+  border-radius: 1.8rem 1.1rem 2.2rem 1.3rem / 1.2rem 2rem 1.1rem 1.9rem;
+  border: 3px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--village-soft, #6b8f71) 14%, #fffaf2), #fffaf2);
+    radial-gradient(circle at 12% 12%, color-mix(in srgb, var(--mb-pop, #ffc857) 35%, transparent), transparent 35%),
+    radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 30%, transparent), transparent 35%),
+    linear-gradient(180deg, color-mix(in srgb, var(--village-soft, #6b8f71) 18%, #fffaf2), #fffaf2);
   color: #000000;
   padding: 1.15rem 1.2rem 1.3rem;
   position: relative;
   box-shadow:
-    inset 0 0 0 6px color-mix(in srgb, var(--mb-wood, #5a3a22) 55%, #3d2818),
-    0 24px 48px rgba(20, 14, 10, 0.28);
-  animation: mbRevealRise 0.28s ease;
+    0 24px 48px rgba(20, 14, 10, 0.28),
+    8px 10px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent);
+  animation: mbRevealRise 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes mbRevealRise {
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
@@ -11633,12 +11805,18 @@ button.mh-card-cover {
   grid-template-columns: auto 1fr;
   gap: 1rem 1.25rem;
   align-items: start;
-  padding: 1.1rem 1.15rem;
-  border: 1px solid color-mix(in srgb, var(--mb-wood, #5a3a22) 32%, transparent);
+  padding: 1.2rem 1.25rem;
+  border: 3px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 45%, transparent);
+  border-radius: 2.2rem 1.2rem 2.6rem 1.5rem / 1.5rem 2.4rem 1.2rem 2.2rem;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--village-soft, #6b8f71) 20%, #fffaf2), #fffaf2);
+    radial-gradient(circle at 8% 20%, color-mix(in srgb, var(--mb-pop, #ffc857) 40%, transparent), transparent 32%),
+    radial-gradient(circle at 92% 78%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 35%, transparent), transparent 34%),
+    linear-gradient(135deg, color-mix(in srgb, var(--village-soft, #6b8f71) 24%, #fffaf2), #fffaf2);
   color: #000000;
-  box-shadow: inset 0 0 0 5px color-mix(in srgb, var(--mb-wood, #5a3a22) 35%, transparent);
+  box-shadow:
+    6px 8px 0 color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 35%, transparent),
+    0 14px 28px color-mix(in srgb, var(--village-color, #6b8f71) 14%, transparent);
+  transform: rotate(0.4deg);
 }
 .mb-jar-visual {
   position: relative;
@@ -11654,12 +11832,13 @@ button.mh-card-cover {
   position: relative;
   z-index: 1;
   filter: drop-shadow(0 6px 10px rgba(40, 28, 18, 0.18));
+  transform: rotate(-6deg);
 }
 .mb-jar-glow {
   position: absolute;
-  inset: 0.4rem;
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--village-soft, #6b8f71) 55%, transparent), transparent 70%);
+  inset: 0.2rem;
+  border-radius: 55% 45% 50% 50% / 45% 55% 45% 55%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent), transparent 70%);
   animation: mbSoftFloat 6s ease-in-out infinite;
 }
 .mb-jar-kicker {
@@ -11668,7 +11847,7 @@ button.mh-card-cover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-family: var(--font-stamp, inherit);
-  color: #1a1a1a;
+  color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 65%, #000);
 }
 .mb-question-jar h2 {
   margin: 0.2rem 0 0.35rem;
@@ -11683,7 +11862,9 @@ button.mh-card-cover {
 .mb-jar-saved {
   margin: 0 0 0.75rem;
   padding: 0.55rem 0.7rem;
-  background: color-mix(in srgb, var(--village-soft, #6b8f71) 22%, #fff);
+  background: color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 28%, #fff);
+  border-radius: 1rem 0.55rem 1.2rem 0.7rem / 0.7rem 1.1rem 0.55rem 1rem;
+  border: 1.5px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 35%, transparent);
 }
 .mb-jar-options {
   list-style: none;
@@ -11696,36 +11877,45 @@ button.mh-card-cover {
   display: flex;
   gap: 0.55rem;
   align-items: flex-start;
-  padding: 0.5rem 0.65rem;
-  border: 1px solid transparent;
+  padding: 0.55rem 0.7rem;
+  border: 2px solid transparent;
+  border-radius: 1.1rem 0.6rem 1.3rem 0.75rem / 0.75rem 1.2rem 0.6rem 1.1rem;
   cursor: pointer;
   color: #000000;
+  background: color-mix(in srgb, #fff 70%, transparent);
 }
 .mb-jar-options label.on {
-  border-color: color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
-  background: color-mix(in srgb, var(--village-soft, #6b8f71) 24%, #fff);
+  border-color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 50%, transparent);
+  background: color-mix(in srgb, var(--mb-pop, #ffc857) 28%, #fff);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 .mb-jar-status { margin: 0.55rem 0 0; font-size: 0.9rem; }
 
-/* Bench journal — ledger strip under the board */
+/* Bench journal — playful ledger */
 .mb-journal {
-  padding: 1.05rem 1.1rem 1.2rem;
-  border: 1px solid color-mix(in srgb, var(--mb-wood, #5a3a22) 28%, transparent);
+  padding: 1.15rem 1.2rem 1.3rem;
+  border: 3px solid color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 40%, transparent);
+  border-radius: 1.4rem 2.4rem 1.6rem 2.2rem / 2.2rem 1.3rem 2.4rem 1.5rem;
   background:
+    radial-gradient(circle at 90% 12%, color-mix(in srgb, var(--mb-pop, #ffc857) 35%, transparent), transparent 28%),
     repeating-linear-gradient(
       transparent,
       transparent 1.85rem,
-      color-mix(in srgb, var(--village-color, #6b8f71) 10%, transparent) 1.85rem,
-      color-mix(in srgb, var(--village-color, #6b8f71) 10%, transparent) 1.9rem
+      color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 14%, transparent) 1.85rem,
+      color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 14%, transparent) 1.9rem
     ),
-    linear-gradient(180deg, #fffaf2, color-mix(in srgb, var(--village-soft, #6b8f71) 12%, #fffaf2));
+    linear-gradient(180deg, #fffaf2, color-mix(in srgb, var(--village-soft, #6b8f71) 16%, #fffaf2));
   color: #000000;
-  box-shadow: inset 4px 0 0 color-mix(in srgb, var(--mb-pin, #b33a3a) 55%, #8a3030);
+  box-shadow:
+    inset 6px 0 0 color-mix(in srgb, var(--mb-pin, #e23d5b) 65%, #8a3030),
+    6px 8px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 45%, transparent);
+  transform: rotate(-0.5deg);
 }
 .mb-journal-head h2 {
   margin: 0 0 0.25rem;
   font-family: var(--font-display, inherit);
   color: #000000;
+  text-shadow: 2px 2px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 .mb-journal-head p {
   margin: 0;
@@ -11761,25 +11951,29 @@ button.mh-card-cover {
 .mb-journal-item.age-14 { opacity: 0.72; }
 .mb-journal-item > button:first-child {
   text-align: left;
-  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 18%, transparent);
-  background: color-mix(in srgb, #ffffff 70%, transparent);
+  border: 2px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 22%, transparent);
+  background: color-mix(in srgb, #ffffff 78%, var(--mb-pop, #ffc857));
   color: #000000;
+  border-radius: 1.1rem 0.6rem 1.25rem 0.75rem / 0.75rem 1.15rem 0.6rem 1.05rem;
   padding: 0.65rem 0.75rem;
   cursor: pointer;
   font: inherit;
   display: grid;
   gap: 0.15rem;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .mb-journal-item > button:first-child:hover,
 .mb-journal-item > button:first-child:focus-visible {
-  border-color: color-mix(in srgb, var(--village-color, #6b8f71) 45%, transparent);
+  border-color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
   outline: none;
+  transform: translateY(-2px) rotate(-0.5deg);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 .mb-journal-when {
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #1a1a1a;
+  color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, #1a1a1a);
   font-family: var(--font-stamp, inherit);
 }
 .mb-journal-type {

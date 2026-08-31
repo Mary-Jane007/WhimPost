@@ -124,6 +124,12 @@ export function MeetingBench({
           <div className="mb-board-rail mb-board-rail-right" aria-hidden />
           <div className="mb-board-rail mb-board-rail-bottom" aria-hidden />
 
+          <div className="mb-play-blobs" aria-hidden>
+            <span className="mb-play-blob b1" />
+            <span className="mb-play-blob b2" />
+            <span className="mb-play-blob b3" />
+          </div>
+
           <div className="mb-board-ambient" aria-hidden>
             {ambient.map((src, i) => (
               // eslint-disable-next-line @next/next/no-img-element
