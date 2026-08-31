@@ -210,6 +210,63 @@ export const SHARED_FEATURES: Array<{
   { emoji: "📬", name: "Daily Mail" },
 ];
 
+/**
+ * Exclusive village workshops — never relocate these across villages.
+ * Nav and square CTAs must follow the village you are currently standing in.
+ */
+export const VILLAGE_WORKSHOPS: Record<
+  VillageId,
+  {
+    href: string;
+    navLabel: string;
+    enterLabel: string;
+    buildingName: string;
+  }
+> = {
+  mosshollow: {
+    href: "/library",
+    navLabel: "Library",
+    enterLabel: "Enter The Grand Library",
+    buildingName: "The Grand Library",
+  },
+  moonmere: {
+    href: "/observatory",
+    navLabel: "Observatory",
+    enterLabel: "Enter The Observatory",
+    buildingName: "The Observatory",
+  },
+  clovermeadow: {
+    href: "/garden",
+    navLabel: "Garden",
+    enterLabel: "Enter The Bloomkeeper's Garden",
+    buildingName: "The Bloomkeeper's Garden",
+  },
+  bramblewood: {
+    href: "/workshop",
+    navLabel: "Workshop",
+    enterLabel: "Enter The Woodland Workshop",
+    buildingName: "The Woodland Workshop",
+  },
+  hearthwick: {
+    href: "/fireside",
+    navLabel: "Fireside",
+    enterLabel: "Enter The Fireside",
+    buildingName: "The Fireside",
+  },
+};
+
+/** Map a workshop route back to its owning village (null if not a workshop). */
+export function villageIdForWorkshopHref(href: string | null | undefined): VillageId | null {
+  if (!href) return null;
+  const path = href.split("?")[0]?.replace(/\/$/, "") || "";
+  for (const [villageId, workshop] of Object.entries(VILLAGE_WORKSHOPS) as Array<
+    [VillageId, (typeof VILLAGE_WORKSHOPS)[VillageId]]
+  >) {
+    if (path === workshop.href) return villageId;
+  }
+  return null;
+}
+
 export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
   mushrooms: {
     emoji: "🍄",

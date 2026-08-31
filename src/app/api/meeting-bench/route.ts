@@ -66,8 +66,13 @@ export async function GET(req: NextRequest) {
   const admin = req.nextUrl.searchParams.get("admin") === "1";
   const teaserOnly = req.nextUrl.searchParams.get("teaser") === "1";
 
+  const villageParam = req.nextUrl.searchParams.get("village");
+  const villageId =
+    (villageParam && isVillageId(villageParam) ? villageParam : null) ||
+    (user.villageId && isVillageId(user.villageId) ? user.villageId : null);
+
   if (teaserOnly) {
-    return NextResponse.json({ teaser: getMeetingBenchTeaser() });
+    return NextResponse.json({ teaser: getMeetingBenchTeaser(villageId) });
   }
 
   if (admin) {
@@ -78,11 +83,12 @@ export async function GET(req: NextRequest) {
         includeDrafts: true,
         userId: user.id,
       }),
-      board: getMeetingBenchBoard(user.id),
+      // Admin list stays global; living board view stays village-local.
+      board: getMeetingBenchBoard(user.id, villageId),
     });
   }
 
-  return NextResponse.json(getMeetingBenchBoard(user.id));
+  return NextResponse.json(getMeetingBenchBoard(user.id, villageId));
 }
 
 export async function POST(req: NextRequest) {

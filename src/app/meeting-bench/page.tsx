@@ -19,13 +19,15 @@ export default async function MeetingBenchPage() {
 
   const db = getDb();
   const isOwner = Boolean(user.isOwner || isSiteOwner(db, user.id));
-  const board = getMeetingBenchBoard(user.id);
+  // Theme Meeting Bench by the village you are standing in (current visit),
+  // so Moonmere Observatory chrome never appears while visiting Mosshollow.
   const villageId =
+    (user.villageId && isVillageId(user.villageId) ? user.villageId : null) ||
     (user.homeVillageId && isVillageId(user.homeVillageId)
       ? user.homeVillageId
       : null) ||
-    (user.villageId && isVillageId(user.villageId) ? user.villageId : null) ||
     ("bramblewood" as VillageId);
+  const board = getMeetingBenchBoard(user.id, villageId);
   const theme = getBenchTheme(villageId);
   const village = VILLAGE_MAP[villageId];
   const pageStyle = {

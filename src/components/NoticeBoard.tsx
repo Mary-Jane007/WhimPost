@@ -48,8 +48,8 @@ export function NoticeBoard({
     <section className="village-panel">
       <h2>🏘️ Village Square</h2>
       <p className="section-lead">
-        Notes and workshop shares from neighbors — crafts, photos, and kind
-        words pinned for everyone.
+        Notes and keepsakes from neighbors — crafts, photos, and kind words left
+        on the village board.
       </p>
       <form className="notice-form" onSubmit={postNote}>
         <textarea
@@ -82,7 +82,7 @@ export function NoticeBoard({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={n.imageUrl}
-                alt="Shared workshop craft"
+                alt="Shared village keepsake"
                 className="notice-share-image"
               />
             ) : null}

@@ -14,6 +14,7 @@ import {
   getVillage,
   RANK_LADDER,
   SHARED_FEATURES,
+  VILLAGE_WORKSHOPS,
   type VillageId,
 } from "@/lib/villages";
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
@@ -78,7 +79,7 @@ export default async function VillagePage() {
     user.id,
     stats.villageId as VillageId
   );
-  const meetingBenchTeaser = getMeetingBenchTeaser();
+  const meetingBenchTeaser = getMeetingBenchTeaser(village.id);
 
   const neighbors = db
     .prepare(
@@ -286,53 +287,25 @@ export default async function VillagePage() {
             </span>
           ))}
         </div>
-        {village.id === "bramblewood" && homeVillageId === "bramblewood" ? (
-          <p className="muted" style={{ marginTop: "0.85rem" }}>
-            <Link href="/workshop" className="btn-primary">
-              Enter The Woodland Workshop
-            </Link>
-          </p>
-        ) : null}
-        {village.id === "mosshollow" && homeVillageId === "mosshollow" ? (
-          <p className="muted" style={{ marginTop: "0.85rem" }}>
-            <Link href="/library" className="btn-primary">
-              Enter The Grand Library
-            </Link>
-          </p>
-        ) : null}
-        {village.id === "mosshollow" && homeVillageId !== "mosshollow" ? (
-          <p className="muted" style={{ marginTop: "0.85rem" }}>
-            The Grand Library belongs to Mosshollow home villagers — it is not
-            moved to other villages.
-          </p>
-        ) : null}
-        {village.id === "clovermeadow" && homeVillageId === "clovermeadow" ? (
-          <p className="muted" style={{ marginTop: "0.85rem" }}>
-            <Link href="/garden" className="btn-primary">
-              Enter The Bloomkeeper&apos;s Garden
-            </Link>
-          </p>
-        ) : null}
-        {village.id === "hearthwick" && homeVillageId === "hearthwick" ? (
-          <p className="muted" style={{ marginTop: "0.85rem" }}>
-            <Link href="/fireside" className="btn-primary">
-              Enter The Fireside
-            </Link>
-          </p>
-        ) : null}
-        {village.id === "moonmere" && homeVillageId === "moonmere" ? (
-          <p className="muted" style={{ marginTop: "0.85rem" }}>
-            <Link href="/observatory" className="btn-primary">
-              Enter The Observatory
-            </Link>
-          </p>
-        ) : null}
-        {village.id === "moonmere" && homeVillageId !== "moonmere" ? (
-          <p className="muted" style={{ marginTop: "0.85rem" }}>
-            The Observatory belongs only to Moonmere — it stays with this
-            village and is never relocated.
-          </p>
-        ) : null}
+        {(() => {
+          const workshop = VILLAGE_WORKSHOPS[village.id];
+          const isHomeHere = homeVillageId === village.id;
+          if (isHomeHere) {
+            return (
+              <p className="muted" style={{ marginTop: "0.85rem" }}>
+                <Link href={workshop.href} className="btn-primary">
+                  {workshop.enterLabel}
+                </Link>
+              </p>
+            );
+          }
+          return (
+            <p className="muted" style={{ marginTop: "0.85rem" }}>
+              {workshop.buildingName} belongs only to {village.name} — it stays
+              with this village and is never relocated.
+            </p>
+          );
+        })()}
       </section>
 
       <LostChronicles

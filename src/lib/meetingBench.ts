@@ -6,7 +6,7 @@ import {
   type GardenSeason,
 } from "@/lib/gardenContent";
 import type { VillageId } from "@/lib/villages";
-import { VILLAGES } from "@/lib/villages";
+import { VILLAGES, villageIdForWorkshopHref } from "@/lib/villages";
 import { persistMeetingBenchCatalog } from "@/lib/persistentMeetingBench";
 
 export type BenchItemKind =
@@ -164,6 +164,17 @@ function excerpt(body: string, max = 110) {
   return `${clean.slice(0, max - 1).trim()}…`;
 }
 
+/** Keep workshop CTAs glued to their home village. */
+export function itemBelongsToVillage(
+  item: Pick<BenchItem, "villages" | "ctaHref">,
+  villageId: VillageId
+): boolean {
+  const workshopOwner = villageIdForWorkshopHref(item.ctaHref);
+  if (workshopOwner && workshopOwner !== villageId) return false;
+  if (item.villages === "all") return true;
+  return item.villages.includes(villageId);
+}
+
 export function ensureMeetingBenchSeeded(db: Database = getDb()) {
   const count = (
     db.prepare(`SELECT COUNT(*) as n FROM meeting_bench_items`).get() as {
@@ -210,29 +221,33 @@ export function ensureMeetingBenchSeeded(db: Database = getDb()) {
     }
   }
 
-  // Keep village workshops local: Observatory CTAs must stay Moonmere-only.
-  const observatoryLeaks = db
+  // Keep every workshop CTA glued to its home village.
+  const workshopLeaks = db
     .prepare(
-      `SELECT id, villages_json FROM meeting_bench_items
-       WHERE cta_href = '/observatory' OR title = 'Stargazing Night'`
+      `SELECT id, villages_json, cta_href FROM meeting_bench_items
+       WHERE cta_href IN ('/observatory', '/library', '/garden', '/workshop', '/fireside')
+          OR title IN ('Stargazing Night')`
     )
-    .all() as Array<{ id: string; villages_json: string }>;
+    .all() as Array<{ id: string; villages_json: string; cta_href: string | null }>;
   let repaired = false;
-  for (const row of observatoryLeaks) {
+  for (const row of workshopLeaks) {
+    const owner = villageIdForWorkshopHref(row.cta_href) ||
+      (row.cta_href === "/observatory" || !row.cta_href ? "moonmere" : null);
+    if (!owner) continue;
     let villages: VillageId[] | "all" = "all";
     try {
       villages = JSON.parse(row.villages_json) as VillageId[] | "all";
     } catch {
       villages = "all";
     }
-    const alreadyMoonmereOnly =
+    const alreadyLocal =
       Array.isArray(villages) &&
       villages.length === 1 &&
-      villages[0] === "moonmere";
-    if (!alreadyMoonmereOnly) {
+      villages[0] === owner;
+    if (!alreadyLocal) {
       db.prepare(
         `UPDATE meeting_bench_items SET villages_json = ? WHERE id = ?`
-      ).run(JSON.stringify(["moonmere"]), row.id);
+      ).run(JSON.stringify([owner]), row.id);
       repaired = true;
     }
   }
@@ -240,7 +255,7 @@ export function ensureMeetingBenchSeeded(db: Database = getDb()) {
     try {
       persistMeetingBenchCatalog(db);
     } catch (err) {
-      console.error("[meeting-bench] observatory locality persist failed:", err);
+      console.error("[meeting-bench] workshop locality persist failed:", err);
     }
   }
 }
@@ -505,11 +520,17 @@ export function listMeetingBenchItems(opts?: {
   );
 }
 
-export function getMeetingBenchBoard(userId?: string | null) {
+export function getMeetingBenchBoard(
+  userId?: string | null,
+  villageId?: VillageId | null
+) {
   const db = getDb();
   ensureMeetingBenchSeeded(db);
   const season = currentGardenSeason();
-  const items = listMeetingBenchItems({ userId });
+  let items = listMeetingBenchItems({ userId });
+  if (villageId) {
+    items = items.filter((item) => itemBelongsToVillage(item, villageId));
+  }
   return {
     season,
     seasonLabel: SEASON_LABEL[season],
@@ -523,8 +544,8 @@ export function getMeetingBenchBoard(userId?: string | null) {
   };
 }
 
-export function getMeetingBenchTeaser(): BenchTeaser {
-  const board = getMeetingBenchBoard();
+export function getMeetingBenchTeaser(villageId?: VillageId | null): BenchTeaser {
+  const board = getMeetingBenchBoard(null, villageId);
   const notice = board.notices[0] || null;
   const gathering =
     board.gatherings.find((g) => g.status === "upcoming" || g.status === "active") ||

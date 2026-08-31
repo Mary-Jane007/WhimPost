@@ -4,10 +4,33 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { UserPublic } from "@/lib/types";
 import type { NavBadges } from "@/lib/notifications";
+import { VILLAGE_WORKSHOPS, type VillageId } from "@/lib/villages";
 
 function formatBadge(n: number) {
   if (n <= 0) return null;
   return n > 99 ? "99+" : String(n);
+}
+
+function workshopForVillage(villageId: string | null | undefined) {
+  if (!villageId || !(villageId in VILLAGE_WORKSHOPS)) return null;
+  return VILLAGE_WORKSHOPS[villageId as VillageId];
+}
+
+function villageEmoji(villageId: string | null | undefined) {
+  switch (villageId) {
+    case "mosshollow":
+      return "🦉";
+    case "clovermeadow":
+      return "🐝";
+    case "moonmere":
+      return "🦋";
+    case "bramblewood":
+      return "🦊";
+    case "hearthwick":
+      return "🦔";
+    default:
+      return "✿";
+  }
 }
 
 export function SiteNav({
@@ -19,27 +42,23 @@ export function SiteNav({
 }) {
   const pathname = usePathname();
 
+  // Workshop chrome follows the village you are currently in — never the home
+  // village alone. That keeps Observatory off Mosshollow, Library off Moonmere, etc.
+  const currentVillageId = user?.villageId || user?.homeVillageId || null;
   const homeId = user?.homeVillageId || user?.villageId || null;
+  const workshop = workshopForVillage(currentVillageId);
+  const visiting =
+    Boolean(user?.villageId && user?.homeVillageId) &&
+    user!.villageId !== user!.homeVillageId;
+
   const links: Array<{
     href: string;
     label: string;
     badgeKey?: keyof NavBadges;
   }> = [
     { href: "/village", label: "Village", badgeKey: "unlocks" },
-    ...(homeId === "bramblewood"
-      ? [{ href: "/workshop", label: "Workshop" }]
-      : []),
-    ...(homeId === "mosshollow"
-      ? [{ href: "/library", label: "Library" }]
-      : []),
-    ...(homeId === "clovermeadow"
-      ? [{ href: "/garden", label: "Garden" }]
-      : []),
-    ...(homeId === "hearthwick"
-      ? [{ href: "/fireside", label: "Fireside" }]
-      : []),
-    ...(homeId === "moonmere"
-      ? [{ href: "/observatory", label: "Observatory" }]
+    ...(workshop
+      ? [{ href: workshop.href, label: workshop.navLabel }]
       : []),
     { href: "/tv-corner", label: "TV Corner" },
     { href: "/meeting-bench", label: "Meeting Bench" },
@@ -57,23 +76,14 @@ export function SiteNav({
     <header className="site-nav">
       <Link href={user ? "/village" : "/"} className="brand-mark">
         <span className="brand-icon" aria-hidden>
-          {homeId === "mosshollow"
-            ? "🦉"
-            : homeId === "clovermeadow"
-              ? "🐝"
-              : homeId === "moonmere"
-                ? "🦋"
-                : homeId === "bramblewood"
-                  ? "🦊"
-                  : homeId === "hearthwick"
-                    ? "🦔"
-                    : "✿"}
+          {villageEmoji(currentVillageId)}
         </span>
         <span className="brand-text">WhimPost</span>
-        {user?.villageId &&
-        user.homeVillageId &&
-        user.villageId !== user.homeVillageId ? (
-          <span className="nav-visiting-cue" title="Currently visiting">
+        {visiting ? (
+          <span
+            className="nav-visiting-cue"
+            title={`Visiting — home is ${homeId || "elsewhere"}`}
+          >
             Visiting
           </span>
         ) : null}
