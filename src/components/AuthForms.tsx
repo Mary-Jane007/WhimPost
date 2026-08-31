@@ -19,6 +19,7 @@ export function LoginForm() {
     setLoading(true);
     setError("");
     setSignedIn(false);
+    const form = e.currentTarget as HTMLFormElement;
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -37,21 +38,31 @@ export function LoginForm() {
       }
 
       // Confirm the browser actually stored the session before navigating.
-      // If this fails, /village would bounce straight back to /login.
-      const me = await fetch("/api/auth/me", { credentials: "same-origin" });
-      const meData = (await me.json().catch(() => null)) as {
-        user?: { id?: string };
-      } | null;
-      if (!me.ok || !meData?.user?.id) {
-        setError(
-          "Signed in on the server, but this browser blocked the session cookie. Open the site from Cursor → Ports → 3333 (Open in Browser), then try again."
-        );
-        setLoading(false);
+      // Retry once — some preview hosts settle the Set-Cookie a tick late.
+      const confirmSession = async () => {
+        const me = await fetch("/api/auth/me", { credentials: "same-origin" });
+        const meData = (await me.json().catch(() => null)) as {
+          user?: { id?: string };
+        } | null;
+        return Boolean(me.ok && meData?.user?.id);
+      };
+
+      if (await confirmSession()) {
+        setSignedIn(true);
+        window.location.replace("/village");
+        return;
+      }
+      await new Promise((r) => setTimeout(r, 120));
+      if (await confirmSession()) {
+        setSignedIn(true);
+        window.location.replace("/village");
         return;
       }
 
+      // Last resort: classic form POST (HTML redirect) so the browser
+      // stores the cookie during a top-level navigation.
       setSignedIn(true);
-      window.location.replace("/village");
+      form.submit();
     } catch {
       setError("Could not reach the forest post. Try again in a moment.");
       setLoading(false);

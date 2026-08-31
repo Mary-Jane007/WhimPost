@@ -52,9 +52,19 @@ async function requestIsHttps() {
       ?.trim()
       .toLowerCase();
     if (proto === "https") return true;
-    const host = (hdrs.get("x-forwarded-host") || hdrs.get("host") || "").toLowerCase();
-    // Cloud agent preview hosts are always HTTPS in the browser.
-    if (host.includes(".agent.cvm.dev") || host.includes(".cursor.sh")) return true;
+    const host = (hdrs.get("x-forwarded-host") || hdrs.get("host") || "")
+      .split(",")[0]
+      ?.trim()
+      .toLowerCase();
+    if (!host) return false;
+    const hostname = host.replace(/:\d+$/, "");
+    const isLoopback =
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "[::1]" ||
+      hostname === "::1";
+    // Cursor / cloud previews and any non-loopback host are HTTPS in the browser.
+    if (!isLoopback) return true;
   } catch {
     // headers() unavailable outside a request — fall through
   }
@@ -72,6 +82,7 @@ async function sessionCookieOptions() {
     secure,
     path: "/",
     maxAge: 60 * 60 * 24 * 14,
+    ...(secure ? { partitioned: true as const } : {}),
   };
 }
 
