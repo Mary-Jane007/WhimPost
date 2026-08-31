@@ -2,11 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { BenchItem } from "@/lib/meetingBench";
+import type { VillageId } from "@/lib/villages";
 import {
   DEFAULT_POLL_OPTIONS,
   DEFAULT_QUESTION,
   findQuestionJarItem,
   pollOptionsFromItem,
+  questionJarSticker,
 } from "@/lib/meetingBenchScene";
 
 const STORAGE_KEY = "whimpost.meeting-bench.question-jar";
@@ -35,13 +37,20 @@ function writeAnswers(next: StoredAnswers) {
   }
 }
 
-export function MeetingBenchQuestionJar({ items }: { items: BenchItem[] }) {
+export function MeetingBenchQuestionJar({
+  items,
+  villageId = null,
+}: {
+  items: BenchItem[];
+  villageId?: VillageId | null;
+}) {
   const jarItem = useMemo(() => findQuestionJarItem(items), [items]);
   const jarKey = jarItem?.id || "default-jar";
   const question = jarItem?.title || DEFAULT_QUESTION;
   const options = jarItem
     ? pollOptionsFromItem(jarItem)
     : DEFAULT_POLL_OPTIONS;
+  const jarSrc = questionJarSticker(villageId);
 
   const [choice, setChoice] = useState("");
   const [saved, setSaved] = useState<string | null>(null);
@@ -70,7 +79,13 @@ export function MeetingBenchQuestionJar({ items }: { items: BenchItem[] }) {
   return (
     <section className="mb-question-jar" aria-labelledby="mb-jar-title">
       <div className="mb-jar-visual" aria-hidden>
-        <span className="mb-jar-glyph">🫙</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="mb-jar-sticker"
+          src={jarSrc}
+          alt=""
+          draggable={false}
+        />
         <span className="mb-jar-glow" />
       </div>
       <div className="mb-jar-copy">

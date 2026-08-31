@@ -15,6 +15,7 @@ type Props = {
   item: BenchItem;
   objectId: BenchObjectId;
   entryType: MeetingBenchEntryType;
+  stickerSrc?: string;
   onClose: () => void;
   onRsvp?: (id: string) => void;
   rsvpBusy?: boolean;
@@ -26,6 +27,7 @@ export function MeetingBenchReveal({
   item,
   objectId,
   entryType,
+  stickerSrc,
   onClose,
   onRsvp,
   rsvpBusy,
@@ -33,6 +35,7 @@ export function MeetingBenchReveal({
   onEdit,
 }: Props) {
   const meta = OBJECT_META[objectId];
+  const art = stickerSrc || meta.src;
   const when = formatWhen(item.startsAt);
   const canRsvp =
     (item.kind === "gathering" || item.kind === "community_event") && onRsvp;
@@ -76,7 +79,8 @@ export function MeetingBenchReveal({
         </button>
 
         <div className="mb-reveal-object" aria-hidden>
-          <span className="mb-reveal-emoji">{meta.emoji}</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="mb-reveal-sticker" src={art} alt="" draggable={false} />
         </div>
 
         <p className="mb-reveal-kicker">

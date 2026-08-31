@@ -75,8 +75,8 @@ export function MeetingBench({
   const discovery = useMemo(() => findDiscoveryItem(allItems), [allItems]);
   const openObject = sceneObjects.find((o) => o.id === openId) || null;
   const ambient = [
-    ...theme.ambient.slice(0, 2),
-    ...(SEASON_AMBIENT[season] || []).slice(0, 2),
+    ...theme.ambient.slice(0, 3),
+    ...(SEASON_AMBIENT[season] || []).slice(0, 1),
   ];
 
   async function rsvp(itemId: string) {
@@ -115,93 +115,110 @@ export function MeetingBench({
 
   return (
     <div
-      className={`meeting-bench mb-living village-${theme.villageId} season-${board.season}`}
+      className={`meeting-bench mb-living mb-gathering-board village-${theme.villageId} season-${board.season}`}
     >
-      <section
-        className="mb-scene-stage"
-        aria-label={theme.sceneLabel}
-      >
-        <div className="mb-scene-sky" aria-hidden>
-          {ambient.map((g, i) => (
-            <span key={`${g}-${i}`} className={`mb-float f${i + 1}`}>
-              {g}
-            </span>
-          ))}
-        </div>
+      <section className="mb-scene-stage" aria-label={theme.sceneLabel}>
+        <div className="mb-board-frame">
+          <div className="mb-board-rail mb-board-rail-top" aria-hidden />
+          <div className="mb-board-rail mb-board-rail-left" aria-hidden />
+          <div className="mb-board-rail mb-board-rail-right" aria-hidden />
+          <div className="mb-board-rail mb-board-rail-bottom" aria-hidden />
 
-        <header className="mb-scene-hero">
-          <p className="mb-scene-kicker">{theme.kicker}</p>
-          <h2 className="mb-scene-title">{theme.headline}</h2>
-          <p className="mb-scene-sub">{theme.subtitle}</p>
-          <p className="mb-scene-hint">
-            Come sit for a little while. Tap what the keeper left on the bench.
-          </p>
-        </header>
+          <div className="mb-board-ambient" aria-hidden>
+            {ambient.map((src, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={`${src}-${i}`}
+                src={src}
+                alt=""
+                className={`mb-ambient-sticker a${i + 1}`}
+                draggable={false}
+              />
+            ))}
+          </div>
 
-        <div className="mb-scene-ground">
-          <div className="mb-scene-objects" role="list">
+          <header className="mb-scene-hero">
+            <p className="mb-scene-kicker">{theme.kicker}</p>
+            <h2 className="mb-scene-title">{theme.headline}</h2>
+            <p className="mb-scene-sub">{theme.subtitle}</p>
+            <p className="mb-scene-hint">
+              Tap what the keeper pinned to the gathering board.
+            </p>
+          </header>
+
+          <div className="mb-scene-ground">
+            <div className="mb-bench-figure">
+              <div className="mb-bench-photo-wrap">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="mb-bench-photo"
+                  src="/meeting-bench/bench-nature.png"
+                  alt=""
+                  width={1280}
+                  height={720}
+                />
+              </div>
+              <p className="mb-bench-caption">
+                {theme.boardLabel} · {theme.benchLabel}
+              </p>
+            </div>
+
+            <div className="mb-scene-objects" role="list">
+              {sceneObjects
+                .filter((o) => o.placement !== "under")
+                .map((obj) => (
+                  <BenchObjectButton
+                    key={obj.id}
+                    obj={obj}
+                    onOpen={() => setOpenId(obj.id)}
+                  />
+                ))}
+            </div>
+
+            {discovery && !sceneObjects.some((o) => o.placement === "under") ? (
+              <button
+                type="button"
+                className={`mb-discovery-nudge ${discoverySeen ? "seen" : ""}`}
+                onClick={openDiscovery}
+                aria-label="Something caught your eye under the bench"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/stickers/skeleton-key.png"
+                  alt=""
+                  className="mb-discovery-sticker"
+                  draggable={false}
+                />
+                <span>Something caught your eye…</span>
+              </button>
+            ) : null}
+
             {sceneObjects
-              .filter((o) => o.placement !== "under")
+              .filter((o) => o.placement === "under")
               .map((obj) => (
                 <BenchObjectButton
                   key={obj.id}
                   obj={obj}
-                  onOpen={() => setOpenId(obj.id)}
+                  onOpen={() => {
+                    try {
+                      localStorage.setItem(
+                        "whimpost.meeting-bench.discovery-seen",
+                        "1"
+                      );
+                    } catch {
+                      /* ignore */
+                    }
+                    setDiscoverySeen(true);
+                    setOpenId(obj.id);
+                  }}
                 />
               ))}
           </div>
-
-          <div className="mb-bench-figure" aria-hidden>
-            <div className="mb-bench-photo-wrap">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="mb-bench-photo"
-                src="/meeting-bench/bench-nature.png"
-                alt=""
-                width={1280}
-                height={720}
-              />
-            </div>
-            <p className="mb-bench-caption">{theme.benchLabel}</p>
-          </div>
-
-          {discovery && !sceneObjects.some((o) => o.placement === "under") ? (
-            <button
-              type="button"
-              className={`mb-discovery-nudge ${discoverySeen ? "seen" : ""}`}
-              onClick={openDiscovery}
-              aria-label="Something caught your eye under the bench"
-            >
-              <span aria-hidden>✨</span>
-              <span>Something caught your eye…</span>
-            </button>
-          ) : null}
-
-          {sceneObjects
-            .filter((o) => o.placement === "under")
-            .map((obj) => (
-              <BenchObjectButton
-                key={obj.id}
-                obj={obj}
-                onOpen={() => {
-                  try {
-                    localStorage.setItem(
-                      "whimpost.meeting-bench.discovery-seen",
-                      "1"
-                    );
-                  } catch {
-                    /* ignore */
-                  }
-                  setDiscoverySeen(true);
-                  setOpenId(obj.id);
-                }}
-              />
-            ))}
         </div>
 
         {isOwner ? (
           <div className="mb-scene-owner-row">
-            <p>Keeper tools — leave something new on the bench:</p>
+            <p>Keeper tools — pin something new on the board:</p>
             <div className="mb-scene-owner-actions">
               {(
                 [
@@ -226,7 +243,7 @@ export function MeetingBench({
         ) : null}
       </section>
 
-      <MeetingBenchQuestionJar items={allItems} />
+      <MeetingBenchQuestionJar items={allItems} villageId={theme.villageId} />
 
       <section className="mb-journal" aria-labelledby="mb-journal-title">
         <header className="mb-journal-head">
@@ -278,6 +295,7 @@ export function MeetingBench({
           }
           objectId={openObject.objectId}
           entryType={openObject.entryType}
+          stickerSrc={openObject.src}
           onClose={() => setOpenId(null)}
           onRsvp={canRsvp ? rsvp : undefined}
           rsvpBusy={busyId === openObject.id}
@@ -322,11 +340,19 @@ function BenchObjectButton({
       className={`mb-object mb-place-${obj.placement} mb-obj-${obj.objectId} ${
         obj.featured ? "featured" : ""
       }`}
+      style={{ ["--mb-pin-rot" as string]: `${obj.rotation}deg` }}
       onClick={onOpen}
       aria-label={`${obj.openVerb} — ${obj.label}`}
     >
-      <span className="mb-object-emoji" aria-hidden>
-        {obj.emoji}
+      <span className="mb-object-pin" aria-hidden />
+      <span className="mb-object-sticker-wrap">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="mb-object-sticker"
+          src={obj.src}
+          alt=""
+          draggable={false}
+        />
       </span>
       <span className="mb-object-label">{obj.item.title}</span>
     </button>

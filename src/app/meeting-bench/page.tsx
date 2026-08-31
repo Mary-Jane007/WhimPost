@@ -35,7 +35,7 @@ export default async function MeetingBenchPage() {
 
   return (
     <main
-      className={`app-main forest-panel meeting-bench-page mb-living-page village-${villageId} season-${board.season}`}
+      className={`app-main forest-panel meeting-bench-page mb-living-page mb-board-page village-${villageId} season-${board.season}`}
       style={pageStyle}
     >
       <PageCrest
@@ -69,29 +69,30 @@ export default async function MeetingBenchPage() {
                     { village: "bramblewood", id: "maple-branch" },
                     { village: "bramblewood", id: "candle-jar" },
                   ]
-                : undefined
+                : villageId === "clovermeadow"
+                  ? [
+                      { village: "clovermeadow", id: "butterfly-pink" },
+                      { village: "clovermeadow", id: "lily-pink" },
+                      { village: "clovermeadow", id: "flowers-sage" },
+                    ]
+                  : undefined
         }
       />
 
-      <header className="page-header meeting-bench-header mb-living-header">
+      <header className="page-header meeting-bench-header mb-living-header mb-board-header">
         <p className="meeting-bench-kicker">{theme.kicker}</p>
-        <h1>🪑 {theme.headline}</h1>
+        <h1>{theme.headline}</h1>
         <p className="mb-living-sub">{theme.subtitle}</p>
-        <p>
-          Come sit for a little while. There&apos;s always something new to
-          discover — notes, gatherings, and quiet surprises left by the village
-          keeper for every WhimPost home.
-        </p>
-        <p className="muted">
-          Looking for neighbor posts and crafts? That&apos;s the{" "}
-          <Link href="/village">Village Square</Link> in your own village.
+        <p className="mb-board-lead">
+          A shared gathering board for every WhimPost home — notes, events, and
+          quiet finds left by the keeper.
         </p>
         {isOwner ? (
           <p className="mb-owner-banner">
             You&apos;re the board keeper — use{" "}
-            <a href="#mb-owner-desk">Edit Meeting Bench</a> to leave notes,
-            events, activities, Chronicle stories, and community gatherings on
-            the bench. For the full WhimPost picture, open{" "}
+            <a href="#mb-owner-desk">Edit Meeting Bench</a> to pin notes,
+            events, activities, Chronicle stories, and community gatherings.
+            For the full WhimPost picture, open{" "}
             <Link href="/admin/analytics">Owner Analytics</Link>.
           </p>
         ) : null}

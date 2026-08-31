@@ -36,7 +36,13 @@ export type BenchObjectPlacement =
   | "ground-right"
   | "under"
   | "air-left"
-  | "air-right";
+  | "air-right"
+  | "pin-tl"
+  | "pin-tr"
+  | "pin-ml"
+  | "pin-mr"
+  | "pin-bl"
+  | "pin-br";
 
 export type VillageBenchTheme = {
   villageId: VillageId;
@@ -45,8 +51,12 @@ export type VillageBenchTheme = {
   subtitle: string;
   sceneLabel: string;
   benchLabel: string;
+  boardLabel: string;
+  /** Realistic ambient stickers pinned around the gathering board. */
   ambient: string[];
   objects: Partial<Record<MeetingBenchEntryType, BenchObjectId>>;
+  /** Optional per-village sticker overrides for object types. */
+  objectStickers?: Partial<Record<BenchObjectId, string>>;
 };
 
 export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
@@ -55,9 +65,15 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
     kicker: "Shared clearing · every village",
     headline: "The Meeting Bench",
     subtitle: "What's rustling in the woods?",
-    sceneLabel: "A rustic wooden bench in a forest clearing",
+    sceneLabel: "A forest gathering board above a rustic wooden bench",
     benchLabel: "Forest bench",
-    ambient: ["🍄", "🍂", "🌿", "🌰"],
+    boardLabel: "Bramblewood notice board",
+    ambient: [
+      "/stickers/villages/bramblewood/fox-face.png",
+      "/stickers/villages/bramblewood/maple-branch.png",
+      "/stickers/villages/bramblewood/pack/mushroom.png",
+      "/stickers/villages/bramblewood/autumn-leaves.png",
+    ],
     objects: {
       announcement: "paper",
       activity: "basket",
@@ -69,15 +85,26 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
       journal: "book",
       discovery: "sparkle",
     },
+    objectStickers: {
+      bell: "/stickers/villages/bramblewood/candle-jar.png",
+      book: "/stickers/villages/bramblewood/book-leaf.png",
+      sparkle: "/stickers/villages/bramblewood/compass.png",
+    },
   },
   mosshollow: {
     villageId: "mosshollow",
     kicker: "Shared reading nook · every village",
     headline: "The Meeting Bench",
     subtitle: "Gather around — there's something to discuss.",
-    sceneLabel: "A moss-covered bench near a woodland reading spot",
+    sceneLabel: "A mossy reading board beside a woodland bench",
     benchLabel: "Mossy bench",
-    ambient: ["📚", "🪶", "🕯️", "🍃"],
+    boardLabel: "Mosshollow reading board",
+    ambient: [
+      "/stickers/villages/mosshollow/pack/books-stack.png",
+      "/stickers/villages/mosshollow/pack/ink-bottle.png",
+      "/stickers/villages/mosshollow/pack/moth.png",
+      "/stickers/villages/mosshollow/pack/lantern.png",
+    ],
     objects: {
       announcement: "paper",
       activity: "basket",
@@ -89,15 +116,26 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
       journal: "book",
       discovery: "sparkle",
     },
+    objectStickers: {
+      paper: "/stickers/villages/mosshollow/pack/letters-bundle.png",
+      book: "/stickers/villages/mosshollow/pack/books-stack.png",
+      sparkle: "/stickers/villages/mosshollow/pack/pocket-watch.png",
+    },
   },
   hearthwick: {
     villageId: "hearthwick",
     kicker: "Shared cottage porch · every village",
     headline: "The Meeting Bench",
     subtitle: "Come sit a while.",
-    sceneLabel: "A cozy cottage bench with warm details nearby",
+    sceneLabel: "A cozy cottage gathering board by the porch bench",
     benchLabel: "Cottage bench",
-    ambient: ["🫖", "🧶", "🕯️", "🍪"],
+    boardLabel: "Hearthwick porch board",
+    ambient: [
+      "/stickers/villages/hearthwick/hedgehog.png",
+      "/stickers/villages/hearthwick/lavender-bouquet.png",
+      "/stickers/villages/hearthwick/herbal-jar.png",
+      "/stickers/villages/hearthwick/cinnamon-sticks.png",
+    ],
     objects: {
       announcement: "paper",
       activity: "basket",
@@ -109,15 +147,28 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
       journal: "book",
       discovery: "sparkle",
     },
+    objectStickers: {
+      jar: "/stickers/villages/hearthwick/herbal-jar.png",
+      book: "/stickers/villages/hearthwick/vintage-books.png",
+      package: "/stickers/villages/hearthwick/wooden-crate.png",
+      bottle: "/stickers/villages/hearthwick/potion-bottles.png",
+      flower: "/stickers/villages/hearthwick/pink-flower.png",
+    },
   },
   clovermeadow: {
     villageId: "clovermeadow",
     kicker: "Shared meadow · every village",
     headline: "The Meeting Bench",
     subtitle: "Something new is blooming.",
-    sceneLabel: "A meadow bench among wildflowers",
+    sceneLabel: "A meadow gathering board among wildflowers",
     benchLabel: "Meadow bench",
-    ambient: ["🌼", "🐝", "🌿", "🌱"],
+    boardLabel: "Clovermeadow garden board",
+    ambient: [
+      "/stickers/villages/clovermeadow/butterfly-pink.png",
+      "/stickers/villages/clovermeadow/flowers-sage.png",
+      "/stickers/villages/clovermeadow/lily-pink.png",
+      "/stickers/villages/clovermeadow/cherries-gingham.png",
+    ],
     objects: {
       announcement: "paper",
       activity: "flower",
@@ -129,15 +180,26 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
       journal: "book",
       discovery: "sparkle",
     },
+    objectStickers: {
+      flower: "/stickers/villages/clovermeadow/lily-pink.png",
+      book: "/stickers/villages/clovermeadow/books-stack.png",
+      basket: "/stickers/picnic-basket.png",
+    },
   },
   moonmere: {
     villageId: "moonmere",
     kicker: "Shared lakeside · every village",
     headline: "The Meeting Bench",
     subtitle: "Something has washed ashore…",
-    sceneLabel: "A quiet lakeside bench beneath the moon",
+    sceneLabel: "A lakeside gathering board beneath the moon",
     benchLabel: "Lakeside bench",
-    ambient: ["🌙", "✨", "🌊", "🦋"],
+    boardLabel: "Moonmere shore board",
+    ambient: [
+      "/stickers/villages/moonmere/luna-moth.png",
+      "/stickers/villages/moonmere/moon-crescent.png",
+      "/stickers/villages/moonmere/lantern-star.png",
+      "/stickers/villages/moonmere/moth-sage.png",
+    ],
     objects: {
       announcement: "bottle",
       activity: "basket",
@@ -149,31 +211,94 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
       journal: "book",
       discovery: "sparkle",
     },
+    objectStickers: {
+      lantern: "/stickers/villages/moonmere/lantern-star.png",
+      paper: "/stickers/villages/moonmere/library-card.png",
+      sign: "/stickers/villages/moonmere/ticket-observatory.png",
+      sparkle: "/stickers/villages/moonmere/fairy-starry.png",
+    },
   },
 };
 
+/** Default realistic sticker art for each interactive object. */
 export const OBJECT_META: Record<
   BenchObjectId,
-  { emoji: string; label: string; openVerb: string }
+  { src: string; label: string; openVerb: string }
 > = {
-  paper: { emoji: "📜", label: "Folded note", openVerb: "Unfold" },
-  basket: { emoji: "🧺", label: "Basket", openVerb: "Open" },
-  bell: { emoji: "🔔", label: "Bell", openVerb: "Ring" },
-  jar: { emoji: "🫙", label: "Question jar", openVerb: "Open" },
-  book: { emoji: "📖", label: "Bench book", openVerb: "Open" },
-  package: { emoji: "📦", label: "Small parcel", openVerb: "Unwrap" },
-  sign: { emoji: "🪧", label: "Wooden sign", openVerb: "Read" },
-  bottle: { emoji: "🫙", label: "Glass bottle", openVerb: "Uncork" },
-  lantern: { emoji: "🏮", label: "Lantern", openVerb: "Lift" },
-  flower: { emoji: "🌼", label: "Blooming note", openVerb: "Look closer" },
-  sparkle: { emoji: "✨", label: "Hidden spark", openVerb: "Discover" },
+  paper: {
+    src: "/stickers/villages/mosshollow/pack/letters-bundle.png",
+    label: "Folded note",
+    openVerb: "Unfold",
+  },
+  basket: {
+    src: "/stickers/picnic-basket.png",
+    label: "Basket",
+    openVerb: "Open",
+  },
+  bell: {
+    src: "/stickers/candle-jar.png",
+    label: "Gathering bell",
+    openVerb: "Ring",
+  },
+  jar: {
+    src: "/stickers/jam-jar.png",
+    label: "Question jar",
+    openVerb: "Open",
+  },
+  book: {
+    src: "/stickers/villages/hearthwick/vintage-books.png",
+    label: "Bench book",
+    openVerb: "Open",
+  },
+  package: {
+    src: "/stickers/villages/hearthwick/wooden-crate.png",
+    label: "Small parcel",
+    openVerb: "Unwrap",
+  },
+  sign: {
+    src: "/stickers/villages/mosshollow/pack/travel-tag.png",
+    label: "Wooden sign",
+    openVerb: "Read",
+  },
+  bottle: {
+    src: "/stickers/villages/hearthwick/potion-bottles.png",
+    label: "Glass bottle",
+    openVerb: "Uncork",
+  },
+  lantern: {
+    src: "/stickers/villages/mosshollow/pack/lantern.png",
+    label: "Lantern",
+    openVerb: "Lift",
+  },
+  flower: {
+    src: "/stickers/sunflower.png",
+    label: "Blooming note",
+    openVerb: "Look closer",
+  },
+  sparkle: {
+    src: "/stickers/skeleton-key.png",
+    label: "Hidden find",
+    openVerb: "Discover",
+  },
 };
 
 export const SEASON_AMBIENT: Record<GardenSeason, string[]> = {
-  spring: ["🌸", "🌱", "💧"],
-  summer: ["☀️", "🦋", "🍑"],
-  autumn: ["🍂", "🍄", "🌰"],
-  winter: ["❄️", "🧣", "⭐"],
+  spring: [
+    "/stickers/narcissus.png",
+    "/stickers/dragonfly.png",
+  ],
+  summer: [
+    "/stickers/sunflower.png",
+    "/stickers/butterfly-green.png",
+  ],
+  autumn: [
+    "/stickers/pinecone.png",
+    "/stickers/mushroom-brown.png",
+  ],
+  winter: [
+    "/stickers/moon-crescent.png",
+    "/stickers/candle-jar.png",
+  ],
 };
 
 const KIND_TO_ENTRY: Record<BenchItemKind, MeetingBenchEntryType> = {
@@ -184,14 +309,14 @@ const KIND_TO_ENTRY: Record<BenchItemKind, MeetingBenchEntryType> = {
   community_event: "community",
 };
 
-const PLACEMENTS: BenchObjectPlacement[] = [
-  "seat-left",
+const BOARD_PLACEMENTS: BenchObjectPlacement[] = [
+  "pin-tl",
+  "pin-tr",
+  "pin-ml",
+  "pin-mr",
+  "pin-bl",
+  "pin-br",
   "seat-mid",
-  "seat-right",
-  "ground-left",
-  "ground-right",
-  "air-left",
-  "air-right",
 ];
 
 export function resolveEntryType(item: BenchItem): MeetingBenchEntryType {
@@ -224,19 +349,28 @@ export function objectForEntry(
   return theme.objects[entryType] || "paper";
 }
 
+export function stickerForObject(
+  villageId: VillageId,
+  objectId: BenchObjectId
+): string {
+  const theme = VILLAGE_BENCH_THEMES[villageId] || VILLAGE_BENCH_THEMES.bramblewood;
+  return theme.objectStickers?.[objectId] || OBJECT_META[objectId].src;
+}
+
 export type SceneObject = {
   id: string;
   item: BenchItem;
   entryType: MeetingBenchEntryType;
   objectId: BenchObjectId;
-  emoji: string;
+  src: string;
   label: string;
   openVerb: string;
   placement: BenchObjectPlacement;
   featured: boolean;
+  rotation: number;
 };
 
-/** Pick the most interesting items to place as physical objects on the bench. */
+/** Pick the most interesting items to pin as physical objects on the board. */
 export function buildSceneObjects(
   items: BenchItem[],
   villageId: VillageId,
@@ -266,19 +400,21 @@ export function buildSceneObjects(
     const entryType = resolveEntryType(item);
     const objectId = objectForEntry(villageId, entryType);
     const meta = OBJECT_META[objectId];
+    const rotations = [-8, 5, -4, 7, -6, 3, -2];
     return {
       id: item.id,
       item,
       entryType,
       objectId,
-      emoji: meta.emoji,
+      src: stickerForObject(villageId, objectId),
       label: `${meta.label}: ${item.title}`,
       openVerb: meta.openVerb,
       placement:
         entryType === "discovery"
           ? "under"
-          : PLACEMENTS[index % PLACEMENTS.length],
+          : BOARD_PLACEMENTS[index % BOARD_PLACEMENTS.length],
       featured: Boolean(item.pinned) || index === 0,
+      rotation: rotations[index % rotations.length],
     };
   });
 }
@@ -379,7 +515,6 @@ export function pollOptionsFromItem(item: BenchItem): string[] {
   if (Array.isArray(raw)) {
     return raw.filter((x): x is string => typeof x === "string" && x.trim().length > 0);
   }
-  // Fallback: lines after a blank line in the body, or lines starting with - / ○
   const lines = item.body
     .split("\n")
     .map((l) => l.trim())
@@ -415,3 +550,20 @@ export const DEFAULT_POLL_OPTIONS = [
   "More stories",
   "Something completely new",
 ];
+
+/** Realistic jar sticker for the question-jar panel. */
+export function questionJarSticker(villageId: VillageId | null | undefined) {
+  if (villageId === "hearthwick") {
+    return "/stickers/villages/hearthwick/herbal-jar.png";
+  }
+  if (villageId === "bramblewood") {
+    return "/stickers/honey-jar.png";
+  }
+  if (villageId === "clovermeadow") {
+    return "/stickers/jam-jar.png";
+  }
+  if (villageId === "moonmere") {
+    return "/stickers/villages/hearthwick/leaf-jar.png";
+  }
+  return "/stickers/jam-jar.png";
+}
