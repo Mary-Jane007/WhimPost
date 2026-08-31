@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-22T02:50:22.232Z",
+  "updatedAt": "2026-08-31T22:08:23.824Z",
   "accounts": [
     {
       "id": "system-bramblewood",
@@ -55,12 +55,12 @@
       "username": "Mary_Jane",
       "display_name": "InkWanderer",
       "email": "marisolleefland@gmail.com",
-      "password_hash": "$2b$10$62OqevdA43wtcO0a68JGPuX3ajKoqBPvJVsLCjqNNu8d5xdGAx7e2",
+      "password_hash": "$2b$10$rBdytFZ55KQdhzrg4SO3veN1Ex10q8tY0Y4qZrHn/q1ZEAz1Zc3GK",
       "bio": "",
       "forest_name": "mosshollow",
       "is_owner": 1,
-      "village_id": "hearthwick",
-      "home_village_id": "hearthwick",
+      "village_id": "moonmere",
+      "home_village_id": "moonmere",
       "reputation": 0,
       "collectibles_json": "{\"mushrooms\":1,\"leaves\":1,\"feathers\":1,\"lost-pages\":1,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":1,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":1,\"clover-cherries\":0,\"clover-honey\":1,\"clover-blossoms\":1,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":1,\"moon-lanterns\":1,\"moon-lilies\":1,\"moon-dreams\":1,\"moon-dust\":0,\"bramble-fox-tails\":1,\"bramble-maple\":1,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":1,\"bramble-compasses\":1,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":1,\"hearth-muffins\":1,\"hearth-recipes\":1,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":1}",
       "visited_villages_json": "[\"bramblewood\",\"clovermeadow\",\"hearthwick\",\"moonmere\",\"mosshollow\"]",
