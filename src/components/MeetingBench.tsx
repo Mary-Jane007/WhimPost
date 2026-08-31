@@ -11,7 +11,6 @@ import {
   flattenBoardItems,
   getBenchTheme,
   journalEntries,
-  SEASON_AMBIENT,
   type SceneObject,
 } from "@/lib/meetingBenchScene";
 import type { GardenSeason } from "@/lib/gardenContent";
@@ -65,7 +64,6 @@ export function MeetingBench({
   }, []);
 
   const theme = getBenchTheme(villageId);
-  const season = board.season as GardenSeason;
   const allItems = useMemo(() => flattenBoardItems(board), [board]);
   const sceneObjects = useMemo(
     () => buildSceneObjects(allItems, theme.villageId),
@@ -74,10 +72,7 @@ export function MeetingBench({
   const journal = useMemo(() => journalEntries(allItems), [allItems]);
   const discovery = useMemo(() => findDiscoveryItem(allItems), [allItems]);
   const openObject = sceneObjects.find((o) => o.id === openId) || null;
-  const ambient = [
-    ...theme.ambient.slice(0, 3),
-    ...(SEASON_AMBIENT[season] || []).slice(0, 1),
-  ];
+  const ambient = theme.ambient.slice(0, 4);
 
   async function rsvp(itemId: string) {
     if (!canRsvp) return;
