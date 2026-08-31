@@ -4,7 +4,7 @@ import { listChannelsForUser } from "@/lib/tvCorner";
 import { completeUploadSession } from "@/lib/tvUpload";
 
 export const runtime = "nodejs";
-export const maxDuration = 600;
+export const maxDuration = 1800; // assemble multi-GB chunked movies
 
 type Ctx = { params: Promise<{ uploadId: string }> };
 

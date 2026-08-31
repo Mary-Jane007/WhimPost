@@ -14,8 +14,11 @@ import {
   resolveChannelBroadcast,
   type TvScheduleSlot,
 } from "@/lib/tvSchedule";
+import { TV_MAX_BYTES, TV_MAX_LABEL } from "@/lib/tvUploadLimits";
 
 export type TvRoomScope = "village" | "friends";
+
+export { TV_MAX_BYTES, TV_MAX_LABEL } from "@/lib/tvUploadLimits";
 
 export type TvVideo = {
   id: string;
@@ -749,8 +752,6 @@ export const TV_MIME_EXT: Record<string, string> = {
 };
 
 export const TV_ALLOWED_MIME = new Set(Object.keys(TV_MIME_EXT));
-export const TV_MAX_BYTES = 5 * 1024 * 1024 * 1024; // 5GB movies
-export const TV_MAX_LABEL = "5GB";
 
 const EXT_MIME: Record<string, string> = {
   mp4: "video/mp4",

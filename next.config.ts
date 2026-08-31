@@ -9,10 +9,10 @@ const nextConfig: NextConfig = {
   ],
   experimental: {
     serverActions: {
-      bodySizeLimit: "5gb",
+      bodySizeLimit: "10gb",
     },
     // Large TV movie uploads — avoid silent truncation of request bodies.
-    proxyClientMaxBodySize: "5gb",
+    proxyClientMaxBodySize: "10gb",
   },
 };
 

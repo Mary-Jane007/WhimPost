@@ -15,7 +15,8 @@ export const INCOMING_DIR = path.join(UPLOAD_DIR, ".incoming");
 
 /** Keep chunks small so tunnel / proxy body limits don't kill big movies. */
 export const TV_CHUNK_SIZE = 2 * 1024 * 1024; // 2MB
-export const TV_CHUNK_MAX = 5 * 1024 * 1024 * 1024;
+/** Soft mirror of TV_MAX_BYTES — session size is enforced via resolveTvUpload. */
+export const TV_CHUNK_MAX = 10 * 1024 * 1024 * 1024;
 
 export type UploadSessionMeta = {
   id: string;
