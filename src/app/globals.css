@@ -10931,17 +10931,17 @@ button.mh-card-cover {
 .meeting-bench-page.village-moonmere {
   --village-color: #2a3548;
   --village-soft: #9bb0c9;
-  --mb-accent: #5b8def;
-  --mb-pop: #c9a7ff;
-  --mb-pop-2: #7ad7c7;
+  --mb-accent: #3db8e8;
+  --mb-pop: #ffd166;
+  --mb-pop-2: #5eead4;
   --mb-pin: #ff6b9d;
-  --mb-pin-alt: #5b8def;
-  --mb-wash: rgba(91, 141, 239, 0.24);
-  --mb-scene-top: #eef4ff;
-  --mb-scene-mid: #d9e7fb;
-  --mb-scene-bot: #b8cdf0;
-  --mb-photo-filter: saturate(1.02) brightness(1.01) hue-rotate(8deg);
-  --mb-photo-warmth: rgba(91, 141, 239, 0.14);
+  --mb-pin-alt: #3db8e8;
+  --mb-wash: rgba(61, 184, 232, 0.28);
+  --mb-scene-top: #e8f8ff;
+  --mb-scene-mid: #c8ecfb;
+  --mb-scene-bot: #9ad6f2;
+  --mb-photo-filter: saturate(1.08) brightness(1.02) hue-rotate(6deg);
+  --mb-photo-warmth: rgba(61, 184, 232, 0.16);
 }
 .meeting-bench-page.village-hearthwick {
   --village-color: #8b5a2b;
@@ -11200,58 +11200,68 @@ button.mh-card-cover {
 .mb-scene-stage {
   position: relative;
   overflow: hidden;
-  border-radius: 2.4rem 1.2rem 2.8rem 1.6rem / 1.6rem 2.6rem 1.2rem 2.4rem;
-  border: 3px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, #fff);
+  border-radius: 3rem 1.4rem 3.4rem 1.8rem / 1.8rem 3.2rem 1.4rem 3rem;
+  border: 4px solid transparent;
   background:
-    radial-gradient(circle at 12% 18%, var(--mb-pop, #ffc857) 0 0.55rem, transparent 0.6rem),
-    radial-gradient(circle at 88% 22%, var(--mb-pop-2, #7ad7c7) 0 0.45rem, transparent 0.5rem),
-    radial-gradient(circle at 76% 86%, var(--mb-pin, #e23d5b) 0 0.4rem, transparent 0.45rem),
-    radial-gradient(circle at 18% 78%, var(--mb-pin-alt, #3d8fd4) 0 0.5rem, transparent 0.55rem),
+    /* confetti dots */
+    radial-gradient(circle at 8% 12%, var(--mb-pop, #ffc857) 0 0.65rem, transparent 0.7rem),
+    radial-gradient(circle at 22% 8%, var(--mb-pin, #e23d5b) 0 0.4rem, transparent 0.45rem),
+    radial-gradient(circle at 78% 10%, var(--mb-pop-2, #7ad7c7) 0 0.55rem, transparent 0.6rem),
+    radial-gradient(circle at 92% 16%, var(--mb-pin-alt, #3d8fd4) 0 0.45rem, transparent 0.5rem),
+    radial-gradient(circle at 12% 88%, var(--mb-pin-alt, #3d8fd4) 0 0.5rem, transparent 0.55rem),
+    radial-gradient(circle at 88% 86%, var(--mb-pop, #ffc857) 0 0.6rem, transparent 0.65rem),
+    radial-gradient(circle at 48% 94%, var(--mb-pin, #e23d5b) 0 0.35rem, transparent 0.4rem),
     radial-gradient(ellipse at 50% 0%, var(--mb-wash, transparent), transparent 55%),
     radial-gradient(ellipse at 82% 12%, var(--mb-season-tint, transparent), transparent 42%),
     linear-gradient(165deg,
       var(--mb-scene-top) 0%,
       var(--mb-scene-mid) 48%,
       var(--mb-scene-bot) 100%);
-  padding: 1rem 0.85rem 1.25rem;
+  padding: 1.1rem 1rem 1.35rem;
   box-shadow:
-    0 22px 44px color-mix(in srgb, var(--village-color, #6b8f71) 22%, transparent),
-    inset 0 0 0 6px color-mix(in srgb, #fff 55%, transparent);
+    0 0 0 4px color-mix(in srgb, var(--mb-accent, #ff6b2c) 70%, #fff),
+    0 0 0 8px color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent),
+    0 24px 48px color-mix(in srgb, var(--village-color, #6b8f71) 24%, transparent),
+    inset 0 0 0 7px color-mix(in srgb, #fff 60%, transparent);
 }
 
 .mb-board-frame {
   position: relative;
   margin: 0 auto;
   max-width: 58rem;
-  padding: 1.2rem 1.05rem 1.45rem;
-  border-radius: 1.8rem 2.6rem 1.4rem 2.2rem / 2.2rem 1.4rem 2.6rem 1.6rem;
+  padding: 1.35rem 1.15rem 1.55rem;
+  border-radius: 2.4rem 3.2rem 1.8rem 2.8rem / 2.8rem 1.8rem 3.2rem 2rem;
   background:
-    radial-gradient(circle at 14% 16%, color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent) 0 1.1rem, transparent 1.15rem),
-    radial-gradient(circle at 86% 20%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 50%, transparent) 0 0.9rem, transparent 0.95rem),
-    radial-gradient(circle at 70% 78%, color-mix(in srgb, var(--mb-pin, #e23d5b) 40%, transparent) 0 1rem, transparent 1.05rem),
-    radial-gradient(circle at 22% 72%, color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 38%, transparent) 0 0.85rem, transparent 0.9rem),
+    /* big playful color blobs in the board paper */
+    radial-gradient(circle at 10% 14%, color-mix(in srgb, var(--mb-pop, #ffc857) 72%, transparent) 0 2rem, transparent 2.1rem),
+    radial-gradient(circle at 90% 18%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 68%, transparent) 0 1.7rem, transparent 1.8rem),
+    radial-gradient(circle at 78% 82%, color-mix(in srgb, var(--mb-pin, #e23d5b) 48%, transparent) 0 1.9rem, transparent 2rem),
+    radial-gradient(circle at 16% 78%, color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 48%, transparent) 0 1.6rem, transparent 1.7rem),
+    radial-gradient(circle at 48% 8%, color-mix(in srgb, var(--mb-accent, #ff6b2c) 35%, transparent) 0 1.2rem, transparent 1.25rem),
+    /* wavy stripe pattern */
     repeating-linear-gradient(
-      -18deg,
+      -12deg,
       transparent,
-      transparent 10px,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 18%, transparent) 10px,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 18%, transparent) 12px
+      transparent 9px,
+      color-mix(in srgb, var(--mb-accent, #ff6b2c) 14%, transparent) 9px,
+      color-mix(in srgb, var(--mb-accent, #ff6b2c) 14%, transparent) 12px
     ),
     repeating-linear-gradient(
-      72deg,
-      color-mix(in srgb, var(--mb-wood-light, #a07850) 28%, #ffe8c8) 0 3px,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 35%, #ffd9a8) 3px 7px
+      78deg,
+      color-mix(in srgb, var(--mb-pop, #ffc857) 22%, #fff6e0) 0 5px,
+      color-mix(in srgb, var(--village-soft, #6b8f71) 28%, #ffe8c0) 5px 11px
     ),
     linear-gradient(
       145deg,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 42%, #ffe6b8),
-      color-mix(in srgb, var(--mb-accent, #ff6b2c) 22%, #f0c27a)
+      color-mix(in srgb, var(--village-soft, #6b8f71) 48%, #ffe9b8),
+      color-mix(in srgb, var(--mb-accent, #ff6b2c) 28%, #ffd089)
     );
-  border: 3px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 50%, var(--mb-wood, #5a3a22));
+  border: 4px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 65%, #fff);
   box-shadow:
-    inset 0 0 0 8px color-mix(in srgb, var(--mb-wood, #5a3a22) 55%, var(--mb-accent, #ff6b2c)),
-    inset 0 0 0 11px color-mix(in srgb, #fff 35%, var(--mb-pop, #ffc857)),
-    0 18px 36px color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+    inset 0 0 0 9px color-mix(in srgb, var(--mb-wood, #5a3a22) 40%, var(--mb-accent, #ff6b2c)),
+    inset 0 0 0 13px color-mix(in srgb, #fff 42%, var(--mb-pop, #ffc857)),
+    10px 14px 0 color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 35%, transparent),
+    0 20px 40px color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
 }
 
 .mb-board-rail {
@@ -11301,39 +11311,74 @@ button.mh-card-cover {
 }
 .mb-play-blob {
   position: absolute;
-  border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
-  opacity: 0.38;
-  filter: blur(0.5px);
-  animation: mbBlobDrift 9s ease-in-out infinite;
+  opacity: 0.55;
+  filter: blur(0.2px);
+  animation: mbBlobDrift 8s ease-in-out infinite;
 }
 .mb-play-blob.b1 {
-  width: 7rem;
-  height: 5.5rem;
-  left: -1rem;
-  top: 18%;
-  background: color-mix(in srgb, var(--mb-pop, #ffc857) 70%, transparent);
+  width: 9rem;
+  height: 7rem;
+  left: -1.5rem;
+  top: 14%;
+  background: color-mix(in srgb, var(--mb-pop, #ffc857) 85%, transparent);
+  border-radius: 70% 30% 60% 40% / 40% 60% 40% 60%;
 }
 .mb-play-blob.b2 {
-  width: 5.5rem;
-  height: 6.2rem;
-  right: -0.8rem;
-  top: 36%;
-  background: color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 65%, transparent);
-  animation-delay: 1.4s;
-  border-radius: 40% 60% 40% 60% / 55% 40% 60% 45%;
+  width: 7rem;
+  height: 8rem;
+  right: -1.2rem;
+  top: 32%;
+  background: color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 80%, transparent);
+  animation-delay: 1.2s;
+  border-radius: 35% 65% 40% 60% / 60% 35% 65% 40%;
 }
 .mb-play-blob.b3 {
-  width: 6rem;
-  height: 4.5rem;
-  left: 28%;
-  bottom: 6%;
-  background: color-mix(in srgb, var(--mb-pin, #e23d5b) 45%, transparent);
-  animation-delay: 2.2s;
-  border-radius: 55% 45% 60% 40% / 40% 60% 40% 60%;
+  width: 8rem;
+  height: 5.5rem;
+  left: 30%;
+  bottom: 4%;
+  background: color-mix(in srgb, var(--mb-pin, #e23d5b) 55%, transparent);
+  animation-delay: 2s;
+  border-radius: 55% 45% 65% 35% / 35% 65% 35% 65%;
 }
+.mb-play-blob.b4 {
+  width: 4.5rem;
+  height: 4.5rem;
+  right: 18%;
+  bottom: 22%;
+  background: color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 70%, transparent);
+  animation-delay: 0.6s;
+  border-radius: 40% 60% 55% 45% / 55% 40% 60% 45%;
+}
+.mb-play-squiggle {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  height: 14px;
+  bottom: 1.1rem;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10px 7px, var(--mb-accent, #ff6b2c) 0 5px, transparent 6px) 0 0 / 28px 14px repeat-x,
+    radial-gradient(circle at 10px 7px, var(--mb-pop, #ffc857) 0 4px, transparent 5px) 14px 0 / 28px 14px repeat-x;
+  opacity: 0.85;
+}
+.mb-play-star {
+  position: absolute;
+  z-index: 2;
+  width: 1.35rem;
+  height: 1.35rem;
+  background: var(--mb-pop, #ffc857);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: mbSoftFloat 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.mb-play-star.s1 { top: 12%; left: 6%; background: var(--mb-pop, #ffc857); }
+.mb-play-star.s2 { top: 20%; right: 7%; background: var(--mb-pin, #e23d5b); animation-delay: 0.8s; width: 1.1rem; height: 1.1rem; }
+.mb-play-star.s3 { bottom: 18%; left: 10%; background: var(--mb-pin-alt, #3d8fd4); animation-delay: 1.4s; width: 1rem; height: 1rem; }
 @keyframes mbBlobDrift {
   0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-  50% { transform: translate(8px, -10px) rotate(6deg) scale(1.06); }
+  50% { transform: translate(12px, -14px) rotate(8deg) scale(1.08); }
 }
 
 .mb-board-ambient {
@@ -11373,7 +11418,8 @@ button.mh-card-cover {
   .mb-jar-glow,
   .mb-reveal-sticker,
   .mb-board-rail,
-  .mb-play-blob {
+  .mb-play-blob,
+  .mb-play-star {
     animation: none !important;
   }
   .mb-ambient-sticker {
@@ -11387,45 +11433,52 @@ button.mh-card-cover {
   max-width: 36rem;
   margin: 2.6rem auto 0.85rem;
   z-index: 4;
-  padding: 0.75rem 1rem 0.9rem;
+  padding: 0.85rem 1.1rem 1rem;
   background:
-    radial-gradient(circle at 12% 20%, color-mix(in srgb, var(--mb-pop, #ffc857) 45%, transparent), transparent 40%),
-    radial-gradient(circle at 88% 80%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 40%, transparent), transparent 42%),
-    color-mix(in srgb, #fffaf2 82%, var(--village-soft, #6b8f71));
-  border: 2.5px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
-  border-radius: 1.6rem 2.4rem 1.2rem 2.8rem / 2.2rem 1.2rem 2.6rem 1.4rem;
+    radial-gradient(circle at 10% 18%, color-mix(in srgb, var(--mb-pop, #ffc857) 65%, transparent), transparent 42%),
+    radial-gradient(circle at 90% 78%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 55%, transparent), transparent 44%),
+    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--mb-pin, #e23d5b) 22%, transparent), transparent 45%),
+    #fffaf2;
+  border: 3.5px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 70%, transparent);
+  border-radius: 2rem 2.8rem 1.4rem 3.2rem / 2.6rem 1.4rem 3rem 1.6rem;
   box-shadow:
-    0 10px 22px color-mix(in srgb, var(--village-color, #6b8f71) 18%, transparent),
-    6px 8px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent);
-  transform: rotate(-1.2deg);
+    0 12px 24px color-mix(in srgb, var(--village-color, #6b8f71) 18%, transparent),
+    8px 10px 0 var(--mb-pop, #ffc857),
+    -5px 6px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 70%, transparent);
+  transform: rotate(-1.6deg);
 }
 .mb-scene-hero::before {
   content: "";
   position: absolute;
-  top: -0.55rem;
-  left: 18%;
-  width: 0.95rem;
-  height: 0.95rem;
+  top: -0.65rem;
+  left: 14%;
+  width: 1.1rem;
+  height: 1.1rem;
   border-radius: 50%;
   background:
     radial-gradient(circle at 35% 30%, #fff3b0, var(--mb-pin, #e23d5b) 55%, #7a1e3a);
   box-shadow:
     0 2px 4px rgba(40, 28, 18, 0.35),
-    12rem 0.2rem 0 -0.12rem var(--mb-pin-alt, #3d8fd4),
-    22rem 0.05rem 0 -0.18rem var(--mb-pop, #ffc857);
+    10rem 0.25rem 0 -0.08rem var(--mb-pin-alt, #3d8fd4),
+    19rem 0.05rem 0 -0.15rem var(--mb-pop, #ffc857),
+    27rem 0.2rem 0 -0.2rem var(--mb-pop-2, #7ad7c7);
 }
 .mb-scene-hero::after {
   content: "";
   position: absolute;
-  right: -0.55rem;
-  bottom: 18%;
-  width: 1.4rem;
-  height: 1.4rem;
-  background: var(--mb-pop-2, #7ad7c7);
-  border-radius: 40% 60% 55% 45% / 55% 40% 60% 45%;
-  transform: rotate(18deg);
-  box-shadow: -0.35rem 0.2rem 0 color-mix(in srgb, var(--mb-pop, #ffc857) 80%, transparent);
-  opacity: 0.9;
+  left: 18%;
+  right: 18%;
+  bottom: 0.35rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--mb-pin, #e23d5b),
+    var(--mb-pop, #ffc857),
+    var(--mb-pop-2, #7ad7c7),
+    var(--mb-pin-alt, #3d8fd4)
+  );
+  opacity: 0.85;
 }
 .mb-scene-kicker {
   margin: 0;
@@ -11433,24 +11486,26 @@ button.mh-card-cover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-family: var(--font-stamp, inherit);
-  color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 70%, #000);
+  color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 75%, #000);
 }
 .mb-scene-title {
   margin: 0.25rem 0 0.2rem;
   font-family: var(--font-display, inherit);
-  font-size: clamp(1.7rem, 4vw, 2.35rem);
+  font-size: clamp(1.85rem, 4.2vw, 2.55rem);
   color: #000000;
   letter-spacing: -0.01em;
-  text-shadow: 2px 2px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent);
+  text-shadow:
+    3px 3px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 70%, transparent),
+    -1px 2px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 .mb-scene-sub {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   color: #000000;
   font-family: var(--font-letter, inherit);
 }
 .mb-scene-hint {
-  margin: 0.45rem 0 0;
+  margin: 0.55rem 0 0.35rem;
   font-size: 0.92rem;
   color: #1a1a1a;
 }
