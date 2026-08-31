@@ -13,7 +13,6 @@ import {
   journalEntries,
   type SceneObject,
 } from "@/lib/meetingBenchScene";
-import type { GardenSeason } from "@/lib/gardenContent";
 
 export type MeetingBenchBoard = {
   season: string;
