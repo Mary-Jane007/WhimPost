@@ -267,6 +267,28 @@ export function villageIdForWorkshopHref(href: string | null | undefined): Villa
   return null;
 }
 
+/**
+ * Workshop hubs stay on their home villages for villagers.
+ * Only the site owner may enter (and edit) every workshop.
+ */
+export function canAccessVillageWorkshop(
+  user: {
+    isOwner: boolean;
+    homeVillageId?: string | null;
+    villageId?: string | null;
+  },
+  workshopVillageId: VillageId
+): boolean {
+  if (user.isOwner) return true;
+  const home = user.homeVillageId || user.villageId;
+  return home === workshopVillageId;
+}
+
+/** Stable order for owner nav: all five workshop hubs. */
+export const ALL_WORKSHOP_LINKS = (
+  Object.values(VILLAGE_WORKSHOPS) as Array<(typeof VILLAGE_WORKSHOPS)[VillageId]>
+).map((w) => ({ href: w.href, label: w.navLabel }));
+
 export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
   mushrooms: {
     emoji: "🍄",

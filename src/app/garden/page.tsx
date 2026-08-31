@@ -6,31 +6,32 @@ import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { BloomkeeperGarden } from "@/components/BloomkeeperGarden";
 import { VillageTasksBoard } from "@/components/VillageTasksBoard";
 import { PageCrest } from "@/components/PageCrest";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 export default async function GardenPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const homeVillageId = user.homeVillageId || user.villageId;
 
-  if (!homeVillageId) {
-    return (
-      <main className="app-main forest-panel">
-        <PageCrest
-          kinds={["clover-blossom", "clover-butterfly-small", "clover-bunny"]}
-        />
-        <header className="page-header">
-          <h1>The Bloomkeeper&apos;s Garden</h1>
-          <p>Join Clovermeadow first — every meadow needs a gentle heart.</p>
-        </header>
-        <p className="muted">
-          <Link href="/village">Visit the village square</Link> to find your
-          place among the clovers.
-        </p>
-      </main>
-    );
-  }
+  if (!canAccessVillageWorkshop(user, "clovermeadow")) {
+    if (!homeVillageId) {
+      return (
+        <main className="app-main forest-panel">
+          <PageCrest
+            kinds={["clover-blossom", "clover-butterfly-small", "clover-bunny"]}
+          />
+          <header className="page-header">
+            <h1>The Bloomkeeper&apos;s Garden</h1>
+            <p>Join Clovermeadow first — every meadow needs a gentle heart.</p>
+          </header>
+          <p className="muted">
+            <Link href="/village">Visit the village square</Link> to find your
+            place among the clovers.
+          </p>
+        </main>
+      );
+    }
 
-  if (homeVillageId !== "clovermeadow") {
     return (
       <main className="app-main forest-panel">
         <PageCrest

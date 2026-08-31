@@ -6,36 +6,37 @@ import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { MoonmereObservatory } from "@/components/MoonmereObservatory";
 import { VillageTasksBoard } from "@/components/VillageTasksBoard";
 import { PageCrest } from "@/components/PageCrest";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 export default async function ObservatoryPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const homeVillageId = user.homeVillageId || user.villageId;
 
-  if (!homeVillageId) {
-    return (
-      <main className="app-main forest-panel">
-        <PageCrest
-          kinds={["moon-crescent", "moon-full", "dragonfly"]}
-          villageStickers={[
-            { village: "moonmere", id: "luna-moth" },
-            { village: "moonmere", id: "moon-crescent" },
-            { village: "moonmere", id: "lantern-star" },
-          ]}
-        />
-        <header className="page-header">
-          <h1>The Observatory</h1>
-          <p>Join Moonmere first — every telescope needs a home village.</p>
-        </header>
-        <p className="muted">
-          <Link href="/village">Visit the village square</Link> to find your
-          place beneath the stars.
-        </p>
-      </main>
-    );
-  }
+  if (!canAccessVillageWorkshop(user, "moonmere")) {
+    if (!homeVillageId) {
+      return (
+        <main className="app-main forest-panel">
+          <PageCrest
+            kinds={["moon-crescent", "moon-full", "dragonfly"]}
+            villageStickers={[
+              { village: "moonmere", id: "luna-moth" },
+              { village: "moonmere", id: "moon-crescent" },
+              { village: "moonmere", id: "lantern-star" },
+            ]}
+          />
+          <header className="page-header">
+            <h1>The Observatory</h1>
+            <p>Join Moonmere first — every telescope needs a home village.</p>
+          </header>
+          <p className="muted">
+            <Link href="/village">Visit the village square</Link> to find your
+            place beneath the stars.
+          </p>
+        </main>
+      );
+    }
 
-  if (homeVillageId !== "moonmere") {
     return (
       <main className="app-main forest-panel">
         <PageCrest kinds={["moon-crescent", "moon-full", "dragonfly"]} />

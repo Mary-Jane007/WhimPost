@@ -290,7 +290,8 @@ export default async function VillagePage() {
         {(() => {
           const workshop = VILLAGE_WORKSHOPS[village.id];
           const isHomeHere = homeVillageId === village.id;
-          if (isHomeHere) {
+          const canEnter = isHomeHere || user.isOwner;
+          if (canEnter) {
             return (
               <p className="muted" style={{ marginTop: "0.85rem" }}>
                 <Link href={workshop.href} className="btn-primary">

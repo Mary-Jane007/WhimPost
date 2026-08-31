@@ -14,6 +14,7 @@ import {
   LIBRARY_TABS,
   type LibraryTabId,
 } from "@/lib/libraryContent";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 type Props = {
   searchParams?: Promise<{ tab?: string }>;
@@ -30,25 +31,25 @@ export default async function LibraryPage({ searchParams }: Props) {
   const homeVillageId = user.homeVillageId || user.villageId;
   const sp = (await searchParams) || {};
   const initialTab = parseTab(sp.tab);
-  if (!homeVillageId) {
-    return (
-      <main className="app-main forest-panel">
-        <PageCrest
-          kinds={["moss-books-stack", "leafy-branch", "moss-ink-bottle"]}
-        />
-        <header className="page-header">
-          <h1>The Grand Library</h1>
-          <p>Join Mosshollow first — every archive needs a quiet home.</p>
-        </header>
-        <p className="muted">
-          <Link href="/village">Visit the village square</Link> to find your
-          place among the moss and shelves.
-        </p>
-      </main>
-    );
-  }
+  if (!canAccessVillageWorkshop(user, "mosshollow")) {
+    if (!homeVillageId) {
+      return (
+        <main className="app-main forest-panel">
+          <PageCrest
+            kinds={["moss-books-stack", "leafy-branch", "moss-ink-bottle"]}
+          />
+          <header className="page-header">
+            <h1>The Grand Library</h1>
+            <p>Join Mosshollow first — every archive needs a quiet home.</p>
+          </header>
+          <p className="muted">
+            <Link href="/village">Visit the village square</Link> to find your
+            place among the moss and shelves.
+          </p>
+        </main>
+      );
+    }
 
-  if (homeVillageId !== "mosshollow") {
     return (
       <main className="app-main forest-panel">
         <PageCrest
