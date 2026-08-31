@@ -300,6 +300,12 @@ export default async function VillagePage() {
             </Link>
           </p>
         ) : null}
+        {village.id === "mosshollow" && homeVillageId !== "mosshollow" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            The Grand Library belongs to Mosshollow home villagers — it is not
+            moved to other villages.
+          </p>
+        ) : null}
         {village.id === "clovermeadow" && homeVillageId === "clovermeadow" ? (
           <p className="muted" style={{ marginTop: "0.85rem" }}>
             <Link href="/garden" className="btn-primary">
@@ -319,6 +325,12 @@ export default async function VillagePage() {
             <Link href="/observatory" className="btn-primary">
               Enter The Observatory
             </Link>
+          </p>
+        ) : null}
+        {village.id === "moonmere" && homeVillageId !== "moonmere" ? (
+          <p className="muted" style={{ marginTop: "0.85rem" }}>
+            The Observatory belongs only to Moonmere — it stays with this
+            village and is never relocated.
           </p>
         ) : null}
       </section>
@@ -444,14 +456,17 @@ export default async function VillagePage() {
               initialVillageId={stats.villageId as VillageId}
             />
           </div>
-          <div style={{ marginTop: "0.75rem" }}>
-            <LibraryAdminEditor
-              clubBooks={listClubBooks()}
-              readingList={listReadingListBooks()}
-              daysUntilShuffle={getBookClubRotation().daysUntilShuffle}
-              returnTo="/village"
-            />
-          </div>
+          {/* Library tools stay in Mosshollow only — never on other village squares. */}
+          {village.id === "mosshollow" ? (
+            <div style={{ marginTop: "0.75rem" }}>
+              <LibraryAdminEditor
+                clubBooks={listClubBooks()}
+                readingList={listReadingListBooks()}
+                daysUntilShuffle={getBookClubRotation().daysUntilShuffle}
+                returnTo="/village"
+              />
+            </div>
+          ) : null}
         </>
       ) : null}
 

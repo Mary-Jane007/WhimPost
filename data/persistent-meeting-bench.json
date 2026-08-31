@@ -126,7 +126,7 @@
       "id": "b76ed79b-aaa7-45ef-a95b-c4e82f8bc35b",
       "kind": "gathering",
       "title": "Stargazing Night",
-      "body": "When the sky clears, Moonmere will leave the observatory lanterns low. Bring quiet eyes and warm layers — every village is welcome under the same stars.",
+      "body": "When the sky clears, Moonmere will leave the observatory lanterns low. Bring quiet eyes and warm layers — this night belongs to Moonmere's dome.",
       "status": "upcoming",
       "season": null,
       "starts_at": "2026-08-20T15:23:30.008Z",
@@ -140,7 +140,10 @@
       "meta_json": "{}",
       "created_at": "2026-08-14 15:23:30",
       "updated_at": "2026-08-14 15:23:30",
-      "created_by": null
+      "created_by": null,
+      "villages": [
+        "moonmere"
+      ]
     },
     {
       "id": "38cb138b-cbc6-4508-af0c-48503bc50c59",

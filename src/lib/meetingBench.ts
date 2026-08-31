@@ -170,44 +170,78 @@ export function ensureMeetingBenchSeeded(db: Database = getDb()) {
       n: number;
     }
   ).n;
-  if (count > 0) return;
-
-  const season = currentGardenSeason();
-  const now = Date.now();
-  const day = 24 * 60 * 60 * 1000;
-  const seeds = seedItems(season, now, day);
-  const insert = db.prepare(
-    `INSERT INTO meeting_bench_items
-      (id, kind, title, body, status, season, starts_at, ends_at, activity_type,
-       villages_json, cta_label, cta_href, pinned, sort_order, meta_json, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)`
-  );
-  const tx = db.transaction(() => {
-    for (const item of seeds) {
-      insert.run(
-        item.id,
-        item.kind,
-        item.title,
-        item.body,
-        item.status,
-        item.season,
-        item.startsAt,
-        item.endsAt,
-        item.activityType,
-        JSON.stringify(item.villages),
-        item.ctaLabel,
-        item.ctaHref,
-        item.pinned ? 1 : 0,
-        item.sortOrder,
-        JSON.stringify(item.meta)
-      );
+  if (count === 0) {
+    const season = currentGardenSeason();
+    const now = Date.now();
+    const day = 24 * 60 * 60 * 1000;
+    const seeds = seedItems(season, now, day);
+    const insert = db.prepare(
+      `INSERT INTO meeting_bench_items
+        (id, kind, title, body, status, season, starts_at, ends_at, activity_type,
+         villages_json, cta_label, cta_href, pinned, sort_order, meta_json, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)`
+    );
+    const tx = db.transaction(() => {
+      for (const item of seeds) {
+        insert.run(
+          item.id,
+          item.kind,
+          item.title,
+          item.body,
+          item.status,
+          item.season,
+          item.startsAt,
+          item.endsAt,
+          item.activityType,
+          JSON.stringify(item.villages),
+          item.ctaLabel,
+          item.ctaHref,
+          item.pinned ? 1 : 0,
+          item.sortOrder,
+          JSON.stringify(item.meta)
+        );
+      }
+    });
+    tx();
+    try {
+      persistMeetingBenchCatalog(db);
+    } catch (err) {
+      console.error("[meeting-bench] seed persist failed:", err);
     }
-  });
-  tx();
-  try {
-    persistMeetingBenchCatalog(db);
-  } catch (err) {
-    console.error("[meeting-bench] seed persist failed:", err);
+  }
+
+  // Keep village workshops local: Observatory CTAs must stay Moonmere-only.
+  const observatoryLeaks = db
+    .prepare(
+      `SELECT id, villages_json FROM meeting_bench_items
+       WHERE cta_href = '/observatory' OR title = 'Stargazing Night'`
+    )
+    .all() as Array<{ id: string; villages_json: string }>;
+  let repaired = false;
+  for (const row of observatoryLeaks) {
+    let villages: VillageId[] | "all" = "all";
+    try {
+      villages = JSON.parse(row.villages_json) as VillageId[] | "all";
+    } catch {
+      villages = "all";
+    }
+    const alreadyMoonmereOnly =
+      Array.isArray(villages) &&
+      villages.length === 1 &&
+      villages[0] === "moonmere";
+    if (!alreadyMoonmereOnly) {
+      db.prepare(
+        `UPDATE meeting_bench_items SET villages_json = ? WHERE id = ?`
+      ).run(JSON.stringify(["moonmere"]), row.id);
+      repaired = true;
+    }
+  }
+  if (repaired) {
+    try {
+      persistMeetingBenchCatalog(db);
+    } catch (err) {
+      console.error("[meeting-bench] observatory locality persist failed:", err);
+    }
   }
 }
 
@@ -329,13 +363,13 @@ function seedItems(season: GardenSeason, now: number, day: number) {
       id: randomUUID(),
       kind: "gathering" as const,
       title: "Stargazing Night",
-      body: "When the sky clears, Moonmere will leave the observatory lanterns low. Bring quiet eyes and warm layers — every village is welcome under the same stars.",
+      body: "When the sky clears, Moonmere will leave the observatory lanterns low. Bring quiet eyes and warm layers — this night belongs to Moonmere's dome.",
       status: "upcoming" as const,
       season: null,
       startsAt: new Date(now + 6 * day).toISOString(),
       endsAt: new Date(now + 6 * day + 2 * 60 * 60 * 1000).toISOString(),
       activityType: "stargazing",
-      villages: "all" as const,
+      villages: ["moonmere"] as VillageId[],
       ctaLabel: "Save my seat",
       ctaHref: "/observatory",
       pinned: false,

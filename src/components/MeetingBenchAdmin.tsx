@@ -127,14 +127,10 @@ function buildMetaFromTasks(
   return meta;
 }
 
+/** Shared places only — village workshops stay on their own villages. */
 const QUICK_LINKS = [
   { label: "Village", href: "/village" },
   { label: "TV Corner", href: "/tv-corner" },
-  { label: "Garden", href: "/garden" },
-  { label: "Library", href: "/library" },
-  { label: "Workshop", href: "/workshop" },
-  { label: "Fireside", href: "/fireside" },
-  { label: "Observatory", href: "/observatory" },
   { label: "Meeting Bench", href: "/meeting-bench" },
 ];
 
