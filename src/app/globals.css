@@ -10861,108 +10861,72 @@ button.mh-card-cover {
 .meeting-bench-page {
   --mb-ink: #000000;
   --mb-muted: #1a1a1a;
-  --mb-wood: color-mix(in srgb, var(--village-color, #6b4a2e) 55%, #5a3a22);
-  --mb-wood-light: color-mix(in srgb, var(--village-soft, #8a6340) 70%, #a07850);
-  --mb-paper: color-mix(in srgb, var(--village-soft, #6b8f71) 22%, #ffffff);
-  --mb-moss: color-mix(in srgb, var(--village-color, #4f6b4a) 65%, #3d5a40);
-  --mb-pin: #e23d5b;
-  --mb-pin-alt: #3d8fd4;
-  --mb-pop: #ffc857;
-  --mb-pop-2: #7ad7c7;
-  --mb-glow: color-mix(in srgb, var(--village-soft, #6b8f71) 45%, transparent);
-  --mb-scene-top: color-mix(in srgb, var(--village-soft, #6b8f71) 34%, #ffffff);
-  --mb-scene-mid: color-mix(in srgb, var(--village-soft, #6b8f71) 18%, #ffffff);
-  --mb-scene-bot: color-mix(in srgb, var(--village-color, #6b8f71) 14%, #f7f3ea);
+  /* Decorative colors derive only from village theme */
+  --mb-accent: var(--village-color, #6b8f71);
+  --mb-soft: var(--village-soft, #6b8f71);
+  --mb-wood: color-mix(in srgb, var(--village-color, #6b4a2e) 62%, #4a3420);
+  --mb-wood-light: color-mix(in srgb, var(--village-soft, #8a6340) 55%, #c4a06a);
+  --mb-paper: color-mix(in srgb, var(--village-soft, #6b8f71) 14%, #fffdf8);
+  --mb-pin: color-mix(in srgb, var(--village-color, #6b8f71) 50%, #7a3030);
+  --mb-wash: color-mix(in srgb, var(--village-soft, #6b8f71) 26%, transparent);
+  --mb-glow: color-mix(in srgb, var(--village-soft, #6b8f71) 30%, transparent);
+  --mb-scene-top: color-mix(in srgb, var(--village-soft, #6b8f71) 20%, #ffffff);
+  --mb-scene-mid: color-mix(in srgb, var(--village-soft, #6b8f71) 10%, #ffffff);
+  --mb-scene-bot: color-mix(in srgb, var(--village-soft, #6b8f71) 24%, #f3efe7);
   --mb-photo-filter: none;
-  --mb-photo-warmth: transparent;
+  --mb-photo-warmth: color-mix(in srgb, var(--village-color, #6b8f71) 10%, transparent);
   --mb-season-tint: transparent;
   --mb-light-text: #f5f0e6;
   --mb-dark-text: #000000;
-  --mb-dot: color-mix(in srgb, var(--mb-pop, #ffc857) 70%, var(--village-color, #6b8f71));
   color: var(--mb-light-text);
 }
 
-/* Per-village Meeting Bench atmospheres — brighter, playful */
+/* Per-village atmospheres — theme washes only */
 .meeting-bench-page.village-bramblewood {
   --village-color: #e07020;
   --village-soft: #f0a868;
-  --mb-accent: #ff6b2c;
-  --mb-pop: #ffd166;
-  --mb-pop-2: #ff8fab;
-  --mb-pin: #e23d5b;
-  --mb-pin-alt: #2bb673;
-  --mb-wash: rgba(255, 140, 60, 0.22);
-  --mb-scene-top: #fff4e0;
-  --mb-scene-mid: #ffe0b8;
-  --mb-scene-bot: #ffc48a;
-  --mb-photo-filter: saturate(1.18) contrast(1.05) sepia(0.08);
-  --mb-photo-warmth: rgba(255, 120, 40, 0.16);
+  --mb-scene-top: #fff6ec;
+  --mb-scene-mid: #ffe9d4;
+  --mb-scene-bot: #f5d4b0;
+  --mb-photo-filter: saturate(1.06) contrast(1.03) sepia(0.08);
 }
 .meeting-bench-page.village-mosshollow {
   --village-color: #1a3d2e;
-  --village-soft: #7fb38a;
-  --mb-accent: #3f9b62;
-  --mb-pop: #c5e063;
-  --mb-pop-2: #8fd3c8;
-  --mb-pin: #e07a3d;
-  --mb-pin-alt: #4c8fe0;
-  --mb-wash: rgba(127, 179, 138, 0.28);
-  --mb-scene-top: #f0f8ee;
-  --mb-scene-mid: #d9efd8;
-  --mb-scene-bot: #b5dcb8;
-  --mb-photo-filter: saturate(1.05) hue-rotate(-6deg) contrast(1.03);
-  --mb-photo-warmth: rgba(63, 155, 98, 0.12);
+  --village-soft: #6b8f71;
+  --mb-scene-top: #f2f6f1;
+  --mb-scene-mid: #e4eee5;
+  --mb-scene-bot: #cfdccf;
+  --mb-photo-filter: saturate(0.96) hue-rotate(-6deg) contrast(1.02);
 }
 .meeting-bench-page.village-clovermeadow {
   --village-color: #d4849a;
-  --village-soft: #f7c6d4;
-  --mb-accent: #ff6f91;
-  --mb-pop: #ffe066;
-  --mb-pop-2: #b8f2e6;
-  --mb-pin: #ff5c8a;
-  --mb-pin-alt: #7ec8e3;
-  --mb-wash: rgba(255, 150, 180, 0.32);
-  --mb-scene-top: #fff7fb;
-  --mb-scene-mid: #ffe3ee;
-  --mb-scene-bot: #ffc2d4;
-  --mb-photo-filter: saturate(1.14) brightness(1.04);
-  --mb-photo-warmth: rgba(255, 111, 145, 0.16);
+  --village-soft: #f2c4d0;
+  --mb-scene-top: #fff7f9;
+  --mb-scene-mid: #ffeef3;
+  --mb-scene-bot: #f6d8e2;
+  --mb-photo-filter: saturate(1.05) brightness(1.02);
 }
 .meeting-bench-page.village-moonmere {
   --village-color: #2a3548;
-  --village-soft: #9bb0c9;
-  --mb-accent: #3db8e8;
-  --mb-pop: #ffd166;
-  --mb-pop-2: #5eead4;
-  --mb-pin: #ff6b9d;
-  --mb-pin-alt: #3db8e8;
-  --mb-wash: rgba(61, 184, 232, 0.28);
-  --mb-scene-top: #e8f8ff;
-  --mb-scene-mid: #c8ecfb;
-  --mb-scene-bot: #9ad6f2;
-  --mb-photo-filter: saturate(1.08) brightness(1.02) hue-rotate(6deg);
-  --mb-photo-warmth: rgba(61, 184, 232, 0.16);
+  --village-soft: #8a9b88;
+  --mb-scene-top: #eef2f4;
+  --mb-scene-mid: #e2e8ec;
+  --mb-scene-bot: #c9d3d8;
+  --mb-photo-filter: saturate(0.9) brightness(0.98) hue-rotate(8deg);
 }
 .meeting-bench-page.village-hearthwick {
   --village-color: #8b5a2b;
-  --village-soft: #ecc79a;
-  --mb-accent: #e89b3c;
-  --mb-pop: #ffb347;
-  --mb-pop-2: #f08080;
-  --mb-pin: #e25b3a;
-  --mb-pin-alt: #5aa9e6;
-  --mb-wash: rgba(255, 179, 71, 0.28);
-  --mb-scene-top: #fff8ec;
-  --mb-scene-mid: #ffe4bc;
-  --mb-scene-bot: #f5c98a;
-  --mb-photo-filter: saturate(1.12) contrast(1.04) sepia(0.06);
-  --mb-photo-warmth: rgba(232, 155, 60, 0.14);
+  --village-soft: #e2c39a;
+  --mb-scene-top: #fff8ef;
+  --mb-scene-mid: #f7ead6;
+  --mb-scene-bot: #e8d0b0;
+  --mb-photo-filter: saturate(1.05) contrast(1.02) sepia(0.06);
 }
 
-.meeting-bench-page.season-spring { --mb-season-tint: rgba(160, 230, 170, 0.2); }
-.meeting-bench-page.season-summer { --mb-season-tint: rgba(255, 210, 100, 0.18); }
-.meeting-bench-page.season-autumn { --mb-season-tint: rgba(255, 150, 80, 0.16); }
-.meeting-bench-page.season-winter { --mb-season-tint: rgba(160, 200, 240, 0.18); }
+.meeting-bench-page.season-spring { --mb-season-tint: color-mix(in srgb, var(--village-soft) 16%, transparent); }
+.meeting-bench-page.season-summer { --mb-season-tint: color-mix(in srgb, var(--village-soft) 14%, transparent); }
+.meeting-bench-page.season-autumn { --mb-season-tint: color-mix(in srgb, var(--village-color) 10%, transparent); }
+.meeting-bench-page.season-winter { --mb-season-tint: color-mix(in srgb, var(--village-soft) 12%, transparent); }
 
 .meeting-bench-kicker {
   letter-spacing: 0.08em;
@@ -10988,13 +10952,10 @@ button.mh-card-cover {
 .mb-owner-banner {
   margin-top: 0.85rem;
   padding: 0.75rem 1rem;
-  border: 2.5px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 50%, transparent);
-  border-radius: 1.4rem 0.8rem 1.6rem 1rem / 1rem 1.5rem 0.8rem 1.35rem;
-  background:
-    radial-gradient(circle at 8% 30%, color-mix(in srgb, var(--mb-pop, #ffc857) 40%, transparent), transparent 40%),
-    color-mix(in srgb, var(--village-soft, #6b8f71) 26%, #ffffff);
+  border: 2px dashed color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
+  border-radius: 1.3rem 0.75rem 1.5rem 0.95rem / 0.95rem 1.4rem 0.75rem 1.25rem;
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 22%, #ffffff);
   color: #000000;
-  box-shadow: 4px 5px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 40%, transparent);
 }
 .mb-owner-banner a { color: #000000; font-weight: 600; text-decoration: underline; }
 
@@ -11197,110 +11158,73 @@ button.mh-card-cover {
   display: none !important;
 }
 
+
 .mb-scene-stage {
   position: relative;
   overflow: hidden;
-  border-radius: 3rem 1.4rem 3.4rem 1.8rem / 1.8rem 3.2rem 1.4rem 3rem;
-  border: 4px solid transparent;
+  border-radius: 2rem 1.15rem 2.4rem 1.4rem / 1.5rem 2.2rem 1.2rem 2rem;
+  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
   background:
-    /* confetti dots */
-    radial-gradient(circle at 8% 12%, var(--mb-pop, #ffc857) 0 0.65rem, transparent 0.7rem),
-    radial-gradient(circle at 22% 8%, var(--mb-pin, #e23d5b) 0 0.4rem, transparent 0.45rem),
-    radial-gradient(circle at 78% 10%, var(--mb-pop-2, #7ad7c7) 0 0.55rem, transparent 0.6rem),
-    radial-gradient(circle at 92% 16%, var(--mb-pin-alt, #3d8fd4) 0 0.45rem, transparent 0.5rem),
-    radial-gradient(circle at 12% 88%, var(--mb-pin-alt, #3d8fd4) 0 0.5rem, transparent 0.55rem),
-    radial-gradient(circle at 88% 86%, var(--mb-pop, #ffc857) 0 0.6rem, transparent 0.65rem),
-    radial-gradient(circle at 48% 94%, var(--mb-pin, #e23d5b) 0 0.35rem, transparent 0.4rem),
     radial-gradient(ellipse at 50% 0%, var(--mb-wash, transparent), transparent 55%),
     radial-gradient(ellipse at 82% 12%, var(--mb-season-tint, transparent), transparent 42%),
     linear-gradient(165deg,
       var(--mb-scene-top) 0%,
       var(--mb-scene-mid) 48%,
       var(--mb-scene-bot) 100%);
-  padding: 1.1rem 1rem 1.35rem;
-  box-shadow:
-    0 0 0 4px color-mix(in srgb, var(--mb-accent, #ff6b2c) 70%, #fff),
-    0 0 0 8px color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent),
-    0 24px 48px color-mix(in srgb, var(--village-color, #6b8f71) 24%, transparent),
-    inset 0 0 0 7px color-mix(in srgb, #fff 60%, transparent);
+  padding: 1rem 0.9rem 1.25rem;
+  box-shadow: 0 18px 36px color-mix(in srgb, var(--village-color, #6b8f71) 14%, transparent);
 }
 
 .mb-board-frame {
   position: relative;
   margin: 0 auto;
   max-width: 58rem;
-  padding: 1.35rem 1.15rem 1.55rem;
-  border-radius: 2.4rem 3.2rem 1.8rem 2.8rem / 2.8rem 1.8rem 3.2rem 2rem;
+  padding: 1.2rem 1.05rem 1.4rem;
+  border-radius: 1.7rem 2.3rem 1.35rem 2rem / 2rem 1.35rem 2.4rem 1.5rem;
   background:
-    /* big playful color blobs in the board paper */
-    radial-gradient(circle at 10% 14%, color-mix(in srgb, var(--mb-pop, #ffc857) 72%, transparent) 0 2rem, transparent 2.1rem),
-    radial-gradient(circle at 90% 18%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 68%, transparent) 0 1.7rem, transparent 1.8rem),
-    radial-gradient(circle at 78% 82%, color-mix(in srgb, var(--mb-pin, #e23d5b) 48%, transparent) 0 1.9rem, transparent 2rem),
-    radial-gradient(circle at 16% 78%, color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 48%, transparent) 0 1.6rem, transparent 1.7rem),
-    radial-gradient(circle at 48% 8%, color-mix(in srgb, var(--mb-accent, #ff6b2c) 35%, transparent) 0 1.2rem, transparent 1.25rem),
-    /* wavy stripe pattern */
-    repeating-linear-gradient(
-      -12deg,
-      transparent,
-      transparent 9px,
-      color-mix(in srgb, var(--mb-accent, #ff6b2c) 14%, transparent) 9px,
-      color-mix(in srgb, var(--mb-accent, #ff6b2c) 14%, transparent) 12px
-    ),
-    repeating-linear-gradient(
-      78deg,
-      color-mix(in srgb, var(--mb-pop, #ffc857) 22%, #fff6e0) 0 5px,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 28%, #ffe8c0) 5px 11px
-    ),
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--village-soft, #6b8f71) 22%, transparent) 0 1.2rem, transparent 1.3rem),
+    radial-gradient(circle at 90% 24%, color-mix(in srgb, var(--village-soft, #6b8f71) 16%, transparent) 0 1rem, transparent 1.1rem),
     linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--village-soft, #6b8f71) 48%, #ffe9b8),
-      color-mix(in srgb, var(--mb-accent, #ff6b2c) 28%, #ffd089)
+      150deg,
+      color-mix(in srgb, var(--village-soft, #6b8f71) 22%, #f7ead2),
+      color-mix(in srgb, var(--village-color, #6b8f71) 10%, #e8d0a8)
     );
-  border: 4px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 65%, #fff);
+  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
   box-shadow:
-    inset 0 0 0 9px color-mix(in srgb, var(--mb-wood, #5a3a22) 40%, var(--mb-accent, #ff6b2c)),
-    inset 0 0 0 13px color-mix(in srgb, #fff 42%, var(--mb-pop, #ffc857)),
-    10px 14px 0 color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 35%, transparent),
-    0 20px 40px color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+    inset 0 0 0 8px color-mix(in srgb, var(--mb-wood, #5a3a22) 70%, #3d2818),
+    inset 0 0 0 11px color-mix(in srgb, var(--mb-wood-light, #a07850) 45%, #8a6238),
+    0 16px 32px color-mix(in srgb, var(--village-color, #6b8f71) 16%, transparent);
 }
 
 .mb-board-rail {
   position: absolute;
   background: linear-gradient(
     90deg,
-    var(--mb-accent, #ff6b2c),
-    var(--mb-pop, #ffc857),
-    var(--mb-pop-2, #7ad7c7),
-    var(--mb-pin-alt, #3d8fd4),
-    var(--mb-accent, #ff6b2c)
+    color-mix(in srgb, var(--mb-wood, #5a3a22) 88%, #2a1810),
+    color-mix(in srgb, var(--mb-wood-light, #a07850) 70%, #7a5230),
+    color-mix(in srgb, var(--mb-wood, #5a3a22) 88%, #2a1810)
   );
-  background-size: 220% 100%;
-  animation: mbRainbowSlide 10s linear infinite;
   pointer-events: none;
   z-index: 2;
   border-radius: 999px;
-  opacity: 0.9;
-}
-@keyframes mbRainbowSlide {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 220% 50%; }
+  opacity: 0.85;
 }
 .mb-board-rail-top,
 .mb-board-rail-bottom {
-  left: 0.7rem;
-  right: 0.7rem;
-  height: 0.42rem;
+  left: 0.65rem;
+  right: 0.65rem;
+  height: 0.4rem;
 }
-.mb-board-rail-top { top: 0.55rem; }
-.mb-board-rail-bottom { bottom: 0.55rem; }
+.mb-board-rail-top { top: 0.5rem; }
+.mb-board-rail-bottom { bottom: 0.5rem; }
 .mb-board-rail-left,
 .mb-board-rail-right {
-  top: 0.7rem;
-  bottom: 0.7rem;
-  width: 0.42rem;
+  top: 0.65rem;
+  bottom: 0.65rem;
+  width: 0.4rem;
 }
-.mb-board-rail-left { left: 0.55rem; }
-.mb-board-rail-right { right: 0.55rem; }
+.mb-board-rail-left { left: 0.5rem; }
+.mb-board-rail-right { right: 0.5rem; }
 
 .mb-play-blobs {
   position: absolute;
@@ -11311,74 +11235,38 @@ button.mh-card-cover {
 }
 .mb-play-blob {
   position: absolute;
-  opacity: 0.55;
-  filter: blur(0.2px);
-  animation: mbBlobDrift 8s ease-in-out infinite;
+  opacity: 0.18;
+  animation: mbBlobDrift 10s ease-in-out infinite;
 }
 .mb-play-blob.b1 {
-  width: 9rem;
-  height: 7rem;
-  left: -1.5rem;
-  top: 14%;
-  background: color-mix(in srgb, var(--mb-pop, #ffc857) 85%, transparent);
-  border-radius: 70% 30% 60% 40% / 40% 60% 40% 60%;
+  width: 7.5rem;
+  height: 5.8rem;
+  left: -1.2rem;
+  top: 16%;
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 70%, transparent);
+  border-radius: 65% 35% 58% 42% / 42% 58% 42% 58%;
 }
 .mb-play-blob.b2 {
-  width: 7rem;
-  height: 8rem;
-  right: -1.2rem;
-  top: 32%;
-  background: color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 80%, transparent);
-  animation-delay: 1.2s;
-  border-radius: 35% 65% 40% 60% / 60% 35% 65% 40%;
+  width: 6rem;
+  height: 7rem;
+  right: -1rem;
+  top: 34%;
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 55%, transparent);
+  animation-delay: 1.4s;
+  border-radius: 38% 62% 42% 58% / 58% 38% 62% 42%;
 }
 .mb-play-blob.b3 {
-  width: 8rem;
-  height: 5.5rem;
-  left: 30%;
-  bottom: 4%;
-  background: color-mix(in srgb, var(--mb-pin, #e23d5b) 55%, transparent);
-  animation-delay: 2s;
-  border-radius: 55% 45% 65% 35% / 35% 65% 35% 65%;
+  width: 6.5rem;
+  height: 4.8rem;
+  left: 32%;
+  bottom: 5%;
+  background: color-mix(in srgb, var(--village-color, #6b8f71) 22%, transparent);
+  animation-delay: 2.2s;
+  border-radius: 55% 45% 60% 40% / 40% 60% 40% 60%;
 }
-.mb-play-blob.b4 {
-  width: 4.5rem;
-  height: 4.5rem;
-  right: 18%;
-  bottom: 22%;
-  background: color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 70%, transparent);
-  animation-delay: 0.6s;
-  border-radius: 40% 60% 55% 45% / 55% 40% 60% 45%;
-}
-.mb-play-squiggle {
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  height: 14px;
-  bottom: 1.1rem;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 10px 7px, var(--mb-accent, #ff6b2c) 0 5px, transparent 6px) 0 0 / 28px 14px repeat-x,
-    radial-gradient(circle at 10px 7px, var(--mb-pop, #ffc857) 0 4px, transparent 5px) 14px 0 / 28px 14px repeat-x;
-  opacity: 0.85;
-}
-.mb-play-star {
-  position: absolute;
-  z-index: 2;
-  width: 1.35rem;
-  height: 1.35rem;
-  background: var(--mb-pop, #ffc857);
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  animation: mbSoftFloat 4.5s ease-in-out infinite;
-  pointer-events: none;
-}
-.mb-play-star.s1 { top: 12%; left: 6%; background: var(--mb-pop, #ffc857); }
-.mb-play-star.s2 { top: 20%; right: 7%; background: var(--mb-pin, #e23d5b); animation-delay: 0.8s; width: 1.1rem; height: 1.1rem; }
-.mb-play-star.s3 { bottom: 18%; left: 10%; background: var(--mb-pin-alt, #3d8fd4); animation-delay: 1.4s; width: 1rem; height: 1rem; }
 @keyframes mbBlobDrift {
   0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-  50% { transform: translate(12px, -14px) rotate(8deg) scale(1.08); }
+  50% { transform: translate(8px, -10px) rotate(5deg) scale(1.04); }
 }
 
 .mb-board-ambient {
@@ -11392,9 +11280,9 @@ button.mh-card-cover {
   position: absolute;
   width: clamp(2.4rem, 7vw, 3.4rem);
   height: auto;
-  filter: drop-shadow(0 4px 8px rgba(40, 28, 18, 0.22));
+  filter: drop-shadow(0 4px 8px rgba(40, 28, 18, 0.18));
   animation: mbAmbientFloat 7s ease-in-out infinite;
-  opacity: 0.94;
+  opacity: 0.92;
   --mb-amb-rot: 0deg;
 }
 .mb-ambient-sticker.a1 { left: 4%; top: 0.15rem; --mb-amb-rot: -8deg; }
@@ -11417,9 +11305,7 @@ button.mh-card-cover {
   .mb-object-sticker-wrap,
   .mb-jar-glow,
   .mb-reveal-sticker,
-  .mb-board-rail,
-  .mb-play-blob,
-  .mb-play-star {
+  .mb-play-blob {
     animation: none !important;
   }
   .mb-ambient-sticker {
@@ -11431,81 +11317,52 @@ button.mh-card-cover {
   position: relative;
   text-align: center;
   max-width: 36rem;
-  margin: 2.6rem auto 0.85rem;
+  margin: 2.5rem auto 0.85rem;
   z-index: 4;
-  padding: 0.85rem 1.1rem 1rem;
-  background:
-    radial-gradient(circle at 10% 18%, color-mix(in srgb, var(--mb-pop, #ffc857) 65%, transparent), transparent 42%),
-    radial-gradient(circle at 90% 78%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 55%, transparent), transparent 44%),
-    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--mb-pin, #e23d5b) 22%, transparent), transparent 45%),
-    #fffaf2;
-  border: 3.5px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 70%, transparent);
-  border-radius: 2rem 2.8rem 1.4rem 3.2rem / 2.6rem 1.4rem 3rem 1.6rem;
-  box-shadow:
-    0 12px 24px color-mix(in srgb, var(--village-color, #6b8f71) 18%, transparent),
-    8px 10px 0 var(--mb-pop, #ffc857),
-    -5px 6px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 70%, transparent);
-  transform: rotate(-1.6deg);
+  padding: 0.7rem 0.95rem 0.85rem;
+  background: color-mix(in srgb, #fffaf2 86%, var(--village-soft, #6b8f71));
+  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  border-radius: 1.5rem 2.1rem 1.15rem 2.4rem / 2rem 1.15rem 2.3rem 1.3rem;
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--village-color, #6b8f71) 12%, transparent);
+  transform: rotate(-0.8deg);
 }
 .mb-scene-hero::before {
   content: "";
   position: absolute;
-  top: -0.65rem;
-  left: 14%;
-  width: 1.1rem;
-  height: 1.1rem;
+  top: -0.4rem;
+  left: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+  transform: translateX(-50%);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 30%, #fff3b0, var(--mb-pin, #e23d5b) 55%, #7a1e3a);
-  box-shadow:
-    0 2px 4px rgba(40, 28, 18, 0.35),
-    10rem 0.25rem 0 -0.08rem var(--mb-pin-alt, #3d8fd4),
-    19rem 0.05rem 0 -0.15rem var(--mb-pop, #ffc857),
-    27rem 0.2rem 0 -0.2rem var(--mb-pop-2, #7ad7c7);
+    radial-gradient(circle at 35% 30%, #f2d6a0, var(--mb-pin, #8a3030) 55%, #5a1e1e);
+  box-shadow: 0 2px 4px rgba(40, 28, 18, 0.3);
 }
-.mb-scene-hero::after {
-  content: "";
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: 0.35rem;
-  height: 0.45rem;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--mb-pin, #e23d5b),
-    var(--mb-pop, #ffc857),
-    var(--mb-pop-2, #7ad7c7),
-    var(--mb-pin-alt, #3d8fd4)
-  );
-  opacity: 0.85;
-}
+.mb-scene-hero::after { content: none; }
 .mb-scene-kicker {
   margin: 0;
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-family: var(--font-stamp, inherit);
-  color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 75%, #000);
+  color: color-mix(in srgb, var(--village-color, #6b8f71) 55%, #1a1a1a);
 }
 .mb-scene-title {
   margin: 0.25rem 0 0.2rem;
   font-family: var(--font-display, inherit);
-  font-size: clamp(1.85rem, 4.2vw, 2.55rem);
+  font-size: clamp(1.7rem, 4vw, 2.35rem);
   color: #000000;
   letter-spacing: -0.01em;
-  text-shadow:
-    3px 3px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 70%, transparent),
-    -1px 2px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 .mb-scene-sub {
   margin: 0;
-  font-size: 1.08rem;
+  font-size: 1.05rem;
   color: #000000;
   font-family: var(--font-letter, inherit);
 }
 .mb-scene-hint {
-  margin: 0.55rem 0 0.35rem;
+  margin: 0.45rem 0 0;
   font-size: 0.92rem;
   color: #1a1a1a;
 }
@@ -11528,12 +11385,9 @@ button.mh-card-cover {
 .mb-bench-photo-wrap {
   position: relative;
   overflow: hidden;
-  border: 3px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, #fff);
-  border-radius: 1.8rem 1.1rem 2.2rem 1.4rem / 1.3rem 2rem 1.1rem 1.8rem;
-  box-shadow:
-    0 14px 28px color-mix(in srgb, var(--village-color, #6b8f71) 22%, transparent),
-    8px 10px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 55%, transparent),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 30%, transparent);
+  border-radius: 1.6rem 1.05rem 1.9rem 1.25rem / 1.2rem 1.75rem 1.05rem 1.6rem;
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--village-color, #6b8f71) 16%, transparent);
 }
 
 .mb-bench-photo {
@@ -11553,10 +11407,8 @@ button.mh-card-cover {
   pointer-events: none;
   background:
     linear-gradient(180deg, var(--mb-photo-warmth, transparent), transparent 42%),
-    linear-gradient(0deg, var(--mb-photo-warmth, transparent), transparent 28%),
-    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--mb-pop, #ffc857) 28%, transparent), transparent 28%),
-    radial-gradient(circle at 88% 78%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 24%, transparent), transparent 30%);
-  mix-blend-mode: soft-light;
+    linear-gradient(0deg, var(--mb-photo-warmth, transparent), transparent 28%);
+  mix-blend-mode: multiply;
 }
 
 .mb-bench-caption {
@@ -11592,93 +11444,64 @@ button.mh-card-cover {
   min-width: 4.2rem;
   z-index: 6;
   transform: rotate(var(--mb-pin-rot, 0deg));
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.45, 0.64, 1), filter 0.25s ease;
 }
 .mb-object:hover,
 .mb-object:focus-visible {
-  transform: rotate(var(--mb-pin-rot, 0deg)) translateY(-7px) scale(1.08);
+  transform: rotate(var(--mb-pin-rot, 0deg)) translateY(-6px) scale(1.06);
   outline: none;
-  filter: brightness(1.05);
   z-index: 7;
 }
 .mb-object:focus-visible .mb-object-sticker-wrap {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
 }
 .mb-object-pin {
-  width: 0.7rem;
-  height: 0.7rem;
+  width: 0.6rem;
+  height: 0.6rem;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 30%, #fff3b0, var(--mb-pin, #e23d5b) 58%, #7a1e3a);
-  box-shadow: 0 2px 3px rgba(40, 28, 18, 0.35);
+    radial-gradient(circle at 35% 30%, #f0d090, var(--mb-pin, #8a3030) 58%, #5a1e1e);
+  box-shadow: 0 2px 3px rgba(40, 28, 18, 0.3);
   margin-bottom: -0.15rem;
   z-index: 2;
-}
-.mb-object:nth-child(even) .mb-object-pin {
-  background:
-    radial-gradient(circle at 35% 30%, #e8f4ff, var(--mb-pin-alt, #3d8fd4) 58%, #1e4a7a);
-}
-.mb-object:nth-child(3n) .mb-object-pin {
-  background:
-    radial-gradient(circle at 35% 30%, #fff8d0, var(--mb-pop, #ffc857) 58%, #b07a10);
 }
 .mb-object-sticker-wrap {
   display: grid;
   place-items: center;
-  width: 3.6rem;
-  height: 3.6rem;
-  padding: 0.25rem;
-  background:
-    linear-gradient(145deg,
-      color-mix(in srgb, #fff 88%, var(--mb-pop, #ffc857)),
-      color-mix(in srgb, #fffaf2 80%, var(--village-soft, #6b8f71)));
-  border: 2px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 45%, transparent);
-  border-radius: 1.15rem 0.55rem 1.35rem 0.75rem / 0.85rem 1.25rem 0.55rem 1.1rem;
-  box-shadow:
-    0 8px 16px rgba(40, 28, 18, 0.14),
-    3px 4px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 55%, transparent);
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0.22rem;
+  background: color-mix(in srgb, #fffaf2 90%, var(--village-soft, #6b8f71));
+  border: 1.5px solid color-mix(in srgb, var(--village-color, #6b8f71) 24%, transparent);
+  border-radius: 1.05rem 0.5rem 1.2rem 0.7rem / 0.8rem 1.15rem 0.5rem 1rem;
+  box-shadow: 0 8px 16px rgba(40, 28, 18, 0.12);
   animation: mbSoftFloat 5.5s ease-in-out infinite;
 }
 .mb-object:nth-child(2n) .mb-object-sticker-wrap {
-  border-radius: 50% 45% 55% 50% / 50% 55% 45% 50%;
-  background:
-    linear-gradient(160deg,
-      color-mix(in srgb, #fff 90%, var(--mb-pop-2, #7ad7c7)),
-      color-mix(in srgb, #fff 75%, var(--village-soft, #6b8f71)));
-  box-shadow:
-    0 8px 16px rgba(40, 28, 18, 0.14),
-    3px 4px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent);
+  border-radius: 50% 46% 54% 50% / 50% 54% 46% 50%;
 }
 .mb-object:nth-child(3n) .mb-object-sticker-wrap {
-  border-radius: 0.45rem 1.4rem 0.55rem 1.5rem / 1.3rem 0.5rem 1.4rem 0.55rem;
-  box-shadow:
-    0 8px 16px rgba(40, 28, 18, 0.14),
-    3px 4px 0 color-mix(in srgb, var(--mb-pin, #e23d5b) 40%, transparent);
-}
-.mb-object:nth-child(4n) .mb-object-sticker-wrap {
-  border-radius: 1.5rem 1.5rem 0.45rem 0.45rem;
-  border-style: dashed;
+  border-radius: 0.45rem 1.25rem 0.5rem 1.35rem / 1.2rem 0.5rem 1.25rem 0.5rem;
 }
 .mb-object.featured .mb-object-sticker-wrap {
   box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent),
-    0 10px 18px rgba(40, 28, 18, 0.16),
-    4px 5px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 65%, transparent);
+    0 0 0 2px color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent),
+    0 10px 18px rgba(40, 28, 18, 0.14);
 }
 .mb-object-sticker {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 2px 3px rgba(40, 28, 18, 0.18));
+  filter: drop-shadow(0 2px 3px rgba(40, 28, 18, 0.16));
 }
 .mb-object-label {
   font-size: 0.7rem;
   line-height: 1.2;
   text-align: center;
-  background: color-mix(in srgb, #fff 88%, var(--mb-pop, #ffc857));
-  border: 1.5px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 35%, transparent);
-  border-radius: 0.85rem 1.2rem 0.7rem 1.1rem / 1rem 0.7rem 1.15rem 0.8rem;
-  padding: 0.2rem 0.4rem;
+  background: color-mix(in srgb, #fffaf2 90%, var(--village-soft, #6b8f71));
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 18%, transparent);
+  border-radius: 0.8rem 1.05rem 0.65rem 1rem / 0.9rem 0.65rem 1.05rem 0.75rem;
+  padding: 0.18rem 0.38rem;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -11686,7 +11509,6 @@ button.mh-card-cover {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   font-family: var(--font-stamp, inherit);
-  box-shadow: 2px 2px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 
 .mb-place-pin-tl { left: 3%; top: 8%; }
@@ -11708,30 +11530,26 @@ button.mh-card-cover {
 .mb-place-seat-mid:focus-visible,
 .mb-place-under:hover,
 .mb-place-under:focus-visible {
-  transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)) translateY(-5px) scale(1.05);
+  transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)) translateY(-6px) scale(1.06);
 }
 
 .mb-discovery-nudge {
   position: absolute;
   left: 50%;
   bottom: 3%;
-  transform: translateX(-50%) rotate(-2deg);
+  transform: translateX(-50%) rotate(-1deg);
   z-index: 6;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  border: 2px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
-  background:
-    linear-gradient(120deg,
-      color-mix(in srgb, #fff 85%, var(--mb-pop, #ffc857)),
-      color-mix(in srgb, #fff 80%, var(--mb-pop-2, #7ad7c7)));
+  border: 1.5px dashed color-mix(in srgb, var(--village-color, #6b8f71) 35%, transparent);
+  background: color-mix(in srgb, #fffaf2 90%, var(--village-soft, #6b8f71));
   color: #000000;
-  border-radius: 1.4rem 0.7rem 1.6rem 0.9rem / 0.9rem 1.5rem 0.7rem 1.3rem;
-  padding: 0.4rem 0.85rem;
+  border-radius: 1.2rem 0.65rem 1.4rem 0.8rem / 0.8rem 1.3rem 0.65rem 1.15rem;
+  padding: 0.35rem 0.75rem;
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
-  box-shadow: 3px 4px 0 color-mix(in srgb, var(--mb-pin, #e23d5b) 40%, transparent);
 }
 .mb-discovery-nudge.seen { opacity: 0.72; }
 .mb-discovery-sticker {
@@ -11775,19 +11593,15 @@ button.mh-card-cover {
   width: min(100%, 32rem);
   max-height: min(88vh, 40rem);
   overflow: auto;
-  border-radius: 1.8rem 1.1rem 2.2rem 1.3rem / 1.2rem 2rem 1.1rem 1.9rem;
-  border: 3px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
+  border-radius: 1.5rem 1rem 1.8rem 1.15rem / 1.1rem 1.7rem 1rem 1.6rem;
+  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 32%, transparent);
   background:
-    radial-gradient(circle at 12% 12%, color-mix(in srgb, var(--mb-pop, #ffc857) 35%, transparent), transparent 35%),
-    radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 30%, transparent), transparent 35%),
-    linear-gradient(180deg, color-mix(in srgb, var(--village-soft, #6b8f71) 18%, #fffaf2), #fffaf2);
+    linear-gradient(180deg, color-mix(in srgb, var(--village-soft, #6b8f71) 14%, #fffaf2), #fffaf2);
   color: #000000;
   padding: 1.15rem 1.2rem 1.3rem;
   position: relative;
-  box-shadow:
-    0 24px 48px rgba(20, 14, 10, 0.28),
-    8px 10px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent);
-  animation: mbRevealRise 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 24px 48px rgba(20, 14, 10, 0.28);
+  animation: mbRevealRise 0.28s cubic-bezier(0.34, 1.45, 0.64, 1);
 }
 @keyframes mbRevealRise {
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
@@ -11807,7 +11621,7 @@ button.mh-card-cover {
   width: 4.5rem;
   height: 4.5rem;
   object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(40, 28, 18, 0.2));
+  filter: drop-shadow(0 6px 10px rgba(40, 28, 18, 0.18));
   animation: mbSoftFloat 4s ease-in-out infinite;
 }
 .mb-reveal-kicker {
@@ -11816,7 +11630,7 @@ button.mh-card-cover {
   font-size: 0.78rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #1a1a1a;
+  color: color-mix(in srgb, var(--village-color, #6b8f71) 50%, #1a1a1a);
   font-family: var(--font-stamp, inherit);
 }
 .mb-reveal-panel h2 {
@@ -11844,6 +11658,7 @@ button.mh-card-cover {
   margin: 0.75rem 0 0;
   padding: 0.65rem 0.75rem;
   background: color-mix(in srgb, var(--village-soft, #6b8f71) 18%, #fff);
+  border-radius: 0.85rem;
 }
 .mb-reveal-tasks li { margin: 0.25rem 0; font-size: 0.9rem; }
 .mb-reveal-actions {
@@ -11860,18 +11675,12 @@ button.mh-card-cover {
   grid-template-columns: auto 1fr;
   gap: 1rem 1.25rem;
   align-items: start;
-  padding: 1.2rem 1.25rem;
-  border: 3px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 45%, transparent);
-  border-radius: 2.2rem 1.2rem 2.6rem 1.5rem / 1.5rem 2.4rem 1.2rem 2.2rem;
-  background:
-    radial-gradient(circle at 8% 20%, color-mix(in srgb, var(--mb-pop, #ffc857) 40%, transparent), transparent 32%),
-    radial-gradient(circle at 92% 78%, color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 35%, transparent), transparent 34%),
-    linear-gradient(135deg, color-mix(in srgb, var(--village-soft, #6b8f71) 24%, #fffaf2), #fffaf2);
+  padding: 1.15rem 1.2rem;
+  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
+  border-radius: 1.8rem 1.1rem 2.1rem 1.3rem / 1.3rem 2rem 1.1rem 1.8rem;
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 16%, #fffaf2);
   color: #000000;
-  box-shadow:
-    6px 8px 0 color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 35%, transparent),
-    0 14px 28px color-mix(in srgb, var(--village-color, #6b8f71) 14%, transparent);
-  transform: rotate(0.4deg);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--village-color, #6b8f71) 10%, transparent);
 }
 .mb-jar-visual {
   position: relative;
@@ -11886,14 +11695,13 @@ button.mh-card-cover {
   object-fit: contain;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 6px 10px rgba(40, 28, 18, 0.18));
-  transform: rotate(-6deg);
+  filter: drop-shadow(0 6px 10px rgba(40, 28, 18, 0.16));
 }
 .mb-jar-glow {
   position: absolute;
-  inset: 0.2rem;
-  border-radius: 55% 45% 50% 50% / 45% 55% 45% 55%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--mb-pop, #ffc857) 55%, transparent), transparent 70%);
+  inset: 0.35rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--village-soft, #6b8f71) 45%, transparent), transparent 70%);
   animation: mbSoftFloat 6s ease-in-out infinite;
 }
 .mb-jar-kicker {
@@ -11902,7 +11710,7 @@ button.mh-card-cover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-family: var(--font-stamp, inherit);
-  color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 65%, #000);
+  color: color-mix(in srgb, var(--village-color, #6b8f71) 50%, #1a1a1a);
 }
 .mb-question-jar h2 {
   margin: 0.2rem 0 0.35rem;
@@ -11917,9 +11725,8 @@ button.mh-card-cover {
 .mb-jar-saved {
   margin: 0 0 0.75rem;
   padding: 0.55rem 0.7rem;
-  background: color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 28%, #fff);
-  border-radius: 1rem 0.55rem 1.2rem 0.7rem / 0.7rem 1.1rem 0.55rem 1rem;
-  border: 1.5px dashed color-mix(in srgb, var(--mb-accent, #ff6b2c) 35%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 20%, #fff);
+  border-radius: 0.9rem 0.5rem 1.05rem 0.65rem / 0.65rem 1rem 0.5rem 0.9rem;
 }
 .mb-jar-options {
   list-style: none;
@@ -11932,45 +11739,39 @@ button.mh-card-cover {
   display: flex;
   gap: 0.55rem;
   align-items: flex-start;
-  padding: 0.55rem 0.7rem;
-  border: 2px solid transparent;
-  border-radius: 1.1rem 0.6rem 1.3rem 0.75rem / 0.75rem 1.2rem 0.6rem 1.1rem;
+  padding: 0.5rem 0.65rem;
+  border: 1.5px solid transparent;
+  border-radius: 0.95rem 0.55rem 1.1rem 0.65rem / 0.65rem 1.05rem 0.55rem 0.95rem;
   cursor: pointer;
   color: #000000;
-  background: color-mix(in srgb, #fff 70%, transparent);
+  background: color-mix(in srgb, #fff 72%, transparent);
 }
 .mb-jar-options label.on {
-  border-color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 50%, transparent);
-  background: color-mix(in srgb, var(--mb-pop, #ffc857) 28%, #fff);
-  box-shadow: 3px 3px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
+  border-color: color-mix(in srgb, var(--village-color, #6b8f71) 38%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 24%, #fff);
 }
 .mb-jar-status { margin: 0.55rem 0 0; font-size: 0.9rem; }
 
-/* Bench journal — playful ledger */
+/* Bench journal */
 .mb-journal {
-  padding: 1.15rem 1.2rem 1.3rem;
-  border: 3px solid color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 40%, transparent);
-  border-radius: 1.4rem 2.4rem 1.6rem 2.2rem / 2.2rem 1.3rem 2.4rem 1.5rem;
+  padding: 1.1rem 1.15rem 1.25rem;
+  border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 24%, transparent);
+  border-radius: 1.25rem 2rem 1.4rem 1.85rem / 1.85rem 1.2rem 2rem 1.35rem;
   background:
-    radial-gradient(circle at 90% 12%, color-mix(in srgb, var(--mb-pop, #ffc857) 35%, transparent), transparent 28%),
     repeating-linear-gradient(
       transparent,
       transparent 1.85rem,
-      color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 14%, transparent) 1.85rem,
-      color-mix(in srgb, var(--mb-pin-alt, #3d8fd4) 14%, transparent) 1.9rem
+      color-mix(in srgb, var(--village-color, #6b8f71) 8%, transparent) 1.85rem,
+      color-mix(in srgb, var(--village-color, #6b8f71) 8%, transparent) 1.9rem
     ),
-    linear-gradient(180deg, #fffaf2, color-mix(in srgb, var(--village-soft, #6b8f71) 16%, #fffaf2));
+    linear-gradient(180deg, #fffaf2, color-mix(in srgb, var(--village-soft, #6b8f71) 12%, #fffaf2));
   color: #000000;
-  box-shadow:
-    inset 6px 0 0 color-mix(in srgb, var(--mb-pin, #e23d5b) 65%, #8a3030),
-    6px 8px 0 color-mix(in srgb, var(--mb-pop, #ffc857) 45%, transparent);
-  transform: rotate(-0.5deg);
+  box-shadow: inset 5px 0 0 color-mix(in srgb, var(--mb-pin, #8a3030) 55%, #6a2828);
 }
 .mb-journal-head h2 {
   margin: 0 0 0.25rem;
   font-family: var(--font-display, inherit);
   color: #000000;
-  text-shadow: 2px 2px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 .mb-journal-head p {
   margin: 0;
@@ -12006,29 +11807,26 @@ button.mh-card-cover {
 .mb-journal-item.age-14 { opacity: 0.72; }
 .mb-journal-item > button:first-child {
   text-align: left;
-  border: 2px solid color-mix(in srgb, var(--mb-accent, #ff6b2c) 22%, transparent);
-  background: color-mix(in srgb, #ffffff 78%, var(--mb-pop, #ffc857));
+  border: 1.5px solid color-mix(in srgb, var(--village-color, #6b8f71) 18%, transparent);
+  background: color-mix(in srgb, #ffffff 78%, var(--village-soft, #6b8f71));
   color: #000000;
-  border-radius: 1.1rem 0.6rem 1.25rem 0.75rem / 0.75rem 1.15rem 0.6rem 1.05rem;
+  border-radius: 0.95rem 0.55rem 1.1rem 0.65rem / 0.65rem 1.05rem 0.55rem 0.95rem;
   padding: 0.65rem 0.75rem;
   cursor: pointer;
   font: inherit;
   display: grid;
   gap: 0.15rem;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .mb-journal-item > button:first-child:hover,
 .mb-journal-item > button:first-child:focus-visible {
-  border-color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, transparent);
+  border-color: color-mix(in srgb, var(--village-color, #6b8f71) 42%, transparent);
   outline: none;
-  transform: translateY(-2px) rotate(-0.5deg);
-  box-shadow: 3px 3px 0 color-mix(in srgb, var(--mb-pop-2, #7ad7c7) 45%, transparent);
 }
 .mb-journal-when {
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--mb-accent, #ff6b2c) 55%, #1a1a1a);
+  color: color-mix(in srgb, var(--village-color, #6b8f71) 45%, #1a1a1a);
   font-family: var(--font-stamp, inherit);
 }
 .mb-journal-type {
@@ -12037,6 +11835,33 @@ button.mh-card-cover {
 }
 .mb-journal-item strong { font-size: 0.98rem; }
 .mb-journal-edit { font-size: 0.85rem; }
+
+@media (max-width: 720px) {
+  .mb-scene-ground { min-height: auto; }
+  .mb-bench-photo { max-height: min(46vh, 22rem); }
+  .mb-scene-hero { margin-top: 3.1rem; }
+  .mb-place-pin-tl { left: 1%; top: 4%; }
+  .mb-place-pin-tr { right: 1%; top: 6%; }
+  .mb-place-pin-ml { left: 0; top: 38%; }
+  .mb-place-pin-mr { right: 0; top: 40%; }
+  .mb-place-pin-bl { left: 4%; bottom: 16%; }
+  .mb-place-pin-br { right: 4%; bottom: 14%; }
+  .mb-place-seat-left { left: 8%; bottom: 32%; }
+  .mb-place-seat-mid { bottom: 36%; }
+  .mb-place-seat-right { right: 8%; bottom: 32%; }
+  .mb-object { max-width: 6.2rem; }
+  .mb-object-sticker-wrap { width: 3rem; height: 3rem; }
+  .mb-question-jar {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .mb-jar-options label { text-align: left; }
+  .mb-journal-item {
+    grid-template-columns: 1fr;
+  }
+  .mb-ambient-sticker { width: 2.2rem; }
+}
 
 /* Village square teaser */
 .mb-teaser-list {

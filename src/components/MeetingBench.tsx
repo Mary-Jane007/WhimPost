@@ -128,11 +128,6 @@ export function MeetingBench({
             <span className="mb-play-blob b1" />
             <span className="mb-play-blob b2" />
             <span className="mb-play-blob b3" />
-            <span className="mb-play-blob b4" />
-            <span className="mb-play-star s1" />
-            <span className="mb-play-star s2" />
-            <span className="mb-play-star s3" />
-            <span className="mb-play-squiggle" />
           </div>
 
           <div className="mb-board-ambient" aria-hidden>
