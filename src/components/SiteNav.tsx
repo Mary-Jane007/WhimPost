@@ -4,11 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { UserPublic } from "@/lib/types";
 import type { NavBadges } from "@/lib/notifications";
-import {
-  ALL_WORKSHOP_LINKS,
-  VILLAGE_WORKSHOPS,
-  type VillageId,
-} from "@/lib/villages";
+import { VILLAGE_WORKSHOPS, type VillageId } from "@/lib/villages";
 
 function formatBadge(n: number) {
   if (n <= 0) return null;
@@ -46,16 +42,11 @@ export function SiteNav({
 }) {
   const pathname = usePathname();
 
-  // Villagers see only the workshop for the village they are standing in.
-  // The site owner sees every workshop hub (and alone may edit them).
+  // Each village has exactly one workshop. Nav must show only the workshop for
+  // the village you are standing in — never Library in Moonmere, etc.
   const currentVillageId = user?.villageId || user?.homeVillageId || null;
   const homeId = user?.homeVillageId || user?.villageId || null;
   const workshop = workshopForVillage(currentVillageId);
-  const workshopLinks = user?.isOwner
-    ? ALL_WORKSHOP_LINKS
-    : workshop
-      ? [{ href: workshop.href, label: workshop.navLabel }]
-      : [];
   const visiting =
     Boolean(user?.villageId && user?.homeVillageId) &&
     user!.villageId !== user!.homeVillageId;
@@ -66,7 +57,9 @@ export function SiteNav({
     badgeKey?: keyof NavBadges;
   }> = [
     { href: "/village", label: "Village", badgeKey: "unlocks" },
-    ...workshopLinks,
+    ...(workshop
+      ? [{ href: workshop.href, label: workshop.navLabel }]
+      : []),
     { href: "/tv-corner", label: "TV Corner" },
     { href: "/meeting-bench", label: "Meeting Bench" },
     ...(user?.isOwner

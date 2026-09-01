@@ -96,7 +96,7 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/mosshollow/mascot.png",
     color: "#1a3d2e",
     colorSoft: "#6b8f71",
-    building: "The Great Library",
+    building: "The Grand Library",
     buildingEmoji: "📚",
   },
   {
@@ -110,7 +110,7 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/clovermeadow/mascot.png",
     color: "#d4849a",
     colorSoft: "#f2c4d0",
-    building: "Community Garden",
+    building: "The Bloomkeeper's Garden",
     buildingEmoji: "🌻",
   },
   {
@@ -140,7 +140,7 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/bramblewood/mascot.png",
     color: "#e07020",
     colorSoft: "#f0a868",
-    building: "Explorer's Guild",
+    building: "The Woodland Workshop",
     buildingEmoji: "🗺️",
   },
   {
@@ -155,7 +155,7 @@ export const VILLAGES: VillageInfo[] = [
     mascotImage: "/villages/hearthwick/mascot.png",
     color: "#8b5a2b",
     colorSoft: "#e2c39a",
-    building: "The Hearth Hall",
+    building: "The Fireside",
     buildingEmoji: "🫖",
   },
 ];
@@ -211,8 +211,13 @@ export const SHARED_FEATURES: Array<{
 ];
 
 /**
- * Exclusive village workshops — never relocate these across villages.
- * Nav and square CTAs must follow the village you are currently standing in.
+ * Fixed exclusive workshops — one per village, never shown elsewhere:
+ *   Mosshollow → Library
+ *   Moonmere → Observatory
+ *   Clovermeadow → Garden
+ *   Bramblewood → Workshop
+ *   Hearthwick → Fireside
+ * Nav and square CTAs follow only the village you are currently standing in.
  */
 export const VILLAGE_WORKSHOPS: Record<
   VillageId,
@@ -268,8 +273,10 @@ export function villageIdForWorkshopHref(href: string | null | undefined): Villa
 }
 
 /**
- * Workshop hubs stay on their home villages for villagers.
- * Only the site owner may enter (and edit) every workshop.
+ * Workshop hubs are exclusive to their home villages.
+ * Villagers may only enter their home workshop.
+ * The site owner may enter (and edit) every workshop, but nav/chrome still
+ * show only the workshop for the village currently being visited.
  */
 export function canAccessVillageWorkshop(
   user: {
@@ -283,11 +290,6 @@ export function canAccessVillageWorkshop(
   const home = user.homeVillageId || user.villageId;
   return home === workshopVillageId;
 }
-
-/** Stable order for owner nav: all five workshop hubs. */
-export const ALL_WORKSHOP_LINKS = (
-  Object.values(VILLAGE_WORKSHOPS) as Array<(typeof VILLAGE_WORKSHOPS)[VillageId]>
-).map((w) => ({ href: w.href, label: w.navLabel }));
 
 export const COLLECTIBLE_META: Record<CollectibleKind, CollectibleMeta> = {
   mushrooms: {

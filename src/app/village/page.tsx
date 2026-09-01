@@ -258,53 +258,56 @@ export default async function VillagePage() {
       </div>
 
       <section className="village-panel">
-        <h2>
-          {village.buildingEmoji} {village.building}
-        </h2>
-        <p className="section-lead">Your village&apos;s special heart.</p>
-        <div className="village-features">
-          {SHARED_FEATURES.map((f) =>
-            f.href ? (
-              <Link key={f.name} href={f.href} className="feature-chip">
-                <span aria-hidden>{f.emoji}</span>
-                {f.name}
-              </Link>
-            ) : (
-              <div key={f.name} className="feature-chip">
-                <span aria-hidden>{f.emoji}</span>
-                {f.name}
-              </div>
-            )
-          )}
-        </div>
-        <div className="unlock-row">
-          {unlockLabels.map((label, i) => (
-            <span
-              key={label}
-              className={`unlock-pill ${unlock > i ? "unlocked" : ""}`}
-            >
-              {unlock > i ? "✦" : "·"} {label}
-            </span>
-          ))}
-        </div>
         {(() => {
           const workshop = VILLAGE_WORKSHOPS[village.id];
           const isHomeHere = homeVillageId === village.id;
           const canEnter = isHomeHere || user.isOwner;
-          if (canEnter) {
-            return (
-              <p className="muted" style={{ marginTop: "0.85rem" }}>
-                <Link href={workshop.href} className="btn-primary">
-                  {workshop.enterLabel}
-                </Link>
-              </p>
-            );
-          }
           return (
-            <p className="muted" style={{ marginTop: "0.85rem" }}>
-              {workshop.buildingName} belongs only to {village.name} — it stays
-              with this village and is never relocated.
-            </p>
+            <>
+              <h2>
+                {village.buildingEmoji} {workshop.buildingName}
+              </h2>
+              <p className="section-lead">
+                Exclusive to {village.name} — this is the only workshop here.
+              </p>
+              <div className="village-features">
+                {SHARED_FEATURES.map((f) =>
+                  f.href ? (
+                    <Link key={f.name} href={f.href} className="feature-chip">
+                      <span aria-hidden>{f.emoji}</span>
+                      {f.name}
+                    </Link>
+                  ) : (
+                    <div key={f.name} className="feature-chip">
+                      <span aria-hidden>{f.emoji}</span>
+                      {f.name}
+                    </div>
+                  )
+                )}
+              </div>
+              <div className="unlock-row">
+                {unlockLabels.map((label, i) => (
+                  <span
+                    key={label}
+                    className={`unlock-pill ${unlock > i ? "unlocked" : ""}`}
+                  >
+                    {unlock > i ? "✦" : "·"} {label}
+                  </span>
+                ))}
+              </div>
+              {canEnter ? (
+                <p className="muted" style={{ marginTop: "0.85rem" }}>
+                  <Link href={workshop.href} className="btn-primary">
+                    {workshop.enterLabel}
+                  </Link>
+                </p>
+              ) : (
+                <p className="muted" style={{ marginTop: "0.85rem" }}>
+                  {workshop.buildingName} belongs only to {village.name}. It
+                  does not appear in other villages and is never relocated.
+                </p>
+              )}
+            </>
           );
         })()}
       </section>
