@@ -447,8 +447,9 @@ export function LibraryBookReader({
           position,
         });
       }
-      setSaveHint("Place saved");
-      window.setTimeout(() => setSaveHint(""), 1200);
+      // Avoid mounting/unmounting header text on every save — that resized the
+      // stage and fed a ResizeObserver ↔ rendition.resize twitch loop.
+      setSaveHint((prev) => (prev === "Place saved" ? prev : "Place saved"));
     };
 
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
@@ -935,15 +936,16 @@ export function LibraryBookReader({
 
         expandChapterToFullHeight(mount);
 
+        // Ignore sub-chrome jitter (save hint, scrollbar gutter, overlays).
+        const SIZE_EPS = 24;
         let lastSize = measure();
         let resizeTimer: number | null = null;
         const doResize = () => {
           const size = measure();
           if (
-            Math.abs(size.width - lastSize.width) < 2 &&
-            Math.abs(size.height - lastSize.height) < 2
+            Math.abs(size.width - lastSize.width) < SIZE_EPS &&
+            Math.abs(size.height - lastSize.height) < SIZE_EPS
           ) {
-            expandChapterToFullHeight(mount);
             return;
           }
           lastSize = size;
@@ -996,9 +998,12 @@ export function LibraryBookReader({
         observer = new ResizeObserver(() => scheduleResize());
         observer.observe(mount);
 
+        let lastEmittedLabel = placeRef.current.label || "";
         rendition.on("relocated", (location: unknown) => {
           if (!host || host.dataset.reactToken !== token) return;
-          expandChapterToFullHeight(mount);
+          // scrolled-doc fires relocated while scrolling. Rewriting iframe
+          // height here was the continuous twitch — expand only on chapter
+          // render / explicit nav (see rendered + navRef above).
           const place = placeFromLocation(location, bookApiRef.current);
           if (!place.reliable) {
             place.percent = placeRef.current.percent;
@@ -1007,7 +1012,10 @@ export function LibraryBookReader({
             }
           }
           placeRef.current = place;
-          setLocationLabel(place.label);
+          if (place.label && place.label !== lastEmittedLabel) {
+            lastEmittedLabel = place.label;
+            setLocationLabel(place.label);
+          }
           void persistPlace(place);
         });
 
@@ -1154,11 +1162,13 @@ export function LibraryBookReader({
             <p className="mh-reader-kicker">Mosshollow reading room</p>
             <h2>{title}</h2>
             {author ? <p className="muted">by {author}</p> : null}
-            {saveHint ? (
-              <p className="mh-reader-saved" aria-live="polite">
-                ✦ {saveHint}
-              </p>
-            ) : null}
+            <p
+              className="mh-reader-saved"
+              aria-live="polite"
+              data-empty={saveHint ? undefined : "1"}
+            >
+              {saveHint ? `✦ ${saveHint}` : "\u00a0"}
+            </p>
           </div>
           <div className="mh-reader-header-actions">
             <span className="mh-reader-loc" aria-live="polite">

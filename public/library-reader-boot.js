@@ -316,12 +316,13 @@
     var lastW = width;
     var lastH = height;
     var resizeTimer = null;
+    var SIZE_EPS = 24;
     function resize() {
       var r = mount.getBoundingClientRect();
       var w = Math.max(280, Math.floor(r.width || mount.clientWidth || width));
       var h = Math.max(320, Math.floor(r.height || mount.clientHeight || height));
-      if (Math.abs(w - lastW) < 2 && Math.abs(h - lastH) < 2) {
-        expandChapter();
+      // Ignore tiny chrome jitter so resize does not fight scroll.
+      if (Math.abs(w - lastW) < SIZE_EPS && Math.abs(h - lastH) < SIZE_EPS) {
         return;
       }
       lastW = w;

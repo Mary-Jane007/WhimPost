@@ -7549,9 +7549,13 @@ button.mh-card-cover {
 
 .mh-reader-saved {
   margin: 0.2rem 0 0;
+  min-height: 1.1em;
   font-size: 0.78rem;
   color: #c9a227;
-  animation: mh-note-pop 0.55s ease;
+}
+
+.mh-reader-saved[data-empty] {
+  visibility: hidden;
 }
 
 .mh-reader-toolbar {
@@ -7678,6 +7682,7 @@ button.mh-card-cover {
   max-height: 100% !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
+  scrollbar-gutter: stable;
   -webkit-overflow-scrolling: touch;
 }
 
