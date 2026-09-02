@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-02T20:18:55.865Z",
+  "updatedAt": "2026-09-02T20:23:45.667Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -361,6 +361,16 @@
       "channelTitle": "Heartwick Exclusive",
       "villageId": "hearthwick",
       "isGlobal": false
+    },
+    {
+      "title": "Anne with an E",
+      "filename": "7e52dcf3-3c5d-4b8d-9918-27aec9cf7aff.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 2400008556,
+      "durationMs": 5279500,
+      "channelTitle": "The Storybook Cinema",
+      "villageId": null,
+      "isGlobal": true
     },
     {
       "title": "Bambi",
