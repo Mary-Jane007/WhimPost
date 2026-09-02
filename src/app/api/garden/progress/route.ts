@@ -8,16 +8,17 @@ import {
 } from "@/lib/garden";
 import { chronicleAfterActivity } from "@/lib/chronicle";
 import type { ChronicleActivityKey } from "@/lib/chronicleContent";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 async function requireGardenUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
 > {
   const user = await getCurrentUser();
   if (!user) return { error: jsonError("Not signed in", 401) };
-  if (user.villageId !== "clovermeadow") {
+  if (!canAccessVillageWorkshop(user, "clovermeadow")) {
     return {
       error: jsonError(
-        "The Bloomkeeper's Garden is only for Clovermeadow villagers",
+        "The Bloomkeeper's Garden is only for Clovermeadow villagers — visitors cannot participate",
         403
       ),
     };

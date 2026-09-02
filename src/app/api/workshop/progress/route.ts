@@ -14,16 +14,17 @@ import {
 } from "@/lib/workshop";
 import { chronicleAfterActivity } from "@/lib/chronicle";
 import type { ChronicleActivityKey } from "@/lib/chronicleContent";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 async function requireWorkshopUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
 > {
   const user = await getCurrentUser();
   if (!user) return { error: jsonError("Not signed in", 401) };
-  if (user.villageId !== "bramblewood") {
+  if (!canAccessVillageWorkshop(user, "bramblewood")) {
     return {
       error: jsonError(
-        "The Bramblewood Workshop is only for Bramblewood villagers",
+        "The Bramblewood Workshop is only for Bramblewood villagers — visitors cannot participate",
         403
       ),
     };

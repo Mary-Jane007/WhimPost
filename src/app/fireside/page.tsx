@@ -43,8 +43,9 @@ export default async function FiresidePage() {
         <header className="page-header">
           <h1>The Fireside</h1>
           <p>
-            This cottage is exclusive to Hearthwick. Join that village if you
-            wish to warm your hands by our fire.
+            This cottage is exclusive to Hearthwick villagers. Visitors cannot
+            participate — join that village if you wish to warm your hands by
+            our fire.
           </p>
         </header>
         <p className="muted">

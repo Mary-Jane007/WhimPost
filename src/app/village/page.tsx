@@ -268,7 +268,8 @@ export default async function VillagePage() {
                 {village.buildingEmoji} {workshop.buildingName}
               </h2>
               <p className="section-lead">
-                Exclusive to {village.name} — this is the only workshop here.
+                Exclusive to {village.name} villagers — visitors cannot
+                participate.
               </p>
               <div className="village-features">
                 {SHARED_FEATURES.map((f) =>
@@ -303,8 +304,8 @@ export default async function VillagePage() {
                 </p>
               ) : (
                 <p className="muted" style={{ marginTop: "0.85rem" }}>
-                  {workshop.buildingName} belongs only to {village.name}. It
-                  does not appear in other villages and is never relocated.
+                  {workshop.buildingName} is only for {village.name} villagers.
+                  Guests may visit the square, but cannot join this workshop.
                 </p>
               )}
             </>

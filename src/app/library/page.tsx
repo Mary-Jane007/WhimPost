@@ -58,8 +58,9 @@ export default async function LibraryPage({ searchParams }: Props) {
         <header className="page-header">
           <h1>The Grand Library</h1>
           <p>
-            This library is exclusive to Mosshollow. Settle among the owls if
-            you wish to become an Archivist.
+            This library is exclusive to Mosshollow villagers. Visitors from
+            other villages cannot participate — settle among the owls if you
+            wish to become an Archivist.
           </p>
         </header>
         <p className="muted">

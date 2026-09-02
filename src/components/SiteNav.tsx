@@ -4,7 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { UserPublic } from "@/lib/types";
 import type { NavBadges } from "@/lib/notifications";
-import { VILLAGE_WORKSHOPS, type VillageId } from "@/lib/villages";
+import {
+  canAccessVillageWorkshop,
+  VILLAGE_WORKSHOPS,
+  type VillageId,
+} from "@/lib/villages";
 
 function formatBadge(n: number) {
   if (n <= 0) return null;
@@ -42,11 +46,14 @@ export function SiteNav({
 }) {
   const pathname = usePathname();
 
-  // Each village has exactly one workshop. Nav must show only the workshop for
-  // the village you are standing in — never Library in Moonmere, etc.
+  // Workshop chrome stays on the village you are standing in, but only home
+  // villagers (and the owner) may open it — visitors never get a participate link.
   const currentVillageId = user?.villageId || user?.homeVillageId || null;
   const homeId = user?.homeVillageId || user?.villageId || null;
   const workshop = workshopForVillage(currentVillageId);
+  const canUseWorkshop =
+    Boolean(user && currentVillageId) &&
+    canAccessVillageWorkshop(user!, currentVillageId as VillageId);
   const visiting =
     Boolean(user?.villageId && user?.homeVillageId) &&
     user!.villageId !== user!.homeVillageId;
@@ -57,7 +64,7 @@ export function SiteNav({
     badgeKey?: keyof NavBadges;
   }> = [
     { href: "/village", label: "Village", badgeKey: "unlocks" },
-    ...(workshop
+    ...(workshop && canUseWorkshop
       ? [{ href: workshop.href, label: workshop.navLabel }]
       : []),
     { href: "/tv-corner", label: "TV Corner" },

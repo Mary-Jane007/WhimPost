@@ -8,16 +8,17 @@ import {
 } from "@/lib/moon";
 import { chronicleAfterActivity } from "@/lib/chronicle";
 import type { ChronicleActivityKey } from "@/lib/chronicleContent";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 async function requireMoonUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
 > {
   const user = await getCurrentUser();
   if (!user) return { error: jsonError("Not signed in", 401) };
-  if (user.villageId !== "moonmere") {
+  if (!canAccessVillageWorkshop(user, "moonmere")) {
     return {
       error: jsonError(
-        "The Observatory is only for Moonmere villagers",
+        "The Observatory is only for Moonmere villagers — visitors cannot participate",
         403
       ),
     };

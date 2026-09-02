@@ -13,16 +13,17 @@ import {
   redirectSameHost,
   wantsHtmlRedirect,
 } from "@/lib/requestBody";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 async function requireLibraryUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
 > {
   const user = await getCurrentUser();
   if (!user) return { error: jsonError("Not signed in", 401) };
-  if (user.villageId !== "mosshollow") {
+  if (!canAccessVillageWorkshop(user, "mosshollow")) {
     return {
       error: jsonError(
-        "The Grand Library is only for Mosshollow villagers",
+        "The Grand Library is only for Mosshollow villagers — visitors cannot participate",
         403
       ),
     };

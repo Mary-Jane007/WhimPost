@@ -7,16 +7,17 @@ import {
   listAnnotations,
   type AnnotationInk,
 } from "@/lib/libraryReading";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 export const runtime = "nodejs";
 
 async function requireLibraryUser() {
   const user = await getCurrentUser();
   if (!user) return { error: jsonError("Not signed in", 401) };
-  if (user.villageId !== "mosshollow") {
+  if (!canAccessVillageWorkshop(user, "mosshollow")) {
     return {
       error: jsonError(
-        "The Grand Library is only for Mosshollow villagers",
+        "The Grand Library is only for Mosshollow villagers — visitors cannot participate",
         403
       ),
     };

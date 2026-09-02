@@ -43,8 +43,9 @@ export default async function WorkshopPage() {
         <header className="page-header">
           <h1>The Woodland Workshop</h1>
           <p>
-            This atelier is exclusive to Bramblewood. Join that village if you
-            want a seat among the autumn crafts.
+            This atelier is exclusive to Bramblewood villagers. Visitors cannot
+            participate — join that village if you want a seat among the autumn
+            crafts.
           </p>
         </header>
         <p className="muted">

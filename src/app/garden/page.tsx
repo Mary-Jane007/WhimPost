@@ -40,8 +40,9 @@ export default async function GardenPage() {
         <header className="page-header">
           <h1>The Bloomkeeper&apos;s Garden</h1>
           <p>
-            This garden is exclusive to Clovermeadow. Settle among the wildflowers
-            if you wish to become a Bloomkeeper.
+            This garden is exclusive to Clovermeadow villagers. Visitors cannot
+            participate — settle among the wildflowers if you wish to become a
+            Bloomkeeper.
           </p>
         </header>
         <p className="muted">

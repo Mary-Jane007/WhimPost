@@ -9,6 +9,7 @@ import { ensureMediaReleaseAsset } from "@/lib/mediaRelease";
 import { ensureLibraryBookBytes } from "@/lib/persistentLibraryBooks";
 import { isLfsPointerFile } from "@/lib/lfsPointer";
 import { LibraryReadClient } from "@/components/LibraryReadClient";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 type Props = {
   params: Promise<{ bookId: string }>;
@@ -39,7 +40,7 @@ function ensureBookFileReady(fileUrl: string) {
 export default async function LibraryReadPage({ params }: Props) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.villageId !== "mosshollow") redirect("/library");
+  if (!canAccessVillageWorkshop(user, "mosshollow")) redirect("/library");
 
   // Heal any LFS stubs before we hand the reader a URL.
   try {

@@ -8,16 +8,17 @@ import {
 } from "@/lib/hearth";
 import { chronicleAfterActivity } from "@/lib/chronicle";
 import type { ChronicleActivityKey } from "@/lib/chronicleContent";
+import { canAccessVillageWorkshop } from "@/lib/villages";
 
 async function requireHearthUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
 > {
   const user = await getCurrentUser();
   if (!user) return { error: jsonError("Not signed in", 401) };
-  if (user.villageId !== "hearthwick") {
+  if (!canAccessVillageWorkshop(user, "hearthwick")) {
     return {
       error: jsonError(
-        "The Fireside is only for Hearthwick villagers",
+        "The Fireside is only for Hearthwick villagers — visitors cannot participate",
         403
       ),
     };

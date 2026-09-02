@@ -43,8 +43,9 @@ export default async function ObservatoryPage() {
         <header className="page-header">
           <h1>The Observatory</h1>
           <p>
-            This dome is exclusive to Moonmere. Join that village if you wish
-            to watch the night with us.
+            This dome is exclusive to Moonmere villagers. Visitors cannot
+            participate — join that village if you wish to watch the night with
+            us.
           </p>
         </header>
         <p className="muted">
