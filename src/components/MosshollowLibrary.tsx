@@ -34,6 +34,8 @@ import {
   XpCollectibleGiftBoard,
   formatGrantedCollectibles,
 } from "@/components/XpCollectibleGiftBoard";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import { LIBRARY_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import type { CollectibleKind } from "@/lib/villages";
 
@@ -170,6 +172,7 @@ export function MosshollowLibrary({
   async function postAction(action: Record<string, unknown>) {
     setBusy(true);
     setError(null);
+    const prevXp = progress.xp;
     try {
       const res = await fetch("/api/library/progress", {
         method: "POST",
@@ -178,7 +181,14 @@ export function MosshollowLibrary({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not update the library");
-      if (data.progress) setProgress(data.progress);
+      if (data.progress) {
+        setProgress(data.progress);
+        celebrateProgressGain({
+          prevXp,
+          nextXp: data.progress.xp,
+          grantedCollectibles: data.grantedCollectibles || [],
+        });
+      }
       const grantedCollectibles = (data.grantedCollectibles ||
         []) as CollectibleKind[];
       if (grantedCollectibles.length) {
@@ -268,6 +278,7 @@ export function MosshollowLibrary({
           claimedIds={progress.xpGiftsClaimed || []}
           lead="Reach XP milestones to gift Mosshollow collectibles"
         />
+        <XpAlmanacCard villageId="mosshollow" compact />
       </header>
 
       {error ? <p className="mh-error">{error}</p> : null}

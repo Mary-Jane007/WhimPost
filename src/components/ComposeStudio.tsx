@@ -29,6 +29,10 @@ import {
   type WaxSeal,
 } from "@/lib/types";
 import { getVillage } from "@/lib/villages";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { buildXpCelebration } from "@/lib/xpCelebrate";
+import { emitXpCelebration } from "@/lib/xpCelebrateClient";
+import type { CollectibleKind } from "@/lib/villages";
 
 function scatter(seed: number, index: number) {
   const n = seed * 17 + index * 41;
@@ -282,6 +286,20 @@ export function ComposeStudio({
       setError(data.error || "Could not send letter");
       return;
     }
+    const rewards = data.rewards as
+      | { reputationGained?: number; collectibles?: CollectibleKind[] }
+      | undefined;
+    if (rewards) {
+      emitXpCelebration(
+        buildXpCelebration({
+          reputation: rewards.reputationGained || 0,
+          collectibles: rewards.collectibles || [],
+          activityHint: "sending a letter from your writing desk",
+        })
+      );
+      // Brief pause so the celebration can be seen before navigation.
+      await new Promise((r) => window.setTimeout(r, 900));
+    }
     router.push(`/letter/${data.letter.id}`);
     router.refresh();
   }
@@ -303,6 +321,7 @@ export function ComposeStudio({
 
   return (
     <div className={`compose-studio ${composeThemeClass}`.trim()}>
+      <XpAlmanacCard villageId="letters" className="compose-xp-almanac" />
       <div className="compose-toolbar">
         <label className="recipient-pick">
           To

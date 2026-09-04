@@ -24,6 +24,8 @@ import {
 } from "@/lib/hearthContent";
 import { COLLECTIBLE_META, type CollectibleKind } from "@/lib/villages";
 import { OwnerImageAttach } from "@/components/OwnerImageAttach";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import {
   resolveVillageImage,
   villageMediaKey,
@@ -77,6 +79,7 @@ export function HearthwickFireside({
   async function postAction(action: Record<string, unknown>) {
     setBusy(true);
     setError(null);
+    const prevXp = progress.xp;
     try {
       const res = await fetch("/api/hearth/progress", {
         method: "POST",
@@ -86,6 +89,13 @@ export function HearthwickFireside({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not save");
       setProgress(data.progress);
+      if (data.progress) {
+        celebrateProgressGain({
+          prevXp,
+          nextXp: data.progress.xp || 0,
+          grantedCollectibles: data.grantedCollectibles || [],
+        });
+      }
       const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
       emitChronicleUnlock(data.chronicleUnlock);
       return {
@@ -175,6 +185,7 @@ export function HearthwickFireside({
           </span>
           <span>{Object.keys(progress.kindling).length} kindling notes</span>
         </div>
+        <XpAlmanacCard villageId="hearthwick" compact />
       </header>
 
       {error ? <p className="hw-error">{error}</p> : null}

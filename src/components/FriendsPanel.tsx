@@ -84,11 +84,23 @@ export function FriendsPanel({
   }
 
   async function respond(requestId: string, action: "accept" | "decline") {
-    await fetch("/api/friends/respond", {
+    const res = await fetch("/api/friends/respond", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ requestId, action }),
     });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && action === "accept" && data.rewards) {
+      const { buildXpCelebration } = await import("@/lib/xpCelebrate");
+      const { emitXpCelebration } = await import("@/lib/xpCelebrateClient");
+      emitXpCelebration(
+        buildXpCelebration({
+          reputation: data.rewards.reputationGained || 0,
+          collectibles: data.rewards.collectibles || [],
+          activityHint: "welcoming a new friend to the village",
+        })
+      );
+    }
     await refresh();
   }
 

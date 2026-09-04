@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { VillageId } from "@/lib/villages";
+import type { CollectibleKind, VillageId } from "@/lib/villages";
 import type { VillageHubId, VillageTaskView } from "@/lib/villageTasks";
+import { buildXpCelebration } from "@/lib/xpCelebrate";
+import { emitXpCelebration } from "@/lib/xpCelebrateClient";
 
 type Props = {
   villageId: VillageId;
@@ -54,6 +56,7 @@ export function VillageTasksBoard({ villageId, hub }: Props) {
       setError(data.error || "Could not complete task");
       return;
     }
+    const granted = (data.granted || []) as CollectibleKind[];
     const names = (data.task?.rewardMeta || [])
       .map((r: { emoji: string; name: string }) => `${r.emoji} ${r.name}`)
       .join(", ");
@@ -61,10 +64,17 @@ export function VillageTasksBoard({ villageId, hub }: Props) {
       names
         ? `Done! You earned ${names}${
             data.reputationGained
-              ? ` (+${data.reputationGained} reputation)`
+              ? ` (+${data.reputationGained} standing)`
               : ""
           }.`
         : "Task complete."
+    );
+    emitXpCelebration(
+      buildXpCelebration({
+        reputation: Number(data.reputationGained) || 0,
+        collectibles: granted,
+        activityHint: "finishing a village task",
+      })
     );
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, ...data.task } : t))
@@ -88,8 +98,8 @@ export function VillageTasksBoard({ villageId, hub }: Props) {
       <header className="vt-board-head">
         <h2>Village tasks</h2>
         <p className="vt-board-lead">
-          Owner quests for this hub — complete one to earn the listed
-          collectibles.
+          Soft quests from the village owner — finish one to earn the listed
+          collectibles and a little forest standing.
         </p>
       </header>
       {error ? <p className="form-error">{error}</p> : null}

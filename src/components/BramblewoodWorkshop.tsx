@@ -28,6 +28,8 @@ import {
   XpCollectibleGiftBoard,
   formatGrantedCollectibles,
 } from "@/components/XpCollectibleGiftBoard";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import { WORKSHOP_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import type { CollectibleKind } from "@/lib/villages";
 
@@ -128,6 +130,7 @@ export function BramblewoodWorkshop({
   async function postAction(body: Record<string, unknown>) {
     setBusy(true);
     setError(null);
+    const prevXp = progress.xp;
     try {
       const res = await fetch("/api/workshop/progress", {
         method: "POST",
@@ -137,6 +140,13 @@ export function BramblewoodWorkshop({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not save");
       setProgress(data.progress);
+      if (data.progress) {
+        celebrateProgressGain({
+          prevXp,
+          nextXp: data.progress.xp,
+          grantedCollectibles: data.grantedCollectibles || [],
+        });
+      }
       const grantedCollectibles = (data.grantedCollectibles ||
         []) as CollectibleKind[];
       const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
@@ -306,6 +316,7 @@ export function BramblewoodWorkshop({
             claimedIds={progress.xpGiftsClaimed || []}
             lead="Reach XP milestones to gift Bramblewood collectibles"
           />
+          <XpAlmanacCard villageId="bramblewood" compact />
           {progress.badges.length > 0 ? (
             <ul className="bw-badges">
               {progress.badges.slice(0, 8).map((b) => (

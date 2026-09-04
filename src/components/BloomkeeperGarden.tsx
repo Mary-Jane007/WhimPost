@@ -36,6 +36,8 @@ import {
   XpCollectibleGiftBoard,
   formatGrantedCollectibles,
 } from "@/components/XpCollectibleGiftBoard";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import { GARDEN_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import type { CollectibleKind } from "@/lib/villages";
 
@@ -111,6 +113,7 @@ export function BloomkeeperGarden({
   async function postAction(action: Record<string, unknown>) {
     setBusy(true);
     setError(null);
+    const prevXp = progress.xp;
     try {
       const res = await fetch("/api/garden/progress", {
         method: "POST",
@@ -122,6 +125,11 @@ export function BloomkeeperGarden({
       if (data.progress) {
         setProgress(data.progress);
         triggerBloom();
+        celebrateProgressGain({
+          prevXp,
+          nextXp: data.progress.xp,
+          grantedCollectibles: data.grantedCollectibles || [],
+        });
       }
       const grantedCollectibles = (data.grantedCollectibles ||
         []) as CollectibleKind[];
@@ -247,6 +255,7 @@ export function BloomkeeperGarden({
           claimedIds={progress.xpGiftsClaimed || []}
           lead="Reach XP milestones to gift Clovermeadow collectibles"
         />
+        <XpAlmanacCard villageId="clovermeadow" compact />
       </header>
 
       {error ? <p className="cm-error">{error}</p> : null}

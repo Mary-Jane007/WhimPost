@@ -41,6 +41,8 @@ import {
   XpCollectibleGiftBoard,
   formatGrantedCollectibles,
 } from "@/components/XpCollectibleGiftBoard";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import { MOON_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import type { CollectibleKind } from "@/lib/villages";
 
@@ -112,6 +114,7 @@ export function MoonmereObservatory({
   async function postAction(action: Record<string, unknown>) {
     setBusy(true);
     setError(null);
+    const prevXp = progress.xp;
     try {
       const res = await fetch("/api/moon/progress", {
         method: "POST",
@@ -121,6 +124,13 @@ export function MoonmereObservatory({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not save");
       setProgress(data.progress);
+      if (data.progress) {
+        celebrateProgressGain({
+          prevXp,
+          nextXp: data.progress.xp,
+          grantedCollectibles: data.grantedCollectibles || [],
+        });
+      }
       const grantedCollectibles = (data.grantedCollectibles ||
         []) as CollectibleKind[];
       if (grantedCollectibles.length) {
@@ -340,6 +350,7 @@ export function MoonmereObservatory({
           claimedIds={progress.xpGiftsClaimed || []}
           lead="Reach XP milestones to gift Moonmere collectibles"
         />
+        <XpAlmanacCard villageId="moonmere" compact />
       </header>
 
       {error ? <p className="mm-error">{error}</p> : null}
