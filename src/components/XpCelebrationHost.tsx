@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { COLLECTIBLE_META } from "@/lib/villages";
 import type { XpCelebrationDetail } from "@/lib/xpCelebrate";
+import {
+  celebrationSoundKind,
+  playXpCelebrationSound,
+} from "@/lib/xpCelebrationSound";
 
 type Toast = XpCelebrationDetail & { id: number };
 
 /**
  * Global cottagecore celebration toasts whenever a villager earns XP,
- * forest standing, or collectibles.
+ * forest standing, or collectibles — each with a soft whimsical chime.
  */
 export function XpCelebrationHost() {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -19,6 +23,7 @@ export function XpCelebrationHost() {
       if (!detail) return;
       const id = Date.now() + Math.floor(Math.random() * 1000);
       setToasts((prev) => [...prev.slice(-2), { ...detail, id }]);
+      playXpCelebrationSound(celebrationSoundKind(detail));
     }
     window.addEventListener("whimpost:xp-celebrate", onCelebrate);
     return () =>
