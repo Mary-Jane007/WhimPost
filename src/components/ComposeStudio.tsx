@@ -306,15 +306,18 @@ export function ComposeStudio({
 
   if (friends.length === 0) {
     return (
-      <div className="empty-state">
-        <h1>Your desk is ready</h1>
-        <p>
-          WhimPost letters travel between friends. Find a woodland writer first,
-          then come back to compose.
-        </p>
-        <a href="/friends" className="btn-primary">
-          Find friends
-        </a>
+      <div className="compose-studio">
+        <XpAlmanacCard villageId="letters" className="compose-xp-almanac" />
+        <div className="empty-state">
+          <h1>Your desk is ready</h1>
+          <p>
+            WhimPost letters travel between friends. Find a woodland writer first,
+            then come back to compose.
+          </p>
+          <a href="/friends" className="btn-primary">
+            Find friends
+          </a>
+        </div>
       </div>
     );
   }
