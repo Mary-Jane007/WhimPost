@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { COLLECTIBLE_META } from "@/lib/villages";
 import type { XpCelebrationDetail } from "@/lib/xpCelebrate";
 import {
+  bindXpCelebrationAudioUnlock,
   celebrationSoundKind,
   playXpCelebrationSound,
 } from "@/lib/xpCelebrationSound";
@@ -18,12 +19,13 @@ export function XpCelebrationHost() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
+    bindXpCelebrationAudioUnlock();
     function onCelebrate(e: Event) {
       const detail = (e as CustomEvent<XpCelebrationDetail>).detail;
       if (!detail) return;
       const id = Date.now() + Math.floor(Math.random() * 1000);
       setToasts((prev) => [...prev.slice(-2), { ...detail, id }]);
-      playXpCelebrationSound(celebrationSoundKind(detail));
+      void playXpCelebrationSound(celebrationSoundKind(detail));
     }
     window.addEventListener("whimpost:xp-celebrate", onCelebrate);
     return () =>
