@@ -1,6 +1,8 @@
 import { randomUUID } from "crypto";
 import { getDb } from "@/lib/db";
 import {
+  CANDLE_CRAFTS,
+  CANDLE_XP_COLLECTIBLE_GIFTS,
   COZY_RECIPES,
   HEARTH_XP,
   SAMPLE_FIRESIDE_NOTES,
@@ -9,6 +11,8 @@ import {
   todaysHerb,
   todaysInspiration,
 } from "@/lib/hearthContent";
+import { grantCollectible } from "@/lib/villageProgress";
+import type { CollectibleKind } from "@/lib/villages";
 
 export type HearthNote = {
   id: string;
@@ -19,17 +23,32 @@ export type HearthNote = {
 
 export type HearthProgress = {
   xp: number;
+  candleXp: number;
   title: ReturnType<typeof titleForHearthXp>;
   badges: string[];
   ritualsDone: Record<string, boolean>;
   favoriteRecipes: Record<string, boolean>;
   kindling: Record<string, boolean>;
+  candlesDone: Record<string, boolean>;
+  candleGiftsClaimed: string[];
+  /** Next unclaimed candle XP gift, if any. */
+  nextCandleGift: {
+    id: string;
+    minCandleXp: number;
+    kind: CollectibleKind;
+    label: string;
+  } | null;
   notes: HearthNote[];
   featured: {
     ritualIds: string[];
     herbId: string;
     inspiration: ReturnType<typeof todaysInspiration>;
   };
+};
+
+export type HearthActionResult = {
+  progress: HearthProgress;
+  grantedCollectibles: CollectibleKind[];
 };
 
 type ProgressRow = {
@@ -39,6 +58,8 @@ type ProgressRow = {
   rituals_json: string;
   favorite_recipes_json: string;
   kindling_json: string;
+  candles_json: string;
+  candle_gifts_json: string;
 };
 
 function parseJson<T>(raw: string | null | undefined, fallback: T): T {
@@ -105,7 +126,8 @@ function readRow(userId: string): ProgressRow {
   const db = getDb();
   return db
     .prepare(
-      `SELECT user_id, xp, badges_json, rituals_json, favorite_recipes_json, kindling_json
+      `SELECT user_id, xp, badges_json, rituals_json, favorite_recipes_json,
+              kindling_json, candles_json, candle_gifts_json
        FROM hearth_progress WHERE user_id = ?`
     )
     .get(userId) as ProgressRow;
@@ -114,6 +136,48 @@ function readRow(userId: string): ProgressRow {
 function addBadge(badges: string[], badge: string) {
   if (!badges.includes(badge)) badges.push(badge);
   return badges;
+}
+
+function candleXpFromDone(candlesDone: Record<string, boolean>): number {
+  const count = Object.values(candlesDone).filter(Boolean).length;
+  return count * HEARTH_XP.candleCraft;
+}
+
+function nextCandleGift(
+  candleXp: number,
+  claimed: string[]
+): HearthProgress["nextCandleGift"] {
+  const claimedSet = new Set(claimed);
+  for (const gift of CANDLE_XP_COLLECTIBLE_GIFTS) {
+    if (claimedSet.has(gift.id)) continue;
+    return {
+      id: gift.id,
+      minCandleXp: gift.minCandleXp,
+      kind: gift.kind,
+      label: gift.label,
+    };
+  }
+  // All claimed — still show last tier as complete target
+  void candleXp;
+  return null;
+}
+
+function claimCandleXpGifts(
+  db: ReturnType<typeof getDb>,
+  userId: string,
+  candleXp: number,
+  claimed: string[]
+): { claimed: string[]; granted: CollectibleKind[] } {
+  const nextClaimed = [...claimed];
+  const granted: CollectibleKind[] = [];
+  for (const gift of CANDLE_XP_COLLECTIBLE_GIFTS) {
+    if (nextClaimed.includes(gift.id)) continue;
+    if (candleXp < gift.minCandleXp) continue;
+    grantCollectible(db, userId, gift.kind, 1);
+    nextClaimed.push(gift.id);
+    granted.push(gift.kind);
+  }
+  return { claimed: nextClaimed, granted };
 }
 
 export function getHearthProgress(userId: string): HearthProgress {
@@ -131,13 +195,21 @@ export function getHearthProgress(userId: string): HearthProgress {
     if (ritualsDone[key]) todaysRituals[key] = true;
   }
 
+  const candlesDone = parseJson<Record<string, boolean>>(row.candles_json, {});
+  const candleGiftsClaimed = parseJson<string[]>(row.candle_gifts_json, []);
+  const candleXp = candleXpFromDone(candlesDone);
+
   return {
     xp: Number(row.xp) || 0,
+    candleXp,
     title: titleForHearthXp(Number(row.xp) || 0),
     badges: parseJson(row.badges_json, []),
     ritualsDone: todaysRituals,
     favoriteRecipes: parseJson(row.favorite_recipes_json, {}),
     kindling: parseJson(row.kindling_json, {}),
+    candlesDone,
+    candleGiftsClaimed,
+    nextCandleGift: nextCandleGift(candleXp, candleGiftsClaimed),
     notes: listNotes(),
     featured: {
       ritualIds: rituals.map((r) => r.id),
@@ -151,12 +223,13 @@ export type HearthAction =
   | { type: "completeRitual"; ritualId: string }
   | { type: "leaveNote"; body: string }
   | { type: "toggleRecipeFavorite"; recipeId: string }
-  | { type: "toggleKindling"; noteId: string };
+  | { type: "toggleKindling"; noteId: string }
+  | { type: "completeCandleCraft"; candleId: string };
 
 export function applyHearthAction(
   userId: string,
   action: HearthAction
-): HearthProgress {
+): HearthActionResult {
   const db = getDb();
   ensureProgressRow(userId);
   const row = readRow(userId);
@@ -168,6 +241,9 @@ export function applyHearthAction(
     {}
   );
   const kindling = parseJson<Record<string, boolean>>(row.kindling_json, {});
+  const candlesDone = parseJson<Record<string, boolean>>(row.candles_json, {});
+  let candleGiftsClaimed = parseJson<string[]>(row.candle_gifts_json, []);
+  let grantedCollectibles: CollectibleKind[] = [];
 
   if (action.type === "completeRitual") {
     const todays = dailyRituals();
@@ -227,6 +303,27 @@ export function applyHearthAction(
         }
       }
     }
+  } else if (action.type === "completeCandleCraft") {
+    const craft = CANDLE_CRAFTS.find((c) => c.id === action.candleId);
+    if (craft && !candlesDone[craft.id]) {
+      candlesDone[craft.id] = true;
+      xp += HEARTH_XP.candleCraft;
+      const candleXp = candleXpFromDone(candlesDone);
+      const giftResult = claimCandleXpGifts(
+        db,
+        userId,
+        candleXp,
+        candleGiftsClaimed
+      );
+      candleGiftsClaimed = giftResult.claimed;
+      grantedCollectibles = giftResult.granted;
+      const doneCount = Object.values(candlesDone).filter(Boolean).length;
+      if (doneCount >= 1) badges = addBadge(badges, "Candle Crafter");
+      if (doneCount >= 5) badges = addBadge(badges, "Wick Keeper");
+      if (doneCount >= CANDLE_CRAFTS.length) {
+        badges = addBadge(badges, "Fireside Candle Master");
+      }
+    }
   }
 
   db.prepare(
@@ -236,6 +333,8 @@ export function applyHearthAction(
       rituals_json = ?,
       favorite_recipes_json = ?,
       kindling_json = ?,
+      candles_json = ?,
+      candle_gifts_json = ?,
       updated_at = datetime('now')
      WHERE user_id = ?`
   ).run(
@@ -244,8 +343,13 @@ export function applyHearthAction(
     JSON.stringify(ritualsDone),
     JSON.stringify(favoriteRecipes),
     JSON.stringify(kindling),
+    JSON.stringify(candlesDone),
+    JSON.stringify(candleGiftsClaimed),
     userId
   );
 
-  return getHearthProgress(userId);
+  return {
+    progress: getHearthProgress(userId),
+    grantedCollectibles,
+  };
 }

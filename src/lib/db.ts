@@ -537,6 +537,18 @@ function migrate(db: Database.Database) {
     "is_global",
     "is_global INTEGER NOT NULL DEFAULT 0"
   );
+  ensureColumn(
+    db,
+    "hearth_progress",
+    "candles_json",
+    "candles_json TEXT NOT NULL DEFAULT '{}'"
+  );
+  ensureColumn(
+    db,
+    "hearth_progress",
+    "candle_gifts_json",
+    "candle_gifts_json TEXT NOT NULL DEFAULT '[]'"
+  );
   ensureColumn(db, "village_notes", "image_url", "image_url TEXT");
   ensureColumn(
     db,
