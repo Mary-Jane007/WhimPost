@@ -164,6 +164,24 @@ function listCatalogUploadPaths() {
   } catch {
     // ignore
   }
+  try {
+    const villagePath = path.join(ROOT, "data", "persistent-village-media.json");
+    if (fs.existsSync(villagePath)) {
+      const raw = fs.readFileSync(villagePath, "utf8");
+      const parsed = JSON.parse(raw) as { images?: Record<string, string> };
+      for (const url of Object.values(parsed.images || {})) {
+        const match = /\/api\/uploads\/([a-f0-9-]+\.[a-z0-9]+)$/i.exec(
+          String(url || "")
+        );
+        if (!match?.[1]) continue;
+        const abs = path.join(UPLOAD_DIR, match[1]);
+        if (!fs.existsSync(abs)) continue;
+        paths.add(path.join("data", "uploads", match[1]));
+      }
+    }
+  } catch {
+    // ignore
+  }
   return [...paths];
 }
 
@@ -279,6 +297,13 @@ export function scheduleEnsureTvUploadBytes() {
         tvMedia.importPersistentTvMedia(db);
       } catch (err) {
         console.warn("[persistent-tv] post-restore catalog import failed:", err);
+      }
+      // Publish any catalogued local files still missing from the durable shelf
+      // (including newly split multi-GB clips).
+      try {
+        publishReleaseAssets();
+      } catch (err) {
+        console.warn("[persistent-tv] post-restore publish failed:", err);
       }
     } catch (err) {
       console.warn("[persistent-tv] background media restore failed:", err);

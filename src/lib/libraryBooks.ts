@@ -930,6 +930,26 @@ export function upsertLibraryBook(
   } catch (err) {
     console.error("[persistent-library-books] export failed:", err);
   }
+  if (input.fileUrl) {
+    const match = /\/api\/uploads\/([a-f0-9-]+\.[a-z0-9]+)$/i.exec(
+      input.fileUrl
+    );
+    if (match?.[1]) {
+      try {
+        const { publishUploadedMediaNow } = require("@/lib/mediaRelease") as typeof import("@/lib/mediaRelease");
+        const bookFile = match[1];
+        setTimeout(() => {
+          try {
+            publishUploadedMediaNow([bookFile]);
+          } catch (err) {
+            console.warn("[library] eager media publish failed:", err);
+          }
+        }, 0);
+      } catch {
+        // ignore
+      }
+    }
+  }
 
   return getLibraryBookRecord(id)!;
 }

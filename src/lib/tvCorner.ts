@@ -324,6 +324,21 @@ export function createVideo(input: {
   } catch (err) {
     console.error("[tv] persist after create failed:", err);
   }
+  // Push bytes to the durable shelf right away so a server reset cannot
+  // strand a brand-new clip before the debounced git sync runs.
+  try {
+    const { publishUploadedMediaNow } = require("@/lib/mediaRelease") as typeof import("@/lib/mediaRelease");
+    const clipName = input.filename;
+    setTimeout(() => {
+      try {
+        publishUploadedMediaNow([clipName]);
+      } catch (err) {
+        console.warn("[tv] eager media publish failed:", err);
+      }
+    }, 0);
+  } catch {
+    // ignore
+  }
   return getVideoById(id)!;
 }
 

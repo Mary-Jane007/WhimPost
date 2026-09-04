@@ -64,6 +64,18 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[persistent-site-uploads] export failed:", err);
   }
+  try {
+    const { publishUploadedMediaNow } = await import("@/lib/mediaRelease");
+    setTimeout(() => {
+      try {
+        publishUploadedMediaNow([filename]);
+      } catch (err) {
+        console.warn("[uploads] eager media publish failed:", err);
+      }
+    }, 0);
+  } catch {
+    // ignore
+  }
 
   return NextResponse.json({
     url: `/api/uploads/${filename}`,
