@@ -47,41 +47,60 @@ function grantFromVillagePack(
   userId: string,
   villageId: VillageId | null,
   index: number
-) {
+): CollectibleKind | null {
   const pack = collectiblesForVillage(villageId);
-  if (pack.length === 0) return;
-  grantCollectible(db, userId, pack[index % pack.length]);
+  if (pack.length === 0) return null;
+  const kind = pack[index % pack.length];
+  grantCollectible(db, userId, kind);
+  return kind;
 }
+
+export type LetterRewardResult = {
+  reputationGained: number;
+  collectibles: CollectibleKind[];
+};
 
 /** Rewards for sending a letter — reputation + chance at village collectibles. */
 export function rewardLetterSent(
   db: Database,
   userId: string,
   bodyLength: number
-) {
+): LetterRewardResult {
   const villageId = getUserVillageId(db, userId);
+  let reputationGained = REP_REWARDS.sendLetter;
   addReputation(db, userId, REP_REWARDS.sendLetter);
+  const collectibles: CollectibleKind[] = [];
 
   if (bodyLength >= 280) {
     addReputation(db, userId, REP_REWARDS.longLetter);
-    grantFromVillagePack(db, userId, villageId, 0);
-    grantFromVillagePack(db, userId, villageId, 2);
+    reputationGained += REP_REWARDS.longLetter;
+    const a = grantFromVillagePack(db, userId, villageId, 0);
+    const b = grantFromVillagePack(db, userId, villageId, 2);
+    if (a) collectibles.push(a);
+    if (b) collectibles.push(b);
   }
   if (bodyLength >= 120) {
-    grantFromVillagePack(db, userId, villageId, 1);
+    const c = grantFromVillagePack(db, userId, villageId, 1);
+    if (c) collectibles.push(c);
   }
 
   const roll = bodyLength % 7;
   if (roll <= 3) {
-    grantFromVillagePack(db, userId, villageId, 3 + roll);
+    const d = grantFromVillagePack(db, userId, villageId, 3 + roll);
+    if (d) collectibles.push(d);
   }
+
+  return { reputationGained, collectibles };
 }
 
-export function rewardWelcome(db: Database, userId: string) {
+export function rewardWelcome(db: Database, userId: string): LetterRewardResult {
   const villageId = getUserVillageId(db, userId);
   addReputation(db, userId, REP_REWARDS.welcomeFriend);
-  // First keepsake in the village pack (butterflies / pink butterflies)
-  grantFromVillagePack(db, userId, villageId, 0);
+  const kind = grantFromVillagePack(db, userId, villageId, 0);
+  return {
+    reputationGained: REP_REWARDS.welcomeFriend,
+    collectibles: kind ? [kind] : [],
+  };
 }
 
 export function getVillageReputation(db: Database, villageId: VillageId) {

@@ -5,9 +5,11 @@ import type { UserPublic } from "@/lib/types";
 import type { HearthProgress } from "@/lib/hearth";
 import {
   CANDLE_CRAFTS,
+  CANDLE_XP_COLLECTIBLE_GIFTS,
   COZY_RECIPES,
   HEARTH_ART,
   HEARTH_TABS,
+  HEARTH_TITLES,
   HEARTH_XP,
   HERBS,
   HERB_CATEGORY_LABELS,
@@ -21,7 +23,11 @@ import {
   type KnitDifficulty,
   type RecipeCategory,
 } from "@/lib/hearthContent";
+import { COLLECTIBLE_META, type CollectibleKind } from "@/lib/villages";
 import { OwnerImageAttach } from "@/components/OwnerImageAttach";
+import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import {
   resolveVillageImage,
   villageMediaKey,
@@ -75,6 +81,7 @@ export function HearthwickFireside({
   async function postAction(action: Record<string, unknown>) {
     setBusy(true);
     setError(null);
+    const prevXp = progress.xp;
     try {
       const res = await fetch("/api/hearth/progress", {
         method: "POST",
@@ -84,9 +91,20 @@ export function HearthwickFireside({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not save");
       setProgress(data.progress);
+      if (data.progress) {
+        celebrateProgressGain({
+          prevXp,
+          nextXp: data.progress.xp || 0,
+          grantedCollectibles: data.grantedCollectibles || [],
+        });
+      }
       const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
       emitChronicleUnlock(data.chronicleUnlock);
-      return data.progress as HearthProgress;
+      return {
+        progress: data.progress as HearthProgress,
+        grantedCollectibles: (data.grantedCollectibles ||
+          []) as CollectibleKind[],
+      };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       return null;
@@ -163,11 +181,29 @@ export function HearthwickFireside({
             {progress.title.emoji} {progress.title.title}
           </span>
           <span>{progress.xp} XP</span>
+          <span>{progress.candleXp} candle XP</span>
           <span>
             {Object.keys(progress.favoriteRecipes).length} saved recipes
           </span>
           <span>{Object.keys(progress.kindling).length} kindling notes</span>
         </div>
+        <WorkshopXpProgress
+          xp={progress.xp}
+          xpLabel="fireside XP"
+          titles={HEARTH_TITLES}
+          secondary={{
+            xp: progress.candleXp || 0,
+            xpLabel: "candle XP",
+            gifts: CANDLE_XP_COLLECTIBLE_GIFTS.map((g) => ({
+              id: g.id,
+              minXp: g.minCandleXp,
+              kind: g.kind,
+              label: g.label,
+            })),
+            claimedIds: progress.candleGiftsClaimed || [],
+          }}
+        />
+        <XpAlmanacCard villageId="hearthwick" compact />
       </header>
 
       {error ? <p className="hw-error">{error}</p> : null}
@@ -309,8 +345,8 @@ export function HearthwickFireside({
                         void postAction({
                           type: "completeRitual",
                           ritualId: r.id,
-                        }).then((p) => {
-                          if (p?.ritualsDone[key]) {
+                        }).then((result) => {
+                          if (result?.progress.ritualsDone[key]) {
                             setToast("A soft glow settles over the hearth.");
                           }
                         })
@@ -561,48 +597,128 @@ export function HearthwickFireside({
           <section className="hw-section">
             <h2>Candle Crafts</h2>
             <p className="hw-section-lead">
-              Slow handmade light — tutorials for beeswax, botanicals, and
-              teacup glows.
+              Slow handmade light — finish a craft to earn +{HEARTH_XP.candleCraft}{" "}
+              candle XP. Reach XP milestones to gift Hearthwick collectibles into
+              your jar.
             </p>
+            <div className="hw-candle-xp-board" aria-label="Candle XP gifts">
+              <p className="hw-candle-xp-stat">
+                <strong>{progress.candleXp}</strong> candle XP ·{" "}
+                {
+                  Object.values(progress.candlesDone || {}).filter(Boolean)
+                    .length
+                }
+                /{CANDLE_CRAFTS.length} crafts lit
+              </p>
+              <ul className="hw-candle-gift-list">
+                {CANDLE_XP_COLLECTIBLE_GIFTS.map((gift) => {
+                  const claimed = (progress.candleGiftsClaimed || []).includes(
+                    gift.id
+                  );
+                  const meta = COLLECTIBLE_META[gift.kind];
+                  const reached = progress.candleXp >= gift.minCandleXp;
+                  return (
+                    <li
+                      key={gift.id}
+                      className={
+                        claimed
+                          ? "claimed"
+                          : reached
+                            ? "ready"
+                            : "locked"
+                      }
+                    >
+                      <span className="hw-candle-gift-xp">
+                        {gift.minCandleXp} XP
+                      </span>
+                      <span>
+                        {meta.emoji} {meta.name}
+                      </span>
+                      <span className="hw-candle-gift-label">
+                        {claimed
+                          ? "Gifted"
+                          : reached
+                            ? "Ready"
+                            : gift.label}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
             <div className="hw-grid">
-              {CANDLE_CRAFTS.map((c) => (
-                <article key={c.id} className="hw-card">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={catalogImage("candle", c.id, c.image)}
-                    alt=""
-                    className="hw-card-img"
-                  />
-                  {user.isOwner ? (
-                    <OwnerImageAttach
-                      mediaKey={villageMediaKey("hearth", "candle", c.id)}
-                      hasImage={Boolean(
-                        media[villageMediaKey("hearth", "candle", c.id)]
-                      )}
-                      onChanged={setMedia}
+              {CANDLE_CRAFTS.map((c) => {
+                const done = Boolean(progress.candlesDone?.[c.id]);
+                return (
+                  <article
+                    key={c.id}
+                    className={done ? "hw-card done" : "hw-card"}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={catalogImage("candle", c.id, c.image)}
+                      alt=""
+                      className="hw-card-img"
                     />
-                  ) : null}
-                  <h3>
-                    <span aria-hidden>{c.emoji}</span> {c.name}
-                  </h3>
-                  <p className="hw-meta">
-                    {c.difficulty} · {c.time}
-                  </p>
-                  <h4>Materials</h4>
-                  <ul className="hw-ing">
-                    {c.materials.map((m) => (
-                      <li key={m}>{m}</li>
-                    ))}
-                  </ul>
-                  <h4>Steps</h4>
-                  <ol className="hw-steps">
-                    {c.steps.map((s) => (
-                      <li key={s}>{s}</li>
-                    ))}
-                  </ol>
-                  <p className="hw-safety">Safety · {c.safety}</p>
-                </article>
-              ))}
+                    {user.isOwner ? (
+                      <OwnerImageAttach
+                        mediaKey={villageMediaKey("hearth", "candle", c.id)}
+                        hasImage={Boolean(
+                          media[villageMediaKey("hearth", "candle", c.id)]
+                        )}
+                        onChanged={setMedia}
+                      />
+                    ) : null}
+                    <h3>
+                      <span aria-hidden>{c.emoji}</span> {c.name}
+                    </h3>
+                    <p className="hw-meta">
+                      {c.difficulty} · {c.time} · +{HEARTH_XP.candleCraft} XP
+                    </p>
+                    <h4>Materials</h4>
+                    <ul className="hw-ing">
+                      {c.materials.map((m) => (
+                        <li key={m}>{m}</li>
+                      ))}
+                    </ul>
+                    <h4>Steps</h4>
+                    <ol className="hw-steps">
+                      {c.steps.map((s) => (
+                        <li key={s}>{s}</li>
+                      ))}
+                    </ol>
+                    <p className="hw-safety">Safety · {c.safety}</p>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      disabled={busy || done}
+                      onClick={() =>
+                        void postAction({
+                          type: "completeCandleCraft",
+                          candleId: c.id,
+                        }).then((result) => {
+                          if (!result) return;
+                          const gifts = result.grantedCollectibles || [];
+                          if (gifts.length > 0) {
+                            const names = gifts
+                              .map((k) => COLLECTIBLE_META[k].name)
+                              .join(", ");
+                            setToast(
+                              `+${HEARTH_XP.candleCraft} candle XP — collectible gift: ${names}`
+                            );
+                          } else if (result.progress.candlesDone[c.id]) {
+                            setToast(
+                              `Candle lit. +${HEARTH_XP.candleCraft} candle XP.`
+                            );
+                          }
+                        })
+                      }
+                    >
+                      {done ? "Craft complete" : "I finished this craft"}
+                    </button>
+                  </article>
+                );
+              })}
             </div>
           </section>
         )}

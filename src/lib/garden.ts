@@ -17,6 +17,11 @@ import {
   titleForGardenXp,
   weeklyKindness,
 } from "@/lib/gardenContent";
+import {
+  GARDEN_XP_COLLECTIBLE_GIFTS,
+  claimXpCollectibleGifts,
+} from "@/lib/workshopXpGifts";
+import type { CollectibleKind } from "@/lib/villages";
 
 export type GardenJournalEntry = {
   id: string;
@@ -54,11 +59,17 @@ export type GardenProgress = {
   petals: JoyPetal[];
   communityBlooms: number;
   communityKindness: number;
+  xpGiftsClaimed: string[];
   featured: {
     dailyIds: string[];
     kindnessIds: string[];
     joySeedId: string;
   };
+};
+
+export type GardenActionResult = {
+  progress: GardenProgress;
+  grantedCollectibles: CollectibleKind[];
 };
 
 type ProgressRow = {
@@ -75,6 +86,7 @@ type ProgressRow = {
   collections_json: string;
   wish_id: string | null;
   wish_week: number;
+  xp_gifts_json?: string;
 };
 
 function parseJson<T>(raw: string | null | undefined, fallback: T): T {
@@ -130,7 +142,12 @@ function readRow(userId: string): ProgressRow {
   ensureProgressRow(userId);
   const db = getDb();
   return db
-    .prepare(`SELECT * FROM garden_progress WHERE user_id = ?`)
+    .prepare(
+      `SELECT user_id, xp, badges_json, decorations_json, blooms, daily_json,
+              spotted_json, kindness_json, rare_json, visitors_json,
+              collections_json, wish_id, wish_week, xp_gifts_json
+       FROM garden_progress WHERE user_id = ?`
+    )
     .get(userId) as ProgressRow;
 }
 
@@ -328,6 +345,7 @@ export function getGardenProgress(userId: string): GardenProgress {
     petals: listPetals(seed.id),
     communityBlooms: Number(community.blooms) || 0,
     communityKindness: Number(community.kindness) || 0,
+    xpGiftsClaimed: parseJson(row.xp_gifts_json, []),
     featured: {
       dailyIds: daily.map((d) => d.id),
       kindnessIds: kindness.map((k) => k.id),
@@ -359,7 +377,7 @@ export type GardenAction =
 export function applyGardenAction(
   userId: string,
   action: GardenAction
-): GardenProgress {
+): GardenActionResult {
   const db = getDb();
   ensureProgressRow(userId);
   const row = readRow(userId);
@@ -381,6 +399,7 @@ export function applyGardenAction(
   );
   const wishId = row.wish_id;
   const wishWeek = Number(row.wish_week) || 0;
+  let xpGiftsClaimed = parseJson<string[]>(row.xp_gifts_json, []);
 
   const bumpCollection = (id: string, by = 1) => {
     collections[id] = (collections[id] || 0) + by;
@@ -564,6 +583,16 @@ export function applyGardenAction(
   if (community.blooms >= 50000) badges = addBadge(badges, "Fountain Keeper Badge");
   if (community.blooms >= 100000) badges = addBadge(badges, "Clover Festival Badge");
 
+  const giftResult = claimXpCollectibleGifts(
+    db,
+    userId,
+    xp,
+    GARDEN_XP_COLLECTIBLE_GIFTS,
+    xpGiftsClaimed
+  );
+  xpGiftsClaimed = giftResult.claimed;
+  const grantedCollectibles = giftResult.granted;
+
   db.prepare(
     `UPDATE garden_progress SET
       xp = ?,
@@ -578,6 +607,7 @@ export function applyGardenAction(
       collections_json = ?,
       wish_id = ?,
       wish_week = ?,
+      xp_gifts_json = ?,
       updated_at = datetime('now')
      WHERE user_id = ?`
   ).run(
@@ -593,8 +623,12 @@ export function applyGardenAction(
     JSON.stringify(collections),
     wishId,
     wishWeek,
+    JSON.stringify(xpGiftsClaimed),
     userId
   );
 
-  return getGardenProgress(userId);
+  return {
+    progress: getGardenProgress(userId),
+    grantedCollectibles,
+  };
 }

@@ -49,7 +49,16 @@ export async function POST(req: NextRequest) {
   );
 
   if (action === "accept") {
-    rewardWelcome(db, user.id);
+    const welcome = rewardWelcome(db, user.id);
+    if (wantsHtmlRedirect(req)) {
+      const nextRaw = fields.next || "/friends";
+      const next =
+        nextRaw.startsWith("/") && !nextRaw.startsWith("//")
+          ? nextRaw
+          : "/friends";
+      return redirectSameHost(req, next);
+    }
+    return NextResponse.json({ ok: true, rewards: welcome });
   }
 
   if (wantsHtmlRedirect(req)) {

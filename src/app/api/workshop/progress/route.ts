@@ -83,7 +83,10 @@ export async function POST(req: NextRequest) {
     action = body as WorkshopAction;
   }
 
-  const progress = applyWorkshopAction(gate.user.id, action);
+  const { progress, grantedCollectibles } = applyWorkshopAction(
+    gate.user.id,
+    action
+  );
 
   let key: ChronicleActivityKey | null = null;
   if (action.type === "complete") key = "workshop.complete";
@@ -96,5 +99,5 @@ export async function POST(req: NextRequest) {
     ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
     : null;
 
-  return NextResponse.json({ progress, chronicleUnlock });
+  return NextResponse.json({ progress, grantedCollectibles, chronicleUnlock });
 }
