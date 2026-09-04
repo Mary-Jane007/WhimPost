@@ -11,6 +11,7 @@ import {
   type CottageWeather,
 } from "@/lib/cottageCatalog";
 import {
+  isDecorUnlocked,
   keepsakeTotal,
 } from "@/lib/cottageDecor";
 import type { CollectibleKind, VillageId } from "@/lib/villages";
@@ -42,6 +43,7 @@ export type CottagePersisted = {
   signText: string;
   favoriteItemId: string | null;
   welcomed: boolean;
+  layoutTouched: boolean;
   timeMode: "auto" | CottageTimeOfDay;
   weatherMode: "auto" | CottageWeather;
   placements: CottagePlacement[];
@@ -80,13 +82,17 @@ function defaultName(displayName: string, villageId: VillageId | null) {
   return `${displayName}'s Cottage`;
 }
 
-function seedPlacements(villageId: VillageId | null): CottagePlacement[] {
+function seedPlacements(
+  villageId: VillageId | null,
+  reputation: number,
+  collectibles: Partial<Record<CollectibleKind, number>>
+): CottagePlacement[] {
   return catalogForVillage(villageId).map((item) => ({
     itemId: item.id,
     x: item.x,
     y: item.y,
     rotation: 0,
-    placed: item.unlock.type === "always",
+    placed: isDecorUnlocked(item, reputation, collectibles),
   }));
 }
 
@@ -170,6 +176,7 @@ export function ensureCottageTable(db: Database) {
       sign_text TEXT NOT NULL DEFAULT '',
       favorite_item_id TEXT,
       welcomed INTEGER NOT NULL DEFAULT 0,
+      layout_touched INTEGER NOT NULL DEFAULT 0,
       time_mode TEXT NOT NULL DEFAULT 'auto',
       weather_mode TEXT NOT NULL DEFAULT 'auto',
       placements_json TEXT NOT NULL DEFAULT '[]',
@@ -179,6 +186,13 @@ export function ensureCottageTable(db: Database) {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
+  try {
+    db.exec(
+      `ALTER TABLE user_cottages ADD COLUMN layout_touched INTEGER NOT NULL DEFAULT 0`
+    );
+  } catch {
+    /* already present */
+  }
 }
 
 function rowToPersisted(row: {
@@ -187,6 +201,7 @@ function rowToPersisted(row: {
   sign_text: string;
   favorite_item_id: string | null;
   welcomed: number;
+  layout_touched?: number;
   time_mode: string;
   weather_mode: string;
   placements_json: string;
@@ -200,6 +215,7 @@ function rowToPersisted(row: {
     signText: row.sign_text || "",
     favoriteItemId: row.favorite_item_id,
     welcomed: Boolean(row.welcomed),
+    layoutTouched: Boolean(row.layout_touched),
     timeMode: (row.time_mode as CottagePersisted["timeMode"]) || "auto",
     weatherMode: (row.weather_mode as CottagePersisted["weatherMode"]) || "auto",
     placements: parseJson(row.placements_json, []),
@@ -211,19 +227,28 @@ function rowToPersisted(row: {
 
 function mergePlacements(
   villageId: VillageId | null,
-  saved: CottagePlacement[]
+  saved: CottagePlacement[],
+  reputation: number,
+  collectibles: Partial<Record<CollectibleKind, number>>
 ): CottagePlacement[] {
   const catalog = catalogForVillage(villageId);
   const byId = new Map(saved.map((p) => [p.itemId, p]));
   return catalog.map((item) => {
     const existing = byId.get(item.id);
-    if (existing) return existing;
+    const unlocked = isDecorUnlocked(item, reputation, collectibles);
+    if (existing) {
+      // Newly unlocked pieces that were never stored should appear in the room.
+      if (unlocked && !saved.some((x) => x.itemId === item.id)) {
+        return { ...existing, placed: true };
+      }
+      return existing;
+    }
     return {
       itemId: item.id,
       x: item.x,
       y: item.y,
       rotation: 0,
-      placed: item.unlock.type === "always",
+      placed: unlocked,
     };
   });
 }
@@ -264,7 +289,11 @@ export function getOrCreateCottage(
     | undefined;
 
   if (!row) {
-    const placements = seedPlacements(villageId);
+    const placements = seedPlacements(
+      villageId,
+      user.reputation,
+      collectibles
+    );
     const memories = seedMemories({
       displayName: user.displayName,
       createdAt: user.createdAt,
@@ -294,16 +323,28 @@ export function getOrCreateCottage(
   }
 
   const persisted = rowToPersisted(row!);
-  const placements = mergePlacements(villageId, persisted.placements);
-  // Auto-place newly unlocked always items if never stored
-  for (const item of catalogForVillage(villageId)) {
-    const p = placements.find((x) => x.itemId === item.id);
-    if (!p) continue;
-    if (
-      item.unlock.type === "always" &&
-      !persisted.placements.some((x) => x.itemId === item.id)
-    ) {
-      p.placed = true;
+  const placements = mergePlacements(
+    villageId,
+    persisted.placements,
+    user.reputation,
+    collectibles
+  );
+  // Until the villager rearranges things, keep the room filled with
+  // everything they've unlocked so the cottage never feels barren.
+  if (!persisted.layoutTouched) {
+    for (const item of catalogForVillage(villageId)) {
+      const p = placements.find((x) => x.itemId === item.id);
+      if (!p) continue;
+      p.placed = isDecorUnlocked(item, user.reputation, collectibles);
+    }
+  } else {
+    for (const item of catalogForVillage(villageId)) {
+      const p = placements.find((x) => x.itemId === item.id);
+      if (!p) continue;
+      const unlocked = isDecorUnlocked(item, user.reputation, collectibles);
+      if (unlocked && !persisted.placements.some((x) => x.itemId === item.id)) {
+        p.placed = true;
+      }
     }
   }
 
@@ -342,6 +383,7 @@ export type CottagePatch = Partial<{
   signText: string;
   favoriteItemId: string | null;
   welcomed: boolean;
+  layoutTouched: boolean;
   timeMode: CottagePersisted["timeMode"];
   weatherMode: CottagePersisted["weatherMode"];
   placements: CottagePlacement[];
@@ -383,6 +425,14 @@ export function updateCottage(
           ? 1
           : 0
         : Number(current.welcomed || 0),
+    layout_touched:
+      patch.layoutTouched !== undefined
+        ? patch.layoutTouched
+          ? 1
+          : 0
+        : patch.placements !== undefined
+          ? 1
+          : Number(current.layout_touched || 0),
     time_mode:
       patch.timeMode !== undefined
         ? patch.timeMode
@@ -412,6 +462,7 @@ export function updateCottage(
       sign_text = ?,
       favorite_item_id = ?,
       welcomed = ?,
+      layout_touched = ?,
       time_mode = ?,
       weather_mode = ?,
       placements_json = ?,
@@ -425,6 +476,7 @@ export function updateCottage(
     next.sign_text,
     next.favorite_item_id,
     next.welcomed,
+    next.layout_touched,
     next.time_mode,
     next.weather_mode,
     next.placements_json,

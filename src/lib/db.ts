@@ -594,6 +594,7 @@ function migrate(db: Database.Database) {
       sign_text TEXT NOT NULL DEFAULT '',
       favorite_item_id TEXT,
       welcomed INTEGER NOT NULL DEFAULT 0,
+      layout_touched INTEGER NOT NULL DEFAULT 0,
       time_mode TEXT NOT NULL DEFAULT 'auto',
       weather_mode TEXT NOT NULL DEFAULT 'auto',
       placements_json TEXT NOT NULL DEFAULT '[]',
