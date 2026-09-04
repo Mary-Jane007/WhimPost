@@ -584,6 +584,25 @@ function migrate(db: Database.Database) {
   `);
 
   // Fresh-start TV Corner uses a flat clip shelf (no auto-channels).
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS user_cottages (
+      user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      village_id TEXT,
+      cottage_name TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      sign_text TEXT NOT NULL DEFAULT '',
+      favorite_item_id TEXT,
+      welcomed INTEGER NOT NULL DEFAULT 0,
+      time_mode TEXT NOT NULL DEFAULT 'auto',
+      weather_mode TEXT NOT NULL DEFAULT 'auto',
+      placements_json TEXT NOT NULL DEFAULT '[]',
+      memories_json TEXT NOT NULL DEFAULT '[]',
+      displayed_letter_id TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
 }
 
 function createDb() {

@@ -76,7 +76,7 @@ export function SiteNav({
     { href: "/sent", label: "Sent" },
     { href: "/compose", label: "Write" },
     { href: "/friends", label: "Friends", badgeKey: "friends" },
-    { href: "/profile", label: "Profile" },
+    { href: "/profile", label: "My Cottage" },
   ];
 
   return (

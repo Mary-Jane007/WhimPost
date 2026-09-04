@@ -1,22 +1,6 @@
 import { RANK_LADDER, type CollectibleKind } from "@/lib/villages";
 
-export type CottageDecorId =
-  | "welcome-mat"
-  | "window-drape"
-  | "potted-fern"
-  | "woven-rug"
-  | "tea-nook"
-  | "hearth"
-  | "bookshelf"
-  | "candle"
-  | "writing-desk"
-  | "letter-bundle"
-  | "wall-mirror"
-  | "lantern"
-  | "keepsake-jar"
-  | "pressed-leaves"
-  | "garden-sill"
-  | "ceiling-mobile";
+export type CottageDecorId = string;
 
 export type CottageUnlock =
   | { type: "always" }
