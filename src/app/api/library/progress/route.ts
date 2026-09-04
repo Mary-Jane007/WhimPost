@@ -120,7 +120,10 @@ export async function POST(req: NextRequest) {
     return jsonError("Expected a library action");
   }
 
-  const progress = applyLibraryAction(gate.user.id, action);
+  const { progress, grantedCollectibles } = applyLibraryAction(
+    gate.user.id,
+    action
+  );
   const key = LIBRARY_KEYS[action.type];
   const chronicleUnlock = key
     ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
@@ -129,5 +132,5 @@ export async function POST(req: NextRequest) {
   if (wantsHtmlRedirect(req)) {
     return redirectSameHost(req, nextPath);
   }
-  return NextResponse.json({ progress, chronicleUnlock });
+  return NextResponse.json({ progress, grantedCollectibles, chronicleUnlock });
 }

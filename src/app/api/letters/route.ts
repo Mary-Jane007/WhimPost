@@ -202,7 +202,7 @@ export async function POST(req: NextRequest) {
     imageJson
   );
 
-  rewardLetterSent(db, user.id, letterBody.length);
+  const letterRewards = rewardLetterSent(db, user.id, letterBody.length);
   trackAnalyticsEvent({
     event: "letter_sent",
     userId: user.id,
@@ -213,5 +213,5 @@ export async function POST(req: NextRequest) {
 
   const row = db.prepare(`SELECT * FROM letters WHERE id = ?`).get(id) as LetterRecord;
   const letter = toLetterView(row);
-  return NextResponse.json({ letter });
+  return NextResponse.json({ letter, rewards: letterRewards });
 }

@@ -12,6 +12,7 @@ export type ChronicleActivityKey =
   | "hearth.completeRitual"
   | "hearth.leaveNote"
   | "hearth.toggleRecipeFavorite"
+  | "hearth.completeCandleCraft"
   | "moon.completeRitual"
   | "moon.saveJournal"
   | "moon.submitDream"
@@ -30,6 +31,7 @@ export const CHRONICLE_ACTIVITY_LABELS: Record<ChronicleActivityKey, string> = {
   "hearth.completeRitual": "Complete a fireside ritual",
   "hearth.leaveNote": "Leave a Fireside Note",
   "hearth.toggleRecipeFavorite": "Save a cozy recipe",
+  "hearth.completeCandleCraft": "Finish a candle craft",
   "moon.completeRitual": "Complete a night ritual",
   "moon.saveJournal": "Save a Moon Journal entry",
   "moon.submitDream": "Bottle a dream",

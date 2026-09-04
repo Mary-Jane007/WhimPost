@@ -37,6 +37,14 @@ import {
   villageMediaKey,
   type VillageMediaMap,
 } from "@/lib/villageMediaShared";
+import {
+  XpCollectibleGiftBoard,
+  formatGrantedCollectibles,
+} from "@/components/XpCollectibleGiftBoard";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
+import { MOON_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
+import type { CollectibleKind } from "@/lib/villages";
 
 type Props = {
   user: UserPublic;
@@ -106,6 +114,7 @@ export function MoonmereObservatory({
   async function postAction(action: Record<string, unknown>) {
     setBusy(true);
     setError(null);
+    const prevXp = progress.xp;
     try {
       const res = await fetch("/api/moon/progress", {
         method: "POST",
@@ -115,9 +124,26 @@ export function MoonmereObservatory({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not save");
       setProgress(data.progress);
+      if (data.progress) {
+        celebrateProgressGain({
+          prevXp,
+          nextXp: data.progress.xp,
+          grantedCollectibles: data.grantedCollectibles || [],
+        });
+      }
+      const grantedCollectibles = (data.grantedCollectibles ||
+        []) as CollectibleKind[];
+      if (grantedCollectibles.length) {
+        setToast(
+          `Collectible gift: ${formatGrantedCollectibles(grantedCollectibles)}`
+        );
+      }
       const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
       emitChronicleUnlock(data.chronicleUnlock);
-      return data.progress as MoonProgress;
+      return {
+        progress: data.progress as MoonProgress,
+        grantedCollectibles,
+      };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       return null;
@@ -156,7 +182,12 @@ export function MoonmereObservatory({
     const next = await postAction({ type: "saveJournal", body: journalBody });
     if (next) {
       setJournalBody("");
-      setToast("Saved privately in your Moon Journal.");
+      const gifts = next.grantedCollectibles || [];
+      setToast(
+        gifts.length
+          ? `Saved privately in your Moon Journal. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+          : "Saved privately in your Moon Journal."
+      );
     }
   }
 
@@ -169,7 +200,12 @@ export function MoonmereObservatory({
     });
     if (next) {
       setDreamBody("");
-      setToast("Dream sealed in a glass bottle.");
+      const gifts = next.grantedCollectibles || [];
+      setToast(
+        gifts.length
+          ? `Dream sealed in a glass bottle. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+          : "Dream sealed in a glass bottle."
+      );
     }
   }
 
@@ -307,6 +343,14 @@ export function MoonmereObservatory({
           <span>{progress.dreams.length} bottled dreams</span>
           <span>{progress.journal.length} journal pages</span>
         </div>
+        <XpCollectibleGiftBoard
+          xp={progress.xp}
+          xpLabel="observatory XP"
+          gifts={MOON_XP_COLLECTIBLE_GIFTS}
+          claimedIds={progress.xpGiftsClaimed || []}
+          lead="Reach XP milestones to gift Moonmere collectibles"
+        />
+        <XpAlmanacCard villageId="moonmere" compact />
       </header>
 
       {error ? <p className="mm-error">{error}</p> : null}
@@ -507,8 +551,14 @@ export function MoonmereObservatory({
                         void postAction({
                           type: "completeRitual",
                           ritualId: r.id,
-                        }).then((p) => {
-                          if (p) setToast("Ritual noted under the stars.");
+                        }).then((result) => {
+                          if (!result) return;
+                          const gifts = result.grantedCollectibles || [];
+                          setToast(
+                            gifts.length
+                              ? `Ritual noted under the stars. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                              : "Ritual noted under the stars."
+                          );
                         })
                       }
                     >

@@ -25,8 +25,64 @@ export const HEARTH_XP = {
   note: 20,
   favoriteRecipe: 5,
   kindling: 5,
+  /** Mark a Candle Crafts project complete (once each). */
+  candleCraft: 50,
   craftBrowse: 0,
 } as const;
+
+/**
+ * Candle-craft XP milestones → Hearthwick collectible gifts.
+ * Candle XP is earned only from completing Candle Crafts projects.
+ */
+export const CANDLE_XP_COLLECTIBLE_GIFTS: Array<{
+  id: string;
+  minCandleXp: number;
+  kind:
+    | "hearth-embers"
+    | "hearth-teacups"
+    | "hearth-kettles"
+    | "hearth-cinnamon-rolls"
+    | "hearth-blankets"
+    | "hearth-letters";
+  label: string;
+}> = [
+  {
+    id: "candle-gift-embers",
+    minCandleXp: 50,
+    kind: "hearth-embers",
+    label: "First flame",
+  },
+  {
+    id: "candle-gift-teacups",
+    minCandleXp: 150,
+    kind: "hearth-teacups",
+    label: "Warm pour",
+  },
+  {
+    id: "candle-gift-kettles",
+    minCandleXp: 250,
+    kind: "hearth-kettles",
+    label: "Steady wick",
+  },
+  {
+    id: "candle-gift-rolls",
+    minCandleXp: 350,
+    kind: "hearth-cinnamon-rolls",
+    label: "Sweet wax",
+  },
+  {
+    id: "candle-gift-blankets",
+    minCandleXp: 450,
+    kind: "hearth-blankets",
+    label: "Soft glow",
+  },
+  {
+    id: "candle-gift-letters",
+    minCandleXp: 500,
+    kind: "hearth-letters",
+    label: "Candle keeper",
+  },
+];
 
 export const HEARTH_TITLES = [
   { minXp: 0, title: "Warm Guest", emoji: "🕯" },

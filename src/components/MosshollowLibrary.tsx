@@ -30,6 +30,14 @@ import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 import { ShelfBookFileDetach } from "@/components/ShelfBookFileDetach";
 import { ShelfBookRemove } from "@/components/ShelfBookRemove";
 import { getBookProgressView } from "@/lib/libraryProgressView";
+import {
+  XpCollectibleGiftBoard,
+  formatGrantedCollectibles,
+} from "@/components/XpCollectibleGiftBoard";
+import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
+import { LIBRARY_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
+import type { CollectibleKind } from "@/lib/villages";
 
 type Props = {
   user: UserPublic;
@@ -164,6 +172,7 @@ export function MosshollowLibrary({
   async function postAction(action: Record<string, unknown>) {
     setBusy(true);
     setError(null);
+    const prevXp = progress.xp;
     try {
       const res = await fetch("/api/library/progress", {
         method: "POST",
@@ -172,10 +181,27 @@ export function MosshollowLibrary({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Could not update the library");
-      if (data.progress) setProgress(data.progress);
+      if (data.progress) {
+        setProgress(data.progress);
+        celebrateProgressGain({
+          prevXp,
+          nextXp: data.progress.xp,
+          grantedCollectibles: data.grantedCollectibles || [],
+        });
+      }
+      const grantedCollectibles = (data.grantedCollectibles ||
+        []) as CollectibleKind[];
+      if (grantedCollectibles.length) {
+        setToast(
+          `Collectible gift: ${formatGrantedCollectibles(grantedCollectibles)}`
+        );
+      }
       const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
       emitChronicleUnlock(data.chronicleUnlock);
-      return data.progress as LibraryProgress;
+      return {
+        progress: data.progress as LibraryProgress,
+        grantedCollectibles,
+      };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       return null;
@@ -245,6 +271,14 @@ export function MosshollowLibrary({
           <span>{progress.badges.length} badges</span>
           <span>{progress.stamps.length} stamps</span>
         </div>
+        <XpCollectibleGiftBoard
+          xp={progress.xp}
+          xpLabel="library XP"
+          gifts={LIBRARY_XP_COLLECTIBLE_GIFTS}
+          claimedIds={progress.xpGiftsClaimed || []}
+          lead="Reach XP milestones to gift Mosshollow collectibles"
+        />
+        <XpAlmanacCard villageId="mosshollow" compact />
       </header>
 
       {error ? <p className="mh-error">{error}</p> : null}
@@ -274,9 +308,14 @@ export function MosshollowLibrary({
           type="button"
           className="mh-secret-book"
           onClick={() => {
-            void postAction({ type: "claimSecret" }).then((p) => {
-              if (p) {
-                setToast("A glowing book revealed a secret…");
+            void postAction({ type: "claimSecret" }).then((result) => {
+              if (result) {
+                const gifts = result.grantedCollectibles || [];
+                setToast(
+                  gifts.length
+                    ? `A glowing book revealed a secret… Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                    : "A glowing book revealed a secret…"
+                );
                 setSecretVisible(false);
               }
             });
@@ -529,8 +568,14 @@ export function MosshollowLibrary({
                       bookId: book.id,
                       reflection: `Finished ${book.title} with the Book Club.`,
                       quote: book.quotes[0],
-                    }).then((p) => {
-                      if (p) setToast("Bookworm Badge earned — well read.");
+                    }).then((result) => {
+                      if (!result) return;
+                      const gifts = result.grantedCollectibles || [];
+                      setToast(
+                        gifts.length
+                          ? `Bookworm Badge earned — collectible gift: ${formatGrantedCollectibles(gifts)}`
+                          : "Bookworm Badge earned — well read."
+                      );
                     })
                   }
                 >
@@ -933,12 +978,17 @@ export function MosshollowLibrary({
                         type: "curiosityQuiz",
                         factId: curiosity.id,
                         choice: quizChoice,
-                      }).then((p) => {
-                        if (!p) return;
-                        setToast(
+                      }).then((result) => {
+                        if (!result) return;
+                        const gifts = result.grantedCollectibles || [];
+                        const base =
                           quizChoice === curiosity.quiz.answer
                             ? "Correct — lantern lit."
-                            : "Fact saved; try another night."
+                            : "Fact saved; try another night.";
+                        setToast(
+                          gifts.length
+                            ? `${base} Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                            : base
                         );
                         setQuizChoice(null);
                       });
@@ -980,10 +1030,15 @@ export function MosshollowLibrary({
                       type: "solveMystery",
                       mysteryId: mystery.id,
                       answer: mysteryAnswer,
-                    }).then((p) => {
-                      if (!p) return;
-                      if (p.mysteryDone[mystery.id]) {
-                        setToast(`Stamp unlocked: ${mystery.stamp}`);
+                    }).then((result) => {
+                      if (!result) return;
+                      if (result.progress.mysteryDone[mystery.id]) {
+                        const gifts = result.grantedCollectibles || [];
+                        setToast(
+                          gifts.length
+                            ? `Stamp unlocked: ${mystery.stamp} — collectible gift: ${formatGrantedCollectibles(gifts)}`
+                            : `Stamp unlocked: ${mystery.stamp}`
+                        );
                         setMysteryAnswer("");
                       } else {
                         setError("Not quite — reread the clues by candlelight.");
@@ -1075,10 +1130,15 @@ export function MosshollowLibrary({
                     type: "submitThought",
                     promptId: thought.id,
                     body: thoughtBody,
-                  }).then((p) => {
-                    if (p) {
+                  }).then((result) => {
+                    if (result) {
                       setThoughtBody("");
-                      setToast("Your reflection joined the quiet circle.");
+                      const gifts = result.grantedCollectibles || [];
+                      setToast(
+                        gifts.length
+                          ? `Your reflection joined the quiet circle. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                          : "Your reflection joined the quiet circle."
+                      );
                     }
                   });
                 }}
@@ -1194,12 +1254,17 @@ export function MosshollowLibrary({
                   activityName: journalName,
                   note: journalNote,
                   quote: journalQuote,
-                }).then((p) => {
-                  if (p) {
+                }).then((result) => {
+                  if (result) {
                     setJournalName("");
                     setJournalNote("");
                     setJournalQuote("");
-                    setToast("Journal page pressed into the ledger.");
+                    const gifts = result.grantedCollectibles || [];
+                    setToast(
+                      gifts.length
+                        ? `Journal page pressed into the ledger. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                        : "Journal page pressed into the ledger."
+                    );
                   }
                 });
               }}
