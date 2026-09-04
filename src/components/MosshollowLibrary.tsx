@@ -8,6 +8,7 @@ import {
   ARCHIVE_CLIPS,
   LIBRARY_COLLECTIONS,
   LIBRARY_TABS,
+  LIBRARY_TITLES,
   LIBRARY_XP,
   READING_CATEGORIES,
   featuredCuriosity,
@@ -34,6 +35,7 @@ import {
   XpCollectibleGiftBoard,
   formatGrantedCollectibles,
 } from "@/components/XpCollectibleGiftBoard";
+import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
 import { XpAlmanacCard } from "@/components/XpAlmanacCard";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import { LIBRARY_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
@@ -271,6 +273,13 @@ export function MosshollowLibrary({
           <span>{progress.badges.length} badges</span>
           <span>{progress.stamps.length} stamps</span>
         </div>
+        <WorkshopXpProgress
+          xp={progress.xp}
+          xpLabel="library XP"
+          titles={LIBRARY_TITLES}
+          gifts={LIBRARY_XP_COLLECTIBLE_GIFTS}
+          claimedIds={progress.xpGiftsClaimed || []}
+        />
         <XpCollectibleGiftBoard
           xp={progress.xp}
           xpLabel="library XP"

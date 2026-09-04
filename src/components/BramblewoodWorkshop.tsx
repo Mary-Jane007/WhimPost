@@ -14,6 +14,7 @@ import {
   WOODLAND_ADVENTURES,
   WOODLAND_DIY,
   WORKSHOP_TABS,
+  WORKSHOP_TITLES,
   featuredExpedition,
   todaysWoodlandInspiration,
   type WorkshopTabId,
@@ -28,6 +29,7 @@ import {
   XpCollectibleGiftBoard,
   formatGrantedCollectibles,
 } from "@/components/XpCollectibleGiftBoard";
+import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
 import { XpAlmanacCard } from "@/components/XpAlmanacCard";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import { WORKSHOP_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
@@ -309,6 +311,13 @@ export function BramblewoodWorkshop({
             </span>
             <span>{progress.xp} XP</span>
           </div>
+          <WorkshopXpProgress
+            xp={progress.xp}
+            xpLabel="workshop XP"
+            titles={WORKSHOP_TITLES}
+            gifts={WORKSHOP_XP_COLLECTIBLE_GIFTS}
+            claimedIds={progress.xpGiftsClaimed || []}
+          />
           <XpCollectibleGiftBoard
             xp={progress.xp}
             xpLabel="workshop XP"

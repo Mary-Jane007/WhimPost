@@ -16,6 +16,7 @@ import {
   DREAM_THEME_LABELS,
   MOON_ART,
   MOON_TABS,
+  MOON_TITLES,
   NIGHT_CREATURES,
   SKY_FACTS,
   dailyRituals,
@@ -41,6 +42,7 @@ import {
   XpCollectibleGiftBoard,
   formatGrantedCollectibles,
 } from "@/components/XpCollectibleGiftBoard";
+import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
 import { XpAlmanacCard } from "@/components/XpAlmanacCard";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import { MOON_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
@@ -343,6 +345,13 @@ export function MoonmereObservatory({
           <span>{progress.dreams.length} bottled dreams</span>
           <span>{progress.journal.length} journal pages</span>
         </div>
+        <WorkshopXpProgress
+          xp={progress.xp}
+          xpLabel="observatory XP"
+          titles={MOON_TITLES}
+          gifts={MOON_XP_COLLECTIBLE_GIFTS}
+          claimedIds={progress.xpGiftsClaimed || []}
+        />
         <XpCollectibleGiftBoard
           xp={progress.xp}
           xpLabel="observatory XP"

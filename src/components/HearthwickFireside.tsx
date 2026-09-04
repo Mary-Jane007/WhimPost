@@ -9,6 +9,7 @@ import {
   COZY_RECIPES,
   HEARTH_ART,
   HEARTH_TABS,
+  HEARTH_TITLES,
   HEARTH_XP,
   HERBS,
   HERB_CATEGORY_LABELS,
@@ -24,6 +25,7 @@ import {
 } from "@/lib/hearthContent";
 import { COLLECTIBLE_META, type CollectibleKind } from "@/lib/villages";
 import { OwnerImageAttach } from "@/components/OwnerImageAttach";
+import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
 import { XpAlmanacCard } from "@/components/XpAlmanacCard";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import {
@@ -185,6 +187,22 @@ export function HearthwickFireside({
           </span>
           <span>{Object.keys(progress.kindling).length} kindling notes</span>
         </div>
+        <WorkshopXpProgress
+          xp={progress.xp}
+          xpLabel="fireside XP"
+          titles={HEARTH_TITLES}
+          secondary={{
+            xp: progress.candleXp || 0,
+            xpLabel: "candle XP",
+            gifts: CANDLE_XP_COLLECTIBLE_GIFTS.map((g) => ({
+              id: g.id,
+              minXp: g.minCandleXp,
+              kind: g.kind,
+              label: g.label,
+            })),
+            claimedIds: progress.candleGiftsClaimed || [],
+          }}
+        />
         <XpAlmanacCard villageId="hearthwick" compact />
       </header>
 
