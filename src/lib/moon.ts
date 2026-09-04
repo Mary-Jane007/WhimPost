@@ -14,6 +14,11 @@ import {
 } from "@/lib/moonContent";
 import { MOON_SOUND_DIR } from "@/lib/moonPaths";
 import { persistAllDurableState } from "@/lib/tvPersist";
+import {
+  MOON_XP_COLLECTIBLE_GIFTS,
+  claimXpCollectibleGifts,
+} from "@/lib/workshopXpGifts";
+import type { CollectibleKind } from "@/lib/villages";
 
 export { MOON_SOUND_DIR } from "@/lib/moonPaths";
 
@@ -56,10 +61,16 @@ export type MoonProgress = {
   journal: MoonJournalEntry[];
   /** playlistId → playable sound URL */
   playlistSounds: Record<string, string>;
+  xpGiftsClaimed: string[];
   featured: {
     ritualIds: string[];
     inspiration: ReturnType<typeof todaysInspiration>;
   };
+};
+
+export type MoonActionResult = {
+  progress: MoonProgress;
+  grantedCollectibles: CollectibleKind[];
 };
 
 type ProgressRow = {
@@ -67,6 +78,7 @@ type ProgressRow = {
   xp: number;
   badges_json: string;
   rituals_json: string;
+  xp_gifts_json?: string;
 };
 
 function parseJson<T>(raw: string | null | undefined, fallback: T): T {
@@ -301,7 +313,7 @@ function readRow(userId: string): ProgressRow {
   const db = getDb();
   return db
     .prepare(
-      `SELECT user_id, xp, badges_json, rituals_json
+      `SELECT user_id, xp, badges_json, rituals_json, xp_gifts_json
        FROM moon_progress WHERE user_id = ?`
     )
     .get(userId) as ProgressRow;
@@ -332,6 +344,7 @@ export function getMoonProgress(userId: string): MoonProgress {
     dreams: listDreams(),
     journal: listJournal(userId),
     playlistSounds: listPlaylistSounds(),
+    xpGiftsClaimed: parseJson(row.xp_gifts_json, []),
     featured: {
       ritualIds: rituals.map((r) => r.id),
       inspiration,
@@ -347,13 +360,14 @@ export type MoonAction =
 export function applyMoonAction(
   userId: string,
   action: MoonAction
-): MoonProgress {
+): MoonActionResult {
   const db = getDb();
   ensureProgressRow(userId);
   const row = readRow(userId);
   let xp = Number(row.xp) || 0;
   let badges = parseJson<string[]>(row.badges_json, []);
   const ritualsDone = parseJson<Record<string, boolean>>(row.rituals_json, {});
+  let xpGiftsClaimed = parseJson<string[]>(row.xp_gifts_json, []);
 
   if (action.type === "completeRitual") {
     const todays = dailyRituals();
@@ -402,14 +416,34 @@ export function applyMoonAction(
     }
   }
 
+  const giftResult = claimXpCollectibleGifts(
+    db,
+    userId,
+    xp,
+    MOON_XP_COLLECTIBLE_GIFTS,
+    xpGiftsClaimed
+  );
+  xpGiftsClaimed = giftResult.claimed;
+  const grantedCollectibles = giftResult.granted;
+
   db.prepare(
     `UPDATE moon_progress SET
       xp = ?,
       badges_json = ?,
       rituals_json = ?,
+      xp_gifts_json = ?,
       updated_at = datetime('now')
      WHERE user_id = ?`
-  ).run(xp, JSON.stringify(badges), JSON.stringify(ritualsDone), userId);
+  ).run(
+    xp,
+    JSON.stringify(badges),
+    JSON.stringify(ritualsDone),
+    JSON.stringify(xpGiftsClaimed),
+    userId
+  );
 
-  return getMoonProgress(userId);
+  return {
+    progress: getMoonProgress(userId),
+    grantedCollectibles,
+  };
 }

@@ -9109,6 +9109,142 @@ button.mh-card-cover {
 
 .hw-card.done { opacity: 0.82; }
 
+.hw-candle-xp-board {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 248, 236, 0.98), rgba(240, 220, 190, 0.94));
+  border: 1px solid rgba(120, 80, 40, 0.28);
+}
+
+.hw-candle-xp-stat {
+  margin: 0 0 0.65rem;
+  color: #3d2a1c;
+  font-size: 0.95rem;
+}
+
+.hw-candle-gift-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+@media (min-width: 720px) {
+  .hw-candle-gift-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.hw-candle-gift-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.7rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 246, 0.85);
+  border: 1px solid rgba(110, 75, 45, 0.18);
+  color: #3d2a1c;
+  font-size: 0.88rem;
+}
+
+.hw-candle-gift-list li.claimed {
+  opacity: 0.78;
+  border-color: rgba(90, 130, 70, 0.35);
+}
+
+.hw-candle-gift-list li.ready {
+  border-color: rgba(180, 110, 40, 0.45);
+  background: rgba(255, 240, 210, 0.95);
+}
+
+.hw-candle-gift-xp {
+  font-weight: 700;
+  color: #6b4224;
+  min-width: 4.2rem;
+}
+
+.hw-candle-gift-label {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: #6a4a30;
+  text-transform: lowercase;
+}
+
+.xp-gift-board {
+  margin: 0.85rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 245, 0.96), rgba(236, 228, 214, 0.92));
+  border: 1px solid rgba(90, 70, 45, 0.22);
+  color: #2c2418;
+}
+
+.xp-gift-stat {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  color: #2c2418;
+}
+
+.xp-gift-lead {
+  color: #5a4a38;
+  font-size: 0.88rem;
+}
+
+.xp-gift-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+@media (min-width: 720px) {
+  .xp-gift-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.xp-gift-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.7rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 252, 0.82);
+  border: 1px solid rgba(90, 70, 45, 0.16);
+  font-size: 0.88rem;
+  color: #2c2418;
+}
+
+.xp-gift-list li.claimed {
+  opacity: 0.78;
+  border-color: rgba(90, 130, 70, 0.35);
+}
+
+.xp-gift-list li.ready {
+  border-color: rgba(160, 110, 45, 0.4);
+  background: rgba(255, 244, 220, 0.95);
+}
+
+.xp-gift-xp {
+  font-weight: 700;
+  color: #5a4328;
+  min-width: 4.2rem;
+}
+
+.xp-gift-label {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: #6a5640;
+  text-transform: lowercase;
+}
+
 .hw-card p {
   color: #443022;
   line-height: 1.5;

@@ -19,6 +19,11 @@ import {
   titleForXp,
   type WorkshopTabId,
 } from "@/lib/workshopContent";
+import {
+  WORKSHOP_XP_COLLECTIBLE_GIFTS,
+  claimXpCollectibleGifts,
+} from "@/lib/workshopXpGifts";
+import type { CollectibleKind } from "@/lib/villages";
 
 export type JournalEntry = {
   id: string;
@@ -47,11 +52,17 @@ export type WorkshopProgress = {
   birds: Record<string, { spotted: boolean; photoUrl?: string }>;
   collections: Record<string, number>;
   journal: JournalEntry[];
+  xpGiftsClaimed: string[];
   featured: {
     craftId: string;
     promptId: string;
     expeditionId: string;
   };
+};
+
+export type WorkshopActionResult = {
+  progress: WorkshopProgress;
+  grantedCollectibles: CollectibleKind[];
 };
 
 type ProgressRow = {
@@ -67,6 +78,7 @@ type ProgressRow = {
   birds_json: string;
   broadcast_json: string;
   seasonal_json: string;
+  xp_gifts_json?: string;
   updated_at: string;
 };
 
@@ -95,7 +107,12 @@ function readRow(userId: string): ProgressRow {
   ensureProgressRow(userId);
   const db = getDb();
   return db
-    .prepare(`SELECT * FROM workshop_progress WHERE user_id = ?`)
+    .prepare(
+      `SELECT user_id, xp, badges_json, completed_json, photos_json, quest_json,
+              quest_photos_json, plant_id, plant_weeks_json, birds_json,
+              broadcast_json, seasonal_json, xp_gifts_json, updated_at
+       FROM workshop_progress WHERE user_id = ?`
+    )
     .get(userId) as ProgressRow;
 }
 
@@ -153,6 +170,7 @@ export function getWorkshopProgress(userId: string): WorkshopProgress {
     birds: parseJson(row.birds_json, {}),
     collections: broadcast.collections || {},
     journal: listJournal(userId),
+    xpGiftsClaimed: parseJson(row.xp_gifts_json, []),
     featured: {
       craftId: featuredCraft().id,
       promptId: featuredPrompt().id,
@@ -260,7 +278,7 @@ export type WorkshopAction =
 export function applyWorkshopAction(
   userId: string,
   action: WorkshopAction
-): WorkshopProgress {
+): WorkshopActionResult {
   const db = getDb();
   ensureProgressRow(userId);
   const row = readRow(userId);
@@ -286,6 +304,7 @@ export function applyWorkshopAction(
     {}
   );
   const collections = { ...(broadcast.collections || {}) };
+  let xpGiftsClaimed = parseJson<string[]>(row.xp_gifts_json, []);
 
   if (action.type === "complete") {
     if (!completed[action.key]) {
@@ -365,7 +384,7 @@ export function applyWorkshopAction(
     const name = action.activityName.trim().slice(0, 120);
     const note = action.note.trim().slice(0, 2000);
     if (!name || !note) {
-      return getWorkshopProgress(userId);
+      return { progress: getWorkshopProgress(userId), grantedCollectibles: [] };
     }
 
     const craft = CRAFTS.find((c) => c.id === action.activityId);
@@ -450,6 +469,16 @@ export function applyWorkshopAction(
     }
   }
 
+  const giftResult = claimXpCollectibleGifts(
+    db,
+    userId,
+    xp,
+    WORKSHOP_XP_COLLECTIBLE_GIFTS,
+    xpGiftsClaimed
+  );
+  xpGiftsClaimed = giftResult.claimed;
+  const grantedCollectibles = giftResult.granted;
+
   db.prepare(
     `UPDATE workshop_progress
      SET xp = ?,
@@ -463,6 +492,7 @@ export function applyWorkshopAction(
          birds_json = ?,
          broadcast_json = ?,
          seasonal_json = ?,
+         xp_gifts_json = ?,
          updated_at = datetime('now')
      WHERE user_id = ?`
   ).run(
@@ -477,10 +507,14 @@ export function applyWorkshopAction(
     JSON.stringify(birds),
     JSON.stringify({ collections }),
     "{}",
+    JSON.stringify(xpGiftsClaimed),
     userId
   );
 
-  return getWorkshopProgress(userId);
+  return {
+    progress: getWorkshopProgress(userId),
+    grantedCollectibles,
+  };
 }
 
 export function craftCompletionPayload(craftId: string, photoUrl?: string) {

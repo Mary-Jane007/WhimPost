@@ -32,6 +32,12 @@ import {
   villageMediaKey,
   type VillageMediaMap,
 } from "@/lib/villageMediaShared";
+import {
+  XpCollectibleGiftBoard,
+  formatGrantedCollectibles,
+} from "@/components/XpCollectibleGiftBoard";
+import { GARDEN_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
+import type { CollectibleKind } from "@/lib/villages";
 
 type Props = {
   user: UserPublic;
@@ -117,9 +123,19 @@ export function BloomkeeperGarden({
         setProgress(data.progress);
         triggerBloom();
       }
+      const grantedCollectibles = (data.grantedCollectibles ||
+        []) as CollectibleKind[];
+      if (grantedCollectibles.length) {
+        setToast(
+          `Collectible gift: ${formatGrantedCollectibles(grantedCollectibles)}`
+        );
+      }
       const { emitChronicleUnlock } = await import("@/lib/chronicleClient");
       emitChronicleUnlock(data.chronicleUnlock);
-      return data.progress as GardenProgress;
+      return {
+        progress: data.progress as GardenProgress,
+        grantedCollectibles,
+      };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       return null;
@@ -224,6 +240,13 @@ export function BloomkeeperGarden({
           <span>{progress.blooms} blooms</span>
           <span>{progress.badges.length} badges</span>
         </div>
+        <XpCollectibleGiftBoard
+          xp={progress.xp}
+          xpLabel="garden XP"
+          gifts={GARDEN_XP_COLLECTIBLE_GIFTS}
+          claimedIds={progress.xpGiftsClaimed || []}
+          lead="Reach XP milestones to gift Clovermeadow collectibles"
+        />
       </header>
 
       {error ? <p className="cm-error">{error}</p> : null}
@@ -404,12 +427,16 @@ export function BloomkeeperGarden({
                           mood: "gentle",
                           note: note || undefined,
                           photoUrl: photo || undefined,
-                        }).then((p) => {
-                          if (p?.dailyDone[key]) {
+                        }).then((result) => {
+                          if (result?.progress.dailyDone[key]) {
+                            const gifts = result.grantedCollectibles || [];
+                            const base = task.communityBonus
+                              ? "Community meadow brightened — and a flower bloomed."
+                              : "A flower bloomed in your meadow.";
                             setToast(
-                              task.communityBonus
-                                ? "Community meadow brightened — and a flower bloomed."
-                                : "A flower bloomed in your meadow."
+                              gifts.length
+                                ? `${base} Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                                : base
                             );
                             setDailyPhotos((prev) => {
                               const next = { ...prev };
@@ -452,11 +479,16 @@ export function BloomkeeperGarden({
                   photoUrl: spotPhoto || undefined,
                   note: spotNote,
                   mood: "wonder",
-                }).then((p) => {
-                  if (p) {
+                }).then((result) => {
+                  if (result) {
                     setSpotNote("");
                     setSpotPhoto(null);
-                    setToast("Spotted flower added to your meadow.");
+                    const gifts = result.grantedCollectibles || [];
+                    setToast(
+                      gifts.length
+                        ? `Spotted flower added to your meadow. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                        : "Spotted flower added to your meadow."
+                    );
                   }
                 });
               }}
@@ -578,8 +610,14 @@ export function BloomkeeperGarden({
                         void postAction({
                           type: "completeKindness",
                           missionId: m.id,
-                        }).then((p) => {
-                          if (p) setToast(`${m.rareFlower} bloomed for you.`);
+                        }).then((result) => {
+                          if (!result) return;
+                          const gifts = result.grantedCollectibles || [];
+                          setToast(
+                            gifts.length
+                              ? `${m.rareFlower} bloomed for you. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                              : `${m.rareFlower} bloomed for you.`
+                          );
                         })
                       }
                     >
@@ -619,10 +657,15 @@ export function BloomkeeperGarden({
                     type: "submitSeed",
                     promptId: seed.id,
                     body: seedBody,
-                  }).then((p) => {
-                    if (p) {
+                  }).then((result) => {
+                    if (result) {
                       setSeedBody("");
-                      setToast("A joy petal drifted into the meadow.");
+                      const gifts = result.grantedCollectibles || [];
+                      setToast(
+                        gifts.length
+                          ? `A joy petal drifted into the meadow. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                          : "A joy petal drifted into the meadow."
+                      );
                     }
                   });
                 }}
@@ -869,11 +912,16 @@ export function BloomkeeperGarden({
                   activityName: journalName,
                   note: journalNote,
                   mood: journalMood,
-                }).then((p) => {
-                  if (p) {
+                }).then((result) => {
+                  if (result) {
                     setJournalName("");
                     setJournalNote("");
-                    setToast("Scrapbook page pressed.");
+                    const gifts = result.grantedCollectibles || [];
+                    setToast(
+                      gifts.length
+                        ? `Scrapbook page pressed. Collectible gift: ${formatGrantedCollectibles(gifts)}`
+                        : "Scrapbook page pressed."
+                    );
                   }
                 });
               }}
