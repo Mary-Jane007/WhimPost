@@ -47,10 +47,13 @@ export async function POST(req: NextRequest) {
     return jsonError("Expected an observatory action");
   }
 
-  const progress = applyMoonAction(gate.user.id, body);
+  const { progress, grantedCollectibles } = applyMoonAction(
+    gate.user.id,
+    body
+  );
   const key = MOON_KEYS[body.type];
   const chronicleUnlock = key
     ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
     : null;
-  return NextResponse.json({ progress, chronicleUnlock });
+  return NextResponse.json({ progress, grantedCollectibles, chronicleUnlock });
 }

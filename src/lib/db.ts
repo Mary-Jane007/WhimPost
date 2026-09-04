@@ -549,6 +549,30 @@ function migrate(db: Database.Database) {
     "candle_gifts_json",
     "candle_gifts_json TEXT NOT NULL DEFAULT '[]'"
   );
+  ensureColumn(
+    db,
+    "library_progress",
+    "xp_gifts_json",
+    "xp_gifts_json TEXT NOT NULL DEFAULT '[]'"
+  );
+  ensureColumn(
+    db,
+    "garden_progress",
+    "xp_gifts_json",
+    "xp_gifts_json TEXT NOT NULL DEFAULT '[]'"
+  );
+  ensureColumn(
+    db,
+    "moon_progress",
+    "xp_gifts_json",
+    "xp_gifts_json TEXT NOT NULL DEFAULT '[]'"
+  );
+  ensureColumn(
+    db,
+    "workshop_progress",
+    "xp_gifts_json",
+    "xp_gifts_json TEXT NOT NULL DEFAULT '[]'"
+  );
   ensureColumn(db, "village_notes", "image_url", "image_url TEXT");
   ensureColumn(
     db,

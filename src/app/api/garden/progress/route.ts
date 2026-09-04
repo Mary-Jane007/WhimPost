@@ -48,10 +48,13 @@ export async function POST(req: NextRequest) {
     return jsonError("Expected a garden action");
   }
 
-  const progress = applyGardenAction(gate.user.id, body);
+  const { progress, grantedCollectibles } = applyGardenAction(
+    gate.user.id,
+    body
+  );
   const key = GARDEN_KEYS[body.type];
   const chronicleUnlock = key
     ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
     : null;
-  return NextResponse.json({ progress, chronicleUnlock });
+  return NextResponse.json({ progress, grantedCollectibles, chronicleUnlock });
 }
