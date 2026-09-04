@@ -31,6 +31,7 @@ const HEARTH_KEYS: Partial<Record<HearthAction["type"], ChronicleActivityKey>> =
     completeRitual: "hearth.completeRitual",
     leaveNote: "hearth.leaveNote",
     toggleRecipeFavorite: "hearth.toggleRecipeFavorite",
+    completeCandleCraft: "hearth.completeCandleCraft",
   };
 
 export async function GET() {
@@ -48,10 +49,17 @@ export async function POST(req: NextRequest) {
     return jsonError("Expected a fireside action");
   }
 
-  const progress = applyHearthAction(gate.user.id, body);
+  const { progress, grantedCollectibles } = applyHearthAction(
+    gate.user.id,
+    body
+  );
   const key = HEARTH_KEYS[body.type];
   const chronicleUnlock = key
     ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
     : null;
-  return NextResponse.json({ progress, chronicleUnlock });
+  return NextResponse.json({
+    progress,
+    grantedCollectibles,
+    chronicleUnlock,
+  });
 }

@@ -25,6 +25,11 @@ import {
   saveReadingPosition,
   type ReadingPositions,
 } from "@/lib/libraryReading";
+import {
+  LIBRARY_XP_COLLECTIBLE_GIFTS,
+  claimXpCollectibleGifts,
+} from "@/lib/workshopXpGifts";
+import type { CollectibleKind } from "@/lib/villages";
 
 export type LibraryJournalEntry = {
   id: string;
@@ -62,6 +67,7 @@ export type LibraryProgress = {
   archives: Record<string, { favorite?: boolean; completed?: boolean; progress?: number }>;
   collectionProgress: Record<string, number>;
   secretsFound: string[];
+  xpGiftsClaimed: string[];
   journal: LibraryJournalEntry[];
   thoughts: ThoughtReply[];
   featured: {
@@ -71,6 +77,11 @@ export type LibraryProgress = {
     thoughtId: string;
     challengeIds: string[];
   };
+};
+
+export type LibraryActionResult = {
+  progress: LibraryProgress;
+  grantedCollectibles: CollectibleKind[];
 };
 
 type ProgressRow = {
@@ -89,6 +100,7 @@ type ProgressRow = {
   archives_json: string;
   collections_json: string;
   secrets_json: string;
+  xp_gifts_json?: string;
 };
 
 function parseJson<T>(raw: string | null | undefined, fallback: T): T {
@@ -256,6 +268,7 @@ export function getLibraryProgress(userId: string): LibraryProgress {
     archives: parseJson(row.archives_json, {}),
     collectionProgress: parseJson(row.collections_json, {}),
     secretsFound: parseJson(row.secrets_json, []),
+    xpGiftsClaimed: parseJson(row.xp_gifts_json, []),
     journal: listJournal(userId),
     thoughts: listThoughts(thought.id),
     featured: {
@@ -295,7 +308,7 @@ export type LibraryAction =
 export function applyLibraryAction(
   userId: string,
   action: LibraryAction
-): LibraryProgress {
+): LibraryActionResult {
   const db = getDb();
   ensureProgressRow(userId);
   const row = readRow(userId);
@@ -331,6 +344,7 @@ export function applyLibraryAction(
     {}
   );
   let secretsFound = parseJson<string[]>(row.secrets_json, []);
+  let xpGiftsClaimed = parseJson<string[]>(row.xp_gifts_json, []);
 
   const bumpCollection = (id: string, by = 1) => {
     collectionProgress[id] = (collectionProgress[id] || 0) + by;
@@ -362,11 +376,11 @@ export function applyLibraryAction(
     readingStatus[action.bookId] =
       pct >= 100 ? "finished" : pct > 0 ? "reading" : readingStatus[action.bookId] || "none";
     // Early return — saveReadingPosition already wrote progress columns.
-    return getLibraryProgress(userId);
+    return { progress: getLibraryProgress(userId), grantedCollectibles: [] };
   } else if (action.type === "resetReadingProgress") {
     resetUserReadingProgress(userId, action.bookId);
     // Early return — reset already wrote progress columns.
-    return getLibraryProgress(userId);
+    return { progress: getLibraryProgress(userId), grantedCollectibles: [] };
   } else if (action.type === "finishBook") {
     const book = findLibraryBook(action.bookId);
     if (book && !finishedBooks[action.bookId]) {
@@ -552,6 +566,16 @@ export function applyLibraryAction(
     }
   }
 
+  const giftResult = claimXpCollectibleGifts(
+    db,
+    userId,
+    xp,
+    LIBRARY_XP_COLLECTIBLE_GIFTS,
+    xpGiftsClaimed
+  );
+  xpGiftsClaimed = giftResult.claimed;
+  const grantedCollectibles = giftResult.granted;
+
   db.prepare(
     `UPDATE library_progress SET
       xp = ?,
@@ -567,6 +591,7 @@ export function applyLibraryAction(
       archives_json = ?,
       collections_json = ?,
       secrets_json = ?,
+      xp_gifts_json = ?,
       updated_at = datetime('now')
      WHERE user_id = ?`
   ).run(
@@ -583,8 +608,12 @@ export function applyLibraryAction(
     JSON.stringify(archives),
     JSON.stringify(collectionProgress),
     JSON.stringify(secretsFound),
+    JSON.stringify(xpGiftsClaimed),
     userId
   );
 
-  return getLibraryProgress(userId);
+  return {
+    progress: getLibraryProgress(userId),
+    grantedCollectibles,
+  };
 }

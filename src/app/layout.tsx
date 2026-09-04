@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteForestStickers } from "@/components/SiteForestStickers";
 import { ChronicleUnlockHost } from "@/components/ChronicleUnlockHost";
+import { XpCelebrationHost } from "@/components/XpCelebrationHost";
 import { AnalyticsBeacon } from "@/components/AnalyticsBeacon";
 import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
@@ -67,6 +68,7 @@ export default async function RootLayout({
           <SiteNav user={user} badges={badges} />
           {children}
           <ChronicleUnlockHost />
+          <XpCelebrationHost />
           <AnalyticsBeacon />
         </div>
       </body>

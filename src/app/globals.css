@@ -9109,6 +9109,142 @@ button.mh-card-cover {
 
 .hw-card.done { opacity: 0.82; }
 
+.hw-candle-xp-board {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 248, 236, 0.98), rgba(240, 220, 190, 0.94));
+  border: 1px solid rgba(120, 80, 40, 0.28);
+}
+
+.hw-candle-xp-stat {
+  margin: 0 0 0.65rem;
+  color: #3d2a1c;
+  font-size: 0.95rem;
+}
+
+.hw-candle-gift-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+@media (min-width: 720px) {
+  .hw-candle-gift-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.hw-candle-gift-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.7rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 246, 0.85);
+  border: 1px solid rgba(110, 75, 45, 0.18);
+  color: #3d2a1c;
+  font-size: 0.88rem;
+}
+
+.hw-candle-gift-list li.claimed {
+  opacity: 0.78;
+  border-color: rgba(90, 130, 70, 0.35);
+}
+
+.hw-candle-gift-list li.ready {
+  border-color: rgba(180, 110, 40, 0.45);
+  background: rgba(255, 240, 210, 0.95);
+}
+
+.hw-candle-gift-xp {
+  font-weight: 700;
+  color: #6b4224;
+  min-width: 4.2rem;
+}
+
+.hw-candle-gift-label {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: #6a4a30;
+  text-transform: lowercase;
+}
+
+.xp-gift-board {
+  margin: 0.85rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 245, 0.96), rgba(236, 228, 214, 0.92));
+  border: 1px solid rgba(90, 70, 45, 0.22);
+  color: #2c2418;
+}
+
+.xp-gift-stat {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  color: #2c2418;
+}
+
+.xp-gift-lead {
+  color: #5a4a38;
+  font-size: 0.88rem;
+}
+
+.xp-gift-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+@media (min-width: 720px) {
+  .xp-gift-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.xp-gift-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.7rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 252, 0.82);
+  border: 1px solid rgba(90, 70, 45, 0.16);
+  font-size: 0.88rem;
+  color: #2c2418;
+}
+
+.xp-gift-list li.claimed {
+  opacity: 0.78;
+  border-color: rgba(90, 130, 70, 0.35);
+}
+
+.xp-gift-list li.ready {
+  border-color: rgba(160, 110, 45, 0.4);
+  background: rgba(255, 244, 220, 0.95);
+}
+
+.xp-gift-xp {
+  font-weight: 700;
+  color: #5a4328;
+  min-width: 4.2rem;
+}
+
+.xp-gift-label {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: #6a5640;
+  text-transform: lowercase;
+}
+
 .hw-card p {
   color: #443022;
   line-height: 1.5;
@@ -13282,5 +13418,236 @@ svg {
   .vt-board-list > li {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+/* —— XP celebration toasts —— */
+.xp-celeb-stack {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 80;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.75rem;
+  width: min(22rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.xp-celeb-toast {
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  padding: 1rem 1.1rem 0.9rem;
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(165deg, rgba(255, 250, 240, 0.98), rgba(236, 224, 200, 0.96));
+  border: 1px solid rgba(110, 80, 45, 0.28);
+  box-shadow:
+    0 18px 40px rgba(40, 28, 12, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  color: #2c2418;
+  animation: xp-celeb-in 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes xp-celeb-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.xp-celeb-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.xp-celeb-sparkles span {
+  position: absolute;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: #d4a05a;
+  opacity: 0.55;
+  animation: xp-celeb-spark 2.4s ease-in-out infinite;
+}
+
+.xp-celeb-sparkles span:nth-child(1) { top: 12%; left: 10%; animation-delay: 0s; }
+.xp-celeb-sparkles span:nth-child(2) { top: 18%; right: 14%; animation-delay: 0.4s; background: #8a9b68; }
+.xp-celeb-sparkles span:nth-child(3) { bottom: 22%; left: 18%; animation-delay: 0.8s; background: #c4785a; }
+.xp-celeb-sparkles span:nth-child(4) { bottom: 16%; right: 20%; animation-delay: 1.1s; }
+
+@keyframes xp-celeb-spark {
+  0%, 100% { transform: scale(0.6); opacity: 0.25; }
+  50% { transform: scale(1.25); opacity: 0.8; }
+}
+
+.xp-celeb-eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a6145;
+}
+
+.xp-celeb-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.25rem;
+  color: #3a2a18;
+}
+
+.xp-celeb-body {
+  margin: 0 0 0.65rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: #4a3a28;
+}
+
+.xp-celeb-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.55rem;
+}
+
+.xp-celeb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 252, 0.85);
+  border: 1px solid rgba(110, 80, 45, 0.2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5a4328;
+}
+
+.xp-celeb-chip.gift {
+  background: rgba(255, 240, 210, 0.95);
+}
+
+.xp-celeb-dismiss {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #7a6145;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* —— Forest XP almanac cards —— */
+.xp-almanac {
+  margin: 0.85rem 0 1.1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 245, 0.97), rgba(236, 228, 214, 0.94));
+  border: 1px solid rgba(90, 70, 45, 0.22);
+  color: #2c2418;
+}
+
+.xp-almanac.compact {
+  padding: 0.85rem 1rem;
+  margin: 0.65rem 0 0.9rem;
+}
+
+.xp-almanac-eyebrow {
+  margin: 0 0 0.15rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a6145;
+}
+
+.xp-almanac-head h2 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.2rem;
+  color: #3a2a18;
+}
+
+.xp-almanac-lead,
+.xp-almanac-gift-lead {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #5a4a38;
+}
+
+.xp-almanac-tasks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.xp-almanac-tasks li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.15rem 0.75rem;
+  padding: 0.4rem 0.55rem;
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 252, 0.75);
+  border: 1px solid rgba(90, 70, 45, 0.12);
+  font-size: 0.88rem;
+}
+
+.xp-almanac-task {
+  color: #2c2418;
+}
+
+.xp-almanac-xp {
+  font-weight: 700;
+  color: #6b4224;
+  justify-self: end;
+}
+
+.xp-almanac-note {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+  color: #6a5640;
+}
+
+.xp-almanac-gifts {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed rgba(90, 70, 45, 0.25);
+  font-size: 0.86rem;
+  color: #4a3a28;
+}
+
+.xp-almanac-gifts ul {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.xp-almanac-gifts em {
+  font-style: normal;
+  color: #7a6145;
+  font-size: 0.8rem;
+}
+
+.compose-xp-almanac {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .xp-celeb-stack {
+    left: max(0.75rem, env(safe-area-inset-left));
+    right: max(0.75rem, env(safe-area-inset-right));
+    width: auto;
   }
 }
