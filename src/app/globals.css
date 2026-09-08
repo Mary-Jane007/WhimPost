@@ -11650,76 +11650,30 @@ button.mh-card-cover {
 /* ——— Meeting Bench ——— */
 /* ——— Meeting Bench (immersive living place) ——— */
 .meeting-bench-page {
-  --mb-ink: #000000;
-  --mb-muted: #1a1a1a;
-  /* Decorative colors derive only from village theme */
-  --mb-accent: var(--village-color, #6b8f71);
-  --mb-soft: var(--village-soft, #6b8f71);
-  --mb-wood: color-mix(in srgb, var(--village-color, #6b4a2e) 62%, #4a3420);
-  --mb-wood-light: color-mix(in srgb, var(--village-soft, #8a6340) 55%, #c4a06a);
-  --mb-paper: color-mix(in srgb, var(--village-soft, #6b8f71) 14%, #fffdf8);
-  --mb-pin: color-mix(in srgb, var(--village-color, #6b8f71) 72%, #4a2424);
-  --mb-wash: color-mix(in srgb, var(--village-soft, #6b8f71) 26%, transparent);
-  --mb-glow: color-mix(in srgb, var(--village-soft, #6b8f71) 30%, transparent);
-  --mb-scene-top: color-mix(in srgb, var(--village-soft, #6b8f71) 20%, #ffffff);
-  --mb-scene-mid: color-mix(in srgb, var(--village-soft, #6b8f71) 10%, #ffffff);
-  --mb-scene-bot: color-mix(in srgb, var(--village-soft, #6b8f71) 24%, #f3efe7);
-  --mb-photo-filter: none;
-  --mb-photo-warmth: color-mix(in srgb, var(--village-color, #6b8f71) 10%, transparent);
-  --mb-season-tint: transparent;
-  --mb-light-text: #f5f0e6;
-  --mb-dark-text: #000000;
-  color: var(--mb-light-text);
+  --mb-wood: #6b4a2e;
+  --mb-wood-light: #8a6340;
+  --mb-paper: #f3e6d0;
+  --mb-ink: #3a2a1c;
+  --mb-moss: #4f6b4a;
+  --mb-pin: #b33a3a;
 }
 
-/* Per-village atmospheres — theme washes only */
-.meeting-bench-page.village-bramblewood {
-  --village-color: #e07020;
-  --village-soft: #f0a868;
-  --mb-scene-top: #fff6ec;
-  --mb-scene-mid: #ffe9d4;
-  --mb-scene-bot: #f5d4b0;
-  --mb-photo-filter: saturate(1.06) contrast(1.03) sepia(0.08);
+.meeting-bench-page.season-spring {
+  --mb-accent: #6a9a6a;
+  --mb-wash: rgba(186, 220, 180, 0.22);
 }
-.meeting-bench-page.village-mosshollow {
-  --village-color: #1a3d2e;
-  --village-soft: #6b8f71;
-  --mb-scene-top: #f2f6f1;
-  --mb-scene-mid: #e4eee5;
-  --mb-scene-bot: #cfdccf;
-  --mb-photo-filter: saturate(0.96) hue-rotate(-6deg) contrast(1.02);
+.meeting-bench-page.season-summer {
+  --mb-accent: #c48a3a;
+  --mb-wash: rgba(255, 214, 140, 0.2);
 }
-.meeting-bench-page.village-clovermeadow {
-  --village-color: #d4849a;
-  --village-soft: #f2c4d0;
-  --mb-scene-top: #fff7f9;
-  --mb-scene-mid: #ffeef3;
-  --mb-scene-bot: #f6d8e2;
-  --mb-photo-filter: saturate(1.05) brightness(1.02);
+.meeting-bench-page.season-autumn {
+  --mb-accent: #b65a2e;
+  --mb-wash: rgba(220, 150, 90, 0.2);
 }
-.meeting-bench-page.village-moonmere {
-  --village-color: #2a3548;
-  --village-soft: #8a9b88;
-  --mb-scene-top: #eef2f4;
-  --mb-scene-mid: #e2e8ec;
-  --mb-scene-bot: #c9d3d8;
-  --mb-photo-filter: saturate(0.9) brightness(0.98) hue-rotate(8deg);
-}
-.meeting-bench-page.village-hearthwick {
-  --village-color: #8b5a2b;
-  --village-soft: #e2c39a;
-  --mb-scene-top: #fff8ef;
-  --mb-scene-mid: #f7ead6;
-  --mb-scene-bot: #e8d0b0;
-  --mb-photo-filter: saturate(1.05) contrast(1.02) sepia(0.06);
-}
-
-.meeting-bench-page.season-spring { --mb-season-tint: color-mix(in srgb, var(--village-soft) 16%, transparent); }
-.meeting-bench-page.season-summer { --mb-season-tint: color-mix(in srgb, var(--village-soft) 14%, transparent); }
-.meeting-bench-page.season-autumn { --mb-season-tint: color-mix(in srgb, var(--village-color) 10%, transparent); }
-.meeting-bench-page.season-winter { --mb-season-tint: color-mix(in srgb, var(--village-soft) 12%, transparent); }
-
-.meeting-bench-kicker {
+.meeting-bench-page.season-winter {
+  --mb-accent: #5a7388;
+  --mb-wash: rgba(180, 205, 220, 0.22);
+}.meeting-bench-kicker {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 0.78rem;
