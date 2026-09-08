@@ -6,7 +6,7 @@ import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import { getVillage, isVillageId } from "@/lib/villages";
 import { persistAllDurableState } from "@/lib/tvPersist";
-import { isSharedTvChannelTitle } from "@/lib/persistentTvMedia";
+import { isProtectedTvChannelTitle, isSharedTvChannelTitle } from "@/lib/tvProtectedChannels";
 import {
   addVideoToChannelSchedule,
   probeAndStoreDuration,
@@ -260,6 +260,13 @@ export function deleteChannel(channelId: string, user: UserPublic) {
   const channel = getChannelById(channelId);
   if (!channel) {
     return { ok: false as const, error: "Channel not found", status: 404 };
+  }
+  if (isProtectedTvChannelTitle(channel.title)) {
+    return {
+      ok: false as const,
+      error: `${channel.title} is a forever lounge channel and cannot be removed`,
+      status: 403,
+    };
   }
 
   const db = getDb();
