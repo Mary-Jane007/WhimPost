@@ -8,11 +8,21 @@ import {
   PERSISTENT_TV_MEDIA_PATH,
   TV_CACHE_DIR,
 } from "@/lib/tvMediaPaths";
+import {
+  isProtectedTvChannelTitle,
+  isSharedTvChannelTitle,
+  PROTECTED_SHARED_TV_TITLES,
+} from "@/lib/tvProtectedChannels";
 
 /**
  * Git-tracked catalog of uploaded TV files (metadata only).
  */
 export { PERSISTENT_TV_MEDIA_PATH } from "@/lib/tvMediaPaths";
+export {
+  isProtectedTvChannelTitle,
+  isSharedTvChannelTitle,
+  PROTECTED_SHARED_TV_TITLES,
+} from "@/lib/tvProtectedChannels";
 
 export type PersistentTvMediaClip = {
   title: string;
@@ -24,11 +34,6 @@ export type PersistentTvMediaClip = {
   villageId: string | null;
   isGlobal?: boolean;
 };
-
-/** Channels that should always play in every village lounge. */
-export function isSharedTvChannelTitle(title: string) {
-  return title.trim().toLowerCase() === "cottage cartoons";
-}
 
 /**
  * True when catalog bytes are watchable locally — either a real upload or a
@@ -43,8 +48,8 @@ function clipBytesPresent(filename: string) {
 }
 
 /**
- * Promote shared channels (Cottage Cartoons) to every-village and clear
- * village locks on their clips so all lounges can tune in.
+ * Promote shared channels (Cottage Cartoons, Storybook Cinema) to every-village
+ * and clear village locks on their clips so all lounges can tune in.
  */
 export function ensureSharedTvChannelsGlobal(db: Database) {
   const channels = db
@@ -68,6 +73,53 @@ export function ensureSharedTvChannelsGlobal(db: Database) {
     changed += locked;
   }
   return changed;
+}
+
+/**
+ * Always create protected shared channel rows — even before clip bytes land —
+ * so The Storybook Cinema never vanishes from the lounge dial.
+ */
+export function ensureProtectedTvChannels(db: Database) {
+  const owner = db
+    .prepare(
+      `SELECT id FROM users
+       WHERE is_owner = 1
+       ORDER BY CASE WHEN username = 'Mary_Jane' THEN 0 ELSE 1 END, created_at ASC
+       LIMIT 1`
+    )
+    .get() as { id: string } | undefined;
+  const anyUser = db.prepare(`SELECT id FROM users LIMIT 1`).get() as
+    | { id: string }
+    | undefined;
+  const creatorId = owner?.id || anyUser?.id;
+  if (!creatorId) return 0;
+
+  const findChannel = db.prepare(
+    `SELECT id FROM tv_channels
+     WHERE lower(trim(title)) = lower(?)
+     ORDER BY is_global DESC, created_at ASC
+     LIMIT 1`
+  );
+  const insertChannel = db.prepare(
+    `INSERT INTO tv_channels (id, title, village_id, created_by, is_global)
+     VALUES (?, ?, ?, ?, 1)`
+  );
+
+  const titles = ["Cottage Cartoons", "The Storybook Cinema"];
+  let created = 0;
+  for (const title of titles) {
+    const existing = findChannel.get(title) as { id: string } | undefined;
+    if (existing) {
+      db.prepare(`UPDATE tv_channels SET is_global = 1 WHERE id = ?`).run(
+        existing.id
+      );
+      continue;
+    }
+    insertChannel.run(randomUUID(), title, "mosshollow", creatorId);
+    created += 1;
+  }
+  ensureSharedTvChannelsGlobal(db);
+  return created;
 }
 
 type PersistentTvMediaFile = {
@@ -121,6 +173,7 @@ function shuffleIds(ids: string[]): string[] {
 
 /** Snapshot uploaded (file) TV clips so fresh servers can restore them. */
 export function exportPersistentTvMedia(db: Database) {
+  const previous = readFile();
   const rows = db
     .prepare(
       `SELECT v.title, v.filename, v.mime, v.size_bytes, v.duration_ms,
@@ -141,12 +194,12 @@ export function exportPersistentTvMedia(db: Database) {
     is_global: number | null;
   }>;
 
-  const clips: PersistentTvMediaClip[] = [];
+  const byFilename = new Map<string, PersistentTvMediaClip>();
   for (const row of rows) {
     if (row.filename.startsWith("link-")) continue;
     const filePath = path.join(UPLOAD_DIR, row.filename);
-    if (!fs.existsSync(filePath)) continue;
-    clips.push({
+    if (!fs.existsSync(filePath) && !clipBytesPresent(row.filename)) continue;
+    byFilename.set(row.filename, {
       title: row.title,
       filename: row.filename,
       mime: row.mime || "video/mp4",
@@ -154,17 +207,35 @@ export function exportPersistentTvMedia(db: Database) {
       durationMs: row.duration_ms > 0 ? row.duration_ms : undefined,
       channelTitle: row.channel_title || "Clip shelf",
       villageId: row.village_id,
-      isGlobal: Boolean(row.is_global),
+      isGlobal:
+        Boolean(row.is_global) ||
+        isSharedTvChannelTitle(row.channel_title || ""),
     });
   }
 
-  writeFile(clips);
+  // Never let a temporary empty DB wipe protected forever channels from git.
+  for (const clip of previous?.clips || []) {
+    if (!isProtectedTvChannelTitle(clip.channelTitle)) continue;
+    if (!clip.filename || byFilename.has(clip.filename)) continue;
+    byFilename.set(clip.filename, {
+      ...clip,
+      isGlobal: true,
+      villageId: null,
+      channelTitle: clip.channelTitle.trim() || "The Storybook Cinema",
+    });
+  }
+
+  writeFile(Array.from(byFilename.values()));
 }
 
 /** Restore uploaded clips into owner channels (and seed shuffle schedules). */
 export function importPersistentTvMedia(db: Database) {
+  ensureProtectedTvChannels(db);
   const file = readFile();
-  if (!file || file.clips.length === 0) return;
+  if (!file || file.clips.length === 0) {
+    ensureSharedTvChannelsGlobal(db);
+    return;
+  }
 
   const owner = db
     .prepare(

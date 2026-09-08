@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { UserPublic } from "@/lib/types";
 import type { VillageId } from "@/lib/villages";
 import type { TvChannel, TvRoomState, TvVideo } from "@/lib/tvCorner";
+import { isProtectedTvChannelTitle } from "@/lib/tvProtectedChannels";
 import { TV_MAX_BYTES, TV_MAX_LABEL } from "@/lib/tvUploadLimits";
 
 type Props = {
@@ -316,6 +317,13 @@ export function TvCorner({
 
   async function removeChannel(id: string) {
     if (!user.isOwner) return;
+    const target = channels.find((c) => c.id === id);
+    if (target && isProtectedTvChannelTitle(target.title)) {
+      setError(
+        `${target.title} is a forever lounge channel and cannot be removed`
+      );
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -1067,7 +1075,7 @@ export function TvCorner({
                         {ch.videos.length === 1 ? "" : "s"}
                       </span>
                     </button>
-                    {user.isOwner ? (
+                    {user.isOwner && !isProtectedTvChannelTitle(ch.title) ? (
                       <button
                         type="button"
                         className="tv-video-remove"
@@ -1341,7 +1349,8 @@ export function TvCorner({
                           {tuned ? " · on air" : ""}
                         </span>
                       </button>
-                      {user.isOwner ? (
+                      {user.isOwner &&
+                      !isProtectedTvChannelTitle(channel.title) ? (
                         <button
                           type="button"
                           className="tv-video-remove"

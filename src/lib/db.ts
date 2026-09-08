@@ -679,6 +679,7 @@ function createDb() {
   // Restore uploaded file clips when bytes are already present locally.
   try {
     const tvMedia = loadPersistentTvMedia();
+    tvMedia.ensureProtectedTvChannels(db);
     tvMedia.importPersistentTvMedia(db);
   } catch (err) {
     console.error("[persistent-tv-media] import failed:", err);
@@ -753,6 +754,7 @@ export function getDb() {
       }
       try {
         const tvMedia = loadPersistentTvMedia();
+        tvMedia.ensureProtectedTvChannels(globalForDb.whimpostDb);
         tvMedia.importPersistentTvMedia(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-tv-media] import failed:", err);
