@@ -3810,8 +3810,626 @@ body.theme-mosshollow .cottage-window-glow {
   }
 }
 
+/* —— Personal Cottage advances —— */
+.cottage-main {
+  width: min(1240px, calc(100% - 1rem));
+}
 
-/* —— Moonmere vintage celestial village theme —— */
+.personal-cottage .cottage-room {
+  min-height: min(68vh, 640px);
+  height: clamp(420px, 68vh, 680px);
+}
+
+.cottage-sign {
+  margin: 0.45rem 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: color-mix(in srgb, var(--cream, #f3e6d0) 78%, var(--gold));
+}
+
+.cottage-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.1rem;
+  padding: 0.35rem 0.15rem;
+  font-family: var(--font-stamp);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(243, 230, 208, 0.72);
+}
+
+.cottage-saving {
+  font-style: normal;
+  opacity: 0.65;
+}
+
+.cottage-window-pane {
+  position: absolute;
+  top: 10%;
+  right: 12%;
+  width: 24%;
+  height: 32%;
+  border: 3px solid rgba(70, 48, 28, 0.65);
+  border-radius: 14% 18% 12% 16% / 18% 14% 20% 16%;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 236, 200, 0.18),
+    0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.cottage-sky {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, #87b5d8 0%, #cfe4f4 55%, #f2e6c8 100%);
+}
+
+.time-evening .cottage-sky {
+  background: linear-gradient(180deg, #c47a4a 0%, #e8b06a 45%, #5a3a28 100%);
+}
+
+.time-night .cottage-sky {
+  background: linear-gradient(180deg, #12182a 0%, #243454 50%, #1a2438 100%);
+}
+
+.cottage-weather-fx,
+.cottage-window-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.personal-cottage .cottage-window-glow {
+  top: auto;
+  right: auto;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  filter: none;
+  animation: cottageWindow 7s ease-in-out infinite;
+  background: radial-gradient(
+    ellipse at 40% 30%,
+    rgba(255, 245, 210, 0.45),
+    transparent 70%
+  );
+}
+
+.time-night .cottage-window-glow {
+  background: radial-gradient(
+    ellipse at 45% 35%,
+    rgba(180, 210, 255, 0.35),
+    transparent 68%
+  );
+}
+
+.weather-rain .cottage-weather-fx {
+  background-image: repeating-linear-gradient(
+    -18deg,
+    transparent 0 10px,
+    rgba(220, 235, 255, 0.28) 10px 11px
+  );
+  animation: cottageRain 0.7s linear infinite;
+  opacity: 0.55;
+}
+
+.weather-snow .cottage-weather-fx {
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.7) 0 1.5px, transparent 3px);
+  background-size: 18px 22px, 28px 34px;
+  animation: cottageSnow 4.5s linear infinite;
+  opacity: 0.7;
+}
+
+.weather-fog .cottage-weather-fx {
+  background: linear-gradient(
+    180deg,
+    rgba(220, 225, 230, 0.15),
+    rgba(200, 210, 220, 0.55)
+  );
+}
+
+.weather-cloudy .cottage-sky {
+  filter: saturate(0.75) brightness(0.92);
+}
+
+.weather-wind .cottage-weather-fx {
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.12) 48%,
+    transparent 62%
+  );
+  animation: cottageWind 2.8s ease-in-out infinite;
+}
+
+.cottage-lamp-glow {
+  position: absolute;
+  left: 18%;
+  top: 42%;
+  width: 28%;
+  height: 28%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 190, 110, 0.28),
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 2;
+  animation: cottageLamp 3.8s ease-in-out infinite;
+}
+
+.cottage-starfield {
+  position: absolute;
+  inset: 0 0 38% 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 70% 18%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 40% 12%, rgba(255, 255, 255, 0.65), transparent);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.time-evening .cottage-back-wall,
+.time-night .cottage-back-wall {
+  filter: brightness(0.88);
+}
+
+.time-night .cottage-back-wall {
+  filter: brightness(0.72) saturate(0.9);
+}
+
+.time-night.cottage-theme-moonmere .cottage-back-wall,
+body.theme-moonmere .time-night .cottage-back-wall {
+  filter: brightness(0.78) saturate(1.05);
+}
+
+.cottage-memory-wall {
+  position: absolute;
+  left: 4%;
+  top: 16%;
+  width: 22%;
+  display: grid;
+  gap: 0.35rem;
+  z-index: 4;
+}
+
+.cottage-memory-card {
+  display: grid;
+  gap: 0.1rem;
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid rgba(90, 60, 35, 0.35);
+  border-radius: 6px;
+  background: linear-gradient(165deg, #f6ead4, #e8d5b4);
+  color: #3a2a18;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  font: inherit;
+}
+
+.cottage-memory-card strong {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  line-height: 1.15;
+}
+
+.cottage-memory-card em {
+  font-size: 0.65rem;
+  opacity: 0.7;
+}
+
+.cottage-keepsake-shelf {
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  top: 44%;
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  z-index: 5;
+  padding: 0.2rem 0.35rem 0.45rem;
+  border-bottom: 4px solid #5a4028;
+  background: linear-gradient(180deg, transparent, rgba(40, 28, 16, 0.2));
+}
+
+.cottage-keepsake-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.cottage-keepsake-btn:hover {
+  transform: translateY(-3px) scale(1.06);
+}
+
+/* Realistic whimsical glyph medallions */
+.cottage-glyph {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.cottage-glyph-sm { width: 2rem; height: 2rem; }
+.cottage-glyph-md { width: 2.75rem; height: 2.75rem; }
+.cottage-glyph-lg { width: 3.6rem; height: 3.6rem; }
+.cottage-glyph-xl { width: 4.4rem; height: 4.4rem; }
+
+.cottage-glyph-art,
+.cottage-glyph-medallion {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 42% 48% 40% 46% / 46% 40% 48% 42%;
+  filter:
+    contrast(1.06)
+    saturate(1.12)
+    drop-shadow(0 3px 5px rgba(40, 24, 10, 0.45));
+}
+
+.cottage-glyph-medallion {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255, 250, 235, 0.95), transparent 42%),
+    radial-gradient(circle at 70% 75%, rgba(180, 130, 70, 0.25), transparent 50%),
+    linear-gradient(160deg, #f3e4c8, #d8c09a 55%, #c4a574);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.55),
+    inset 0 -2px 4px rgba(90, 60, 30, 0.25),
+    0 4px 10px rgba(0, 0, 0, 0.28);
+}
+
+.cottage-glyph-emoji {
+  font-size: 1.15em;
+  line-height: 1;
+  filter: contrast(1.08) saturate(1.2);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 3px rgba(60, 35, 15, 0.35);
+}
+
+.cottage-glyph-sm .cottage-glyph-emoji { font-size: 1rem; }
+.cottage-glyph-lg .cottage-glyph-emoji { font-size: 1.55rem; }
+
+.cottage-glyph-ghost-art {
+  position: absolute;
+  inset: 8%;
+  display: grid;
+  place-items: center;
+  opacity: 0.18;
+  filter: blur(0.4px);
+  pointer-events: none;
+  font-size: 1.4em;
+}
+
+.cottage-glyph-shine {
+  position: absolute;
+  inset: 10% 18% auto 18%;
+  height: 28%;
+  border-radius: 50%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.cottage-glyph.is-locked {
+  opacity: 0.42;
+  filter: grayscale(0.35);
+}
+
+.cottage-glyph.is-favorite .cottage-glyph-medallion,
+.cottage-glyph.is-favorite .cottage-glyph-art {
+  box-shadow:
+    0 0 0 2px rgba(233, 196, 106, 0.7),
+    0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+.cottage-decor {
+  touch-action: none;
+}
+
+.cottage-decor .cottage-glyph {
+  animation: cottageFloat 6.5s ease-in-out infinite;
+}
+
+.cottage-decor.is-locked .cottage-glyph {
+  animation: none;
+}
+
+.cottage-hearth-live .cottage-glyph-art,
+.cottage-hearth-live .cottage-glyph-medallion {
+  animation: cottageFlicker 2.4s ease-in-out infinite;
+}
+
+.is-favorite-decor {
+  z-index: 6;
+}
+
+.cottage-mascot-bubble,
+.cottage-secret-note {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  bottom: 10%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  max-width: min(90%, 360px);
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  background: linear-gradient(165deg, #f7ecda, #e8d6b5);
+  color: #2f2216;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.cottage-mascot-bubble p,
+.cottage-secret-note p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.cottage-mascot-bubble button,
+.cottage-secret-note button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.cottage-mascot-hotspot {
+  cursor: pointer;
+  border: none;
+  font: inherit;
+}
+
+.cottage-welcome-onboard .cottage-mascot-intro {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.65rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.cottage-inspect-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.5rem 0;
+}
+
+.cottage-identity-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.cottage-identity-form label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.cottage-identity-form input,
+.cottage-identity-form textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(243, 230, 208, 0.22);
+  background: rgba(0, 0, 0, 0.22);
+  color: inherit;
+  padding: 0.45rem 0.55rem;
+  font: inherit;
+}
+
+.cottage-storage-cats,
+.cottage-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.45rem 0 0.7rem;
+}
+
+.cottage-storage-cats button,
+.cottage-chip-row button {
+  border: 1px solid rgba(243, 230, 208, 0.22);
+  background: rgba(0, 0, 0, 0.18);
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.28rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.cottage-storage-cats button.is-active,
+.cottage-chip-row button.is-active,
+.cottage-tool.is-active {
+  background: color-mix(in srgb, var(--village-soft, #6b8f71) 35%, transparent);
+  border-color: rgba(243, 230, 208, 0.45);
+}
+
+.cottage-storage-list,
+.cottage-memory-list,
+.cottage-book-list {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+  max-height: 42vh;
+  overflow: auto;
+}
+
+.cottage-storage-list li,
+.cottage-memory-list li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.55rem;
+  align-items: start;
+  padding: 0.45rem;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.cottage-storage-list li.is-locked-row {
+  opacity: 0.75;
+}
+
+.cottage-storage-list p,
+.cottage-memory-list p {
+  margin: 0.15rem 0;
+  font-size: 0.85rem;
+}
+
+.cottage-book-list li {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.cottage-book-list em {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  text-transform: capitalize;
+}
+
+.cottage-env-controls p {
+  margin: 0.55rem 0 0.2rem;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.is-customizing .cottage-room {
+  outline: 2px dashed rgba(233, 196, 106, 0.45);
+  outline-offset: -4px;
+}
+
+@keyframes cottageRain {
+  from { background-position: 0 0; }
+  to { background-position: 12px 28px; }
+}
+
+@keyframes cottageSnow {
+  from { background-position: 0 0, 10px 0; }
+  to { background-position: 0 40px, 14px 50px; }
+}
+
+@keyframes cottageWind {
+  0%, 100% { transform: translateX(-8%); opacity: 0.2; }
+  50% { transform: translateX(12%); opacity: 0.45; }
+}
+
+@keyframes cottageLamp {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+@keyframes cottageFlicker {
+  0%, 100% { filter: contrast(1.05) saturate(1.1) brightness(1); }
+  40% { filter: contrast(1.08) saturate(1.2) brightness(1.08); }
+  70% { filter: contrast(1.02) saturate(1.05) brightness(0.96); }
+}
+
+@media (max-width: 900px) {
+  .cottage-memory-wall {
+    width: 28%;
+  }
+
+  .personal-cottage .cottage-room {
+    height: clamp(380px, 62vh, 560px);
+    overflow: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .cottage-memory-wall {
+    display: none;
+  }
+
+  .cottage-keepsake-shelf {
+    left: 12%;
+    right: 12%;
+  }
+
+  .cottage-stats-row {
+    font-size: 0.7rem;
+  }
+}
+
+/* Village cottage wall/floor personality */
+.cottage-theme-bramblewood .cottage-back-wall,
+body.theme-bramblewood .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(255, 180, 100, 0.08), transparent 40%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(92, 52, 28, 0.45) 0 16px,
+      rgba(70, 38, 18, 0.55) 16px 32px
+    ),
+    linear-gradient(165deg, #4a2a14, #2a180c);
+}
+
+.cottage-theme-clovermeadow .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(255, 220, 230, 0.16), transparent 42%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(240, 210, 218, 0.2) 0 18px,
+      rgba(220, 180, 190, 0.15) 18px 36px
+    ),
+    linear-gradient(165deg, #6a4450, #3a2430);
+}
+
+.cottage-theme-mosshollow .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(120, 150, 110, 0.12), transparent 40%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(40, 55, 42, 0.5) 0 14px,
+      rgba(28, 40, 30, 0.6) 14px 28px
+    ),
+    linear-gradient(165deg, #1a2a22, #0e1510);
+}
+
+.cottage-theme-hearthwick .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(255, 210, 150, 0.12), transparent 40%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(120, 80, 45, 0.4) 0 16px,
+      rgba(90, 58, 32, 0.5) 16px 32px
+    ),
+    linear-gradient(165deg, #5a3a22, #2c1e14);
+}
+
+.cottage-theme-moonmere .cottage-back-wall {
+  background:
+    linear-gradient(180deg, rgba(150, 170, 210, 0.12), transparent 42%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(50, 60, 80, 0.45) 0 15px,
+      rgba(34, 42, 58, 0.55) 15px 30px
+    ),
+    linear-gradient(165deg, #243040, #12161e);
+}
+
+
 body.theme-moonmere {
   --forest-deep: #12161e;
   --forest: #1a2230;
