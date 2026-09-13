@@ -56,8 +56,12 @@ next-env.d.ts
 !/data/persistent-welcome-letters.json
 # Keep Meeting Bench living-world board across fresh servers.
 !/data/persistent-meeting-bench.json
+# Locked tip + TV media floor — never thin these.
+!/data/locked-main.json
+!/data/locked-tv-media.json
 /data/tv-cache/
 /data/.media-release-staging/
+/data/.durable-main-worktree/
 # Track celestial audio in git (release shelf is the durable backup).
 /data/uploads/moon-sounds/*
 !/data/uploads/moon-sounds/.gitkeep

@@ -12,6 +12,7 @@ import {
   ensureTvUploadBytes,
   scheduleEnsureTvUploadBytes,
 } from "@/lib/tvPersist";
+import { assertLockedMainPresent } from "@/lib/lockedMain";
 
 function loadPersistentTvMedia() {
   // Lazy require avoids circular init where production bundles can briefly
@@ -700,6 +701,12 @@ function createDb() {
   `);
 
   migrate(db);
+  // Alarm early if this checkout drifted off the locked tip / TV floor.
+  try {
+    assertLockedMainPresent();
+  } catch (err) {
+    console.error("[locked-main] assert failed:", err);
+  }
   // Restore accounts saved in git so logins work on fresh servers.
   // Never let a snapshot conflict brick auth / the whole app.
   try {

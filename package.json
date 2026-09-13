@@ -9,6 +9,7 @@
     "lint": "eslint src --max-warnings 0",
     "persist-tv": "node scripts/persist-tv.mjs",
     "persist-tv:push": "node scripts/persist-tv.mjs --push",
+    "verify-media": "node scripts/verify-media-shelf.mjs",
     "seed-library-books": "node scripts/seed-library-books.mjs",
     "persist-library-books": "node scripts/persist-library-books.mjs"
   },

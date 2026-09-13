@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "lockedAt": "2026-09-13T02:03:25Z",
+  "mainSha": "319a327c6f3d336cc1ea276155e964d030fc0f69",
+  "note": "Do not ship a thinner WhimPost tip than this lock. TV media floor is data/locked-tv-media.json.",
+  "features": [
+    "meeting-bench-gathering-board",
+    "personal-cottage",
+    "workshop-xp-gifts-celebrations",
+    "storybook-cinema-forever",
+    "cottage-cartoons-forever",
+    "durable-tv-media-release"
+  ],
+  "requiredMarkers": [
+    {
+      "path": "src/components/MeetingBench.tsx",
+      "includes": "mb-gathering-board"
+    },
+    {
+      "path": "src/lib/tvProtectedChannels.ts",
+      "includes": "the storybook cinema"
+    },
+    {
+      "path": "data/persistent-tv-media.json",
+      "minClips": 40
+    },
+    {
+      "path": "data/locked-tv-media.json",
+      "minClips": 40
+    }
+  ],
+  "tvMediaFloorPath": "data/locked-tv-media.json",
+  "mediaReleaseTag": "whimpost-media"
+}

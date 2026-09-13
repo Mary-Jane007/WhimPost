@@ -15,6 +15,11 @@ import {
   PERSISTENT_MOON_SOUNDS_PATH,
 } from "@/lib/persistentMoonSounds";
 import { PERSISTENT_SITE_UPLOADS_PATH } from "@/lib/persistentSiteUploads";
+import {
+  assertLockedMainPresent,
+  LOCKED_MAIN_PATH,
+  LOCKED_TV_MEDIA_PATH,
+} from "@/lib/lockedMain";
 
 const ROOT = process.cwd();
 const LOCK_PATH = path.join(ROOT, "data", ".tv-persist.lock");
@@ -286,6 +291,7 @@ export function scheduleEnsureTvUploadBytes() {
   g.whimpostMediaRestoreScheduled = true;
   setTimeout(() => {
     try {
+      assertLockedMainPresent();
       ensureTvUploadBytes();
       // Bytes may land after the first import — re-bind catalog rows now.
       try {
@@ -393,6 +399,106 @@ function git(args: string[], opts?: { timeout?: number }) {
   }).trim();
 }
 
+const DURABLE_CATALOG_PATHS = new Set([
+  "data/persistent-tv.json",
+  "data/persistent-tv-media.json",
+  "data/persistent-library-books.json",
+  "data/persistent-moon-sounds.json",
+  "data/persistent-site-uploads.json",
+  "data/persistent-village-media.json",
+  "data/persistent-accounts.json",
+  "data/persistent-welcome-letters.json",
+  "data/persistent-meeting-bench.json",
+  "data/locked-main.json",
+  "data/locked-tv-media.json",
+]);
+
+/**
+ * Mirror durable catalog / lock files onto origin/main from a throwaway
+ * worktree so feature-branch media commits cannot strand off main.
+ */
+function pushDurableCatalogsToMain(stagedPaths: string[]) {
+  const catalogs = stagedPaths.filter((p) => DURABLE_CATALOG_PATHS.has(p));
+  if (catalogs.length === 0) return;
+
+  const worktree = path.join(ROOT, "data", ".durable-main-worktree");
+  try {
+    try {
+      git(["fetch", "origin", "main"], { timeout: 120_000 });
+    } catch (err) {
+      console.warn("[persistent-tv] fetch origin/main failed:", err);
+      return;
+    }
+
+    fs.rmSync(worktree, { recursive: true, force: true });
+    git(
+      ["worktree", "add", "--force", worktree, "origin/main"],
+      { timeout: 120_000 }
+    );
+
+    let copied = 0;
+    for (const rel of catalogs) {
+      const from = path.join(ROOT, rel);
+      const to = path.join(worktree, rel);
+      if (!fs.existsSync(from)) continue;
+      fs.mkdirSync(path.dirname(to), { recursive: true });
+      fs.copyFileSync(from, to);
+      copied += 1;
+    }
+    if (!copied) return;
+
+    execFileSync(
+      "git",
+      ["add", "-f", "--", ...catalogs],
+      { cwd: worktree, stdio: "pipe", timeout: 60_000 }
+    );
+    const staged = execFileSync(
+      "git",
+      ["diff", "--cached", "--name-only"],
+      { cwd: worktree, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }
+    )
+      .trim()
+      .split("\n")
+      .filter(Boolean);
+    if (staged.length === 0) return;
+
+    execFileSync(
+      "git",
+      [
+        "commit",
+        "-m",
+        "Lock durable media catalogs onto main so clips and features survive",
+        "--",
+        ...staged,
+      ],
+      { cwd: worktree, stdio: "pipe", timeout: 60_000 }
+    );
+    execFileSync("git", ["push", "origin", "HEAD:main"], {
+      cwd: worktree,
+      stdio: "pipe",
+      timeout: 20 * 60_000,
+    });
+    console.info(
+      `[persistent-tv] mirrored ${staged.length} durable catalog(s) onto origin/main`
+    );
+  } catch (err) {
+    console.warn(
+      "[persistent-tv] could not mirror durable catalogs onto main:",
+      err instanceof Error ? err.message : err
+    );
+  } finally {
+    try {
+      git(["worktree", "remove", "--force", worktree], { timeout: 60_000 });
+    } catch {
+      try {
+        fs.rmSync(worktree, { recursive: true, force: true });
+      } catch {
+        // ignore
+      }
+    }
+  }
+}
+
 export async function runDurableTvGitSync(): Promise<{
   ok: boolean;
   committed: boolean;
@@ -452,6 +558,8 @@ export async function runDurableTvGitSync(): Promise<{
         "data/persistent-accounts.json",
         "data/persistent-welcome-letters.json",
         "data/persistent-meeting-bench.json",
+        "data/locked-main.json",
+        "data/locked-tv-media.json",
         ...uploadPaths,
       ]);
 
@@ -492,6 +600,8 @@ export async function runDurableTvGitSync(): Promise<{
             line === "data/persistent-accounts.json" ||
             line === "data/persistent-welcome-letters.json" ||
             line === "data/persistent-meeting-bench.json" ||
+            line === "data/locked-main.json" ||
+            line === "data/locked-tv-media.json" ||
             (line.startsWith("data/uploads/") &&
               !line.includes("/.incoming/") &&
               !line.includes("/.media-release-staging/"))
@@ -514,14 +624,22 @@ export async function runDurableTvGitSync(): Promise<{
         console.warn(
           "[persistent-tv] durable commit saved locally (detached HEAD; not pushed)"
         );
+        // Still try to mirror catalogs onto main so media never strands.
+        pushDurableCatalogsToMain(staged);
         return;
       }
 
       git(["push", "-u", "origin", "HEAD"], { timeout: 20 * 60_000 });
       pushed = true;
       console.info(
-        `[persistent-tv] durable shelf pushed to origin (${staged.length} path(s))`
+        `[persistent-tv] durable shelf pushed to origin/${branch} (${staged.length} path(s))`
       );
+
+      // Always mirror durable catalogs onto main so feature-branch drift cannot
+      // leave TV media / locks only on a throwaway branch.
+      if (branch !== "main") {
+        pushDurableCatalogsToMain(staged);
+      }
     });
 
     if (!ran) {

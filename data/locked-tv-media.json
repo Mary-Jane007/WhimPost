@@ -1,0 +1,407 @@
+{
+  "version": 1,
+  "lockedAt": "2026-09-13T02:07:11Z",
+  "note": "Floor catalog \u2014 export must never drop these TV clips.",
+  "clips": [
+    {
+      "title": "A Fox's Tale- Survival in the Alpine Wild",
+      "filename": "5eb75a0c-6792-4b2f-a11a-7eca133015e4.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 191594433,
+      "durationMs": 3084864,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "Fantastic Mr. Fox",
+      "filename": "ea3c7de8-6f8e-4901-b547-acf1c455525f.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 630319537,
+      "durationMs": 5204741,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "Guess How Much I Love You: Little Redwood Fox",
+      "filename": "ea93a65c-9002-4375-b109-703e7a98a332.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 80159520,
+      "durationMs": 1212058,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Pack a Backpack - REI Experts",
+      "filename": "55eeaa3a-27d4-4636-9673-ab0342c2325a.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 7113783,
+      "durationMs": 97176,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Set Up a Campsite- Rei",
+      "filename": "5899947e-39ed-457a-b6d9-5fd879f6f2eb.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 25499530,
+      "durationMs": 323593,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Use a Compass - REI",
+      "filename": "274bc8e1-f6b9-4253-9188-6b12896ff7df.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 19717749,
+      "durationMs": 435165,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "Once Upon a Forest- A Twig Poet\u2019s Rewilding J\u2026",
+      "filename": "d107b978-eeef-4ec3-a44a-3c961d802f8b.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 68407425,
+      "durationMs": 1093869,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "The Repair Shop  Season 1 Episode 1",
+      "filename": "de815586-ce20-4e00-b3db-45e51b90c250.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 110702676,
+      "durationMs": 1709383,
+      "channelTitle": "Bramblewood Exclusive",
+      "villageId": "bramblewood",
+      "isGlobal": false
+    },
+    {
+      "title": "Franklin's Garden",
+      "filename": "8afa6384-1d70-4c29-92b4-3fe898ba380c.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 71348323,
+      "durationMs": 1377454,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Gardeners' World 2026 - Episode 1",
+      "filename": "5ab73dcb-0dce-41fd-8fd8-f08b1f454d1c.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 266787760,
+      "durationMs": 3763978,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Gardeners' World 2026-Episode 20",
+      "filename": "78588084-04f3-4b47-a430-60bb2c82242e.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 301813742,
+      "durationMs": 3727639,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Silly flowers symphony",
+      "filename": "074dae13-d4f6-47b4-aa85-60265231f095.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 37296337,
+      "durationMs": 469484,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Springwatch 2024 Episode 1",
+      "filename": "da3ef970-cbc0-4f99-a9d2-cbecad69121f.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 244636639,
+      "durationMs": 3545896,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "The Birdwatchers",
+      "filename": "6614b3d4-3239-4c56-9cec-2093dc78788d.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 35210679,
+      "durationMs": 821011,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "The secret garden (animated)",
+      "filename": "99e323d8-ebfa-4daf-a307-ffcb545c1883.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 174746605,
+      "durationMs": 4121263,
+      "channelTitle": "Clovermeadow Exclusive",
+      "villageId": "clovermeadow",
+      "isGlobal": false
+    },
+    {
+      "title": "Anne of Green Gables: Carrots",
+      "filename": "132dc965-5b15-4c55-a95e-df9332bc57ce.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 100831185,
+      "durationMs": 1477741,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Autumn fun - Guess how much I love you",
+      "filename": "efab9f1e-9619-4804-a6bf-009bd495ceab.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 303198636,
+      "durationMs": 1634058,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Franklin- Franklin plays the game",
+      "filename": "374976cd-6799-4209-9df1-71ea07244325.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 61965906,
+      "durationMs": 1377152,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Frog & Toad",
+      "filename": "3cd86f7c-258b-4047-bcb8-4107daeb8c09.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 60763152,
+      "durationMs": 1057344,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Peter Rabbit & Friends - The Tale of Two Bad Mice, Johnny Town Mouse",
+      "filename": "15eb4456-a3eb-4cf4-a0a3-ed5ef2d87260.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 147224657,
+      "durationMs": 1414235,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "The World Of Peter Rabbit & Friends - The Tale of Tom Kitten & Jemima Puddle Duc",
+      "filename": "f9225acf-7406-4b5c-923c-4a1ab6e5ee79.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 208342523,
+      "durationMs": 1401139,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "The World Of Peter Rabbit & Friends - The Tale of the Flopsy Bunnies & Mrs Tittl",
+      "filename": "b2007af6-28b7-4fef-ae9d-5eb358e25909.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 160119019,
+      "durationMs": 1204164,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Winnie the pooh- Prize piglet - fast friends",
+      "filename": "4313f009-0f68-4ed4-9c36-b621b97d7c6f.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 734803948,
+      "durationMs": 1393546,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Winnie-the-Pooh-Cloud, Cloud, Go Away / To Dream the Impossible Scheme",
+      "filename": "6caaa33c-b97b-426e-8d6f-59b26d5d7853.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 75735780,
+      "durationMs": 1363290,
+      "channelTitle": "Cottage Cartoons",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "A Tour of Hobbiton - New Zealand",
+      "filename": "6e6a05d2-d7a1-420a-b343-e1a356c52c90.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 178690152,
+      "durationMs": 2353366,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Baking Cinnamon Buns, Painting",
+      "filename": "a65bdaef-37ec-4ffd-849a-e2959aacf04d.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 103822653,
+      "durationMs": 1210387,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Brambly Hedge - A Winter Story",
+      "filename": "bdfdb7a6-e972-4f74-9bf3-2a8da7cc6b65.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 8472263,
+      "durationMs": 61603,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Game of Wool Britains Best Knitter S01E01",
+      "filename": "c4939df0-c222-43bc-a703-70225524e4c4.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 170545510,
+      "durationMs": 2999995,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Game of Wool The Cast Off - Episode 2",
+      "filename": "dee1ea6c-7f0b-48d1-976f-aa61f49b82e6.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 29308977,
+      "durationMs": 386705,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Make Apple and Crumb Pudding \u2014 The Vic\u2026",
+      "filename": "0136b0a3-1ad7-48fe-a6db-5532ef59ba60.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 27439319,
+      "durationMs": 401310,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to Make Butter \u2013 The Victorian Way",
+      "filename": "d2f99ca9-bdc5-48fe-a9db-fc3dc1efd269.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 18497004,
+      "durationMs": 488734,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "How to make carrot cake - The Victorian Way",
+      "filename": "d9df1d97-20cb-4a4d-8db1-e09404e7d32a.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 17200710,
+      "durationMs": 454136,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Jane Austen House",
+      "filename": "28ab1208-391d-47d5-aaab-5641c8a87b33.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 65538560,
+      "durationMs": 1297252,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Mrs. Apple's recipe \u2014 Strawberry cake",
+      "filename": "2314bb00-c07c-4f0e-b721-52ddb5a9c12f.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 6338482,
+      "durationMs": 93437,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Mrs. Apple\u2018s recipe \u2014 Apple pie",
+      "filename": "21a93570-41fd-4b4f-adfb-49fa8a107cff.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 3444991,
+      "durationMs": 55635,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "The secret life of Hedgehogs",
+      "filename": "1400a663-2940-460c-9123-dcb4ce48c878.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 260156179,
+      "durationMs": 2964200,
+      "channelTitle": "Heartwick Exclusive",
+      "villageId": "hearthwick",
+      "isGlobal": false
+    },
+    {
+      "title": "Anne with an e - season 1 ep 1",
+      "filename": "702859a4-90d6-4141-9bcf-d255974ce2f9.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 2400008556,
+      "durationMs": 5279500,
+      "channelTitle": "The Storybook Cinema",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Bambi",
+      "filename": "963f28d4-4a47-4a4b-a446-1dc9f2c4d0d8.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 174347938,
+      "durationMs": 4060172,
+      "channelTitle": "The Storybook Cinema",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Opheilia",
+      "filename": "3fa4a145-ae79-419a-9d26-b95fd864ba6d.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 497030903,
+      "durationMs": 6378963,
+      "channelTitle": "The Storybook Cinema",
+      "villageId": null,
+      "isGlobal": true
+    },
+    {
+      "title": "Pride and Prejudice",
+      "filename": "1ef1a01e-ecf0-45d6-b86f-0c31897bb6b9.mp4",
+      "mime": "video/mp4",
+      "sizeBytes": 7714796889,
+      "durationMs": 7388333,
+      "channelTitle": "The Storybook Cinema",
+      "villageId": null,
+      "isGlobal": true
+    }
+  ]
+}

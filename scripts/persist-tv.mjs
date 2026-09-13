@@ -63,9 +63,28 @@ fs.writeFileSync(
   )}\n`
 );
 
-const mediaClips = [];
 let missingFiles = 0;
 const playableFiles = [];
+const byFilename = new Map();
+
+// Seed from previous catalog + locked floor so this script can never thin TV media.
+function loadClips(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return [];
+    const parsed = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return Array.isArray(parsed.clips) ? parsed.clips : [];
+  } catch {
+    return [];
+  }
+}
+for (const clip of [
+  ...loadClips(mediaPath),
+  ...loadClips(path.join(root, "data", "locked-tv-media.json")),
+]) {
+  if (!clip?.filename || !clip?.title) continue;
+  byFilename.set(clip.filename, clip);
+}
+
 for (const ch of channels) {
   const rows = db
     .prepare(
@@ -82,6 +101,7 @@ for (const ch of channels) {
     if (!fs.existsSync(filePath)) {
       missingFiles += 1;
       console.warn(`Missing upload bytes: ${row.filename} (${row.title})`);
+      // Keep prior catalog entry instead of dropping the clip.
       continue;
     }
     const size = fs.statSync(filePath).size;
@@ -98,7 +118,7 @@ for (const ch of channels) {
     if (!isPointer && size >= 8192) {
       playableFiles.push(filePath);
     }
-    mediaClips.push({
+    byFilename.set(row.filename, {
       title: row.title,
       filename: row.filename,
       mime: row.mime || "video/mp4",
@@ -111,10 +131,18 @@ for (const ch of channels) {
   }
 }
 
+const mediaClipsFinal = [...byFilename.values()].sort((a, b) =>
+  `${a.channelTitle}:${a.title}`.localeCompare(`${b.channelTitle}:${b.title}`)
+);
+
 fs.writeFileSync(
   mediaPath,
   `${JSON.stringify(
-    { version: 1, updatedAt: new Date().toISOString(), clips: mediaClips },
+    {
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      clips: mediaClipsFinal,
+    },
     null,
     2
   )}\n`
@@ -125,11 +153,11 @@ console.log(
   `Wrote ${linkChannels.reduce((n, c) => n + c.videos.length, 0)} link clip(s) → data/persistent-tv.json`
 );
 console.log(
-  `Wrote ${mediaClips.length} file clip(s) → data/persistent-tv-media.json`
+  `Wrote ${mediaClipsFinal.length} file clip(s) → data/persistent-tv-media.json`
 );
 if (missingFiles > 0) {
   console.warn(
-    `${missingFiles} file clip(s) skipped — bytes missing under data/uploads/`
+    `${missingFiles} DB clip(s) missing local bytes — prior catalog/lock entries were preserved`
   );
 }
 

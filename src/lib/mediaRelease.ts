@@ -782,7 +782,34 @@ export function publishUploadedMediaNow(filenames: string[]) {
     .filter(Boolean);
   if (!names.length) return { ok: true, uploaded: 0 };
   try {
-    return publishMediaReleaseAssets(names);
+    const result = publishMediaReleaseAssets(names);
+    // Verify the durable shelf actually received the bytes — catalogs alone
+    // are not enough (Storybook clips were lost this way before).
+    try {
+      const repo = repoSlug();
+      if (repo && result.ok) {
+        const available = listReleaseAssetNames(repo);
+        const missing = names.filter(
+          (name) => !releaseHasAsset(available, name)
+        );
+        if (missing.length) {
+          console.error(
+            `[media-release] LOCK FAIL — uploaded but missing on ${MEDIA_RELEASE_TAG}: ${missing.join(", ")}`
+          );
+          return {
+            ok: false,
+            uploaded: result.uploaded,
+            error: `missing on release: ${missing.join(", ")}`,
+          };
+        }
+      }
+    } catch (err) {
+      console.warn(
+        "[media-release] post-publish verify failed:",
+        err instanceof Error ? err.message : err
+      );
+    }
+    return result;
   } catch (err) {
     console.warn(
       "[media-release] eager publish failed:",

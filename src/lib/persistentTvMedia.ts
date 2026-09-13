@@ -13,6 +13,7 @@ import {
   isSharedTvChannelTitle,
   PROTECTED_SHARED_TV_TITLES,
 } from "@/lib/tvProtectedChannels";
+import { readLockedTvMediaClips } from "@/lib/lockedMain";
 
 /**
  * Git-tracked catalog of uploaded TV files (metadata only).
@@ -213,15 +214,25 @@ export function exportPersistentTvMedia(db: Database) {
     });
   }
 
-  // Never let a temporary empty DB wipe protected forever channels from git.
-  for (const clip of previous?.clips || []) {
-    if (!isProtectedTvChannelTitle(clip.channelTitle)) continue;
+  // Never thin the git catalog. Keep EVERY prior clip (all villages + forever
+  // lounges) when a temporary empty DB or missing local bytes would drop them.
+  const floorClips = [
+    ...(previous?.clips || []),
+    ...readLockedTvMediaClips(),
+  ];
+  for (const clip of floorClips) {
     if (!clip.filename || byFilename.has(clip.filename)) continue;
+    const protectedChannel = isProtectedTvChannelTitle(clip.channelTitle);
     byFilename.set(clip.filename, {
       ...clip,
-      isGlobal: true,
-      villageId: null,
-      channelTitle: clip.channelTitle.trim() || "The Storybook Cinema",
+      isGlobal:
+        Boolean(clip.isGlobal) ||
+        protectedChannel ||
+        isSharedTvChannelTitle(clip.channelTitle),
+      villageId: protectedChannel ? null : clip.villageId ?? null,
+      channelTitle:
+        clip.channelTitle.trim() ||
+        (protectedChannel ? "The Storybook Cinema" : "Clip shelf"),
     });
   }
 
