@@ -18,24 +18,15 @@ import {
   villagerTitleFor,
   villagerXpProgress,
 } from "@/lib/villagerHome";
-import { CottageRoomEditor } from "@/components/CottageRoomEditor";
 import { ProfileActions } from "@/components/ProfileActions";
 
-type ShelfBook = {
-  id: string;
-  title: string;
-  author: string;
-  status: "none" | "reading" | "finished" | "wishlist";
-};
-
-type HomeTab = "home" | "journey" | "collectables" | "goals" | "settings";
+type HomeTab = "home" | "journey" | "collectables" | "goals";
 
 const TABS: Array<{ id: HomeTab; label: string }> = [
   { id: "home", label: "Home" },
   { id: "journey", label: "Journey" },
   { id: "collectables", label: "Collectables" },
   { id: "goals", label: "Goals" },
-  { id: "settings", label: "Settings" },
 ];
 
 function initialsFor(name: string) {
@@ -55,26 +46,20 @@ function ringStyle(pct: number, color: string): Record<string, string> {
 export function CottageProfile({
   profile,
   village,
-  visitingVillage = null,
   collectibles,
   isSelf,
   relation,
-  shareVillage,
   initialCottage,
-  shelfBooks = [],
   letterCount: letterCountProp,
   activityCount = 0,
   tvCount = 0,
 }: {
   profile: UserPublic;
   village: VillageInfo | null;
-  visitingVillage?: VillageInfo | null;
   collectibles: Record<CollectibleKind, number>;
   isSelf: boolean;
   relation: FriendshipRelation;
-  shareVillage: boolean;
   initialCottage: CottageView;
-  shelfBooks?: ShelfBook[];
   letterCount?: number;
   activityCount?: number;
   tvCount?: number;
@@ -190,19 +175,6 @@ export function CottageProfile({
     ["--pc-gold" as string]: theme.gold,
   };
 
-  const editorProps = {
-    profile,
-    village,
-    visitingVillage,
-    collectibles,
-    isSelf,
-    relation,
-    shareVillage,
-    initialCottage,
-    shelfBooks,
-    embedded: true as const,
-  };
-
   const doneJourney = journey.filter((m) => m.done);
   const journeyList = (tab === "journey" ? journey : doneJourney.slice(0, 5))
     .length
@@ -218,18 +190,8 @@ export function CottageProfile({
           <Link href={village ? `/village` : "/"} className="pc-back">
             ← Back to Village
           </Link>
-          {isSelf ? (
-            <button
-              type="button"
-              className="pc-customize"
-              onClick={() => setTab("settings")}
-            >
-              ⚙ Customize
-            </button>
-          ) : null}
         </div>
 
-        {/* COTTAGE HERO — the visual centerpiece */}
         <section className="pc-hero" aria-label={`${theme.label} personal cottage`}>
           <div className="pc-hero-frame">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -259,7 +221,6 @@ export function CottageProfile({
             </div>
           </div>
 
-          {/* Identity sitting on the hero edge */}
           <div className="pc-identity">
             <div className="pc-avatar-wrap">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -303,7 +264,6 @@ export function CottageProfile({
           </div>
         </section>
 
-        {/* Tabs */}
         <nav className="pc-tabs" aria-label="Cottage sections">
           {TABS.map((t) => (
             <button
@@ -317,289 +277,267 @@ export function CottageProfile({
           ))}
         </nav>
 
-        {tab === "settings" ? (
-          <section className="pc-card pc-settings">
-            <h2>Cottage settings</h2>
-            <p>
-              Arrange furniture, pin memories, and make {cottageName} feel like
-              home.
-            </p>
-            {isSelf ? (
-              <div className="pc-settings-editor">
-                <CottageRoomEditor {...editorProps} />
-              </div>
-            ) : (
-              <p className="pc-muted">Only the cottage keeper can rearrange this home.</p>
-            )}
-          </section>
-        ) : (
-          <div className="pc-body">
-            {/* Journey + Goal */}
-            {(tab === "home" || tab === "journey" || tab === "goals") && (
-              <div
-                className={`pc-split ${
-                  tab === "home" ? "" : "is-solo"
-                }`.trim()}
-              >
-                {(tab === "home" || tab === "journey") && (
-                  <section className="pc-card pc-journey" aria-labelledby="pc-journey-h">
-                    <h2 id="pc-journey-h">My Journey</h2>
-                    <ul className="pc-journey-list">
-                      {journeyList.map((m) => (
-                        <li
-                          key={m.id}
-                          className={m.done ? "is-done" : "is-waiting"}
+        <div className="pc-body">
+          {(tab === "home" || tab === "journey" || tab === "goals") && (
+            <div
+              className={`pc-split ${
+                tab === "home" ? "" : "is-solo"
+              }`.trim()}
+            >
+              {(tab === "home" || tab === "journey") && (
+                <section className="pc-card pc-journey" aria-labelledby="pc-journey-h">
+                  <h2 id="pc-journey-h">My Journey</h2>
+                  <ul className="pc-journey-list">
+                    {journeyList.map((m) => (
+                      <li
+                        key={m.id}
+                        className={m.done ? "is-done" : "is-waiting"}
+                      >
+                        <span className="pc-check" aria-hidden>
+                          {m.done ? "✓" : "○"}
+                        </span>
+                        <div>
+                          <strong>{m.title}</strong>
+                          <p>{m.description}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  {tab === "home" ? (
+                    <button
+                      type="button"
+                      className="pc-text-link"
+                      onClick={() => setTab("journey")}
+                    >
+                      View full journey →
+                    </button>
+                  ) : null}
+                </section>
+              )}
+
+              {(tab === "home" || tab === "goals") && currentGoal ? (
+                <section className="pc-card pc-goal" aria-labelledby="pc-goal-h">
+                  <h2 id="pc-goal-h">Current Goal</h2>
+                  <div className="pc-goal-body">
+                    <div className="pc-goal-copy">
+                      <h3>
+                        <span aria-hidden>{currentGoal.emoji}</span>{" "}
+                        {currentGoal.title}
+                      </h3>
+                      <p>{currentGoal.description}</p>
+                      <div className="pc-goal-meter">
+                        <div
+                          className="pc-xp-bar pc-goal-bar"
+                          role="progressbar"
+                          aria-valuenow={goalPct}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
                         >
-                          <span className="pc-check" aria-hidden>
-                            {m.done ? "✓" : "○"}
-                          </span>
-                          <div>
-                            <strong>{m.title}</strong>
-                            <p>{m.description}</p>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    {tab === "home" ? (
+                          <span style={{ width: `${goalPct}%` }} />
+                        </div>
+                        <em>
+                          {Math.min(goalValue, currentGoal.target)} /{" "}
+                          {currentGoal.target}
+                        </em>
+                      </div>
                       <button
                         type="button"
-                        className="pc-text-link"
-                        onClick={() => setTab("journey")}
+                        className="pc-goal-btn"
+                        onClick={() => setTab("goals")}
                       >
-                        View full journey →
+                        View Goal
                       </button>
-                    ) : null}
-                  </section>
-                )}
-
-                {(tab === "home" || tab === "goals") && currentGoal ? (
-                  <section className="pc-card pc-goal" aria-labelledby="pc-goal-h">
-                    <h2 id="pc-goal-h">Current Goal</h2>
-                    <div className="pc-goal-body">
-                      <div className="pc-goal-copy">
-                        <h3>
-                          <span aria-hidden>{currentGoal.emoji}</span>{" "}
-                          {currentGoal.title}
-                        </h3>
-                        <p>{currentGoal.description}</p>
-                        <div className="pc-goal-meter">
-                          <div
-                            className="pc-xp-bar pc-goal-bar"
-                            role="progressbar"
-                            aria-valuenow={goalPct}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                          >
-                            <span style={{ width: `${goalPct}%` }} />
-                          </div>
-                          <em>
-                            {Math.min(goalValue, currentGoal.target)} /{" "}
-                            {currentGoal.target}
-                          </em>
-                        </div>
-                        <button
-                          type="button"
-                          className="pc-goal-btn"
-                          onClick={() => setTab("goals")}
-                        >
-                          View Goal
-                        </button>
-                      </div>
-                      <div className="pc-goal-art" aria-hidden>
-                        <img src={theme.mascotImage} alt="" draggable={false} />
-                      </div>
                     </div>
-                    {tab === "goals"
-                      ? theme.goals.slice(1).map((goal) => {
-                          const value = goalProgressValue(goal.metric, goalStats);
-                          const pct = Math.min(
-                            100,
-                            Math.round((value / Math.max(1, goal.target)) * 100)
-                          );
-                          return (
-                            <div key={goal.id} className="pc-goal-extra">
-                              <strong>
-                                {goal.emoji} {goal.title}
-                              </strong>
-                              <p>{goal.description}</p>
-                              <div className="pc-xp-bar pc-goal-bar">
-                                <span style={{ width: `${pct}%` }} />
-                              </div>
-                              <em>
-                                {Math.min(value, goal.target)} / {goal.target}
-                              </em>
+                    <div className="pc-goal-art" aria-hidden>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={theme.mascotImage} alt="" draggable={false} />
+                    </div>
+                  </div>
+                  {tab === "goals"
+                    ? theme.goals.slice(1).map((goal) => {
+                        const value = goalProgressValue(goal.metric, goalStats);
+                        const pct = Math.min(
+                          100,
+                          Math.round((value / Math.max(1, goal.target)) * 100)
+                        );
+                        return (
+                          <div key={goal.id} className="pc-goal-extra">
+                            <strong>
+                              {goal.emoji} {goal.title}
+                            </strong>
+                            <p>{goal.description}</p>
+                            <div className="pc-xp-bar pc-goal-bar">
+                              <span style={{ width: `${pct}%` }} />
                             </div>
-                          );
-                        })
-                      : null}
-                  </section>
-                ) : null}
+                            <em>
+                              {Math.min(value, goal.target)} / {goal.target}
+                            </em>
+                          </div>
+                        );
+                      })
+                    : null}
+                </section>
+              ) : null}
+            </div>
+          )}
+
+          {(tab === "home" || tab === "collectables") && (
+            <section className="pc-card pc-collectables" aria-labelledby="pc-col-h">
+              <div className="pc-section-head">
+                <h2 id="pc-col-h">My Collectables</h2>
+                <Link href="/village" className="pc-text-link">
+                  See all →
+                </Link>
               </div>
-            )}
-
-            {/* Collectables */}
-            {(tab === "home" || tab === "collectables") && (
-              <section className="pc-card pc-collectables" aria-labelledby="pc-col-h">
-                <div className="pc-section-head">
-                  <h2 id="pc-col-h">My Collectables</h2>
-                  <Link href="/village" className="pc-text-link">
-                    See all →
-                  </Link>
-                </div>
-                <div className="pc-shelf" role="list">
-                  {showcase.map(({ kind, count }) => (
-                    <div
-                      key={kind}
-                      className={`pc-collectable ${count > 0 ? "is-found" : "is-mystery"}`}
-                      role="listitem"
-                      title={
-                        count > 0
-                          ? collectibleLabel(kind)
-                          : "Something is waiting to be discovered."
-                      }
-                    >
-                      <div className="pc-collectable-disc">
-                        {count > 0 ? (
-                          collectibleImage(kind) ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={collectibleImage(kind)}
-                              alt=""
-                              draggable={false}
-                            />
-                          ) : (
-                            <span aria-hidden>{collectibleEmoji(kind)}</span>
-                          )
+              <div className="pc-shelf" role="list">
+                {showcase.map(({ kind, count }) => (
+                  <div
+                    key={kind}
+                    className={`pc-collectable ${count > 0 ? "is-found" : "is-mystery"}`}
+                    role="listitem"
+                    title={
+                      count > 0
+                        ? collectibleLabel(kind)
+                        : "Something is waiting to be discovered."
+                    }
+                  >
+                    <div className="pc-collectable-disc">
+                      {count > 0 ? (
+                        collectibleImage(kind) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={collectibleImage(kind)}
+                            alt=""
+                            draggable={false}
+                          />
                         ) : (
-                          <span aria-hidden>🔒</span>
-                        )}
-                      </div>
-                      <em>
-                        {count > 0 ? collectibleLabel(kind) : "Mystery"}
-                      </em>
+                          <span aria-hidden>{collectibleEmoji(kind)}</span>
+                        )
+                      ) : (
+                        <span aria-hidden>🔒</span>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
+                    <em>
+                      {count > 0 ? collectibleLabel(kind) : "Mystery"}
+                    </em>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
-            {/* Progress */}
-            {tab === "home" ? (
-              <section className="pc-card pc-progress" aria-labelledby="pc-prog-h">
-                <h2 id="pc-prog-h">My Progress</h2>
-                <div className="pc-progress-row">
-                  {progressItems.map((item) => {
-                    const pct = Math.min(
-                      100,
-                      Math.round((item.value / Math.max(1, item.total)) * 100)
-                    );
-                    return (
-                      <div key={item.key} className="pc-progress-item">
-                        <div
-                          className="pc-ring"
-                          style={ringStyle(pct, theme.accent)}
-                          aria-hidden
-                        >
-                          <span className="pc-ring-inner">{item.emoji}</span>
-                        </div>
-                        <strong>
-                          {item.value}/{item.total}
-                        </strong>
-                        <em>{item.label}</em>
+          {tab === "home" ? (
+            <section className="pc-card pc-progress" aria-labelledby="pc-prog-h">
+              <h2 id="pc-prog-h">My Progress</h2>
+              <div className="pc-progress-row">
+                {progressItems.map((item) => {
+                  const pct = Math.min(
+                    100,
+                    Math.round((item.value / Math.max(1, item.total)) * 100)
+                  );
+                  return (
+                    <div key={item.key} className="pc-progress-item">
+                      <div
+                        className="pc-ring"
+                        style={ringStyle(pct, theme.accent)}
+                        aria-hidden
+                      >
+                        <span className="pc-ring-inner">{item.emoji}</span>
                       </div>
-                    );
-                  })}
-                </div>
-              </section>
-            ) : null}
-
-            {/* Achievements strip on journey/home */}
-            {(tab === "home" || tab === "journey") && (
-              <section className="pc-card pc-achievements" aria-label="Achievements">
-                <div className="pc-section-head">
-                  <h2>Achievements</h2>
-                </div>
-                <div className="pc-badge-row">
-                  {achievements.map((a) => (
-                    <div
-                      key={a.id}
-                      className={`pc-badge ${a.unlocked ? "is-unlocked" : "is-locked"}`}
-                      title={a.title}
-                    >
-                      <span aria-hidden>{a.unlocked ? a.emoji : "🔒"}</span>
-                      <em>{a.unlocked ? a.title : "Soon"}</em>
+                      <strong>
+                        {item.value}/{item.total}
+                      </strong>
+                      <em>{item.label}</em>
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
 
-            {/* Recent activity */}
-            {tab === "home" ? (
-              <section className="pc-card pc-recent" aria-label="Recent activity">
-                <h2>Recent Activity</h2>
-                <ul className="pc-recent-list">
-                  {doneJourney.slice(0, 4).map((m) => (
-                    <li key={`act-${m.id}`}>
-                      <span aria-hidden>{m.emoji}</span>
-                      <strong>{m.title}</strong>
-                      <em>{m.dateLabel}</em>
-                    </li>
-                  ))}
-                  {doneJourney.length === 0 ? (
-                    <li className="pc-muted">Your cottage story is just beginning.</li>
-                  ) : null}
-                </ul>
-              </section>
-            ) : null}
+          {(tab === "home" || tab === "journey") && (
+            <section className="pc-card pc-achievements" aria-label="Achievements">
+              <div className="pc-section-head">
+                <h2>Achievements</h2>
+              </div>
+              <div className="pc-badge-row">
+                {achievements.map((a) => (
+                  <div
+                    key={a.id}
+                    className={`pc-badge ${a.unlocked ? "is-unlocked" : "is-locked"}`}
+                    title={a.title}
+                  >
+                    <span aria-hidden>{a.unlocked ? a.emoji : "🔒"}</span>
+                    <em>{a.unlocked ? a.title : "Soon"}</em>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
-            {/* Memory wall */}
-            {tab === "home" ? (
-              <section className="pc-card pc-memories" aria-label="Memory wall">
-                <h2>Memory Wall</h2>
-                <div className="pc-memory-board">
-                  {(initialCottage.memories?.length
-                    ? initialCottage.memories.slice(0, 4)
-                    : [
-                        {
-                          id: "welcome-memory",
-                          emoji: theme.firstGift.emoji,
-                          title: "First gift",
-                          description: `${theme.firstGift.name} waiting on the shelf.`,
-                          dateLabel: "Welcome",
-                          memoryType: "gift",
-                          pinned: true,
-                        },
-                      ]
-                  ).map((m) => (
-                    <article key={m.id} className="pc-memory-pin">
-                      <span aria-hidden>{m.emoji || "💌"}</span>
-                      <strong>{m.title}</strong>
-                      <p>{m.description}</p>
-                      <em>{m.dateLabel}</em>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            ) : null}
+          {tab === "home" ? (
+            <section className="pc-card pc-recent" aria-label="Recent activity">
+              <h2>Recent Activity</h2>
+              <ul className="pc-recent-list">
+                {doneJourney.slice(0, 4).map((m) => (
+                  <li key={`act-${m.id}`}>
+                    <span aria-hidden>{m.emoji}</span>
+                    <strong>{m.title}</strong>
+                    <em>{m.dateLabel}</em>
+                  </li>
+                ))}
+                {doneJourney.length === 0 ? (
+                  <li className="pc-muted">Your cottage story is just beginning.</li>
+                ) : null}
+              </ul>
+            </section>
+          ) : null}
 
-            {/* Quote footer */}
-            {tab === "home" ? (
-              <footer className="pc-quote">
-                <img
-                  src={theme.mascotImage}
-                  alt=""
-                  className="pc-quote-mascot"
-                  draggable={false}
-                />
-                <blockquote>
-                  <p>“{theme.quote}”</p>
-                  <cite>— {theme.quoteAuthor}</cite>
-                </blockquote>
-              </footer>
-            ) : null}
-          </div>
-        )}
+          {tab === "home" ? (
+            <section className="pc-card pc-memories" aria-label="Memory wall">
+              <h2>Memory Wall</h2>
+              <div className="pc-memory-board">
+                {(initialCottage.memories?.length
+                  ? initialCottage.memories.slice(0, 4)
+                  : [
+                      {
+                        id: "welcome-memory",
+                        emoji: theme.firstGift.emoji,
+                        title: "First gift",
+                        description: `${theme.firstGift.name} waiting on the shelf.`,
+                        dateLabel: "Welcome",
+                        memoryType: "gift",
+                        pinned: true,
+                      },
+                    ]
+                ).map((m) => (
+                  <article key={m.id} className="pc-memory-pin">
+                    <span aria-hidden>{m.emoji || "💌"}</span>
+                    <strong>{m.title}</strong>
+                    <p>{m.description}</p>
+                    <em>{m.dateLabel}</em>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {tab === "home" ? (
+            <footer className="pc-quote">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={theme.mascotImage}
+                alt=""
+                className="pc-quote-mascot"
+                draggable={false}
+              />
+              <blockquote>
+                <p>“{theme.quote}”</p>
+                <cite>— {theme.quoteAuthor}</cite>
+              </blockquote>
+            </footer>
+          ) : null}
+        </div>
       </div>
     </div>
   );

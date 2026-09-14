@@ -9,8 +9,6 @@ import {
   getFriendshipRelation,
   getUserByUsername,
 } from "@/lib/letters";
-import { listReadingListBooks, listClubBooks } from "@/lib/libraryBooks";
-import { getLibraryProgress } from "@/lib/library";
 import { getUserVillageStats } from "@/lib/villageProgress";
 import { getVillage } from "@/lib/villages";
 import { CottageProfile } from "@/components/CottageProfile";
@@ -30,10 +28,6 @@ export default async function ProfilePage({
   const isSelf = viewer.id === profile.id;
   const homeVillageId = profile.homeVillageId || profile.villageId;
   const village = getVillage(homeVillageId);
-  const visitingVillage =
-    profile.villageId && profile.villageId !== homeVillageId
-      ? getVillage(profile.villageId)
-      : null;
   const db = getDb();
   const stats = getUserVillageStats(db, profile.id);
   const letterCount = countUserLetters(db, profile.id);
@@ -54,57 +48,15 @@ export default async function ProfilePage({
     ? ({ status: "none" } as const)
     : getFriendshipRelation(viewer.id, profile.id);
 
-  let shelfBooks: {
-    id: string;
-    title: string;
-    author: string;
-    status: "none" | "reading" | "finished" | "wishlist";
-  }[] = [];
-  try {
-    const progress = getLibraryProgress(profile.id);
-    const books = [...listReadingListBooks(), ...listClubBooks()];
-    const seen = new Set<string>();
-    for (const book of books) {
-      if (seen.has(book.id)) continue;
-      const status =
-        progress.readingStatus[book.id] ||
-        (progress.finishedBooks[book.id]
-          ? "finished"
-          : progress.wishlist[book.id]
-            ? "wishlist"
-            : "none");
-      if (status === "none") continue;
-      seen.add(book.id);
-      shelfBooks.push({
-        id: book.id,
-        title: book.title,
-        author: book.author,
-        status,
-      });
-    }
-    shelfBooks = shelfBooks.slice(0, 12);
-  } catch {
-    shelfBooks = [];
-  }
-
   return (
     <main className="app-main cottage-main">
       <CottageProfile
         profile={profile}
         village={village}
-        visitingVillage={visitingVillage}
         collectibles={stats.collectibles}
         isSelf={isSelf}
         relation={relation}
-        shareVillage={Boolean(
-          !isSelf &&
-            (viewer.homeVillageId || viewer.villageId) &&
-            (profile.homeVillageId || profile.villageId) &&
-            (viewer.homeVillageId || viewer.villageId) ===
-              (profile.homeVillageId || profile.villageId)
-        )}
         initialCottage={cottage}
-        shelfBooks={shelfBooks}
         letterCount={letterCount}
         activityCount={0}
         tvCount={0}
