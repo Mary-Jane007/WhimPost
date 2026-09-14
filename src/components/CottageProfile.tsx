@@ -288,7 +288,7 @@ export function CottageProfile({
               </div>
               {isSelf ? (
                 <p className="pc-character-link">
-                  <Link href="/character">Customize character</Link>
+                  <Link href="/character">Change character</Link>
                 </p>
               ) : null}
             </div>

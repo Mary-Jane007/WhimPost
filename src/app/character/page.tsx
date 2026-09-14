@@ -21,12 +21,13 @@ export default async function CharacterPage() {
       <div className="character-page">
         <p className="belonging-kicker">Cottage resident</p>
         <h1>
-          Customize your character{" "}
+          Choose your character{" "}
           <span aria-hidden>{village.mascot}</span>
         </h1>
         <p className="character-page-lead">
-          Your resident lives in {village.name}. Change species, outfit, or
-          accessories anytime — letters and your cottage profile will update.
+          Your resident lives in {village.name}. Pick a species and male or
+          female version — each has a fixed look. Letters and your cottage
+          profile will update.
         </p>
         <CharacterCustomizeClient
           villageId={villageId as VillageId}

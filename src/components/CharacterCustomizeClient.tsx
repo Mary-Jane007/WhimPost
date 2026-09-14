@@ -54,7 +54,7 @@ export function CharacterCustomizeClient({
   }
 
   return (
-    <div className="character-customize-page">
+    <div className="character-change-page">
       <CharacterPicker
         villageId={villageId}
         value={character}
@@ -62,7 +62,7 @@ export function CharacterCustomizeClient({
           setCharacter(next);
           setSaved(false);
         }}
-        heading="Your village character"
+        heading="Choose your village character"
       />
       {error ? <p className="form-error">{error}</p> : null}
       {saved ? (

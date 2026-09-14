@@ -301,8 +301,8 @@ export function RegisterForm() {
             Your mailbox will open in <strong>{trait.label}</strong> as{" "}
             <strong>{displayName || username}</strong>, with this resident on
             your cottage and letters. That becomes your{" "}
-            <strong>home village</strong> — you can customize your character
-            later anytime.
+            <strong>home village</strong> — you can change your character later
+            anytime.
           </p>
         </div>
         {error && <p className="form-error">{error}</p>}
