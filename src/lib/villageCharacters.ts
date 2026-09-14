@@ -287,7 +287,7 @@ export function characterLabel(character: VillagerCharacter) {
     emoji: species?.emoji || "✨",
     villageLabel: pool.label,
     villageEmoji: pool.emoji,
-    genderLabel: character.gender === "female" ? "♀" : "♂",
+    genderLabel: character.gender === "female" ? "F" : "M",
     blurb: species?.blurb || "",
   };
 }
