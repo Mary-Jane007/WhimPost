@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-14T17:21:44.126Z",
+  "updatedAt": "2026-09-14T17:35:00.828Z",
   "books": [
     {
       "id": "princess",
@@ -120,7 +120,7 @@
       "description": "The Wind in the Willows follows four animal friends—Mole, Rat, Badger, and the adventurous Toad—as they explore the English countryside. Their friendship leads them through peaceful river days, woodland adventures, and plenty of trouble caused by Toad’s wild personality.",
       "minutes": 260,
       "coverEmoji": "🚣",
-      "coverUrl": "/api/uploads/635c9408-ad89-4a09-99e7-1d3667d33933.jpg",
+      "coverUrl": "/api/uploads/7235ff4a-0e06-4c55-854d-dd7c0738c551.jpg",
       "fileUrl": "/api/uploads/21c62f73-2b6a-4969-ac57-f0f2a41b962c.epub",
       "fileName": "pg27805-images-3.epub",
       "fileMime": "application/epub+zip",
