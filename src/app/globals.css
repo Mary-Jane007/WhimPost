@@ -15391,7 +15391,7 @@ svg {
 .char-portrait-caption em {
   font-style: normal;
   font-size: 0.8em;
-  color: color-mix(in srgb, var(--ink, #2f2418) 72%, var(--cream, #f5ead8));
+  color: color-mix(in srgb, var(--ink, #2f2418) 88%, #4a3a2c);
 }
 
 .char-frame-bramblewood .char-portrait-frame {
@@ -15486,13 +15486,13 @@ svg {
   font-style: normal;
   font-size: 0.85em;
   margin-bottom: 0.25rem;
-  color: color-mix(in srgb, var(--ink, #2f2418) 78%, #5a4632);
+  color: color-mix(in srgb, var(--ink, #2f2418) 90%, #3a2a1c);
 }
 .char-card-copy p {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.35;
-  color: color-mix(in srgb, var(--ink, #2f2418) 86%, #4a3a2a);
+  color: color-mix(in srgb, var(--ink, #2f2418) 92%, #3a2a1c);
 }
 .char-customize {
   display: grid;
@@ -15694,47 +15694,47 @@ body.theme-clovermeadow .char-portrait-caption {
 }
 body.theme-clovermeadow .char-card-copy em,
 body.theme-clovermeadow .char-portrait-caption em {
-  color: #5c3a44;
+  color: #4a3038;
 }
 body.theme-clovermeadow .char-card-copy p {
-  color: #4a3038;
+  color: #3d2630;
 }
 body.theme-moonmere .char-card,
 body.theme-moonmere .char-picker-selected,
 body.theme-moonmere .char-portrait-caption {
-  color: #1a2838;
+  color: #152030;
 }
 body.theme-moonmere .char-card-copy em,
 body.theme-moonmere .char-portrait-caption em {
-  color: #3d4a5c;
+  color: #2a3848;
 }
 body.theme-moonmere .char-card-copy p {
-  color: #2a3848;
+  color: #1a2838;
 }
 body.theme-mosshollow .char-card,
 body.theme-mosshollow .char-picker-selected,
 body.theme-mosshollow .char-portrait-caption {
-  color: #1f2a1e;
+  color: #162016;
 }
 body.theme-mosshollow .char-card-copy em,
 body.theme-mosshollow .char-portrait-caption em {
-  color: #3a4a3c;
+  color: #2e3c30;
 }
 body.theme-bramblewood .char-card,
 body.theme-bramblewood .char-picker-selected,
 body.theme-bramblewood .char-portrait-caption {
-  color: #3a1f12;
+  color: #2e160c;
 }
 body.theme-bramblewood .char-card-copy em,
 body.theme-bramblewood .char-portrait-caption em {
-  color: #5c3420;
+  color: #4a2818;
 }
 body.theme-hearthwick .char-card,
 body.theme-hearthwick .char-picker-selected,
 body.theme-hearthwick .char-portrait-caption {
-  color: #2c1e14;
+  color: #241810;
 }
 body.theme-hearthwick .char-card-copy em,
 body.theme-hearthwick .char-portrait-caption em {
-  color: #4a3224;
+  color: #3e2a1c;
 }
