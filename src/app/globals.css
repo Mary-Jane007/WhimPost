@@ -15479,20 +15479,20 @@ svg {
 }
 .char-card-copy strong {
   display: block;
-  color: var(--ink, #2f2418);
+  color: inherit;
 }
 .char-card-copy em {
   display: block;
   font-style: normal;
   font-size: 0.85em;
   margin-bottom: 0.25rem;
-  color: color-mix(in srgb, var(--ink, #2f2418) 90%, #3a2a1c);
+  color: color-mix(in srgb, currentColor 88%, #1a1410);
 }
 .char-card-copy p {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.35;
-  color: color-mix(in srgb, var(--ink, #2f2418) 92%, #3a2a1c);
+  color: color-mix(in srgb, currentColor 92%, #1a1410);
 }
 .char-customize {
   display: grid;
@@ -15641,8 +15641,9 @@ svg {
   margin: 0 auto;
   padding: 1.25rem 1rem 3rem;
 }
-.character-page .belonging-kicker {
-  color: var(--gold, #d4af37);
+.character-page .belonging-kicker,
+.char-picker-head .belonging-kicker {
+  color: var(--gold, #e0c060);
 }
 .character-page > h1 {
   color: var(--cream, #f5ead8);
