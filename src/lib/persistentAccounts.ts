@@ -163,6 +163,7 @@ export function importPersistentAccounts(db: Database) {
         home_village_id:
           account.home_village_id || account.village_id || null,
         reputation: account.reputation ?? 0,
+        character_json: account.character_json ?? null,
         collectibles_json: account.collectibles_json || "{}",
         visited_villages_json: visited,
         created_at: account.created_at || new Date().toISOString(),
