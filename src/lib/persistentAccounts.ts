@@ -21,6 +21,7 @@ export type PersistentAccount = {
   village_id: string | null;
   home_village_id?: string | null;
   reputation: number;
+  character_json?: string | null;
   collectibles_json: string;
   /** Villages this account has already received a welcome letter for. */
   visited_villages_json: string;
@@ -65,7 +66,7 @@ function listUsersFromDb(db: Database): PersistentAccount[] {
   return db
     .prepare(
       `SELECT id, username, display_name, email, password_hash, bio, forest_name,
-              is_owner, village_id, home_village_id, reputation, collectibles_json,
+              is_owner, village_id, home_village_id, reputation, character_json, collectibles_json,
               COALESCE(visited_villages_json, '[]') AS visited_villages_json,
               created_at
        FROM users`
@@ -99,11 +100,11 @@ export function importPersistentAccounts(db: Database) {
   const insert = db.prepare(
     `INSERT INTO users (
       id, username, display_name, email, password_hash, bio, forest_name,
-      is_owner, village_id, home_village_id, reputation, collectibles_json, visited_villages_json,
+      is_owner, village_id, home_village_id, reputation, character_json, collectibles_json, visited_villages_json,
       created_at
     ) VALUES (
       @id, @username, @display_name, @email, @password_hash, @bio, @forest_name,
-      @is_owner, @village_id, @home_village_id, @reputation, @collectibles_json, @visited_villages_json,
+      @is_owner, @village_id, @home_village_id, @reputation, @character_json, @collectibles_json, @visited_villages_json,
       @created_at
     )`
   );
@@ -120,6 +121,7 @@ export function importPersistentAccounts(db: Database) {
       village_id = @village_id,
       home_village_id = @home_village_id,
       reputation = @reputation,
+      character_json = @character_json,
       collectibles_json = @collectibles_json,
       visited_villages_json = @visited_villages_json
      WHERE id = @id`

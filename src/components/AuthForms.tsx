@@ -6,6 +6,12 @@ import type { VillageId } from "@/lib/villages";
 import type { BelongingResult } from "@/lib/belongingQuiz";
 import { BELONGING_TRAITS } from "@/lib/belongingQuiz";
 import { DiscoverBelonging } from "@/components/DiscoverBelonging";
+import { CharacterPicker } from "@/components/CharacterPicker";
+import { CharacterPortrait } from "@/components/CharacterPortrait";
+import {
+  defaultCharacterForVillage,
+  type VillagerCharacter,
+} from "@/lib/villageCharacters";
 
 export function LoginForm() {
   const [login, setLogin] = useState("");
@@ -120,7 +126,7 @@ export function LoginForm() {
   );
 }
 
-type RegisterStep = "account" | "belonging" | "confirm";
+type RegisterStep = "account" | "belonging" | "character" | "confirm";
 
 export function RegisterForm() {
   const [step, setStep] = useState<RegisterStep>("account");
@@ -131,6 +137,7 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [villageId, setVillageId] = useState<VillageId | "">("");
   const [belonging, setBelonging] = useState<BelongingResult | null>(null);
+  const [character, setCharacter] = useState<VillagerCharacter | null>(null);
   const [quizKey, setQuizKey] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -160,19 +167,30 @@ export function RegisterForm() {
   function onBelongingComplete(id: VillageId, result: BelongingResult) {
     setVillageId(id);
     setBelonging(result);
-    setStep("confirm");
+    setCharacter(defaultCharacterForVillage(id));
+    setStep("character");
   }
 
   function retakeBelonging() {
     setVillageId("");
     setBelonging(null);
+    setCharacter(null);
     setQuizKey((k) => k + 1);
     setStep("belonging");
   }
 
+  function continueFromCharacter() {
+    if (!villageId || !character) {
+      setError("Choose a character for your village");
+      return;
+    }
+    setError("");
+    setStep("confirm");
+  }
+
   async function createMailbox() {
-    if (!villageId) {
-      setError("Discover your belonging before settling in");
+    if (!villageId || !character) {
+      setError("Discover your belonging and choose a character first");
       return;
     }
     setLoading(true);
@@ -189,6 +207,7 @@ export function RegisterForm() {
           password,
           forestName,
           villageId,
+          character,
         }),
       });
       const data = (await res.json().catch(() => null)) as {
@@ -227,7 +246,47 @@ export function RegisterForm() {
     );
   }
 
-  if (step === "confirm" && belonging && villageId) {
+  if (step === "character" && villageId) {
+    return (
+      <div className="auth-form register-wide character-step">
+        <CharacterPicker
+          villageId={villageId}
+          value={character}
+          onChange={setCharacter}
+          heading="Choose your character"
+        />
+        {error && <p className="form-error">{error}</p>}
+        <div className="character-step-actions">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={continueFromCharacter}
+            disabled={!character}
+          >
+            Continue with this resident
+          </button>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={retakeBelonging}
+          >
+            Retake Discover your belonging
+          </button>
+        </div>
+        <p className="auth-switch">
+          <button
+            type="button"
+            className="linkish"
+            onClick={() => setStep("belonging")}
+          >
+            ← Back
+          </button>
+        </p>
+      </div>
+    );
+  }
+
+  if (step === "confirm" && belonging && villageId && character) {
     const trait = BELONGING_TRAITS[villageId];
     return (
       <div className="auth-form register-wide belonging-confirm">
@@ -236,12 +295,16 @@ export function RegisterForm() {
           <span aria-hidden>{trait.emoji} </span>
           {trait.label} is waiting
         </h2>
-        <p className="belonging-lead">
-          Your mailbox will open in <strong>{trait.label}</strong> as{" "}
-          <strong>{displayName || username}</strong>. That becomes your{" "}
-          <strong>home village</strong> — you can visit others or retake the
-          quiz later without losing your belonging.
-        </p>
+        <div className="confirm-character-row">
+          <CharacterPortrait character={character} size="lg" showLabel />
+          <p className="belonging-lead">
+            Your mailbox will open in <strong>{trait.label}</strong> as{" "}
+            <strong>{displayName || username}</strong>, with this resident on
+            your cottage and letters. That becomes your{" "}
+            <strong>home village</strong> — you can customize your character
+            later anytime.
+          </p>
+        </div>
         {error && <p className="form-error">{error}</p>}
         <button
           type="button"
@@ -250,6 +313,13 @@ export function RegisterForm() {
           onClick={createMailbox}
         >
           {loading ? "Planting your mailbox…" : "Make this my home"}
+        </button>
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={() => setStep("character")}
+        >
+          Change character
         </button>
         <button
           type="button"
@@ -320,8 +390,9 @@ export function RegisterForm() {
         <p className="belonging-kicker">Next</p>
         <p>
           After your mailbox details, you&apos;ll{" "}
-          <strong>Discover your belonging</strong> — a short path of twelve
-          questions that chooses your village.
+          <strong>Discover your belonging</strong>, then{" "}
+          <strong>choose your village character</strong> — the resident who
+          appears on your cottage and letters.
         </p>
       </div>
 

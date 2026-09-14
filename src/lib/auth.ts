@@ -123,6 +123,7 @@ export function mapUser(row: {
   village_id?: string | null;
   home_village_id?: string | null;
   reputation?: number | null;
+  character_json?: string | null;
 }): UserPublic {
   const villageId = row.village_id || null;
   const homeVillageId = row.home_village_id || villageId || null;
@@ -137,6 +138,7 @@ export function mapUser(row: {
     villageId,
     homeVillageId,
     reputation: Number(row.reputation) || 0,
+    characterJson: row.character_json || null,
   };
 }
 
@@ -147,7 +149,7 @@ export async function getCurrentUser(): Promise<UserPublic | null> {
   const row = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, home_village_id, reputation
+              village_id, home_village_id, reputation, character_json
        FROM users WHERE id = ?`
     )
     .get(session.userId) as
@@ -162,6 +164,7 @@ export async function getCurrentUser(): Promise<UserPublic | null> {
         village_id: string | null;
         home_village_id: string | null;
         reputation: number;
+        character_json?: string | null;
       }
     | undefined;
   if (!row) return null;
