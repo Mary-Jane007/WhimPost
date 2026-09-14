@@ -18,7 +18,6 @@ import {
   villagerTitleFor,
   villagerXpProgress,
 } from "@/lib/villagerHome";
-import { CollectibleIcon } from "@/components/CollectibleIcon";
 import { CottageRoomEditor } from "@/components/CottageRoomEditor";
 import { ProfileActions } from "@/components/ProfileActions";
 
@@ -29,14 +28,14 @@ type ShelfBook = {
   status: "none" | "reading" | "finished" | "wishlist";
 };
 
-type HomeTab = "home" | "journey" | "collectables" | "goals" | "customize";
+type HomeTab = "home" | "journey" | "collectables" | "goals" | "settings";
 
 const TABS: Array<{ id: HomeTab; label: string }> = [
   { id: "home", label: "Home" },
   { id: "journey", label: "Journey" },
   { id: "collectables", label: "Collectables" },
   { id: "goals", label: "Goals" },
-  { id: "customize", label: "Customize" },
+  { id: "settings", label: "Settings" },
 ];
 
 function initialsFor(name: string) {
@@ -46,41 +45,11 @@ function initialsFor(name: string) {
   return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
 }
 
-function deriveRecentActivity(input: {
-  letterCount: number;
-  collectibleCount: number;
-  memoryCount: number;
-  cottageName: string;
-  themeLabel: string;
-}) {
-  const items: Array<{ emoji: string; title: string; detail: string }> = [];
-  if (input.letterCount > 0) {
-    items.push({
-      emoji: "✉️",
-      title: "Letters sent from the cottage",
-      detail: `${input.letterCount} letter${input.letterCount === 1 ? "" : "s"} so far`,
-    });
-  }
-  if (input.collectibleCount > 0) {
-    items.push({
-      emoji: "🧺",
-      title: "Keepsakes brought home",
-      detail: `${input.collectibleCount} discovery${input.collectibleCount === 1 ? "" : "ies"} on the shelves`,
-    });
-  }
-  if (input.memoryCount > 0) {
-    items.push({
-      emoji: "💌",
-      title: "Memories on the wall",
-      detail: `${input.memoryCount} pinned moment${input.memoryCount === 1 ? "" : "s"}`,
-    });
-  }
-  items.push({
-    emoji: "🏡",
-    title: input.cottageName || "Personal cottage",
-    detail: `Settled in ${input.themeLabel}`,
-  });
-  return items.slice(0, 5);
+function ringStyle(pct: number, color: string): Record<string, string> {
+  const p = Math.max(0, Math.min(100, pct));
+  return {
+    background: `conic-gradient(${color} ${p * 3.6}deg, rgba(120, 100, 70, 0.18) 0deg)`,
+  };
 }
 
 export function CottageProfile({
@@ -116,7 +85,7 @@ export function CottageProfile({
   const collectibleCount = useMemo(
     () =>
       (Object.values(collectibles) as number[]).reduce(
-        (sum, n) => sum + (n > 0 ? n : 0),
+        (sum, n) => sum + (n > 0 ? 1 : 0),
         0
       ),
     [collectibles]
@@ -174,22 +143,51 @@ export function CottageProfile({
     reputation: profile.reputation,
   };
   const currentGoal = theme.goals[0];
+  const goalValue = currentGoal
+    ? goalProgressValue(currentGoal.metric, goalStats)
+    : 0;
+  const goalPct = currentGoal
+    ? Math.min(100, Math.round((goalValue / Math.max(1, currentGoal.target)) * 100))
+    : 0;
 
-  const recent = deriveRecentActivity({
-    letterCount,
-    collectibleCount,
-    memoryCount,
-    cottageName,
-    themeLabel: theme.label,
-  });
+  const progressItems = [
+    {
+      key: "activities",
+      label: "Activities",
+      emoji: "🌿",
+      value: activityCount,
+      total: 20,
+    },
+    {
+      key: "letters",
+      label: "Letters",
+      emoji: "✉️",
+      value: letterCount,
+      total: 20,
+    },
+    {
+      key: "shows",
+      label: "Shows",
+      emoji: "📺",
+      value: tvCount,
+      total: 15,
+    },
+    {
+      key: "collectables",
+      label: "Collectables",
+      emoji: "🧺",
+      value: collectibleCount,
+      total: Math.max(5, showcase.length + collectibleCount),
+    },
+  ];
 
   const cssVars = {
-    ["--vh-accent" as string]: theme.accent,
-    ["--vh-soft" as string]: theme.soft,
-    ["--vh-deep" as string]: theme.deep,
-    ["--vh-cream" as string]: theme.cream,
-    ["--vh-ink" as string]: theme.ink,
-    ["--vh-gold" as string]: theme.gold,
+    ["--pc-accent" as string]: theme.accent,
+    ["--pc-soft" as string]: theme.soft,
+    ["--pc-deep" as string]: theme.deep,
+    ["--pc-cream" as string]: theme.cream,
+    ["--pc-ink" as string]: theme.ink,
+    ["--pc-gold" as string]: theme.gold,
   };
 
   const editorProps = {
@@ -202,369 +200,401 @@ export function CottageProfile({
     shareVillage,
     initialCottage,
     shelfBooks,
+    embedded: true as const,
   };
 
+  const doneJourney = journey.filter((m) => m.done);
+  const journeyList = (tab === "journey" ? journey : doneJourney.slice(0, 5))
+    .length
+    ? tab === "journey"
+      ? journey
+      : doneJourney.slice(0, 5)
+    : journey.slice(0, 4);
+
   return (
-    <div
-      className={`villager-home village-${theme.id}`}
-      style={cssVars}
-      data-village={theme.id}
-    >
-      <header className="vh-header-card">
-        <div className="vh-avatar" aria-hidden>
-          {theme.mascotImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
+    <div className={`pc-home village-${theme.id}`} style={cssVars}>
+      <div className="pc-shell">
+        <div className="pc-toolbar">
+          <Link href={village ? `/village` : "/"} className="pc-back">
+            ← Back to Village
+          </Link>
+          {isSelf ? (
+            <button
+              type="button"
+              className="pc-customize"
+              onClick={() => setTab("settings")}
+            >
+              ⚙ Customize
+            </button>
+          ) : null}
+        </div>
+
+        {/* COTTAGE HERO — the visual centerpiece */}
+        <section className="pc-hero" aria-label={`${theme.label} personal cottage`}>
+          <div className="pc-hero-frame">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={theme.mascotImage}
-              alt=""
-              className="vh-avatar-mascot"
+              src={theme.heroImage}
+              alt={`${theme.label} cottage — ${cottageName}`}
+              className="pc-hero-art"
               draggable={false}
             />
-          ) : (
-            <span className="vh-avatar-fallback">
-              {initialsFor(profile.displayName)}
-            </span>
-          )}
-        </div>
-        <div className="vh-header-copy">
-          <p className="vh-kicker">
-            {isSelf ? "Your Personal Cottage" : "Visiting a villager"}
-          </p>
-          <h1 className="vh-display-name">{profile.displayName}</h1>
-          <p className="vh-handle">
-            @{profile.username}
-            {profile.forestName ? ` · “${profile.forestName}”` : ""}
-          </p>
-          <div className="vh-badges">
-            <span className="vh-village-badge">
-              <span aria-hidden>{theme.emoji}</span> {theme.label}
-            </span>
-            <span className="vh-title-badge">{title}</span>
-            {visitingVillage ? (
-              <span className="vh-visiting-badge">
-                Visiting {visitingVillage.name}
-              </span>
-            ) : null}
-          </div>
-          <div className="vh-xp-block">
-            <div className="vh-xp-head">
-              <strong>Level {xp.level}</strong>
-              <em>
-                {xp.current} / {xp.needed} XP
-              </em>
+            <div className="pc-hero-vignette" aria-hidden />
+            <div className="pc-hero-label" aria-hidden>
+              <span>{theme.emoji}</span> {cottageName}
             </div>
-            <div
-              className="vh-xp-bar"
-              role="progressbar"
-              aria-valuenow={xp.percent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label="Villager experience"
-            >
-              <span style={{ width: `${xp.percent}%` }} />
+            <div className="pc-hero-hotspots" aria-hidden>
+              <button type="button" className="pc-hotspot pc-hotspot-a" title="Bookshelf — View your books">
+                <span>📚</span>
+                <em>Bookshelf</em>
+              </button>
+              <button type="button" className="pc-hotspot pc-hotspot-b" title="Mailbox — Letters">
+                <span>📮</span>
+                <em>Mailbox</em>
+              </button>
+              <button type="button" className="pc-hotspot pc-hotspot-c" title="Favorite corner">
+                <span>{theme.emoji}</span>
+                <em>Corner</em>
+              </button>
             </div>
           </div>
-        </div>
-        <div className="vh-header-actions">
-          {!isSelf ? (
-            <ProfileActions username={profile.username} relation={relation} />
-          ) : (
-            <Link href="/compose" className="vh-write-btn">
-              Write a letter
-            </Link>
-          )}
-        </div>
-      </header>
 
-      <section className="vh-cottage-hero" aria-label="Personal cottage">
-        <div className="vh-hero-atmosphere" aria-hidden />
-        <div className="vh-hero-glow" aria-hidden />
-        <div className="vh-hero-floor" aria-hidden />
-        <div className="vh-hero-stickers" aria-hidden>
-          {theme.heroStickers.slice(0, 5).map((src, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={src}
-              src={src}
-              alt=""
-              className={`vh-sticker vh-sticker-${i + 1}`}
-              draggable={false}
-            />
-          ))}
-        </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={theme.mascotImage}
-          alt={theme.mascot}
-          className="vh-hero-mascot"
-          draggable={false}
-        />
-        <div className="vh-hero-copy">
-          <p className="vh-hero-eyebrow">Personal Cottage</p>
-          <h2>{cottageName}</h2>
-          <p className="vh-hero-message">{theme.cottageMessage}</p>
-          {initialCottage.signText ? (
-            <p className="vh-hero-sign">“{initialCottage.signText}”</p>
-          ) : null}
-        </div>
-      </section>
-
-      <nav className="vh-tabs" aria-label="Cottage sections">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={`vh-tab ${tab === t.id ? "is-active" : ""}`}
-            onClick={() => setTab(t.id)}
-            aria-pressed={tab === t.id}
-          >
-            {t.label}
-          </button>
-        ))}
-      </nav>
-
-      {tab === "customize" ? (
-        <div className="vh-customize-wrap">
-          <CottageRoomEditor {...editorProps} embedded />
-        </div>
-      ) : (
-        <div className="vh-body">
-          {(tab === "home" || tab === "journey") && (
-            <section className="vh-panel vh-journey" aria-labelledby="vh-journey-h">
-              <div className="vh-panel-head">
-                <h3 id="vh-journey-h">{theme.journeyLabel}</h3>
-                <p>{theme.welcome}</p>
-              </div>
-              <ol className="vh-journey-list">
-                {journey.map((m) => (
-                  <li
-                    key={m.id}
-                    className={`vh-journey-item ${m.done ? "is-done" : "is-waiting"}`}
-                  >
-                    <span className="vh-journey-emoji" aria-hidden>
-                      {m.emoji}
-                    </span>
-                    <div>
-                      <strong>{m.title}</strong>
-                      <p>{m.description}</p>
-                      <em>{m.dateLabel}</em>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          )}
-
-          {(tab === "home" || tab === "goals") && currentGoal ? (
-            <section className="vh-panel vh-goal" aria-labelledby="vh-goal-h">
-              <div className="vh-panel-head">
-                <h3 id="vh-goal-h">{theme.goalLabel}</h3>
-                <p>{theme.progressLabel}</p>
-              </div>
-              {(tab === "goals" ? theme.goals : [currentGoal]).map((goal) => {
-                const value = goalProgressValue(goal.metric, goalStats);
-                const pct = Math.min(
-                  100,
-                  Math.round((value / Math.max(1, goal.target)) * 100)
-                );
-                return (
-                  <div key={goal.id} className="vh-goal-card">
-                    <div className="vh-goal-icon" aria-hidden>
-                      {goal.emoji}
-                    </div>
-                    <div className="vh-goal-copy">
-                      <strong>{goal.title}</strong>
-                      <p>{goal.description}</p>
-                      <div className="vh-goal-meter">
-                        <span>
-                          {Math.min(value, goal.target)} / {goal.target}
-                        </span>
-                        <div
-                          className="vh-xp-bar vh-goal-bar"
-                          role="progressbar"
-                          aria-valuenow={pct}
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                        >
-                          <span style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </section>
-          ) : null}
-
-          {tab === "home" ? (
-            <section
-              className="vh-progress-strip"
-              aria-label={theme.progressLabel}
-            >
-              <div className="vh-stat">
-                <span aria-hidden>✉️</span>
-                <strong>{letterCount}</strong>
-                <em>Letters</em>
-              </div>
-              <div className="vh-stat">
-                <span aria-hidden>🧺</span>
-                <strong>{collectibleCount}</strong>
-                <em>Collectables</em>
-              </div>
-              <div className="vh-stat">
-                <span aria-hidden>🌿</span>
-                <strong>{activityCount}</strong>
-                <em>Activities</em>
-              </div>
-              <div className="vh-stat">
-                <span aria-hidden>📺</span>
-                <strong>{tvCount}</strong>
-                <em>TV Corner</em>
-              </div>
-              <div className="vh-stat">
-                <span aria-hidden>⭐</span>
-                <strong>
-                  {achievements.filter((a) => a.unlocked).length}
-                </strong>
-                <em>Achievements</em>
-              </div>
-            </section>
-          ) : null}
-
-          {(tab === "home" || tab === "collectables") && (
-            <section
-              className="vh-panel vh-collectables"
-              aria-labelledby="vh-coll-h"
-            >
-              <div className="vh-panel-head">
-                <h3 id="vh-coll-h">{theme.collectablesLabel}</h3>
-                <p>Keepsakes that found their way home.</p>
-              </div>
-              <ul className="vh-collect-grid">
-                {showcase.map(({ kind, count }) => (
-                  <li
-                    key={kind}
-                    className={`vh-collect-item ${count > 0 ? "is-owned" : "is-locked"}`}
-                  >
-                    {collectibleImage(kind) ? (
-                      <CollectibleIcon kind={kind} size="lg" />
-                    ) : (
-                      <span className="vh-collect-emoji" aria-hidden>
-                        {collectibleEmoji(kind)}
-                      </span>
-                    )}
-                    <strong>{collectibleLabel(kind)}</strong>
-                    <em>{count > 0 ? `×${count}` : "Waiting"}</em>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {(tab === "home" || tab === "collectables") && (
-            <section
-              className="vh-panel vh-achievements"
-              aria-labelledby="vh-ach-h"
-            >
-              <div className="vh-panel-head">
-                <h3 id="vh-ach-h">Achievements</h3>
-                <p>Little badges earned along the way.</p>
-              </div>
-              <ul className="vh-achieve-grid">
-                {achievements.map((a) => (
-                  <li
-                    key={a.id}
-                    className={`vh-achieve-item ${a.unlocked ? "is-unlocked" : "is-locked"}`}
-                  >
-                    <span aria-hidden>{a.emoji}</span>
-                    <strong>{a.title}</strong>
-                    <em>{a.unlocked ? "Unlocked" : "Still ahead"}</em>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {tab === "home" ? (
-            <section
-              className="vh-panel vh-recent"
-              aria-labelledby="vh-recent-h"
-            >
-              <div className="vh-panel-head">
-                <h3 id="vh-recent-h">Recent activity</h3>
-                <p>Soft footsteps around the cottage.</p>
-              </div>
-              <ul className="vh-recent-list">
-                {recent.map((item, i) => (
-                  <li key={`${item.title}-${i}`}>
-                    <span aria-hidden>{item.emoji}</span>
-                    <div>
-                      <strong>{item.title}</strong>
-                      <p>{item.detail}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {tab === "home" ? (
-            <section
-              className="vh-panel vh-memory-wall"
-              aria-labelledby="vh-mem-h"
-            >
-              <div className="vh-panel-head">
-                <h3 id="vh-mem-h">Memory wall</h3>
-                <p>Moments pinned beside the window.</p>
-              </div>
-              {initialCottage.memories && initialCottage.memories.length > 0 ? (
-                <ul className="vh-memory-grid">
-                  {initialCottage.memories.slice(0, 8).map((m) => (
-                    <li key={m.id} className="vh-memory-card">
-                      <span aria-hidden>{m.emoji}</span>
-                      <strong>{m.title}</strong>
-                      <p>{m.description}</p>
-                      <em>{m.dateLabel}</em>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="vh-empty">
-                  The wall is quiet for now — memories will gather here as
-                  village life unfolds.
-                </p>
-              )}
-            </section>
-          ) : null}
-
-          {tab === "home" ? (
-            <footer className="vh-quote">
+          {/* Identity sitting on the hero edge */}
+          <div className="pc-identity">
+            <div className="pc-avatar-wrap">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={theme.mascotImage}
                 alt=""
-                className="vh-quote-mascot"
+                className="pc-avatar"
                 draggable={false}
               />
-              <blockquote>
-                <p>“{theme.quote}”</p>
-                <cite>— {theme.quoteAuthor}</cite>
-              </blockquote>
-            </footer>
-          ) : null}
+              <span className="pc-avatar-fallback" aria-hidden>
+                {initialsFor(profile.displayName)}
+              </span>
+            </div>
+            <div className="pc-identity-copy">
+              <h1 className="pc-name">{profile.displayName}</h1>
+              <p className="pc-village-line">
+                <span aria-hidden>{theme.emoji}</span> {theme.label} · {title}
+              </p>
+              <div className="pc-level-row">
+                <strong>Level {xp.level}</strong>
+                <div
+                  className="pc-xp-bar"
+                  role="progressbar"
+                  aria-valuenow={xp.percent}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${xp.current} of ${xp.needed} XP`}
+                >
+                  <span style={{ width: `${xp.percent}%` }} />
+                </div>
+                <em>
+                  {xp.current} / {xp.needed} XP
+                </em>
+              </div>
+            </div>
+            {isSelf ? null : (
+              <div className="pc-identity-actions">
+                <ProfileActions username={profile.username} relation={relation} />
+              </div>
+            )}
+          </div>
+        </section>
 
-          {tab === "goals" && !currentGoal ? (
-            <p className="vh-empty">No goals yet — explore your village first.</p>
-          ) : null}
-        </div>
-      )}
+        {/* Tabs */}
+        <nav className="pc-tabs" aria-label="Cottage sections">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`pc-tab ${tab === t.id ? "is-active" : ""}`}
+              onClick={() => setTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
 
-      {shareVillage && tab === "home" ? (
-        <p className="vh-share-note">
-          You share a village — wave from the{" "}
-          <Link href="/meeting-bench">Meeting Bench</Link>.
-        </p>
-      ) : null}
+        {tab === "settings" ? (
+          <section className="pc-panel pc-settings">
+            <h2>Cottage settings</h2>
+            <p>
+              Arrange furniture, pin memories, and make {cottageName} feel like
+              home.
+            </p>
+            {isSelf ? (
+              <CottageRoomEditor {...editorProps} />
+            ) : (
+              <p className="pc-muted">Only the cottage keeper can rearrange this home.</p>
+            )}
+          </section>
+        ) : (
+          <div className="pc-body">
+            {/* Journey + Goal */}
+            {(tab === "home" || tab === "journey" || tab === "goals") && (
+              <div className="pc-split">
+                {(tab === "home" || tab === "journey") && (
+                  <section className="pc-card pc-journey" aria-labelledby="pc-journey-h">
+                    <h2 id="pc-journey-h">My Journey</h2>
+                    <ul className="pc-journey-list">
+                      {journeyList.map((m) => (
+                        <li
+                          key={m.id}
+                          className={m.done ? "is-done" : "is-waiting"}
+                        >
+                          <span className="pc-check" aria-hidden>
+                            {m.done ? "✓" : "○"}
+                          </span>
+                          <div>
+                            <strong>{m.title}</strong>
+                            <p>{m.description}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                    {tab === "home" ? (
+                      <button
+                        type="button"
+                        className="pc-text-link"
+                        onClick={() => setTab("journey")}
+                      >
+                        View full journey →
+                      </button>
+                    ) : null}
+                  </section>
+                )}
+
+                {(tab === "home" || tab === "goals") && currentGoal ? (
+                  <section className="pc-card pc-goal" aria-labelledby="pc-goal-h">
+                    <h2 id="pc-goal-h">Current Goal</h2>
+                    <div className="pc-goal-body">
+                      <div className="pc-goal-copy">
+                        <h3>
+                          <span aria-hidden>{currentGoal.emoji}</span>{" "}
+                          {currentGoal.title}
+                        </h3>
+                        <p>{currentGoal.description}</p>
+                        <div className="pc-goal-meter">
+                          <div
+                            className="pc-xp-bar pc-goal-bar"
+                            role="progressbar"
+                            aria-valuenow={goalPct}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                          >
+                            <span style={{ width: `${goalPct}%` }} />
+                          </div>
+                          <em>
+                            {Math.min(goalValue, currentGoal.target)} /{" "}
+                            {currentGoal.target}
+                          </em>
+                        </div>
+                        <button
+                          type="button"
+                          className="pc-goal-btn"
+                          onClick={() => setTab("goals")}
+                        >
+                          View Goal
+                        </button>
+                      </div>
+                      <div className="pc-goal-art" aria-hidden>
+                        <img src={theme.mascotImage} alt="" draggable={false} />
+                      </div>
+                    </div>
+                    {tab === "goals"
+                      ? theme.goals.slice(1).map((goal) => {
+                          const value = goalProgressValue(goal.metric, goalStats);
+                          const pct = Math.min(
+                            100,
+                            Math.round((value / Math.max(1, goal.target)) * 100)
+                          );
+                          return (
+                            <div key={goal.id} className="pc-goal-extra">
+                              <strong>
+                                {goal.emoji} {goal.title}
+                              </strong>
+                              <p>{goal.description}</p>
+                              <div className="pc-xp-bar pc-goal-bar">
+                                <span style={{ width: `${pct}%` }} />
+                              </div>
+                              <em>
+                                {Math.min(value, goal.target)} / {goal.target}
+                              </em>
+                            </div>
+                          );
+                        })
+                      : null}
+                  </section>
+                ) : null}
+              </div>
+            )}
+
+            {/* Collectables */}
+            {(tab === "home" || tab === "collectables") && (
+              <section className="pc-card pc-collectables" aria-labelledby="pc-col-h">
+                <div className="pc-section-head">
+                  <h2 id="pc-col-h">My Collectables</h2>
+                  <Link href="/village" className="pc-text-link">
+                    See all →
+                  </Link>
+                </div>
+                <div className="pc-shelf" role="list">
+                  {showcase.map(({ kind, count }) => (
+                    <div
+                      key={kind}
+                      className={`pc-collectable ${count > 0 ? "is-found" : "is-mystery"}`}
+                      role="listitem"
+                      title={
+                        count > 0
+                          ? collectibleLabel(kind)
+                          : "Something is waiting to be discovered."
+                      }
+                    >
+                      <div className="pc-collectable-disc">
+                        {count > 0 ? (
+                          collectibleImage(kind) ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={collectibleImage(kind)}
+                              alt=""
+                              draggable={false}
+                            />
+                          ) : (
+                            <span aria-hidden>{collectibleEmoji(kind)}</span>
+                          )
+                        ) : (
+                          <span aria-hidden>🔒</span>
+                        )}
+                      </div>
+                      <em>
+                        {count > 0 ? collectibleLabel(kind) : "Mystery"}
+                      </em>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Progress */}
+            {tab === "home" ? (
+              <section className="pc-card pc-progress" aria-labelledby="pc-prog-h">
+                <h2 id="pc-prog-h">My Progress</h2>
+                <div className="pc-progress-row">
+                  {progressItems.map((item) => {
+                    const pct = Math.min(
+                      100,
+                      Math.round((item.value / Math.max(1, item.total)) * 100)
+                    );
+                    return (
+                      <div key={item.key} className="pc-progress-item">
+                        <div
+                          className="pc-ring"
+                          style={ringStyle(pct, theme.accent)}
+                          aria-hidden
+                        >
+                          <span className="pc-ring-inner">{item.emoji}</span>
+                        </div>
+                        <strong>
+                          {item.value}/{item.total}
+                        </strong>
+                        <em>{item.label}</em>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : null}
+
+            {/* Achievements strip on journey/home */}
+            {(tab === "home" || tab === "journey") && (
+              <section className="pc-card pc-achievements" aria-label="Achievements">
+                <div className="pc-section-head">
+                  <h2>Achievements</h2>
+                </div>
+                <div className="pc-badge-row">
+                  {achievements.map((a) => (
+                    <div
+                      key={a.id}
+                      className={`pc-badge ${a.unlocked ? "is-unlocked" : "is-locked"}`}
+                      title={a.title}
+                    >
+                      <span aria-hidden>{a.unlocked ? a.emoji : "🔒"}</span>
+                      <em>{a.unlocked ? a.title : "Soon"}</em>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Recent activity */}
+            {tab === "home" ? (
+              <section className="pc-card pc-recent" aria-label="Recent activity">
+                <h2>Recent Activity</h2>
+                <ul className="pc-recent-list">
+                  {doneJourney.slice(0, 4).map((m) => (
+                    <li key={`act-${m.id}`}>
+                      <span aria-hidden>{m.emoji}</span>
+                      <strong>{m.title}</strong>
+                      <em>{m.dateLabel}</em>
+                    </li>
+                  ))}
+                  {doneJourney.length === 0 ? (
+                    <li className="pc-muted">Your cottage story is just beginning.</li>
+                  ) : null}
+                </ul>
+              </section>
+            ) : null}
+
+            {/* Memory wall */}
+            {tab === "home" ? (
+              <section className="pc-card pc-memories" aria-label="Memory wall">
+                <h2>Memory Wall</h2>
+                <div className="pc-memory-board">
+                  {(initialCottage.memories?.length
+                    ? initialCottage.memories.slice(0, 4)
+                    : [
+                        {
+                          id: "welcome-memory",
+                          emoji: theme.firstGift.emoji,
+                          title: "First gift",
+                          description: `${theme.firstGift.name} waiting on the shelf.`,
+                          dateLabel: "Welcome",
+                          memoryType: "gift",
+                          pinned: true,
+                        },
+                      ]
+                  ).map((m) => (
+                    <article key={m.id} className="pc-memory-pin">
+                      <span aria-hidden>{m.emoji || "💌"}</span>
+                      <strong>{m.title}</strong>
+                      <p>{m.description}</p>
+                      <em>{m.dateLabel}</em>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            {/* Quote footer */}
+            {tab === "home" ? (
+              <footer className="pc-quote">
+                <img
+                  src={theme.mascotImage}
+                  alt=""
+                  className="pc-quote-mascot"
+                  draggable={false}
+                />
+                <blockquote>
+                  <p>“{theme.quote}”</p>
+                  <cite>— {theme.quoteAuthor}</cite>
+                </blockquote>
+              </footer>
+            ) : null}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

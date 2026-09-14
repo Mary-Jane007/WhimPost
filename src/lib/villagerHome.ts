@@ -31,6 +31,7 @@ export type VillagerHomeTheme = {
   cream: string;
   ink: string;
   gold: string;
+  heroImage: string;
   heroStickers: string[];
   goals: Array<{
     id: string;
@@ -45,6 +46,7 @@ export type VillagerHomeTheme = {
 export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
   bramblewood: {
     id: "bramblewood",
+    heroImage: "/cottages/heroes/bramblewood.png",
     label: "Bramblewood",
     emoji: "🦊",
     mascot: "Fox",
@@ -56,8 +58,8 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
     collectablesLabel: "Things You've Found",
     journeyLabel: "My Journey",
     goalLabel: "Current Goal",
-    quote: "Every path begins with a single curious step.",
-    quoteAuthor: "The Bramblewood Fox",
+    quote: "The forest always has something new to show you.",
+    quoteAuthor: "Bramblewood Fox",
     firstGift: { emoji: "🕯️", name: "Wooden Lantern" },
     titles: [
       "Woodland Wanderer",
@@ -102,6 +104,7 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
   },
   clovermeadow: {
     id: "clovermeadow",
+    heroImage: "/cottages/heroes/clovermeadow.png",
     label: "Clovermeadow",
     emoji: "🌼",
     mascot: "Bee",
@@ -113,8 +116,8 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
     collectablesLabel: "Things You've Grown & Found",
     journeyLabel: "My Journey",
     goalLabel: "Current Goal",
-    quote: "Tend what you love, and it will bloom twice.",
-    quoteAuthor: "The Meadow Bee",
+    quote: "Small seeds grow into wonderful things.",
+    quoteAuthor: "Clovermeadow Bee",
     firstGift: { emoji: "🌼", name: "Little Flower Pot" },
     titles: [
       "Garden Keeper",
@@ -159,6 +162,7 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
   },
   mosshollow: {
     id: "mosshollow",
+    heroImage: "/cottages/heroes/mosshollow.png",
     label: "Mosshollow",
     emoji: "🦉",
     mascot: "Owl",
@@ -170,8 +174,8 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
     collectablesLabel: "Things You've Discovered",
     journeyLabel: "My Journey",
     goalLabel: "Current Goal",
-    quote: "Curiosity is the lantern that never goes out.",
-    quoteAuthor: "The Mosshollow Owl",
+    quote: "Every book holds a different world.",
+    quoteAuthor: "Mosshollow Owl",
     firstGift: { emoji: "📖", name: "First Book" },
     titles: [
       "Bookworm",
@@ -216,6 +220,7 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
   },
   hearthwick: {
     id: "hearthwick",
+    heroImage: "/cottages/heroes/hearthwick.png",
     label: "Hearthwick",
     emoji: "🦔",
     mascot: "Hedgehog",
@@ -227,8 +232,8 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
     collectablesLabel: "Things You've Collected",
     journeyLabel: "My Journey",
     goalLabel: "Current Goal",
-    quote: "Home is wherever kindness is baked in.",
-    quoteAuthor: "The Hearthwick Hedgehog",
+    quote: "Good things are better when shared.",
+    quoteAuthor: "Heartwick Hedgehog",
     firstGift: { emoji: "🫖", name: "Teacup" },
     titles: [
       "Home Keeper",
@@ -273,6 +278,7 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
   },
   moonmere: {
     id: "moonmere",
+    heroImage: "/cottages/heroes/moonmere.png",
     label: "Moonmere",
     emoji: "🌙",
     mascot: "Luna Moth",
@@ -284,8 +290,8 @@ export const VILLAGER_HOME_THEMES: Record<VillageId, VillagerHomeTheme> = {
     collectablesLabel: "Treasures From the Night",
     journeyLabel: "My Journey",
     goalLabel: "Current Goal",
-    quote: "Quiet waters remember every wish.",
-    quoteAuthor: "The Moonmere Moth",
+    quote: "The night sky reminds us how small and special we are.",
+    quoteAuthor: "Moonmere Moth",
     firstGift: { emoji: "🌙", name: "Little Lantern" },
     titles: [
       "Night Dreamer",

@@ -14,7 +14,6 @@ import { getLibraryProgress } from "@/lib/library";
 import { getUserVillageStats } from "@/lib/villageProgress";
 import { getVillage } from "@/lib/villages";
 import { CottageProfile } from "@/components/CottageProfile";
-import { PageCrest } from "@/components/PageCrest";
 
 export default async function ProfilePage({
   params,
@@ -90,7 +89,6 @@ export default async function ProfilePage({
 
   return (
     <main className="app-main cottage-main">
-      <PageCrest kinds={["hand-mirror", "candle-jar", "leafy-branch"]} />
       <CottageProfile
         profile={profile}
         village={village}
