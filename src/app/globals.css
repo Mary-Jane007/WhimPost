@@ -12098,7 +12098,9 @@ button.mh-card-cover {
   text-align: center;
   max-width: 36rem;
   margin: 2.5rem auto 0.85rem;
-  z-index: 4;
+  z-index: 2;
+  /* Decorative title card must not block taps on pinned board objects. */
+  pointer-events: none;
   padding: 0.7rem 0.95rem 0.85rem;
   background: color-mix(in srgb, #fffaf2 86%, var(--village-soft, #6b8f71));
   border: 2px solid color-mix(in srgb, var(--village-color, #6b8f71) 28%, transparent);
@@ -12152,7 +12154,7 @@ button.mh-card-cover {
   min-height: 22rem;
   margin: 0.55rem auto 0;
   max-width: 52rem;
-  z-index: 3;
+  z-index: 5;
 }
 
 .mb-bench-figure {
