@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   const row = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, password_hash, email, is_owner,
-              village_id, home_village_id, reputation
+              village_id, home_village_id, reputation, character_json
        FROM users
        WHERE username = ? COLLATE NOCASE
           OR email = ? COLLATE NOCASE
