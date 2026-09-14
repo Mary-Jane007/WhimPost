@@ -71,12 +71,8 @@ export function CharacterPortrait({
       </div>
       {showLabel ? (
         <figcaption className="char-portrait-caption">
-          <strong>
-            {label.emoji} {label.speciesName}
-          </strong>
-          <em>
-            {label.villageEmoji} {label.villageLabel}
-          </em>
+          <strong>{label.speciesName}</strong>
+          <em>{label.villageLabel}</em>
         </figcaption>
       ) : null}
     </figure>

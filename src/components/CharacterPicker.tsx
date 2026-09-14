@@ -50,9 +50,7 @@ export function CharacterPicker({
         <h2>{heading}</h2>
         <p className="char-picker-lead">
           Pick a storybook neighbor for{" "}
-          <strong>
-            {village?.mascot || pool.emoji} {village?.name || pool.label}
-          </strong>
+          <strong>{village?.name || pool.label}</strong>
           . Each character has a fixed look — choose species and male or female.
           This becomes your face on letters and your cottage profile.
         </p>
@@ -88,12 +86,7 @@ export function CharacterPicker({
             >
               <CharacterPortrait character={draft} size="md" decorative />
               <div className="char-card-copy">
-                <strong>
-                  {s.emoji} {s.name}{" "}
-                  <span aria-hidden>
-                    {draft.gender === "female" ? "♀" : "♂"}
-                  </span>
-                </strong>
+                <strong>{s.name}</strong>
                 <em>{draft.gender === "female" ? "Female" : "Male"}</em>
                 <p>{s.blurb}</p>
               </div>

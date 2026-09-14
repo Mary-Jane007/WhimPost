@@ -265,7 +265,7 @@ export function CottageProfile({
                 {charMeta ? (
                   <>
                     {" "}
-                    · {charMeta.emoji} {charMeta.speciesName}
+                    · {charMeta.speciesName}
                   </>
                 ) : null}{" "}
                 · {title}

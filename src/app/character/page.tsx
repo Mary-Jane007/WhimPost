@@ -20,10 +20,7 @@ export default async function CharacterPage() {
     <main className="app-main character-main">
       <div className="character-page">
         <p className="belonging-kicker">Cottage resident</p>
-        <h1>
-          Choose your character{" "}
-          <span aria-hidden>{village.mascot}</span>
-        </h1>
+        <h1>Choose your character</h1>
         <p className="character-page-lead">
           Your resident lives in {village.name}. Pick a species and male or
           female version — each has a fixed look. Letters and your cottage

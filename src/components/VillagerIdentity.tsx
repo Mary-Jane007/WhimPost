@@ -47,17 +47,9 @@ export function VillagerIdentity({
         </span>
       )}
       <span className="villager-id-copy">
-        <strong className="villager-id-name">
-          {displayName}
-          {label ? (
-            <span className="villager-id-species" aria-hidden>
-              {" "}
-              {label.emoji}
-            </span>
-          ) : null}
-        </strong>
+        <strong className="villager-id-name">{displayName}</strong>
         <span className="villager-id-meta">
-          {villageEmoji} {villageLabel}
+          {villageLabel}
           {title ? ` · ${title}` : ""}
           {username ? ` · @${username}` : ""}
         </span>
