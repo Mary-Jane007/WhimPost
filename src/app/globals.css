@@ -11747,6 +11747,13 @@ button.mh-card-cover {
 
 /* Owner admin desk — light panels, dark readable ink */
 .mb-admin-launch { margin: 0 0 1.25rem; }
+.mb-admin-launch-actions,
+.mb-admin-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
 .mb-admin-lead {
   margin: 0.35rem 0 0;
   color: #1a1a1a;
