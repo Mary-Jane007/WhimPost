@@ -97,7 +97,7 @@ export function CottageRoomEditor({
   const [panel, setPanel] = useState<Panel>(
     isSelf && !initialCottage.welcomed ? "welcome" : null
   );
-  const [customize, setCustomize] = useState(false);
+  const [customize, setCustomize] = useState(Boolean(embedded && isSelf));
   const [storageCat, setStorageCat] = useState("furniture");
   const [secretNote, setSecretNote] = useState<string | null>(null);
   const [mascotLine, setMascotLine] = useState<string | null>(null);

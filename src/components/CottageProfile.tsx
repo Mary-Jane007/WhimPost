@@ -318,14 +318,16 @@ export function CottageProfile({
         </nav>
 
         {tab === "settings" ? (
-          <section className="pc-panel pc-settings">
+          <section className="pc-card pc-settings">
             <h2>Cottage settings</h2>
             <p>
               Arrange furniture, pin memories, and make {cottageName} feel like
               home.
             </p>
             {isSelf ? (
-              <CottageRoomEditor {...editorProps} />
+              <div className="pc-settings-editor">
+                <CottageRoomEditor {...editorProps} />
+              </div>
             ) : (
               <p className="pc-muted">Only the cottage keeper can rearrange this home.</p>
             )}
@@ -334,7 +336,11 @@ export function CottageProfile({
           <div className="pc-body">
             {/* Journey + Goal */}
             {(tab === "home" || tab === "journey" || tab === "goals") && (
-              <div className="pc-split">
+              <div
+                className={`pc-split ${
+                  tab === "home" ? "" : "is-solo"
+                }`.trim()}
+              >
                 {(tab === "home" || tab === "journey") && (
                   <section className="pc-card pc-journey" aria-labelledby="pc-journey-h">
                     <h2 id="pc-journey-h">My Journey</h2>

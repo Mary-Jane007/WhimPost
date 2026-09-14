@@ -14728,6 +14728,14 @@ svg {
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
   }
+
+  .pc-split.is-solo {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-split.is-solo > .pc-card {
+    max-width: 720px;
+  }
 }
 
 .pc-card {
@@ -15195,6 +15203,21 @@ svg {
 .pc-settings > p {
   margin: 0 0 1rem;
   color: color-mix(in srgb, var(--pc-ink) 70%, transparent);
+}
+
+.pc-settings-editor {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--pc-soft) 28%, white);
+  border: 1px dashed color-mix(in srgb, var(--pc-accent) 28%, transparent);
+  min-height: 220px;
+}
+
+.pc-settings-editor .cottage-room,
+.pc-settings-editor .cottage-editor,
+.pc-settings-editor .personal-cottage {
+  min-height: 280px;
 }
 
 .vh-embedded-saving {
