@@ -174,10 +174,10 @@ export const VILLAGE_CHARACTER_POOLS: Record<VillageId, VillageCharacterPool> = 
         blurb: "Soft wings, starlight errands, and quiet lakeside wonder.",
       },
       {
-        id: "owl",
-        name: "Night Owl",
-        emoji: "🦉",
-        blurb: "Keeps company with constellations and still water.",
+        id: "bat",
+        name: "Night Bat",
+        emoji: "🦇",
+        blurb: "Glides over still water with stars tucked in its wings.",
       },
       {
         id: "fox",
@@ -202,12 +202,22 @@ export function getVillageCharacterPool(villageId: VillageId | null | undefined)
   return VILLAGE_CHARACTER_POOLS.bramblewood;
 }
 
+/** Map retired Moonmere owl picks to the Night Bat species. */
+export function resolveCharacterSpeciesId(
+  villageId: VillageId,
+  speciesId: string
+): string {
+  if (villageId === "moonmere" && speciesId === "owl") return "bat";
+  return speciesId;
+}
+
 export function getCharacterSpecies(
   villageId: VillageId,
   speciesId: string
 ): CharacterSpecies | null {
+  const resolved = resolveCharacterSpeciesId(villageId, speciesId);
   return (
-    getVillageCharacterPool(villageId).species.find((s) => s.id === speciesId) ||
+    getVillageCharacterPool(villageId).species.find((s) => s.id === resolved) ||
     null
   );
 }
@@ -242,7 +252,7 @@ export function parseVillagerCharacter(
     if (data.gender !== "male" && data.gender !== "female") return null;
     return {
       villageId: data.villageId,
-      speciesId: data.speciesId,
+      speciesId: species.id,
       gender: data.gender,
     };
   } catch {
@@ -314,7 +324,7 @@ export function normalizeVillagerCharacter(
   if (!gender) return null;
   return {
     villageId,
-    speciesId,
+    speciesId: species.id,
     gender,
   };
 }

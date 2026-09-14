@@ -9,9 +9,9 @@
   <rect x="28" y="28" width="456" height="584" rx="28" fill="none" stroke="#9aa7c7" stroke-width="6" stroke-opacity="0.55"/>
   <circle cx="256" cy="250" r="132" fill="#e8eef8" stroke="#1a2744" stroke-width="8"/>
   <circle cx="256" cy="250" r="118" fill="#9aa7c7" fill-opacity="0.18"/>
-  <text x="256" y="280" text-anchor="middle" font-size="140">🦉</text>
+  <text x="256" y="280" text-anchor="middle" font-size="140">🦇</text>
   <rect x="120" y="400" width="272" height="46" rx="18" fill="#1a2744" fill-opacity="0.85"/>
-  <text x="256" y="470" text-anchor="middle" font-family="Georgia, serif" font-size="36" fill="#1a2744">Night Owl</text>
-  <text x="256" y="515" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#9aa7c7">♂ Male</text>
+  <text x="256" y="431" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#e8eef8">Night Bat</text>
+  <text x="256" y="515" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#9aa7c7">♀ Female</text>
   <text x="256" y="575" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#1a2744" fill-opacity="0.7">Moonmere</text>
 </svg>
