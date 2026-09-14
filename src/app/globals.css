@@ -15385,12 +15385,13 @@ svg {
 .char-portrait-caption {
   text-align: center;
   font-size: 0.85rem;
+  color: var(--ink, #2f2418);
 }
-.char-portrait-caption strong { display: block; }
+.char-portrait-caption strong { display: block; color: inherit; }
 .char-portrait-caption em {
   font-style: normal;
-  opacity: 0.75;
   font-size: 0.8em;
+  color: color-mix(in srgb, var(--ink, #2f2418) 72%, var(--cream, #f5ead8));
 }
 
 .char-frame-bramblewood .char-portrait-frame {
@@ -15418,14 +15419,21 @@ svg {
   display: grid;
   gap: 1rem;
 }
+.char-picker-head .belonging-kicker {
+  color: var(--gold, #d4af37);
+}
 .char-picker-head h2 {
   margin: 0.15rem 0 0.4rem;
   font-family: var(--font-display, Georgia, serif);
+  color: var(--cream, #f5ead8);
 }
 .char-picker-lead {
   margin: 0;
-  color: color-mix(in srgb, var(--ink, #3a2f24) 78%, transparent);
+  color: color-mix(in srgb, var(--cream, #f5ead8) 88%, var(--ink, #2f2418));
   max-width: 42rem;
+}
+.char-picker-lead strong {
+  color: var(--cream, #f5ead8);
 }
 .char-picker-phases {
   display: flex;
@@ -15455,13 +15463,13 @@ svg {
   text-align: left;
   padding: 0.85rem;
   border-radius: 1rem;
-  border: 1px solid rgba(90, 70, 45, 0.18);
+  border: 1px solid rgba(90, 70, 45, 0.22);
   background:
-    linear-gradient(180deg, rgba(255,252,245,0.95), rgba(245,235,220,0.88));
+    linear-gradient(180deg, rgba(255,252,245,0.98), rgba(245,235,220,0.94));
   box-shadow: 0 8px 18px rgba(70, 50, 30, 0.08);
   cursor: pointer;
   font: inherit;
-  color: inherit;
+  color: var(--ink, #2f2418);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 .char-card:hover { transform: translateY(-2px); }
@@ -15469,18 +15477,22 @@ svg {
   border-color: color-mix(in srgb, var(--accent, #8b5a2b) 55%, transparent);
   box-shadow: 0 10px 24px rgba(90, 60, 30, 0.16);
 }
-.char-card-copy strong { display: block; }
+.char-card-copy strong {
+  display: block;
+  color: var(--ink, #2f2418);
+}
 .char-card-copy em {
   display: block;
   font-style: normal;
-  opacity: 0.7;
   font-size: 0.85em;
   margin-bottom: 0.25rem;
+  color: color-mix(in srgb, var(--ink, #2f2418) 78%, #5a4632);
 }
 .char-card-copy p {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.35;
+  color: color-mix(in srgb, var(--ink, #2f2418) 86%, #4a3a2a);
 }
 .char-customize {
   display: grid;
@@ -15496,23 +15508,25 @@ svg {
 .char-customize-blurb {
   margin: 0.6rem 0 0;
   font-size: 0.92rem;
-  opacity: 0.82;
+  color: color-mix(in srgb, var(--ink, #2f2418) 82%, #4a3a2a);
 }
 .char-customize-controls fieldset {
   border: 1px solid rgba(90, 70, 45, 0.16);
   border-radius: 0.9rem;
   padding: 0.75rem 0.9rem 0.9rem;
   margin: 0 0 0.85rem;
-  background: rgba(255, 252, 245, 0.55);
+  background: rgba(255, 252, 245, 0.92);
+  color: var(--ink, #2f2418);
 }
 .char-customize-controls legend {
   padding: 0 0.35rem;
   font-weight: 600;
+  color: var(--ink, #2f2418);
 }
 .char-customize-controls legend span {
   font-weight: 400;
-  opacity: 0.7;
   font-size: 0.85em;
+  color: color-mix(in srgb, var(--ink, #2f2418) 72%, #5a4632);
 }
 .char-swatches, .char-chip-row, .char-acc-grid {
   display: flex;
@@ -15627,9 +15641,16 @@ svg {
   margin: 0 auto;
   padding: 1.25rem 1rem 3rem;
 }
+.character-page .belonging-kicker {
+  color: var(--gold, #d4af37);
+}
+.character-page > h1 {
+  color: var(--cream, #f5ead8);
+}
 .character-page-lead {
   max-width: 40rem;
   line-height: 1.45;
+  color: color-mix(in srgb, var(--cream, #f5ead8) 90%, var(--ink, #2f2418));
 }
 .sr-only {
   position: absolute;
@@ -15652,10 +15673,68 @@ svg {
   margin: 0.75rem 0 1.25rem;
   padding: 0.85rem 1rem;
   border-radius: 1rem;
-  background: rgba(255, 250, 240, 0.55);
-  border: 1px solid rgba(90, 70, 45, 0.16);
+  background: rgba(255, 250, 240, 0.92);
+  border: 1px solid rgba(90, 70, 45, 0.22);
+  color: var(--ink, #2f2418);
 }
 .char-picker-selected-copy {
   margin: 0;
   font-size: 0.98rem;
+  color: var(--ink, #2f2418);
+}
+.char-picker-selected-copy strong {
+  color: var(--ink, #2f2418);
+}
+
+/* Theme-tuned ink on light character cards (readable, still on-theme) */
+body.theme-clovermeadow .char-card,
+body.theme-clovermeadow .char-picker-selected,
+body.theme-clovermeadow .char-portrait-caption {
+  color: #3d2630;
+}
+body.theme-clovermeadow .char-card-copy em,
+body.theme-clovermeadow .char-portrait-caption em {
+  color: #5c3a44;
+}
+body.theme-clovermeadow .char-card-copy p {
+  color: #4a3038;
+}
+body.theme-moonmere .char-card,
+body.theme-moonmere .char-picker-selected,
+body.theme-moonmere .char-portrait-caption {
+  color: #1a2838;
+}
+body.theme-moonmere .char-card-copy em,
+body.theme-moonmere .char-portrait-caption em {
+  color: #3d4a5c;
+}
+body.theme-moonmere .char-card-copy p {
+  color: #2a3848;
+}
+body.theme-mosshollow .char-card,
+body.theme-mosshollow .char-picker-selected,
+body.theme-mosshollow .char-portrait-caption {
+  color: #1f2a1e;
+}
+body.theme-mosshollow .char-card-copy em,
+body.theme-mosshollow .char-portrait-caption em {
+  color: #3a4a3c;
+}
+body.theme-bramblewood .char-card,
+body.theme-bramblewood .char-picker-selected,
+body.theme-bramblewood .char-portrait-caption {
+  color: #3a1f12;
+}
+body.theme-bramblewood .char-card-copy em,
+body.theme-bramblewood .char-portrait-caption em {
+  color: #5c3420;
+}
+body.theme-hearthwick .char-card,
+body.theme-hearthwick .char-picker-selected,
+body.theme-hearthwick .char-portrait-caption {
+  color: #2c1e14;
+}
+body.theme-hearthwick .char-card-copy em,
+body.theme-hearthwick .char-portrait-caption em {
+  color: #4a3224;
 }
