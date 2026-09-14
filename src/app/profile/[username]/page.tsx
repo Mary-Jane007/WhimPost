@@ -107,6 +107,9 @@ export default async function ProfilePage({
         )}
         initialCottage={cottage}
         shelfBooks={shelfBooks}
+        letterCount={letterCount}
+        activityCount={0}
+        tvCount={0}
       />
     </main>
   );

@@ -14369,3 +14369,908 @@ svg {
 .village-hearthwick .wxp-bar > span {
   background: linear-gradient(90deg, #6b4224, #8b5a2b 55%, #e2c39a);
 }
+
+/* ============================================================
+   Personal Cottage / Villager Home shell
+   ============================================================ */
+
+.villager-home {
+  --vh-accent: #6b8f4e;
+  --vh-soft: #d9e4c8;
+  --vh-deep: #2f3d28;
+  --vh-cream: #f3ead8;
+  --vh-ink: #2a241c;
+  --vh-gold: #c4a574;
+  display: grid;
+  gap: 1.15rem;
+  color: var(--vh-ink);
+  padding-bottom: 2.5rem;
+}
+
+.vh-header-card {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.1rem 1.2rem;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 28%, transparent);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--vh-cream) 92%, white),
+      color-mix(in srgb, var(--vh-soft) 55%, var(--vh-cream))
+    );
+  box-shadow: 0 14px 36px color-mix(in srgb, var(--vh-deep) 18%, transparent);
+}
+
+@media (min-width: 760px) {
+  .vh-header-card {
+    grid-template-columns: auto 1fr auto;
+  }
+}
+
+.vh-avatar {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid color-mix(in srgb, var(--vh-gold) 70%, white);
+  background: var(--vh-soft);
+  flex-shrink: 0;
+}
+
+.vh-avatar-mascot {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.92;
+}
+
+.vh-avatar-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  color: var(--vh-deep);
+  background: color-mix(in srgb, var(--vh-soft) 70%, white);
+}
+
+.vh-kicker {
+  margin: 0;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--vh-ink) 55%, var(--vh-accent));
+}
+
+.vh-display-name {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.4vw, 2.35rem);
+  line-height: 1.1;
+  color: var(--vh-deep);
+}
+
+.vh-handle {
+  margin: 0.25rem 0 0;
+  color: color-mix(in srgb, var(--vh-ink) 70%, transparent);
+}
+
+.vh-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.vh-village-badge,
+.vh-title-badge,
+.vh-visiting-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--vh-cream) 70%, white);
+}
+
+.vh-title-badge {
+  background: color-mix(in srgb, var(--vh-soft) 65%, white);
+}
+
+.vh-xp-block {
+  margin-top: 0.85rem;
+  max-width: 320px;
+}
+
+.vh-xp-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.86rem;
+}
+
+.vh-xp-head em {
+  font-style: normal;
+  opacity: 0.7;
+}
+
+.vh-xp-bar {
+  margin-top: 0.35rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--vh-deep) 12%, white);
+}
+
+.vh-xp-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--vh-accent),
+    color-mix(in srgb, var(--vh-gold) 70%, var(--vh-accent))
+  );
+  transition: width 0.5s ease;
+}
+
+.vh-header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.vh-write-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  background: var(--vh-deep);
+  color: var(--vh-cream);
+  text-decoration: none;
+  font-family: var(--font-stamp);
+  letter-spacing: 0.03em;
+}
+
+.vh-write-btn:hover {
+  filter: brightness(1.08);
+}
+
+/* ---- Cottage hero ---- */
+
+.vh-cottage-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: clamp(260px, 42vw, 380px);
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 30%, transparent);
+  background: var(--vh-deep);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, white 8%, transparent),
+    0 22px 48px color-mix(in srgb, var(--vh-deep) 35%, transparent);
+}
+
+.vh-hero-atmosphere {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 70% 55% at 70% 20%,
+      color-mix(in srgb, var(--vh-soft) 45%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--vh-deep) 88%, black) 0%,
+      color-mix(in srgb, var(--vh-accent) 35%, var(--vh-deep)) 48%,
+      color-mix(in srgb, var(--vh-cream) 35%, var(--vh-deep)) 100%
+    );
+  z-index: 0;
+}
+
+.vh-hero-glow {
+  position: absolute;
+  left: 12%;
+  bottom: 18%;
+  width: 34%;
+  height: 42%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--vh-gold) 55%, transparent),
+    transparent 70%
+  );
+  filter: blur(8px);
+  opacity: 0.55;
+  z-index: 1;
+  animation: vh-flicker 4.5s ease-in-out infinite;
+}
+
+.vh-hero-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 28%;
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in srgb, var(--vh-ink) 55%, var(--vh-deep))
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--vh-ink) 18%, transparent) 0 12px,
+      transparent 12px 24px
+    );
+  opacity: 0.55;
+  z-index: 1;
+}
+
+.vh-hero-stickers {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.vh-sticker {
+  position: absolute;
+  width: clamp(48px, 9vw, 92px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
+  animation: vh-float 7s ease-in-out infinite;
+}
+
+.vh-sticker-1 {
+  left: 6%;
+  top: 14%;
+}
+.vh-sticker-2 {
+  right: 8%;
+  top: 10%;
+  animation-delay: -1.4s;
+  width: clamp(56px, 11vw, 110px);
+}
+.vh-sticker-3 {
+  left: 18%;
+  bottom: 16%;
+  animation-delay: -2.2s;
+}
+.vh-sticker-4 {
+  right: 22%;
+  bottom: 20%;
+  animation-delay: -3.1s;
+}
+.vh-sticker-5 {
+  left: 48%;
+  top: 8%;
+  animation-delay: -0.8s;
+  width: clamp(40px, 7vw, 70px);
+  opacity: 0.85;
+}
+
+.vh-hero-mascot {
+  position: absolute;
+  right: 6%;
+  bottom: 8%;
+  width: clamp(110px, 22vw, 190px);
+  height: auto;
+  z-index: 3;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.35));
+  animation: vh-float 6.5s ease-in-out infinite;
+}
+
+.vh-hero-copy {
+  position: relative;
+  z-index: 4;
+  max-width: min(420px, 78%);
+  padding: clamp(1.2rem, 3vw, 2rem);
+  color: var(--vh-cream);
+}
+
+.vh-hero-eyebrow {
+  margin: 0;
+  font-family: var(--font-stamp);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--vh-gold) 80%, white);
+}
+
+.vh-hero-copy h2 {
+  margin: 0.35rem 0 0.45rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3.2vw, 2.25rem);
+  line-height: 1.15;
+  color: #fff8ea;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+}
+
+.vh-hero-message,
+.vh-hero-sign {
+  margin: 0.35rem 0 0;
+  color: color-mix(in srgb, var(--vh-cream) 88%, white);
+  max-width: 32ch;
+}
+
+.vh-hero-sign {
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* ---- Tabs ---- */
+
+.vh-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.35rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--vh-cream) 80%, white);
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 22%, transparent);
+}
+
+.vh-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--vh-ink);
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  font-family: var(--font-stamp);
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.vh-tab.is-active {
+  background: var(--vh-deep);
+  color: var(--vh-cream);
+}
+
+.vh-tab:hover:not(.is-active) {
+  background: color-mix(in srgb, var(--vh-soft) 55%, white);
+}
+
+.vh-body {
+  display: grid;
+  gap: 1rem;
+}
+
+.vh-panel {
+  padding: 1rem 1.1rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 22%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--vh-cream) 96%, white),
+      color-mix(in srgb, var(--vh-soft) 28%, var(--vh-cream))
+    );
+}
+
+.vh-panel-head h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--vh-deep);
+}
+
+.vh-panel-head p {
+  margin: 0.25rem 0 0.85rem;
+  color: color-mix(in srgb, var(--vh-ink) 68%, transparent);
+}
+
+.vh-journey-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.vh-journey-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.65rem 0.7rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, white 55%, var(--vh-cream));
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 14%, transparent);
+}
+
+.vh-journey-item.is-waiting {
+  opacity: 0.62;
+}
+
+.vh-journey-emoji {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.vh-journey-item strong {
+  display: block;
+}
+
+.vh-journey-item p {
+  margin: 0.15rem 0 0;
+  font-size: 0.92rem;
+}
+
+.vh-journey-item em {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  font-style: normal;
+  opacity: 0.65;
+}
+
+.vh-goal-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.85rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, white 50%, var(--vh-soft));
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 20%, transparent);
+}
+
+.vh-goal-card + .vh-goal-card {
+  margin-top: 0.65rem;
+}
+
+.vh-goal-icon {
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--vh-cream);
+  font-size: 1.45rem;
+}
+
+.vh-goal-copy strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.vh-goal-copy p {
+  margin: 0.2rem 0 0.55rem;
+}
+
+.vh-goal-meter span {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.vh-progress-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+@media (min-width: 640px) {
+  .vh-progress-strip {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.vh-stat {
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: 14px;
+  text-align: center;
+  background: color-mix(in srgb, var(--vh-cream) 88%, white);
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 18%, transparent);
+}
+
+.vh-stat span {
+  font-size: 1.2rem;
+}
+
+.vh-stat strong {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--vh-deep);
+}
+
+.vh-stat em {
+  font-style: normal;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.vh-collect-grid,
+.vh-achieve-grid,
+.vh-memory-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
+.vh-collect-item,
+.vh-achieve-item,
+.vh-memory-card {
+  display: grid;
+  gap: 0.25rem;
+  justify-items: center;
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, white 55%, var(--vh-cream));
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 16%, transparent);
+}
+
+.vh-collect-item.is-locked,
+.vh-achieve-item.is-locked {
+  opacity: 0.55;
+  filter: grayscale(0.25);
+}
+
+.vh-collect-emoji {
+  font-size: 1.7rem;
+}
+
+.vh-collect-item .collectible-icon,
+.vh-collect-item .collectible-icon-lg {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.vh-collect-item strong,
+.vh-achieve-item strong,
+.vh-memory-card strong {
+  font-size: 0.88rem;
+}
+
+.vh-collect-item em,
+.vh-achieve-item em,
+.vh-memory-card em {
+  font-style: normal;
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+.vh-memory-card {
+  align-content: start;
+  text-align: left;
+  justify-items: start;
+}
+
+.vh-memory-card p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.vh-recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.vh-recent-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: start;
+  padding: 0.55rem 0.2rem;
+  border-bottom: 1px dashed color-mix(in srgb, var(--vh-accent) 22%, transparent);
+}
+
+.vh-recent-list li:last-child {
+  border-bottom: 0;
+}
+
+.vh-recent-list strong {
+  display: block;
+}
+
+.vh-recent-list p {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.78;
+}
+
+.vh-empty {
+  margin: 0;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--vh-soft) 40%, white);
+  color: color-mix(in srgb, var(--vh-ink) 72%, transparent);
+}
+
+.vh-quote {
+  display: grid;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 1.1rem 1.2rem;
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--vh-deep) 92%, black),
+      color-mix(in srgb, var(--vh-accent) 40%, var(--vh-deep))
+    );
+  color: var(--vh-cream);
+}
+
+@media (min-width: 560px) {
+  .vh-quote {
+    grid-template-columns: auto 1fr;
+  }
+}
+
+.vh-quote-mascot {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+}
+
+.vh-quote blockquote {
+  margin: 0;
+}
+
+.vh-quote p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
+.vh-quote cite {
+  display: block;
+  margin-top: 0.45rem;
+  font-style: normal;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.vh-share-note {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--vh-ink) 70%, transparent);
+}
+
+.vh-customize-wrap {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--vh-accent) 24%, transparent);
+  background: color-mix(in srgb, var(--vh-deep) 8%, transparent);
+  padding: 0.75rem;
+}
+
+.cottage-profile.is-embedded .cottage-stage {
+  margin-top: 0;
+}
+
+.vh-embedded-saving {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+}
+
+/* ---- Soft motion ---- */
+
+@keyframes vh-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes vh-flicker {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 0.7;
+    transform: scale(1.04);
+  }
+  70% {
+    opacity: 0.52;
+  }
+}
+
+@keyframes vh-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vh-sticker,
+  .vh-hero-mascot,
+  .vh-hero-glow,
+  .villager-home.village-moonmere .vh-sticker-5,
+  .villager-home.village-mosshollow .vh-sticker-5 {
+    animation: none !important;
+  }
+}
+
+/* ---- Per-village atmosphere ---- */
+
+.villager-home.village-bramblewood {
+  --vh-accent: #6b8f4e;
+  --vh-soft: #d9e4c8;
+  --vh-deep: #2f3d28;
+  --vh-cream: #f3ead8;
+  --vh-ink: #2a241c;
+  --vh-gold: #c4a574;
+}
+
+.villager-home.village-bramblewood .vh-hero-atmosphere {
+  background:
+    radial-gradient(ellipse 55% 45% at 25% 70%, rgba(196, 165, 116, 0.35), transparent 70%),
+    linear-gradient(180deg, #24301f 0%, #3d5230 45%, #6b8f4e 100%);
+}
+
+.villager-home.village-bramblewood .vh-hero-glow {
+  background: radial-gradient(circle, rgba(255, 180, 90, 0.55), transparent 70%);
+}
+
+.villager-home.village-clovermeadow {
+  --vh-accent: #7aa35a;
+  --vh-soft: #e8f0d8;
+  --vh-deep: #3d5230;
+  --vh-cream: #faf6ea;
+  --vh-ink: #2f2a22;
+  --vh-gold: #d4b45a;
+}
+
+.villager-home.village-clovermeadow .vh-hero-atmosphere {
+  background:
+    radial-gradient(ellipse 70% 50% at 60% 15%, rgba(255, 255, 220, 0.45), transparent 65%),
+    linear-gradient(180deg, #7aa35a 0%, #b7d28a 42%, #f3ead0 100%);
+}
+
+.villager-home.village-clovermeadow .vh-hero-glow {
+  opacity: 0.35;
+  animation: none;
+  background: radial-gradient(circle, rgba(255, 255, 200, 0.55), transparent 70%);
+}
+
+.villager-home.village-clovermeadow .vh-hero-copy,
+.villager-home.village-clovermeadow .vh-hero-copy h2 {
+  color: #2a341f;
+  text-shadow: none;
+}
+
+.villager-home.village-clovermeadow .vh-hero-eyebrow {
+  color: #5a6e38;
+}
+
+.villager-home.village-clovermeadow .vh-hero-message,
+.villager-home.village-clovermeadow .vh-hero-sign {
+  color: #3a462c;
+}
+
+.villager-home.village-mosshollow {
+  --vh-accent: #5b6b8a;
+  --vh-soft: #d8dde8;
+  --vh-deep: #1e2433;
+  --vh-cream: #efe8d8;
+  --vh-ink: #221e18;
+  --vh-gold: #c9a96a;
+}
+
+.villager-home.village-mosshollow .vh-hero-atmosphere {
+  background:
+    radial-gradient(ellipse 40% 35% at 80% 18%, rgba(200, 210, 255, 0.22), transparent 70%),
+    linear-gradient(180deg, #121722 0%, #2a3348 48%, #4a5670 100%);
+}
+
+.villager-home.village-mosshollow .vh-hero-glow {
+  background: radial-gradient(circle, rgba(180, 200, 255, 0.35), transparent 70%);
+  animation: vh-twinkle 5s ease-in-out infinite;
+}
+
+.villager-home.village-mosshollow .vh-sticker-5 {
+  animation: vh-twinkle 3.8s ease-in-out infinite;
+}
+
+.villager-home.village-hearthwick {
+  --vh-accent: #b86b4a;
+  --vh-soft: #f0ddd0;
+  --vh-deep: #4a2f24;
+  --vh-cream: #faf3e8;
+  --vh-ink: #2c221c;
+  --vh-gold: #d4a574;
+}
+
+.villager-home.village-hearthwick .vh-hero-atmosphere {
+  background:
+    radial-gradient(ellipse 50% 45% at 20% 75%, rgba(255, 140, 70, 0.35), transparent 70%),
+    linear-gradient(180deg, #3a241c 0%, #6a3d2c 42%, #b86b4a 100%);
+}
+
+.villager-home.village-hearthwick .vh-hero-glow {
+  left: 10%;
+  bottom: 12%;
+  width: 42%;
+  height: 48%;
+  background: radial-gradient(circle, rgba(255, 150, 70, 0.65), transparent 72%);
+  animation: vh-flicker 3.8s ease-in-out infinite;
+}
+
+.villager-home.village-moonmere {
+  --vh-accent: #6a7aab;
+  --vh-soft: #d4d8ea;
+  --vh-deep: #161b2a;
+  --vh-cream: #ebe4d4;
+  --vh-ink: #1c1824;
+  --vh-gold: #c4a574;
+}
+
+.villager-home.village-moonmere .vh-hero-atmosphere {
+  background:
+    radial-gradient(ellipse 35% 30% at 75% 18%, rgba(230, 235, 255, 0.35), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 30% 80%, rgba(90, 120, 180, 0.35), transparent 70%),
+    linear-gradient(180deg, #0c101c 0%, #1a2238 50%, #3a4a72 100%);
+}
+
+.villager-home.village-moonmere .vh-hero-glow {
+  background: radial-gradient(circle, rgba(190, 210, 255, 0.4), transparent 70%);
+  animation: vh-twinkle 4.2s ease-in-out infinite;
+}
+
+.villager-home.village-moonmere .vh-sticker-5 {
+  animation: vh-twinkle 3.2s ease-in-out infinite;
+}
+
+@media (max-width: 640px) {
+  .vh-cottage-hero {
+    min-height: 300px;
+  }
+
+  .vh-hero-mascot {
+    width: 100px;
+    right: 4%;
+    bottom: 6%;
+  }
+
+  .vh-hero-copy {
+    max-width: 70%;
+  }
+
+  .vh-sticker {
+    width: 44px;
+  }
+
+  .vh-header-card {
+    text-align: left;
+  }
+}
+
+
