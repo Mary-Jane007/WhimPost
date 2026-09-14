@@ -4315,11 +4315,6 @@ body.theme-moonmere .time-night .cottage-back-wall {
   text-transform: uppercase;
 }
 
-.is-customizing .cottage-room {
-  outline: 2px dashed rgba(233, 196, 106, 0.45);
-  outline-offset: -4px;
-}
-
 @keyframes cottageRain {
   from { background-position: 0 0; }
   to { background-position: 12px 28px; }
@@ -14417,7 +14412,6 @@ svg {
 }
 
 .pc-back,
-.pc-customize,
 .pc-text-link {
   appearance: none;
   border: 0;
@@ -14430,17 +14424,9 @@ svg {
 }
 
 .pc-back:hover,
-.pc-customize:hover,
 .pc-text-link:hover {
   color: var(--pc-deep);
   text-decoration: underline;
-}
-
-.pc-customize {
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pc-accent) 30%, transparent);
-  background: color-mix(in srgb, var(--pc-cream) 80%, white);
 }
 
 /* ---- Hero ---- */
@@ -15191,39 +15177,6 @@ svg {
   font-style: normal;
   font-size: 0.85rem;
   opacity: 0.82;
-}
-
-/* Settings */
-.pc-settings h2 {
-  margin: 0 0 0.4rem;
-  font-family: var(--font-display);
-  color: var(--pc-deep);
-}
-
-.pc-settings > p {
-  margin: 0 0 1rem;
-  color: color-mix(in srgb, var(--pc-ink) 70%, transparent);
-}
-
-.pc-settings-editor {
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--pc-soft) 28%, white);
-  border: 1px dashed color-mix(in srgb, var(--pc-accent) 28%, transparent);
-  min-height: 220px;
-}
-
-.pc-settings-editor .cottage-room,
-.pc-settings-editor .cottage-editor,
-.pc-settings-editor .personal-cottage {
-  min-height: 280px;
-}
-
-.vh-embedded-saving {
-  margin: 0.5rem 0;
-  font-size: 0.85rem;
-  color: color-mix(in srgb, var(--pc-ink) 65%, transparent);
 }
 
 /* Village atmospheres */
