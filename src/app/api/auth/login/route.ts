@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
   const refreshed = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, home_village_id, reputation
+              village_id, home_village_id, reputation, character_json
        FROM users WHERE id = ?`
     )
     .get(row.id) as {
@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
     village_id: string | null;
     home_village_id: string | null;
     reputation: number;
+    character_json: string | null;
   };
 
   const token = await createSessionToken({
