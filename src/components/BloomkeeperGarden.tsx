@@ -10,7 +10,6 @@ import {
   GARDEN_ATTRACTORS,
   GARDEN_COLLECTIONS,
   GARDEN_TABS,
-  GARDEN_TITLES,
   GARDEN_XP,
   MEADOW_FLOWER_IMAGES,
   NATURE_JOURNAL_REWARDS,
@@ -33,14 +32,9 @@ import {
   villageMediaKey,
   type VillageMediaMap,
 } from "@/lib/villageMediaShared";
-import {
-  XpCollectibleGiftBoard,
-  formatGrantedCollectibles,
-} from "@/components/XpCollectibleGiftBoard";
-import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
-import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { formatGrantedCollectibles } from "@/components/XpCollectibleGiftBoard";
+import { WorkshopProgressLink } from "@/components/WorkshopProgressPanel";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
-import { GARDEN_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import type { CollectibleKind } from "@/lib/villages";
 
 type Props = {
@@ -250,21 +244,7 @@ export function BloomkeeperGarden({
           <span>{progress.blooms} blooms</span>
           <span>{progress.badges.length} badges</span>
         </div>
-        <WorkshopXpProgress
-          xp={progress.xp}
-          xpLabel="garden XP"
-          titles={GARDEN_TITLES}
-          gifts={GARDEN_XP_COLLECTIBLE_GIFTS}
-          claimedIds={progress.xpGiftsClaimed || []}
-        />
-        <XpCollectibleGiftBoard
-          xp={progress.xp}
-          xpLabel="garden XP"
-          gifts={GARDEN_XP_COLLECTIBLE_GIFTS}
-          claimedIds={progress.xpGiftsClaimed || []}
-          lead="Reach XP milestones to gift Clovermeadow collectibles"
-        />
-        <XpAlmanacCard villageId="clovermeadow" compact />
+        <WorkshopProgressLink href="/garden/progress" />
       </header>
 
       {error ? <p className="cm-error">{error}</p> : null}
