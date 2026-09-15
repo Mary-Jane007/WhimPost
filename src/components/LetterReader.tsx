@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { EnvelopeFace } from "@/components/EnvelopeFace";
 import { LetterPaper } from "@/components/LetterPaper";
+import { VillagerIdentity } from "@/components/VillagerIdentity";
 import type { LetterView } from "@/lib/types";
 
 export function LetterReader({
@@ -28,13 +29,39 @@ export function LetterReader({
         <Link href={perspective === "inbox" ? "/inbox" : "/sent"} className="back-link">
           ← Back to {perspective === "inbox" ? "inbox" : "sent"}
         </Link>
-        <p>
-          {perspective === "inbox" ? "From" : "To"}{" "}
-          <Link href={`/profile/${counterpart.username}`} className="user-link">
-            <strong>{counterpart.displayName}</strong>
-          </Link>
-          <span className="muted"> @{counterpart.username}</span>
-        </p>
+        <div className="reader-party">
+          <span className="muted">{perspective === "inbox" ? "From" : "To"}</span>
+          <VillagerIdentity
+            displayName={counterpart.displayName}
+            username={counterpart.username}
+            characterJson={counterpart.characterJson}
+            villageId={counterpart.homeVillageId || counterpart.villageId}
+            href={`/profile/${counterpart.username}`}
+            size="sm"
+            layout="letter"
+          />
+        </div>
+        <div className="reader-party reader-party-pair">
+          <VillagerIdentity
+            displayName={letter.sender.displayName}
+            characterJson={letter.sender.characterJson}
+            villageId={letter.sender.homeVillageId || letter.sender.villageId}
+            size="sm"
+            layout="letter"
+          />
+          <span className="reader-party-arrow" aria-hidden>
+            →
+          </span>
+          <VillagerIdentity
+            displayName={letter.recipient.displayName}
+            characterJson={letter.recipient.characterJson}
+            villageId={
+              letter.recipient.homeVillageId || letter.recipient.villageId
+            }
+            size="sm"
+            layout="letter"
+          />
+        </div>
         {letter.sentAt && (
           <time dateTime={letter.sentAt}>
             {new Date(letter.sentAt + "Z").toLocaleString(undefined, {
@@ -45,7 +72,6 @@ export function LetterReader({
         )}
       </div>
 
-      {/* Native <details> so Tap to open works even if React never hydrates. */}
       <details
         className="letter-open-details"
         open={opened}

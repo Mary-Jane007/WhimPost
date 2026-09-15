@@ -19,6 +19,12 @@ import {
   villagerXpProgress,
 } from "@/lib/villagerHome";
 import { ProfileActions } from "@/components/ProfileActions";
+import { CharacterPortrait } from "@/components/CharacterPortrait";
+import {
+  characterLabel,
+  parseVillagerCharacter,
+} from "@/lib/villageCharacters";
+import type { VillageId } from "@/lib/villages";
 
 type HomeTab = "home" | "journey" | "collectables" | "goals";
 
@@ -66,6 +72,13 @@ export function CottageProfile({
 }) {
   const [tab, setTab] = useState<HomeTab>("home");
   const theme = getVillagerHomeTheme(village?.id);
+  const character = parseVillagerCharacter(
+    profile.characterJson,
+    (profile.homeVillageId || profile.villageId || village?.id || null) as
+      | VillageId
+      | null
+  );
+  const charMeta = character ? characterLabel(character) : null;
   const letterCount = letterCountProp ?? initialCottage.letterCount ?? 0;
   const collectibleCount = useMemo(
     () =>
@@ -209,21 +222,39 @@ export function CottageProfile({
 
           <div className="pc-identity">
             <div className="pc-avatar-wrap">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={theme.mascotImage}
-                alt=""
-                className="pc-avatar"
-                draggable={false}
-              />
-              <span className="pc-avatar-fallback" aria-hidden>
-                {initialsFor(profile.displayName)}
-              </span>
+              {character ? (
+                <CharacterPortrait
+                  character={character}
+                  size="md"
+                  className="pc-avatar-character"
+                  decorative
+                />
+              ) : (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={theme.mascotImage}
+                    alt=""
+                    className="pc-avatar"
+                    draggable={false}
+                  />
+                  <span className="pc-avatar-fallback" aria-hidden>
+                    {initialsFor(profile.displayName)}
+                  </span>
+                </>
+              )}
             </div>
             <div className="pc-identity-copy">
               <h1 className="pc-name">{profile.displayName}</h1>
               <p className="pc-village-line">
-                <span aria-hidden>{theme.emoji}</span> {theme.label} · {title}
+                <span aria-hidden>{theme.emoji}</span> {theme.label}
+                {charMeta ? (
+                  <>
+                    {" "}
+                    · {charMeta.speciesName}
+                  </>
+                ) : null}{" "}
+                · {title}
               </p>
               <div className="pc-level-row">
                 <strong>Level {xp.level}</strong>
@@ -241,6 +272,11 @@ export function CottageProfile({
                   {xp.current} / {xp.needed} XP
                 </em>
               </div>
+              {isSelf ? (
+                <p className="pc-character-link">
+                  <Link href="/character">Change character</Link>
+                </p>
+              ) : null}
             </div>
             {isSelf ? null : (
               <div className="pc-identity-actions">

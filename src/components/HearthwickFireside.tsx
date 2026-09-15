@@ -164,27 +164,36 @@ export function HearthwickFireside({
         <img src={HEARTH_ART.kettle} alt="" className="hw-deco kettle" />
       </div>
 
-      <header className="hw-hero">
-        <p className="hw-eyebrow">Hearthwick · The Hearth Hall</p>
-        <h1>The Fireside</h1>
-        <p className="hw-motto">Every stranger is welcomed home.</p>
-        <p className="hw-lead">
-          Come in from the soft rain, {user.displayName}. There are no grand
-          adventures here — only warm drinks, handmade crafts, and evenings
-          beside a crackling fire.
-        </p>
-        <div className="hw-status">
-          <span>
-            {progress.title.emoji} {progress.title.title}
-          </span>
-          <span>{progress.xp} XP</span>
-          <span>{progress.candleXp} candle XP</span>
-          <span>
-            {Object.keys(progress.favoriteRecipes).length} saved recipes
-          </span>
-          <span>{Object.keys(progress.kindling).length} kindling notes</span>
+      <header className="hw-hero workshop-hero-with-scene">
+        <div className="workshop-hero-copy">
+          <p className="hw-eyebrow">Hearthwick · The Hearth Hall</p>
+          <h1>The Fireside</h1>
+          <p className="hw-motto">Every stranger is welcomed home.</p>
+          <p className="hw-lead">
+            Come in from the soft rain, {user.displayName}. There are no grand
+            adventures here — only warm drinks, handmade crafts, and evenings
+            beside a crackling fire.
+          </p>
+          <div className="hw-status">
+            <span>
+              {progress.title.emoji} {progress.title.title}
+            </span>
+            <span>{progress.xp} XP</span>
+            <span>{progress.candleXp} candle XP</span>
+            <span>
+              {Object.keys(progress.favoriteRecipes).length} saved recipes
+            </span>
+            <span>{Object.keys(progress.kindling).length} kindling notes</span>
+          </div>
+          <WorkshopProgressLink href="/fireside/progress" />
         </div>
-        <WorkshopProgressLink href="/fireside/progress" />
+        <div className="workshop-hero-scene">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hearth/hero.jpg"
+            alt="A cozy cottage fireside with a crackling stone fireplace"
+          />
+        </div>
       </header>
 
       {error ? <p className="hw-error">{error}</p> : null}
