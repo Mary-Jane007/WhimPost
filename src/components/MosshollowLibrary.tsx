@@ -8,7 +8,6 @@ import {
   ARCHIVE_CLIPS,
   LIBRARY_COLLECTIONS,
   LIBRARY_TABS,
-  LIBRARY_TITLES,
   LIBRARY_XP,
   READING_CATEGORIES,
   featuredCuriosity,
@@ -31,14 +30,9 @@ import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 import { ShelfBookFileDetach } from "@/components/ShelfBookFileDetach";
 import { ShelfBookRemove } from "@/components/ShelfBookRemove";
 import { getBookProgressView } from "@/lib/libraryProgressView";
-import {
-  XpCollectibleGiftBoard,
-  formatGrantedCollectibles,
-} from "@/components/XpCollectibleGiftBoard";
-import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
-import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { formatGrantedCollectibles } from "@/components/XpCollectibleGiftBoard";
+import { WorkshopProgressLink } from "@/components/WorkshopProgressPanel";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
-import { LIBRARY_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import type { CollectibleKind } from "@/lib/villages";
 
 type Props = {
@@ -253,41 +247,36 @@ export function MosshollowLibrary({
         />
       </div>
 
-      <header className="mh-hero">
-        <p className="mh-eyebrow">Mosshollow · Archivists only</p>
-        <h1>The Grand Library</h1>
-        <p className="mh-subtitle">
-          <em>“Every answer uncovers another question.”</em>
-        </p>
-        <p className="mh-lead">
-          Welcome to the heart of Mosshollow, {user.displayName}. Here, every
-          villager is an Archivist, collecting knowledge one page at a time.
-          Read books, solve mysteries, answer thought-provoking questions,
-          uncover forgotten lore, and expand the Library&apos;s collection.
-        </p>
-        <div className="mh-status">
-          <span>
-            {progress.title.emoji} {progress.title.title}
-          </span>
-          <span>{progress.xp} library XP</span>
-          <span>{progress.badges.length} badges</span>
-          <span>{progress.stamps.length} stamps</span>
+      <header className="mh-hero workshop-hero-with-scene">
+        <div className="workshop-hero-copy">
+          <p className="mh-eyebrow">Mosshollow · Archivists only</p>
+          <h1>The Grand Library</h1>
+          <p className="mh-subtitle">
+            <em>“Every answer uncovers another question.”</em>
+          </p>
+          <p className="mh-lead">
+            Welcome to the heart of Mosshollow, {user.displayName}. Here, every
+            villager is an Archivist, collecting knowledge one page at a time.
+            Read books, solve mysteries, answer thought-provoking questions,
+            uncover forgotten lore, and expand the Library&apos;s collection.
+          </p>
+          <div className="mh-status">
+            <span>
+              {progress.title.emoji} {progress.title.title}
+            </span>
+            <span>{progress.xp} library XP</span>
+            <span>{progress.badges.length} badges</span>
+            <span>{progress.stamps.length} stamps</span>
+          </div>
+          <WorkshopProgressLink href="/library/progress" />
         </div>
-        <WorkshopXpProgress
-          xp={progress.xp}
-          xpLabel="library XP"
-          titles={LIBRARY_TITLES}
-          gifts={LIBRARY_XP_COLLECTIBLE_GIFTS}
-          claimedIds={progress.xpGiftsClaimed || []}
-        />
-        <XpCollectibleGiftBoard
-          xp={progress.xp}
-          xpLabel="library XP"
-          gifts={LIBRARY_XP_COLLECTIBLE_GIFTS}
-          claimedIds={progress.xpGiftsClaimed || []}
-          lead="Reach XP milestones to gift Mosshollow collectibles"
-        />
-        <XpAlmanacCard villageId="mosshollow" compact />
+        <div className="workshop-hero-scene">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/library/hero.jpg"
+            alt="A dark academia library with tall shelves and warm lamplight"
+          />
+        </div>
       </header>
 
       {error ? <p className="mh-error">{error}</p> : null}

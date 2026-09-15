@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EnvelopeFace } from "@/components/EnvelopeFace";
+import { VillagerIdentity } from "@/components/VillagerIdentity";
 import { letterBodyPreview } from "@/lib/letterText";
 import type { LetterView } from "@/lib/types";
 
@@ -44,7 +45,18 @@ export function MailList({
               />
               <div className="mail-item-copy">
                 <p className="mail-person">
-                  {perspective === "inbox" ? "From" : "To"} {person.displayName}
+                  <span className="mail-person-label">
+                    {perspective === "inbox" ? "From" : "To"}
+                  </span>{" "}
+                  <VillagerIdentity
+                    displayName={person.displayName}
+                    username={person.username}
+                    characterJson={person.characterJson}
+                    villageId={person.homeVillageId || person.villageId}
+                    href={`/profile/${person.username}`}
+                    size="sm"
+                    layout="letter"
+                  />
                   {!letter.isRead && perspective === "inbox" && (
                     <span className="unread-dot" aria-label="Unread" />
                   )}

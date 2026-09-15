@@ -236,6 +236,8 @@ export interface UserPublic {
   /** Permanent belonging from the signup quiz (or a later retake). */
   homeVillageId: string | null;
   reputation: number;
+  /** Storybook resident identity (species, gender, outfit). */
+  characterJson: string | null;
 }
 
 export interface FriendshipRow {
