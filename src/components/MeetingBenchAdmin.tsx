@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type {
   BenchItem,
@@ -359,13 +360,18 @@ export function MeetingBenchAdmin({
   if (!open) {
     return (
       <div className="mb-admin-launch">
-        <button
-          type="button"
-          className="btn-primary"
-          onClick={() => setOpen(true)}
-        >
-          Edit Meeting Bench
-        </button>
+        <div className="mb-admin-launch-actions">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => setOpen(true)}
+          >
+            Edit Meeting Bench
+          </button>
+          <Link href="/compose" className="btn-secondary">
+            ✉ Write a letter
+          </Link>
+        </div>
         <p className="mb-admin-lead mb-admin-launch-hint">
           Add notices, gatherings, seasonal activities, Chronicle stories, and
           community events — only you can edit this board.
@@ -386,9 +392,14 @@ export function MeetingBenchAdmin({
             published / active / upcoming items.
           </p>
         </div>
-        <button type="button" className="nav-ghost" onClick={() => setOpen(false)}>
-          Hide editor
-        </button>
+        <div className="mb-admin-head-actions">
+          <Link href="/compose" className="btn-secondary">
+            ✉ Write a letter
+          </Link>
+          <button type="button" className="nav-ghost" onClick={() => setOpen(false)}>
+            Hide editor
+          </button>
+        </div>
       </div>
 
       <div className="mb-quick-add" role="group" aria-label="Add new">
