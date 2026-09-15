@@ -5,11 +5,9 @@ import type { UserPublic } from "@/lib/types";
 import type { HearthProgress } from "@/lib/hearth";
 import {
   CANDLE_CRAFTS,
-  CANDLE_XP_COLLECTIBLE_GIFTS,
   COZY_RECIPES,
   HEARTH_ART,
   HEARTH_TABS,
-  HEARTH_TITLES,
   HEARTH_XP,
   HERBS,
   HERB_CATEGORY_LABELS,
@@ -25,8 +23,7 @@ import {
 } from "@/lib/hearthContent";
 import { COLLECTIBLE_META, type CollectibleKind } from "@/lib/villages";
 import { OwnerImageAttach } from "@/components/OwnerImageAttach";
-import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
-import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { WorkshopProgressLink } from "@/components/WorkshopProgressPanel";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
 import {
   resolveVillageImage,
@@ -167,43 +164,36 @@ export function HearthwickFireside({
         <img src={HEARTH_ART.kettle} alt="" className="hw-deco kettle" />
       </div>
 
-      <header className="hw-hero">
-        <p className="hw-eyebrow">Hearthwick · The Hearth Hall</p>
-        <h1>The Fireside</h1>
-        <p className="hw-motto">Every stranger is welcomed home.</p>
-        <p className="hw-lead">
-          Come in from the soft rain, {user.displayName}. There are no grand
-          adventures here — only warm drinks, handmade crafts, and evenings
-          beside a crackling fire.
-        </p>
-        <div className="hw-status">
-          <span>
-            {progress.title.emoji} {progress.title.title}
-          </span>
-          <span>{progress.xp} XP</span>
-          <span>{progress.candleXp} candle XP</span>
-          <span>
-            {Object.keys(progress.favoriteRecipes).length} saved recipes
-          </span>
-          <span>{Object.keys(progress.kindling).length} kindling notes</span>
+      <header className="hw-hero workshop-hero-with-scene">
+        <div className="workshop-hero-copy">
+          <p className="hw-eyebrow">Hearthwick · The Hearth Hall</p>
+          <h1>The Fireside</h1>
+          <p className="hw-motto">Every stranger is welcomed home.</p>
+          <p className="hw-lead">
+            Come in from the soft rain, {user.displayName}. There are no grand
+            adventures here — only warm drinks, handmade crafts, and evenings
+            beside a crackling fire.
+          </p>
+          <div className="hw-status">
+            <span>
+              {progress.title.emoji} {progress.title.title}
+            </span>
+            <span>{progress.xp} XP</span>
+            <span>{progress.candleXp} candle XP</span>
+            <span>
+              {Object.keys(progress.favoriteRecipes).length} saved recipes
+            </span>
+            <span>{Object.keys(progress.kindling).length} kindling notes</span>
+          </div>
+          <WorkshopProgressLink href="/fireside/progress" />
         </div>
-        <WorkshopXpProgress
-          xp={progress.xp}
-          xpLabel="fireside XP"
-          titles={HEARTH_TITLES}
-          secondary={{
-            xp: progress.candleXp || 0,
-            xpLabel: "candle XP",
-            gifts: CANDLE_XP_COLLECTIBLE_GIFTS.map((g) => ({
-              id: g.id,
-              minXp: g.minCandleXp,
-              kind: g.kind,
-              label: g.label,
-            })),
-            claimedIds: progress.candleGiftsClaimed || [],
-          }}
-        />
-        <XpAlmanacCard villageId="hearthwick" compact />
+        <div className="workshop-hero-scene">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hearth/hero.jpg"
+            alt="A cozy cottage fireside with a crackling stone fireplace"
+          />
+        </div>
       </header>
 
       {error ? <p className="hw-error">{error}</p> : null}
@@ -598,54 +588,21 @@ export function HearthwickFireside({
             <h2>Candle Crafts</h2>
             <p className="hw-section-lead">
               Slow handmade light — finish a craft to earn +{HEARTH_XP.candleCraft}{" "}
-              candle XP. Reach XP milestones to gift Hearthwick collectibles into
-              your jar.
+              candle XP. Track candle milestones and collectible gifts on the
+              progress page.
             </p>
-            <div className="hw-candle-xp-board" aria-label="Candle XP gifts">
-              <p className="hw-candle-xp-stat">
-                <strong>{progress.candleXp}</strong> candle XP ·{" "}
-                {
-                  Object.values(progress.candlesDone || {}).filter(Boolean)
-                    .length
-                }
-                /{CANDLE_CRAFTS.length} crafts lit
-              </p>
-              <ul className="hw-candle-gift-list">
-                {CANDLE_XP_COLLECTIBLE_GIFTS.map((gift) => {
-                  const claimed = (progress.candleGiftsClaimed || []).includes(
-                    gift.id
-                  );
-                  const meta = COLLECTIBLE_META[gift.kind];
-                  const reached = progress.candleXp >= gift.minCandleXp;
-                  return (
-                    <li
-                      key={gift.id}
-                      className={
-                        claimed
-                          ? "claimed"
-                          : reached
-                            ? "ready"
-                            : "locked"
-                      }
-                    >
-                      <span className="hw-candle-gift-xp">
-                        {gift.minCandleXp} XP
-                      </span>
-                      <span>
-                        {meta.emoji} {meta.name}
-                      </span>
-                      <span className="hw-candle-gift-label">
-                        {claimed
-                          ? "Gifted"
-                          : reached
-                            ? "Ready"
-                            : gift.label}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            <p className="hw-candle-xp-stat">
+              <strong>{progress.candleXp}</strong> candle XP ·{" "}
+              {
+                Object.values(progress.candlesDone || {}).filter(Boolean)
+                  .length
+              }
+              /{CANDLE_CRAFTS.length} crafts lit
+            </p>
+            <WorkshopProgressLink
+              href="/fireside/progress"
+              label="Candle XP & collectibles progress"
+            />
             <div className="hw-grid">
               {CANDLE_CRAFTS.map((c) => {
                 const done = Boolean(progress.candlesDone?.[c.id]);
