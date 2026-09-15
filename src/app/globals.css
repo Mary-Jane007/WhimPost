@@ -15317,3 +15317,76 @@ svg {
     justify-items: center;
   }
 }
+
+/* Workshop XP & collectibles progress pages */
+.workshop-progress-page {
+  max-width: 42rem;
+  margin: 0 auto 2.5rem;
+  padding: 0 0.25rem 1.5rem;
+}
+
+.workshop-progress-back {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+}
+
+.workshop-progress-back a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  opacity: 0.88;
+}
+
+.workshop-progress-back a:hover {
+  opacity: 1;
+}
+
+.workshop-progress-hero {
+  margin: 0 0 1.25rem;
+}
+
+.workshop-progress-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.workshop-progress-hero h1 {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  line-height: 1.15;
+}
+
+.workshop-progress-lead {
+  margin: 0 0 0.65rem;
+  max-width: 36rem;
+  line-height: 1.45;
+  opacity: 0.9;
+}
+
+.workshop-progress-stat {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.workshop-progress-stat strong {
+  font-weight: 700;
+}
+
+.workshop-progress-link {
+  margin: 0.55rem 0 0;
+  font-size: 0.95rem;
+}
+
+.workshop-progress-link a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.workshop-progress-link a:hover {
+  opacity: 0.85;
+}
