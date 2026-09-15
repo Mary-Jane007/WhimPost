@@ -130,6 +130,7 @@ function buildMetaFromTasks(
 
 /** Shared places only — village workshops stay on their own villages. */
 const QUICK_LINKS = [
+  { label: "Write a letter", href: "/compose" },
   { label: "Village", href: "/village" },
   { label: "TV Corner", href: "/tv-corner" },
   { label: "Meeting Bench", href: "/meeting-bench" },
@@ -752,7 +753,11 @@ export function MeetingBenchAdmin({
                   setForm((f) => ({
                     ...f,
                     ctaHref: l.href,
-                    ctaLabel: f.ctaLabel || `Visit ${l.label}`,
+                    ctaLabel:
+                      f.ctaLabel ||
+                      (l.href === "/compose"
+                        ? "Write a letter"
+                        : `Visit ${l.label}`),
                   }))
                 }
               >
