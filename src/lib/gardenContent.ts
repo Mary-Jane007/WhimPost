@@ -1336,7 +1336,8 @@ export const COMMUNITY_MILESTONES = [
 ];
 
 export const GARDEN_ART = {
-  meadowBg: "/garden/decor/meadow-bg.jpg",
+  meadowBg: "/garden/decor/hero.jpg",
+  hero: "/garden/decor/hero.jpg",
   birdhouse: "/garden/decor/birdhouse.jpg",
 } as const;
 

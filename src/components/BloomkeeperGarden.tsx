@@ -10,7 +10,6 @@ import {
   GARDEN_ATTRACTORS,
   GARDEN_COLLECTIONS,
   GARDEN_TABS,
-  GARDEN_TITLES,
   GARDEN_XP,
   MEADOW_FLOWER_IMAGES,
   NATURE_JOURNAL_REWARDS,
@@ -33,14 +32,9 @@ import {
   villageMediaKey,
   type VillageMediaMap,
 } from "@/lib/villageMediaShared";
-import {
-  XpCollectibleGiftBoard,
-  formatGrantedCollectibles,
-} from "@/components/XpCollectibleGiftBoard";
-import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
-import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { formatGrantedCollectibles } from "@/components/XpCollectibleGiftBoard";
+import { WorkshopProgressLink } from "@/components/WorkshopProgressPanel";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
-import { GARDEN_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import type { CollectibleKind } from "@/lib/villages";
 
 type Props = {
@@ -230,41 +224,36 @@ export function BloomkeeperGarden({
         </div>
       ) : null}
 
-      <header className="cm-hero">
-        <p className="cm-eyebrow">Clovermeadow · Bloomkeepers only</p>
-        <h1>The Bloomkeeper&apos;s Garden</h1>
-        <p className="cm-subtitle">
-          <em>“Every flower begins with a small act of kindness.”</em>
-        </p>
-        <p className="cm-lead">
-          Legends say the Bloomkeeper&apos;s Garden only blooms for those who
-          spread warmth wherever they go, {user.displayName}. Complete gentle
-          daily tasks to fill your meadow with flowers, attract woodland
-          creatures, and uncover hidden corners of the garden.
-        </p>
-        <div className="cm-status">
-          <span>
-            {progress.title.emoji} {progress.title.title}
-          </span>
-          <span>{progress.xp} garden XP</span>
-          <span>{progress.blooms} blooms</span>
-          <span>{progress.badges.length} badges</span>
+      <header className="cm-hero workshop-hero-with-scene">
+        <div className="workshop-hero-copy">
+          <p className="cm-eyebrow">Clovermeadow · Bloomkeepers only</p>
+          <h1>The Bloomkeeper&apos;s Garden</h1>
+          <p className="cm-subtitle">
+            <em>“Every flower begins with a small act of kindness.”</em>
+          </p>
+          <p className="cm-lead">
+            Legends say the Bloomkeeper&apos;s Garden only blooms for those who
+            spread warmth wherever they go, {user.displayName}. Complete gentle
+            daily tasks to fill your meadow with flowers, attract woodland
+            creatures, and uncover hidden corners of the garden.
+          </p>
+          <div className="cm-status">
+            <span>
+              {progress.title.emoji} {progress.title.title}
+            </span>
+            <span>{progress.xp} garden XP</span>
+            <span>{progress.blooms} blooms</span>
+            <span>{progress.badges.length} badges</span>
+          </div>
+          <WorkshopProgressLink href="/garden/progress" />
         </div>
-        <WorkshopXpProgress
-          xp={progress.xp}
-          xpLabel="garden XP"
-          titles={GARDEN_TITLES}
-          gifts={GARDEN_XP_COLLECTIBLE_GIFTS}
-          claimedIds={progress.xpGiftsClaimed || []}
-        />
-        <XpCollectibleGiftBoard
-          xp={progress.xp}
-          xpLabel="garden XP"
-          gifts={GARDEN_XP_COLLECTIBLE_GIFTS}
-          claimedIds={progress.xpGiftsClaimed || []}
-          lead="Reach XP milestones to gift Clovermeadow collectibles"
-        />
-        <XpAlmanacCard villageId="clovermeadow" compact />
+        <div className="workshop-hero-scene">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/garden/decor/hero.jpg"
+            alt="A blooming cottage garden with roses, lavender, and a stone path"
+          />
+        </div>
       </header>
 
       {error ? <p className="cm-error">{error}</p> : null}
