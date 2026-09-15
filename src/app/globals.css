@@ -6601,6 +6601,63 @@ button.linkish:hover {
   overflow: hidden;
 }
 
+/* Shared realistic workshop homepage hero scenes */
+.workshop-hero-with-scene {
+  display: grid;
+  gap: 1.15rem;
+  align-items: stretch;
+}
+
+@media (min-width: 900px) {
+  .workshop-hero-with-scene {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+  }
+}
+
+.workshop-hero-copy {
+  min-width: 0;
+}
+
+.workshop-hero-scene {
+  position: relative;
+  margin: 0;
+  border-radius: 1.15rem 1.35rem 1.1rem 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(70, 50, 30, 0.28);
+  box-shadow: 0 14px 28px rgba(30, 20, 10, 0.18);
+  background: rgba(20, 16, 12, 0.2);
+  min-height: 12rem;
+}
+
+.workshop-hero-scene img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 12rem;
+  max-height: 18rem;
+  object-fit: cover;
+  object-position: center;
+}
+
+.mh-hero .workshop-hero-scene,
+.mm-hero .workshop-hero-scene {
+  border-color: rgba(200, 190, 170, 0.28);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+}
+
+.cm-hero .workshop-hero-scene {
+  border-color: rgba(120, 150, 80, 0.35);
+}
+
+.hw-hero .workshop-hero-scene {
+  border-color: rgba(120, 80, 45, 0.35);
+}
+
+.bw-hero .workshop-hero-scene {
+  border-color: rgba(120, 82, 42, 0.3);
+}
+
 .bw-hero-table {
   position: absolute;
   left: 8%;

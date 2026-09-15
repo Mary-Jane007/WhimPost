@@ -323,23 +323,32 @@ export function MoonmereObservatory({
         <img src={MOON_ART.lantern} alt="" className="mm-deco lantern" />
       </div>
 
-      <header className="mm-hero">
-        <p className="mm-eyebrow">Moonmere · The Observatory</p>
-        <h1>The Observatory</h1>
-        <p className="mm-motto">Some answers only arrive after sunset.</p>
-        <p className="mm-lead">
-          Welcome beneath the dome, {user.displayName}. Soft blue light,
-          brass instruments, and a sky full of quiet questions await.
-        </p>
-        <div className="mm-status">
-          <span>
-            {progress.title.emoji} {progress.title.title}
-          </span>
-          <span>{progress.xp} XP</span>
-          <span>{progress.dreams.length} bottled dreams</span>
-          <span>{progress.journal.length} journal pages</span>
+      <header className="mm-hero workshop-hero-with-scene">
+        <div className="workshop-hero-copy">
+          <p className="mm-eyebrow">Moonmere · The Observatory</p>
+          <h1>The Observatory</h1>
+          <p className="mm-motto">Some answers only arrive after sunset.</p>
+          <p className="mm-lead">
+            Welcome beneath the dome, {user.displayName}. Soft blue light,
+            brass instruments, and a sky full of quiet questions await.
+          </p>
+          <div className="mm-status">
+            <span>
+              {progress.title.emoji} {progress.title.title}
+            </span>
+            <span>{progress.xp} XP</span>
+            <span>{progress.dreams.length} bottled dreams</span>
+            <span>{progress.journal.length} journal pages</span>
+          </div>
+          <WorkshopProgressLink href="/observatory/progress" />
         </div>
-        <WorkshopProgressLink href="/observatory/progress" />
+        <div className="workshop-hero-scene">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/moon/hero.jpg"
+            alt="A stone observatory dome with a brass telescope under the stars"
+          />
+        </div>
       </header>
 
       {error ? <p className="mm-error">{error}</p> : null}
