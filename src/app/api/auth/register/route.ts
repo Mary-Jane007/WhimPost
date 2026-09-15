@@ -16,6 +16,12 @@ import {
   isSystemUsername,
 } from "@/lib/welcomeLetters";
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
+import {
+  defaultCharacterForVillage,
+  normalizeVillagerCharacter,
+  serializeVillagerCharacter,
+} from "@/lib/villageCharacters";
+import type { VillageId } from "@/lib/villages";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -47,6 +53,11 @@ export async function POST(req: NextRequest) {
     return jsonError("Please choose a village to call home");
   }
 
+  const character =
+    normalizeVillagerCharacter(body.character, villageId as VillageId) ||
+    defaultCharacterForVillage(villageId as VillageId);
+  const characterJson = serializeVillagerCharacter(character);
+
   const db = getDb();
   const existing = db
     .prepare("SELECT id FROM users WHERE username = ? OR email = ?")
@@ -59,8 +70,8 @@ export async function POST(req: NextRequest) {
   db.prepare(
     `INSERT INTO users (
       id, username, display_name, email, password_hash, forest_name,
-      is_owner, village_id, home_village_id, reputation, collectibles_json
-    ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 0, '{}')`
+      is_owner, village_id, home_village_id, reputation, character_json, collectibles_json
+    ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 0, ?, '{}')`
   ).run(
     id,
     username,
@@ -69,7 +80,8 @@ export async function POST(req: NextRequest) {
     hashSync(password, 10),
     forestName,
     villageId,
-    villageId
+    villageId,
+    characterJson
   );
 
   claimOwnerIfUnset(db, id);
@@ -91,7 +103,7 @@ export async function POST(req: NextRequest) {
   const user = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, home_village_id, reputation
+              village_id, home_village_id, reputation, character_json
        FROM users WHERE id = ?`
     )
     .get(id) as {
@@ -105,6 +117,7 @@ export async function POST(req: NextRequest) {
     village_id: string;
     home_village_id: string;
     reputation: number;
+    character_json: string | null;
   };
 
   const token = await createSessionToken({ userId: id, username });

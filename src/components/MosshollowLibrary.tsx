@@ -8,7 +8,6 @@ import {
   ARCHIVE_CLIPS,
   LIBRARY_COLLECTIONS,
   LIBRARY_TABS,
-  LIBRARY_TITLES,
   LIBRARY_XP,
   READING_CATEGORIES,
   featuredCuriosity,
@@ -31,14 +30,9 @@ import { ShelfBookFileAttach } from "@/components/ShelfBookFileAttach";
 import { ShelfBookFileDetach } from "@/components/ShelfBookFileDetach";
 import { ShelfBookRemove } from "@/components/ShelfBookRemove";
 import { getBookProgressView } from "@/lib/libraryProgressView";
-import {
-  XpCollectibleGiftBoard,
-  formatGrantedCollectibles,
-} from "@/components/XpCollectibleGiftBoard";
-import { WorkshopXpProgress } from "@/components/WorkshopXpProgress";
-import { XpAlmanacCard } from "@/components/XpAlmanacCard";
+import { formatGrantedCollectibles } from "@/components/XpCollectibleGiftBoard";
+import { WorkshopProgressLink } from "@/components/WorkshopProgressPanel";
 import { celebrateProgressGain } from "@/lib/celebrateProgressGain";
-import { LIBRARY_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import type { CollectibleKind } from "@/lib/villages";
 
 type Props = {
@@ -273,21 +267,7 @@ export function MosshollowLibrary({
           <span>{progress.badges.length} badges</span>
           <span>{progress.stamps.length} stamps</span>
         </div>
-        <WorkshopXpProgress
-          xp={progress.xp}
-          xpLabel="library XP"
-          titles={LIBRARY_TITLES}
-          gifts={LIBRARY_XP_COLLECTIBLE_GIFTS}
-          claimedIds={progress.xpGiftsClaimed || []}
-        />
-        <XpCollectibleGiftBoard
-          xp={progress.xp}
-          xpLabel="library XP"
-          gifts={LIBRARY_XP_COLLECTIBLE_GIFTS}
-          claimedIds={progress.xpGiftsClaimed || []}
-          lead="Reach XP milestones to gift Mosshollow collectibles"
-        />
-        <XpAlmanacCard villageId="mosshollow" compact />
+        <WorkshopProgressLink href="/library/progress" />
       </header>
 
       {error ? <p className="mh-error">{error}</p> : null}

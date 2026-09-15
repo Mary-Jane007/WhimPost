@@ -1,0 +1,15 @@
+{
+  "install": "npm ci || npm install",
+  "start": "npx next start -H 0.0.0.0 -p 3333",
+  "terminals": [
+    {
+      "name": "whimpost",
+      "command": "npx next start -H 0.0.0.0 -p 3333",
+      "description": "WhimPost web server on port 3333"
+    }
+  ],
+  "ports": [
+    { "name": "WhimPost", "port": 3333 },
+    { "name": "WhimPost preview", "port": 3000 }
+  ]
+}
