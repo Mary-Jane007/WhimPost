@@ -203,21 +203,7 @@ export function CottageProfile({
             />
             <div className="pc-hero-vignette" aria-hidden />
             <div className="pc-hero-label" aria-hidden>
-              <span>{theme.emoji}</span> {cottageName}
-            </div>
-            <div className="pc-hero-hotspots" aria-hidden>
-              <button type="button" className="pc-hotspot pc-hotspot-a" title="Bookshelf — View your books">
-                <span>📚</span>
-                <em>Bookshelf</em>
-              </button>
-              <button type="button" className="pc-hotspot pc-hotspot-b" title="Mailbox — Letters">
-                <span>📮</span>
-                <em>Mailbox</em>
-              </button>
-              <button type="button" className="pc-hotspot pc-hotspot-c" title="Favorite corner">
-                <span>{theme.emoji}</span>
-                <em>Corner</em>
-              </button>
+              {cottageName}
             </div>
           </div>
 
