@@ -14484,68 +14484,6 @@ svg {
   border: 1px solid color-mix(in srgb, white 40%, transparent);
 }
 
-.pc-hero-hotspots {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.pc-hotspot {
-  pointer-events: auto;
-  position: absolute;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1.5px solid color-mix(in srgb, white 55%, transparent);
-  background: color-mix(in srgb, var(--pc-deep) 35%, transparent);
-  color: white;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  opacity: 0.55;
-  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  padding: 0;
-}
-
-.pc-hotspot span {
-  font-size: 1rem;
-  line-height: 1;
-}
-
-.pc-hotspot em {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 6px);
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-style: normal;
-  font-size: 0.72rem;
-  padding: 0.2rem 0.45rem;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--pc-deep) 88%, black);
-  color: var(--pc-cream);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-}
-
-.pc-hotspot:hover,
-.pc-hotspot:focus-visible {
-  opacity: 1;
-  transform: scale(1.08);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pc-gold) 45%, transparent);
-  outline: none;
-}
-
-.pc-hotspot:hover em,
-.pc-hotspot:focus-visible em {
-  opacity: 1;
-}
-
-.pc-hotspot-a { left: 18%; top: 42%; }
-.pc-hotspot-b { right: 22%; top: 58%; }
-.pc-hotspot-c { left: 48%; bottom: 28%; }
-
 /* ---- Identity ---- */
 .pc-identity {
   display: grid;
@@ -15305,10 +15243,6 @@ svg {
     border-radius: 16px;
     width: 100%;
     justify-content: center;
-  }
-
-  .pc-hotspot {
-    display: none;
   }
 
   .pc-quote {

@@ -12,5 +12,7 @@ export function SiteForestStickers({
 }) {
   const pathname = usePathname();
   if (pathname === "/") return null;
+  // Keep the cottage profile hero photo clear of floating stickers/sparkles.
+  if (pathname?.startsWith("/profile")) return null;
   return <ForestStickers density="site" villageId={villageId} />;
 }
