@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type {
   BenchItem,
@@ -129,6 +130,7 @@ function buildMetaFromTasks(
 
 /** Shared places only — village workshops stay on their own villages. */
 const QUICK_LINKS = [
+  { label: "Write a letter", href: "/compose" },
   { label: "Village", href: "/village" },
   { label: "TV Corner", href: "/tv-corner" },
   { label: "Meeting Bench", href: "/meeting-bench" },
@@ -359,13 +361,18 @@ export function MeetingBenchAdmin({
   if (!open) {
     return (
       <div className="mb-admin-launch">
-        <button
-          type="button"
-          className="btn-primary"
-          onClick={() => setOpen(true)}
-        >
-          Edit Meeting Bench
-        </button>
+        <div className="mb-admin-launch-actions">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => setOpen(true)}
+          >
+            Edit Meeting Bench
+          </button>
+          <Link href="/compose" className="btn-secondary">
+            ✉ Write a letter
+          </Link>
+        </div>
         <p className="mb-admin-lead mb-admin-launch-hint">
           Add notices, gatherings, seasonal activities, Chronicle stories, and
           community events — only you can edit this board.
@@ -386,9 +393,14 @@ export function MeetingBenchAdmin({
             published / active / upcoming items.
           </p>
         </div>
-        <button type="button" className="nav-ghost" onClick={() => setOpen(false)}>
-          Hide editor
-        </button>
+        <div className="mb-admin-head-actions">
+          <Link href="/compose" className="btn-secondary">
+            ✉ Write a letter
+          </Link>
+          <button type="button" className="nav-ghost" onClick={() => setOpen(false)}>
+            Hide editor
+          </button>
+        </div>
       </div>
 
       <div className="mb-quick-add" role="group" aria-label="Add new">
@@ -741,7 +753,11 @@ export function MeetingBenchAdmin({
                   setForm((f) => ({
                     ...f,
                     ctaHref: l.href,
-                    ctaLabel: f.ctaLabel || `Visit ${l.label}`,
+                    ctaLabel:
+                      f.ctaLabel ||
+                      (l.href === "/compose"
+                        ? "Write a letter"
+                        : `Visit ${l.label}`),
                   }))
                 }
               >
