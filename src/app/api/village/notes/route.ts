@@ -7,17 +7,30 @@ import {
   deleteOwnVillageNote,
   deleteOwnVillageNoteComment,
   listVillageNotes,
+  normalizeNoteDay,
+  todayNoteDay,
   toggleVillageNoteLike,
 } from "@/lib/villageNotes";
 
-export async function GET() {
+function dayFromRequest(
+  req: NextRequest,
+  body?: { day?: unknown } | null
+): string {
+  const fromQuery = req.nextUrl.searchParams.get("day");
+  const fromBody = typeof body?.day === "string" ? body.day : null;
+  return normalizeNoteDay(fromBody || fromQuery || todayNoteDay());
+}
+
+export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) return jsonError("Not signed in", 401);
   if (!user.villageId) return jsonError("Join a village first", 400);
 
+  const day = dayFromRequest(req);
   const db = getDb();
   return NextResponse.json({
-    notes: listVillageNotes(db, user.villageId, user.id),
+    day,
+    notes: listVillageNotes(db, user.villageId, user.id, { day }),
   });
 }
 
@@ -95,10 +108,12 @@ export async function POST(req: NextRequest) {
     imageUrl
   );
 
+  const day = todayNoteDay();
   return NextResponse.json({
     ok: true,
     id,
-    notes: listVillageNotes(db, user.villageId, user.id),
+    day,
+    notes: listVillageNotes(db, user.villageId, user.id, { day }),
   });
 }
 
@@ -118,8 +133,10 @@ export async function DELETE(req: NextRequest) {
   const result = deleteOwnVillageNote(db, noteId, user.id, user.villageId);
   if (!result.ok) return jsonError(result.error, result.status);
 
+  const day = dayFromRequest(req, body);
   return NextResponse.json({
     ok: true,
-    notes: listVillageNotes(db, user.villageId, user.id),
+    day,
+    notes: listVillageNotes(db, user.villageId, user.id, { day }),
   });
 }

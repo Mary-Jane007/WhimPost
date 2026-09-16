@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import type { Database } from "better-sqlite3";
 import { mapUser } from "@/lib/auth";
+import {
+  normalizeNoteDay,
+  todayNoteDay,
+} from "@/lib/villageNoteDays";
 
 export type VillageNoteCommentView = {
   id: string;
@@ -24,6 +28,8 @@ export type VillageNoteView = {
   comments: VillageNoteCommentView[];
   author: { displayName: string; username: string } | null;
 };
+
+export { normalizeNoteDay, todayNoteDay } from "@/lib/villageNoteDays";
 
 type NoteRow = {
   id: string;
@@ -83,10 +89,12 @@ function mapAuthor(row: NoteRow) {
 export function listVillageNotes(
   db: Database,
   villageId: string,
-  viewerId: string
+  viewerId: string,
+  opts?: { day?: string | null }
 ): VillageNoteView[] {
   ensureVillageNoteSocialTables(db);
 
+  const day = normalizeNoteDay(opts?.day);
   const rows = db
     .prepare(
       `SELECT n.id, n.body, n.anonymous, n.image_url, n.created_at, n.author_id,
@@ -95,10 +103,11 @@ export function listVillageNotes(
        FROM village_notes n
        JOIN users u ON u.id = n.author_id
        WHERE n.village_id = ?
+         AND date(n.created_at) = date(?)
        ORDER BY n.created_at DESC
-       LIMIT 40`
+       LIMIT 80`
     )
-    .all(villageId) as NoteRow[];
+    .all(villageId, day) as NoteRow[];
 
   if (rows.length === 0) return [];
 
