@@ -54,10 +54,10 @@ export const VILLAGE_CHARACTER_POOLS: Record<VillageId, VillageCharacterPool> = 
         blurb: "A clever gatherer of odd treasures and woodland stories.",
       },
       {
-        id: "owl",
-        name: "Forest Owl",
-        emoji: "🦉",
-        blurb: "Quietly watches the canopy and remembers every trail.",
+        id: "squirrel",
+        name: "Squirrel",
+        emoji: "🐿️",
+        blurb: "A quick-footed forager who knows every oak and hollow stash.",
       },
     ],
   },
@@ -202,12 +202,13 @@ export function getVillageCharacterPool(villageId: VillageId | null | undefined)
   return VILLAGE_CHARACTER_POOLS.bramblewood;
 }
 
-/** Map retired Moonmere owl picks to the Night Bat species. */
+/** Map retired species picks to their replacements. */
 export function resolveCharacterSpeciesId(
   villageId: VillageId,
   speciesId: string
 ): string {
   if (villageId === "moonmere" && speciesId === "owl") return "bat";
+  if (villageId === "bramblewood" && speciesId === "owl") return "squirrel";
   return speciesId;
 }
 
