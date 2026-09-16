@@ -12,6 +12,10 @@ import {
   type ChroniclePageContent,
   type ChroniclePageNumber,
 } from "@/lib/chronicleContent";
+import {
+  exportPersistentChroniclePages,
+} from "@/lib/persistentChroniclePages";
+import { scheduleDurableTvGitSync } from "@/lib/tvPersist";
 import type { VillageId } from "@/lib/villages";
 import { isVillageId } from "@/lib/villages";
 import { grantCollectible } from "@/lib/villageProgress";
@@ -89,25 +93,14 @@ function ensureSeedPages() {
     .prepare(`SELECT value FROM app_meta WHERE key = 'chronicle_lore_v'`)
     .get() as { value: string } | undefined;
   const currentLore = Number(loreRow?.value || 0);
-  if (currentLore >= CHRONICLE_LORE_VERSION) return;
-
-  const refresh = db.prepare(
-    `UPDATE chronicle_pages
-     SET title = ?, body = ?, updated_at = datetime('now')
-     WHERE village_id = ? AND page_number = ?`
-  );
-
-  for (const page of DEFAULT_CHRONICLE_PAGES) {
-    // Fresh village lore for the four manuscripts provided; leave Bramblewood alone
-    // if it already had custom text from an earlier seed (still refresh if empty DB path).
-    if (page.villageId === "bramblewood" && currentLore > 0) continue;
-    refresh.run(page.title, page.body, page.villageId, page.pageNumber);
+  if (currentLore < CHRONICLE_LORE_VERSION) {
+    // Bump lore version only — never overwrite title/body. Owner edits and the
+    // durable snapshot are the source of truth for customized manuscript text.
+    db.prepare(
+      `INSERT INTO app_meta (key, value) VALUES ('chronicle_lore_v', ?)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`
+    ).run(String(CHRONICLE_LORE_VERSION));
   }
-
-  db.prepare(
-    `INSERT INTO app_meta (key, value) VALUES ('chronicle_lore_v', ?)
-     ON CONFLICT(key) DO UPDATE SET value = excluded.value`
-  ).run(String(CHRONICLE_LORE_VERSION));
 }
 
 function ensureProgressRow(userId: string, villageId: VillageId) {
@@ -409,6 +402,13 @@ export function upsertChroniclePage(input: ChroniclePageUpdate) {
       Math.max(1, Math.min(99, Number(input.unlockCount) || 1)),
       input.published ? 1 : 0
     );
+  }
+
+  try {
+    exportPersistentChroniclePages(db);
+    scheduleDurableTvGitSync();
+  } catch (err) {
+    console.error("[persistent-chronicle-pages] export failed:", err);
   }
 
   return {
