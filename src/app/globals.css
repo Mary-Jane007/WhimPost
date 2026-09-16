@@ -2663,9 +2663,9 @@ a.feature-chip:hover {
 
 .notice-action {
   appearance: none;
-  border: 1px solid rgba(243, 230, 208, 0.28);
-  background: rgba(243, 230, 208, 0.08);
-  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--village-color, #6b8f71) 45%, transparent);
+  background: color-mix(in srgb, var(--village-soft, #f3e6d0) 16%, transparent);
+  color: color-mix(in srgb, var(--village-color, #6b8f71) 38%, #ffffff);
   border-radius: 999px;
   padding: 0.28rem 0.7rem;
   font: inherit;
@@ -2675,8 +2675,9 @@ a.feature-chip:hover {
 
 .notice-action:hover:not(:disabled),
 .notice-action.liked {
-  background: rgba(196, 122, 78, 0.22);
-  border-color: rgba(196, 122, 78, 0.45);
+  color: color-mix(in srgb, var(--village-soft, #f3e6d0) 28%, #ffffff);
+  background: color-mix(in srgb, var(--village-soft, #f3e6d0) 28%, transparent);
+  border-color: color-mix(in srgb, var(--village-soft, #f3e6d0) 65%, transparent);
 }
 
 .notice-action:disabled {
@@ -2687,7 +2688,70 @@ a.feature-chip:hover {
 .notice-delete {
   margin-left: auto;
   border-color: rgba(160, 70, 55, 0.35);
+  background: rgba(243, 230, 208, 0.08);
   color: #f3d2c7;
+}
+
+.notice-delete:hover:not(:disabled) {
+  color: #ffe6de;
+  background: rgba(160, 70, 55, 0.22);
+  border-color: rgba(160, 70, 55, 0.5);
+}
+
+/* Lighter village-tinted labels for Like / Comment on each theme */
+body.theme-moonmere .notice-action:not(.notice-delete) {
+  color: #9eb6d8;
+  border-color: color-mix(in srgb, #7f9fc8 55%, transparent);
+}
+body.theme-moonmere .notice-action:not(.notice-delete):hover:not(:disabled),
+body.theme-moonmere .notice-action.liked:not(.notice-delete) {
+  color: #c5d6ef;
+  border-color: color-mix(in srgb, #9eb6d8 70%, transparent);
+  background: color-mix(in srgb, #7f9fc8 22%, transparent);
+}
+
+body.theme-clovermeadow .notice-action:not(.notice-delete) {
+  color: #f3c2d0;
+  border-color: color-mix(in srgb, #d4849a 50%, transparent);
+}
+body.theme-clovermeadow .notice-action:not(.notice-delete):hover:not(:disabled),
+body.theme-clovermeadow .notice-action.liked:not(.notice-delete) {
+  color: #ffe0ea;
+  border-color: color-mix(in srgb, #f2c4d0 75%, transparent);
+  background: color-mix(in srgb, #d4849a 22%, transparent);
+}
+
+body.theme-bramblewood .notice-action:not(.notice-delete) {
+  color: #f0a868;
+  border-color: color-mix(in srgb, #e07020 45%, transparent);
+}
+body.theme-bramblewood .notice-action:not(.notice-delete):hover:not(:disabled),
+body.theme-bramblewood .notice-action.liked:not(.notice-delete) {
+  color: #ffd2a3;
+  border-color: color-mix(in srgb, #f0a868 70%, transparent);
+  background: color-mix(in srgb, #e07020 20%, transparent);
+}
+
+body.theme-mosshollow .notice-action:not(.notice-delete) {
+  color: #9fbfa4;
+  border-color: color-mix(in srgb, #6b8f71 50%, transparent);
+}
+body.theme-mosshollow .notice-action:not(.notice-delete):hover:not(:disabled),
+body.theme-mosshollow .notice-action.liked:not(.notice-delete) {
+  color: #d3e6d5;
+  border-color: color-mix(in srgb, #9fbfa4 70%, transparent);
+  background: color-mix(in srgb, #6b8f71 22%, transparent);
+}
+
+body.theme-hearthwick .notice-action:not(.notice-delete) {
+  color: #e2c39a;
+  border-color: color-mix(in srgb, #8b5a2b 45%, transparent);
+}
+body.theme-hearthwick .notice-action:not(.notice-delete):hover:not(:disabled),
+body.theme-hearthwick .notice-action.liked:not(.notice-delete) {
+  color: #f6e4c6;
+  border-color: color-mix(in srgb, #e2c39a 70%, transparent);
+  background: color-mix(in srgb, #8b5a2b 20%, transparent);
 }
 
 .notice-comments {
