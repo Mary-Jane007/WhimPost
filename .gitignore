@@ -56,6 +56,8 @@ next-env.d.ts
 !/data/persistent-welcome-letters.json
 # Keep Meeting Bench living-world board across fresh servers.
 !/data/persistent-meeting-bench.json
+# Keep Lost Chronicles manuscript pages (owner-edited text) across fresh servers.
+!/data/persistent-chronicle-pages.json
 # Locked tip + TV media floor — never thin these.
 !/data/locked-main.json
 !/data/locked-tv-media.json

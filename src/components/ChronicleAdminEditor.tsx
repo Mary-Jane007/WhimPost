@@ -12,6 +12,26 @@ import type { VillageId } from "@/lib/villages";
 
 type VillageOption = { id: VillageId; name: string };
 
+type PageDraft = {
+  title: string;
+  body: string;
+  illustrationUrl: string;
+  unlockKey: ChronicleActivityKey;
+  unlockCount: number;
+  published: boolean;
+};
+
+function draftFromPage(page: ChroniclePageContent): PageDraft {
+  return {
+    title: page.title,
+    body: page.body,
+    illustrationUrl: page.illustrationUrl || "",
+    unlockKey: page.unlockKey,
+    unlockCount: page.unlockCount,
+    published: page.published,
+  };
+}
+
 export function ChronicleAdminEditor({
   initialVillageId,
 }: {
@@ -21,6 +41,9 @@ export function ChronicleAdminEditor({
   const [villages, setVillages] = useState<VillageOption[]>([]);
   const [villageId, setVillageId] = useState<VillageId>(initialVillageId);
   const [pages, setPages] = useState<ChroniclePageContent[]>([]);
+  const [drafts, setDrafts] = useState<
+    Partial<Record<ChroniclePageNumber, PageDraft>>
+  >({});
   const [pageNumber, setPageNumber] = useState<ChroniclePageNumber>(1);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -37,14 +60,25 @@ export function ChronicleAdminEditor({
   const [uploading, setUploading] = useState(false);
   const [uploadPercent, setUploadPercent] = useState<number | null>(null);
 
-  function applyPage(page: ChroniclePageContent | undefined) {
-    if (!page) return;
-    setTitle(page.title);
-    setBody(page.body);
-    setIllustrationUrl(page.illustrationUrl || "");
-    setUnlockKey(page.unlockKey);
-    setUnlockCount(page.unlockCount);
-    setPublished(page.published);
+  function applyDraft(draft: PageDraft | undefined) {
+    if (!draft) return;
+    setTitle(draft.title);
+    setBody(draft.body);
+    setIllustrationUrl(draft.illustrationUrl || "");
+    setUnlockKey(draft.unlockKey);
+    setUnlockCount(draft.unlockCount);
+    setPublished(draft.published);
+  }
+
+  function currentDraft(): PageDraft {
+    return {
+      title,
+      body,
+      illustrationUrl,
+      unlockKey,
+      unlockCount,
+      published,
+    };
   }
 
   async function load(
@@ -67,11 +101,16 @@ export function ChronicleAdminEditor({
     setVillages(data.villages || []);
     setVillageId(nextVillage);
     setPages(list);
+    const nextDrafts: Partial<Record<ChroniclePageNumber, PageDraft>> = {};
+    for (const page of list) {
+      nextDrafts[page.pageNumber] = draftFromPage(page);
+    }
+    setDrafts(nextDrafts);
     const current =
       list.find((p) => p.pageNumber === nextPage) || list[0] || null;
     if (current) {
       setPageNumber(current.pageNumber);
-      applyPage(current);
+      applyDraft(nextDrafts[current.pageNumber]);
     }
   }
 
@@ -89,18 +128,19 @@ export function ChronicleAdminEditor({
     setSaving(true);
     setError("");
     setStatus("");
+    const draft = currentDraft();
     const res = await fetch("/api/chronicle/pages", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         villageId,
         pageNumber,
-        title,
-        body,
-        illustrationUrl,
-        unlockKey,
-        unlockCount,
-        published,
+        title: draft.title,
+        body: draft.body,
+        illustrationUrl: draft.illustrationUrl,
+        unlockKey: draft.unlockKey,
+        unlockCount: draft.unlockCount,
+        published: draft.published,
       }),
     });
     const data = await res.json();
@@ -109,8 +149,18 @@ export function ChronicleAdminEditor({
       setError(data.error || "Could not save");
       return;
     }
-    setPages(data.pages || []);
-    setStatus("Chronicle page saved — villagers will see it immediately.");
+    const list = (data.pages || []) as ChroniclePageContent[];
+    setPages(list);
+    setDrafts((prev) => {
+      const next = { ...prev };
+      for (const page of list) {
+        next[page.pageNumber] =
+          page.pageNumber === pageNumber ? draft : draftFromPage(page);
+      }
+      next[pageNumber] = draft;
+      return next;
+    });
+    setStatus("Chronicle page saved — text stays kept for this village.");
   }
 
   async function uploadIllustration(file: File | null) {
@@ -164,7 +214,7 @@ export function ChronicleAdminEditor({
       </div>
       <p className="muted">
         Edit each village&apos;s four manuscript pages, unlock rules, and
-        illustrations. No coding required.
+        illustrations. Saved text is kept across reloads and fresh servers.
       </p>
 
       {loading ? <p className="muted">Loading parchment…</p> : null}
@@ -196,8 +246,18 @@ export function ChronicleAdminEditor({
               type="button"
               className={pageNumber === n ? "active" : ""}
               onClick={() => {
+                const leaving = currentDraft();
+                const nextDrafts = { ...drafts, [pageNumber]: leaving };
+                setDrafts(nextDrafts);
                 setPageNumber(n);
-                applyPage(pages.find((p) => p.pageNumber === n));
+                applyDraft(
+                  nextDrafts[n] ||
+                    (pages.find((p) => p.pageNumber === n)
+                      ? draftFromPage(
+                          pages.find((p) => p.pageNumber === n)!
+                        )
+                      : undefined)
+                );
                 setShowPreview(false);
               }}
             >

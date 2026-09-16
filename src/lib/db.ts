@@ -4,6 +4,7 @@ import path from "path";
 import { importPersistentAccounts } from "@/lib/persistentAccounts";
 import { importPersistentLibraryBooks, ensureLibraryBookBytes } from "@/lib/persistentLibraryBooks";
 import { importPersistentMeetingBench } from "@/lib/persistentMeetingBench";
+import { importPersistentChroniclePages } from "@/lib/persistentChroniclePages";
 import { importPersistentMoonSounds } from "@/lib/persistentMoonSounds";
 import { importPersistentTv } from "@/lib/persistentTv";
 import { importPersistentWelcomeLetters } from "@/lib/persistentWelcomeLetters";
@@ -792,6 +793,12 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-meeting-bench] import failed:", err);
   }
+  // Restore Lost Chronicles manuscript pages (owner-edited text).
+  try {
+    importPersistentChroniclePages(db);
+  } catch (err) {
+    console.error("[persistent-chronicle-pages] import failed:", err);
+  }
   return db;
 }
 
@@ -864,6 +871,11 @@ export function getDb() {
         importPersistentMeetingBench(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-meeting-bench] import failed:", err);
+      }
+      try {
+        importPersistentChroniclePages(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-chronicle-pages] import failed:", err);
       }
       try {
         importPersistentWelcomeLetters(globalForDb.whimpostDb);

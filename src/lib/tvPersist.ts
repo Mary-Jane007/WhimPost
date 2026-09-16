@@ -8,6 +8,7 @@ import { PERSISTENT_TV_MEDIA_PATH } from "@/lib/tvMediaPaths";
 import { UPLOAD_DIR } from "@/lib/uploadPaths";
 import { exportPersistentLibraryBooks } from "@/lib/persistentLibraryBooks";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
+import { exportPersistentChroniclePages } from "@/lib/persistentChroniclePages";
 import {
   exportPersistentMoonSounds,
   moonSoundAbsolutePath,
@@ -350,6 +351,11 @@ export function persistAllDurableState(db: Database) {
   } catch (err) {
     console.error("[persistent-accounts] export failed:", err);
   }
+  try {
+    exportPersistentChroniclePages(db);
+  } catch (err) {
+    console.error("[persistent-chronicle-pages] export failed:", err);
+  }
   scheduleDurableTvGitSync();
 }
 
@@ -409,6 +415,7 @@ const DURABLE_CATALOG_PATHS = new Set([
   "data/persistent-accounts.json",
   "data/persistent-welcome-letters.json",
   "data/persistent-meeting-bench.json",
+  "data/persistent-chronicle-pages.json",
   "data/locked-main.json",
   "data/locked-tv-media.json",
 ]);
@@ -558,6 +565,7 @@ export async function runDurableTvGitSync(): Promise<{
         "data/persistent-accounts.json",
         "data/persistent-welcome-letters.json",
         "data/persistent-meeting-bench.json",
+        "data/persistent-chronicle-pages.json",
         "data/locked-main.json",
         "data/locked-tv-media.json",
         ...uploadPaths,
@@ -600,6 +608,7 @@ export async function runDurableTvGitSync(): Promise<{
             line === "data/persistent-accounts.json" ||
             line === "data/persistent-welcome-letters.json" ||
             line === "data/persistent-meeting-bench.json" ||
+            line === "data/persistent-chronicle-pages.json" ||
             line === "data/locked-main.json" ||
             line === "data/locked-tv-media.json" ||
             (line.startsWith("data/uploads/") &&
