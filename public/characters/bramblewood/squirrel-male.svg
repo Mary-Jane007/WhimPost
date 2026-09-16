@@ -9,9 +9,9 @@
   <rect x="28" y="28" width="456" height="584" rx="28" fill="none" stroke="#8b5a2b" stroke-width="6" stroke-opacity="0.55"/>
   <circle cx="256" cy="250" r="132" fill="#f3e7d3" stroke="#2f4a2c" stroke-width="8"/>
   <circle cx="256" cy="250" r="118" fill="#8b5a2b" fill-opacity="0.18"/>
-  <text x="256" y="280" text-anchor="middle" font-size="140">🦉</text>
+  <text x="256" y="280" text-anchor="middle" font-size="140">=?</text>
   <rect x="120" y="400" width="272" height="46" rx="18" fill="#2f4a2c" fill-opacity="0.85"/>
-  <text x="256" y="470" text-anchor="middle" font-family="Georgia, serif" font-size="36" fill="#2f4a2c">Forest Owl</text>
-  <text x="256" y="515" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#8b5a2b">♂ Male</text>
+  <text x="256" y="470" text-anchor="middle" font-family="Georgia, serif" font-size="36" fill="#2f4a2c">Squirrel</text>
+  <text x="256" y="515" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#8b5a2b">B Male</text>
   <text x="256" y="575" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#2f4a2c" fill-opacity="0.7">Bramblewood</text>
 </svg>
