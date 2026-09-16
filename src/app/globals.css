@@ -2642,9 +2642,116 @@ a.feature-chip:hover {
   margin: 0 0 0.3rem;
 }
 
-.notice-list span {
+.notice-list span,
+.notice-meta {
   font-size: 0.85rem;
   opacity: 0.65;
+}
+
+.notice-body {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.notice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+}
+
+.notice-action {
+  appearance: none;
+  border: 1px solid rgba(243, 230, 208, 0.28);
+  background: rgba(243, 230, 208, 0.08);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.notice-action:hover:not(:disabled),
+.notice-action.liked {
+  background: rgba(196, 122, 78, 0.22);
+  border-color: rgba(196, 122, 78, 0.45);
+}
+
+.notice-action:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.notice-delete {
+  margin-left: auto;
+  border-color: rgba(160, 70, 55, 0.35);
+  color: #f3d2c7;
+}
+
+.notice-comments {
+  margin-top: 0.35rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed rgba(243, 230, 208, 0.18);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.notice-comments-empty {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.notice-comment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.notice-comment-list li {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(243, 230, 208, 0.12);
+  border-radius: 0.55rem;
+  background: rgba(0, 0, 0, 0.12);
+  display: grid;
+  gap: 0.2rem;
+}
+
+.notice-comment-list p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.notice-comment-delete {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.85;
+}
+
+.notice-comment-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+}
+
+.notice-comment-form input {
+  width: 100%;
+  border: 1px solid rgba(92, 58, 30, 0.25);
+  border-radius: var(--frame-input);
+  background: rgba(243, 230, 208, 0.92);
+  color: var(--ink);
+  padding: 0.45rem 0.65rem;
+  font: inherit;
 }
 
 .bw-journal-share-row {

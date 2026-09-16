@@ -31,6 +31,7 @@ import { VillageTasksAdminEditor } from "@/components/VillageTasksAdminEditor";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { MeetingBenchTeaser } from "@/components/MeetingBenchTeaser";
 import { VillageMascot } from "@/components/VillageMascot";
+import { listVillageNotes } from "@/lib/villageNotes";
 import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
@@ -103,47 +104,7 @@ export default async function VillagePage() {
     reputation: number;
   }>;
 
-  const noteRows = db
-    .prepare(
-      `SELECT n.id, n.body, n.anonymous, n.image_url, n.created_at,
-              u.id as uid, u.username, u.display_name, u.bio, u.forest_name,
-              u.created_at as ucreated, u.is_owner, u.village_id, u.reputation
-       FROM village_notes n
-       JOIN users u ON u.id = n.author_id
-       WHERE n.village_id = ?
-       ORDER BY n.created_at DESC
-       LIMIT 40`
-    )
-    .all(stats.villageId) as Array<{
-    id: string;
-    body: string;
-    anonymous: number;
-    image_url: string | null;
-    created_at: string;
-    uid: string;
-    username: string;
-    display_name: string;
-    bio: string;
-    forest_name: string;
-    ucreated: string;
-    is_owner: number;
-    village_id: string | null;
-    reputation: number;
-  }>;
-
-  const notes = noteRows.map((r) => ({
-    id: r.id,
-    body: r.body,
-    anonymous: Boolean(r.anonymous),
-    imageUrl: r.image_url || null,
-    createdAt: r.created_at,
-    author: r.anonymous
-      ? null
-      : {
-          displayName: r.display_name,
-          username: r.username,
-        },
-  }));
+  const notes = listVillageNotes(db, stats.villageId, user.id);
 
   const unlockLabels = [
     "Lantern path lit",
@@ -360,7 +321,7 @@ export default async function VillagePage() {
         </div>
       </section>
 
-      <NoticeBoard initialNotes={notes} />
+      <NoticeBoard initialNotes={notes} currentUserId={user.id} />
 
       <MeetingBenchTeaser teaser={meetingBenchTeaser} isOwner={user.isOwner} />
 
