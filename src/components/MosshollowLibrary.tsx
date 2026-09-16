@@ -247,27 +247,36 @@ export function MosshollowLibrary({
         />
       </div>
 
-      <header className="mh-hero">
-        <p className="mh-eyebrow">Mosshollow · Archivists only</p>
-        <h1>The Grand Library</h1>
-        <p className="mh-subtitle">
-          <em>“Every answer uncovers another question.”</em>
-        </p>
-        <p className="mh-lead">
-          Welcome to the heart of Mosshollow, {user.displayName}. Here, every
-          villager is an Archivist, collecting knowledge one page at a time.
-          Read books, solve mysteries, answer thought-provoking questions,
-          uncover forgotten lore, and expand the Library&apos;s collection.
-        </p>
-        <div className="mh-status">
-          <span>
-            {progress.title.emoji} {progress.title.title}
-          </span>
-          <span>{progress.xp} library XP</span>
-          <span>{progress.badges.length} badges</span>
-          <span>{progress.stamps.length} stamps</span>
+      <header className="mh-hero workshop-hero-with-scene">
+        <div className="workshop-hero-copy">
+          <p className="mh-eyebrow">Mosshollow · Archivists only</p>
+          <h1>The Grand Library</h1>
+          <p className="mh-subtitle">
+            <em>“Every answer uncovers another question.”</em>
+          </p>
+          <p className="mh-lead">
+            Welcome to the heart of Mosshollow, {user.displayName}. Here, every
+            villager is an Archivist, collecting knowledge one page at a time.
+            Read books, solve mysteries, answer thought-provoking questions,
+            uncover forgotten lore, and expand the Library&apos;s collection.
+          </p>
+          <div className="mh-status">
+            <span>
+              {progress.title.emoji} {progress.title.title}
+            </span>
+            <span>{progress.xp} library XP</span>
+            <span>{progress.badges.length} badges</span>
+            <span>{progress.stamps.length} stamps</span>
+          </div>
+          <WorkshopProgressLink href="/library/progress" />
         </div>
-        <WorkshopProgressLink href="/library/progress" />
+        <div className="workshop-hero-scene">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/library/hero.jpg"
+            alt="A dark academia library with tall shelves and warm lamplight"
+          />
+        </div>
       </header>
 
       {error ? <p className="mh-error">{error}</p> : null}

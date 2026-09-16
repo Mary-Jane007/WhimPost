@@ -41,10 +41,11 @@ type UserRow = {
   village_id: string | null;
   home_village_id: string | null;
   reputation: number;
+  character_json?: string | null;
 };
 
 const USER_SELECT = `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, home_village_id, reputation
+              village_id, home_village_id, reputation, character_json
        FROM users`;
 
 export function getUserById(id: string): UserPublic | null {

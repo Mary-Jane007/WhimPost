@@ -224,27 +224,36 @@ export function BloomkeeperGarden({
         </div>
       ) : null}
 
-      <header className="cm-hero">
-        <p className="cm-eyebrow">Clovermeadow · Bloomkeepers only</p>
-        <h1>The Bloomkeeper&apos;s Garden</h1>
-        <p className="cm-subtitle">
-          <em>“Every flower begins with a small act of kindness.”</em>
-        </p>
-        <p className="cm-lead">
-          Legends say the Bloomkeeper&apos;s Garden only blooms for those who
-          spread warmth wherever they go, {user.displayName}. Complete gentle
-          daily tasks to fill your meadow with flowers, attract woodland
-          creatures, and uncover hidden corners of the garden.
-        </p>
-        <div className="cm-status">
-          <span>
-            {progress.title.emoji} {progress.title.title}
-          </span>
-          <span>{progress.xp} garden XP</span>
-          <span>{progress.blooms} blooms</span>
-          <span>{progress.badges.length} badges</span>
+      <header className="cm-hero workshop-hero-with-scene">
+        <div className="workshop-hero-copy">
+          <p className="cm-eyebrow">Clovermeadow · Bloomkeepers only</p>
+          <h1>The Bloomkeeper&apos;s Garden</h1>
+          <p className="cm-subtitle">
+            <em>“Every flower begins with a small act of kindness.”</em>
+          </p>
+          <p className="cm-lead">
+            Legends say the Bloomkeeper&apos;s Garden only blooms for those who
+            spread warmth wherever they go, {user.displayName}. Complete gentle
+            daily tasks to fill your meadow with flowers, attract woodland
+            creatures, and uncover hidden corners of the garden.
+          </p>
+          <div className="cm-status">
+            <span>
+              {progress.title.emoji} {progress.title.title}
+            </span>
+            <span>{progress.xp} garden XP</span>
+            <span>{progress.blooms} blooms</span>
+            <span>{progress.badges.length} badges</span>
+          </div>
+          <WorkshopProgressLink href="/garden/progress" />
         </div>
-        <WorkshopProgressLink href="/garden/progress" />
+        <div className="workshop-hero-scene">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/garden/decor/hero.jpg"
+            alt="A blooming cottage garden with roses, lavender, and a stone path"
+          />
+        </div>
       </header>
 
       {error ? <p className="cm-error">{error}</p> : null}

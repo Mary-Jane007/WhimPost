@@ -48,7 +48,8 @@ export function titleForMoonXp(xp: number) {
 }
 
 export const MOON_ART = {
-  observatory: "/moon/observatory.jpg",
+  observatory: "/moon/hero.jpg",
+  hero: "/moon/hero.jpg",
   moth: "/stickers/villages/moonmere/luna-moth.png",
   lantern: "/stickers/villages/moonmere/lantern-star.png",
   crescent: "/stickers/villages/moonmere/moon-crescent.png",

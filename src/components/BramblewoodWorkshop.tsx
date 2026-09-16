@@ -314,24 +314,11 @@ export function BramblewoodWorkshop({
             </ul>
           ) : null}
         </div>
-        <div className="bw-hero-atelier" aria-hidden>
+        <div className="workshop-hero-scene">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/stickers/villages/bramblewood/fox-sitting.png"
-            alt=""
-            className="bw-hero-fox"
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/stickers/villages/bramblewood/compass.png"
-            alt=""
-            className="bw-hero-compass"
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/stickers/villages/bramblewood/maple-branch.png"
-            alt=""
-            className="bw-hero-maple"
+            src="/workshop/hero.jpg"
+            alt="A woodland craft cottage opening onto a forest trail"
           />
         </div>
       </header>
