@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:39:11.275Z",
+  "updatedAt": "2026-09-17T23:39:41.565Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -126,13 +126,13 @@
       "id": "69f2d265-a375-491a-9bd3-6137e855cfa9",
       "villageId": "hearthwick",
       "pageNumber": 3,
-      "title": "The Basket Beside the Fire",
+      "title": "The Winter the Fire Went Out",
       "body": "Old journals mention a small basket that once stood beside the village fireplace. Inside were folded notes containing encouragement, recipes, memories, and simple acts of kindness. The writers never signed their names. Generations later, the basket is still there, though no one remembers who placed it by the fire in the first place.",
       "illustrationUrl": "",
       "unlockKey": "hearth.completeRitual",
       "unlockCount": 3,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:39:41"
     },
     {
       "id": "8a83f3d1-eaa7-4135-916b-0cb6b453d03b",
