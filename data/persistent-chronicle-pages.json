@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:14:54.440Z",
+  "updatedAt": "2026-09-17T23:15:27.063Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -78,13 +78,13 @@
       "id": "588eeda9-47fa-4dcb-b037-32f4d4912c7e",
       "villageId": "clovermeadow",
       "pageNumber": 3,
-      "title": "Forgotten Corners",
+      "title": "The Night of the Lanterns",
       "body": "Even now, old stone borders and hidden garden paths occasionally appear beneath the grass after heavy rain. No one remembers who built them, but no one removes them either. Instead, new flowers are planted there, as though finishing a task someone began long ago.",
       "illustrationUrl": "",
       "unlockKey": "garden.completeDaily",
       "unlockCount": 3,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:15:27"
     },
     {
       "id": "0657d380-91b4-4b00-b298-3dff2e85c96c",
