@@ -585,6 +585,27 @@ function migrate(db: Database.Database) {
   );
 
   db.exec(`
+    CREATE TABLE IF NOT EXISTS village_note_likes (
+      note_id TEXT NOT NULL REFERENCES village_notes(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (note_id, user_id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_village_note_likes_note
+      ON village_note_likes(note_id);
+
+    CREATE TABLE IF NOT EXISTS village_note_comments (
+      id TEXT PRIMARY KEY,
+      note_id TEXT NOT NULL REFERENCES village_notes(id) ON DELETE CASCADE,
+      author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_village_note_comments_note
+      ON village_note_comments(note_id, created_at);
+  `);
+
+  db.exec(`
     CREATE TABLE IF NOT EXISTS analytics_events (
       id TEXT PRIMARY KEY,
       event_name TEXT NOT NULL,
