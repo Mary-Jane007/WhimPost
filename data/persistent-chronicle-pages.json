@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T22:02:40.973Z",
+  "updatedAt": "2026-09-17T22:03:20.352Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -91,12 +91,12 @@
       "villageId": "clovermeadow",
       "pageNumber": 4,
       "title": "The Meadow Remembers Forever",
-      "body": "There was a clover lane that never forgot a footstep.\n\nKEEP-SAVED-20260917220240 — the path remembers every word.\n\nWhen villagers left and returned the next morning, the words were still there, pressed into the parchment like dew.",
+      "body": "There was a clover lane that never forgot a footstep.\n\nAUTOKEEP-1789682593295 stays after exit.\n\nWhen villagers left and returned, the words were still there.",
       "illustrationUrl": "",
       "unlockKey": "garden.completeKindness",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-17 22:02:40"
+      "updatedAt": "2026-09-17 22:03:20"
     },
     {
       "id": "d3cc3800-a37b-41a9-ba72-9c96224d6a77",
