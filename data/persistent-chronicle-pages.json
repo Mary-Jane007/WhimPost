@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:29:37.768Z",
+  "updatedAt": "2026-09-17T23:30:01.026Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -162,13 +162,13 @@
       "id": "47ff1e50-0141-48ff-9f21-4bb1adb556c2",
       "villageId": "moonmere",
       "pageNumber": 2,
-      "title": "The Observatory Logbook",
+      "title": "The Night Watchers",
       "body": "The observatory keeps a logbook dating back further than anyone can explain. Each page records the phases of the moon, unusual weather, and familiar constellations in remarkably consistent handwriting. The earliest pages are unsigned, and no one has discovered who began them.",
       "illustrationUrl": "",
       "unlockKey": "moon.saveJournal",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:30:01"
     },
     {
       "id": "bfa7f9dc-fac6-4ef3-b2e2-faf843c60fcd",
