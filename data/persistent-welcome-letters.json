@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-14T17:19:35.327Z",
+  "updatedAt": "2026-09-17T21:56:25.351Z",
   "letters": [
+    {
+      "id": "cfe689cd-4588-4893-a6de-d42090040234",
+      "villageId": "bramblewood",
+      "recipientId": "40f254f6-12fa-43fe-9048-80f77bdde8c5",
+      "senderId": "system-bramblewood",
+      "subject": "Welcome to Bramblewood",
+      "body": "**Greetings, explorer,**\n\nWe were beginning to wonder when you'd find us.\n\nThe foxes insisted you'd taken the longer trail.\n\nThe ravens claimed you were distracted by something interesting.\n\nAs usual, they were probably both right.\n\nWelcome to **Bramblewood**, where every winding path hides a story, every forgotten ruin whispers a mystery, and every letter is the beginning of another adventure.\n\nBefore setting off, we've packed a travel satchel for you — the first pieces of your Bramblewood collection.\n\nInside you'll find:\n\n* ![Fox Tails](/stickers/collectibles/bramblewood/bramble-fox-tails.png) A soft fox tail for luck on every trail.\n* ![Maple Leaves](/stickers/collectibles/bramblewood/bramble-maple.png) A pressed maple leaf from the dens.\n* ![Hello Fall Candles](/stickers/collectibles/bramblewood/bramble-candles.png) A Hello Fall candle to warm your satchel.\n* ![Wonder Compasses](/stickers/collectibles/bramblewood/bramble-compasses.png) A compass that occasionally points toward wonder instead of north.\n\nThese are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the trails. Your cottage will fill as your collection grows.\n\nShould you stumble upon something extraordinary, write about it.\n\nThe village has always loved a good tale.\n\nAnd remember—\n\nThe finest adventures are rarely planned.\n\nWelcome to **Bramblewood**.\n\n*May curiosity always know the way.*",
+      "paperStyle": "parchment",
+      "envelopeStyle": "kraft",
+      "waxSeal": "spiral",
+      "stampStyle": "fox-seated",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-fox\",\"kind\":\"bramble-fox-sitting\",\"x\":92,\"y\":8,\"scale\":0.68,\"rotation\":10},{\"id\":\"welcome-maple\",\"kind\":\"bramble-maple-leaf\",\"x\":8,\"y\":10,\"scale\":0.58,\"rotation\":-14},{\"id\":\"welcome-compass\",\"kind\":\"bramble-compass\",\"x\":9,\"y\":88,\"scale\":0.55,\"rotation\":-6},{\"id\":\"welcome-mushroom\",\"kind\":\"bramble-mushroom\",\"x\":93,\"y\":92,\"scale\":0.55,\"rotation\":8}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":6,\"scale\":0.5,\"rotation\":-8}]",
+      "isRead": false,
+      "sentAt": "2026-09-14 22:40:21",
+      "createdAt": "2026-09-14 22:40:21"
+    },
     {
       "id": "0cd42e2a-4662-40bb-8695-f9db2fc83925",
       "villageId": "bramblewood",
@@ -91,6 +109,24 @@
       "isRead": true,
       "sentAt": "2026-08-13 02:16:18",
       "createdAt": "2026-08-13 02:16:18"
+    },
+    {
+      "id": "a42f7aa0-d2a4-44e3-83e4-3c5c61da0d05",
+      "villageId": "moonmere",
+      "recipientId": "system-moonmere",
+      "senderId": "system-moonmere",
+      "subject": "Welcome to Moonmere",
+      "body": "**To the traveler beneath the stars,**\n\nLast night, the lake held an extra reflection.\n\nNot of the moon.\n\nOf you.\n\nWelcome to **Moonmere**, where lanterns glow long after sunset and conversations linger like ripples across quiet water.\n\nSome villagers write after midnight.\nSome write after watching the rain.\nSome simply wait until their heart has something gentle to say.\n\nThere is no wrong time to begin.\n\nWaiting at your window is a silver lantern — the first pieces of your Moonmere collection.\n\nInside it you'll find:\n\n* ![Night Lilies](/stickers/collectibles/moonmere/moon-lilies.png) Night lily petals from the lakeshore blooms.\n* ![Mere Pearls](/stickers/collectibles/moonmere/moon-pearls.png) A mere pearl, smooth as the water's hush.\n* ![Dock Lanterns](/stickers/collectibles/moonmere/moon-lanterns.png) A dock lantern that burns with a quiet light.\n* ![Dream Notes](/stickers/collectibles/moonmere/moon-dreams.png) A dream note that asks only one question:\n\n*\"What have you been dreaming about lately?\"*\n\nThese are only the beginning. Write letters, welcome friends, and gather more keepsakes as starlight settles on the dock. Your cottage will fill as your collection grows.\n\nYou needn't have the answer today.\n\nMoonmere has always believed that the best letters arrive when they're ready.\n\nUntil then, the lake will keep your secrets, and the stars will keep you company.\n\nWelcome to **Moonmere**.\n\n*May your words drift softly into waiting hearts.*",
+      "paperStyle": "night",
+      "envelopeStyle": "ink",
+      "waxSeal": "moon",
+      "stampStyle": "moon-full",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-moon-full\",\"kind\":\"moon-full-clouds\",\"x\":92,\"y\":8,\"scale\":0.62,\"rotation\":8},{\"id\":\"welcome-fairy\",\"kind\":\"moon-fairy-blue\",\"x\":8,\"y\":10,\"scale\":0.55,\"rotation\":-10},{\"id\":\"welcome-lantern\",\"kind\":\"moon-lantern\",\"x\":8,\"y\":88,\"scale\":0.55,\"rotation\":-4},{\"id\":\"welcome-seal\",\"kind\":\"moon-seal-sun\",\"x\":12,\"y\":48,\"scale\":0.48,\"rotation\":6}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":6,\"scale\":0.5,\"rotation\":-8}]",
+      "isRead": false,
+      "sentAt": "2026-09-16 19:40:36",
+      "createdAt": "2026-09-16 19:40:36"
     }
   ]
 }

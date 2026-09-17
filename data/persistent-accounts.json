@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-14T17:35:00.829Z",
+  "updatedAt": "2026-09-17T21:56:25.352Z",
   "accounts": [
     {
       "id": "system-bramblewood",
@@ -14,6 +14,7 @@
       "village_id": "bramblewood",
       "home_village_id": "bramblewood",
       "reputation": 0,
+      "character_json": null,
       "collectibles_json": "{}",
       "visited_villages_json": "[]",
       "created_at": "2026-07-20 22:18:13"
@@ -30,9 +31,27 @@
       "village_id": "clovermeadow",
       "home_village_id": "clovermeadow",
       "reputation": 0,
+      "character_json": null,
       "collectibles_json": "{}",
       "visited_villages_json": "[]",
       "created_at": "2026-07-20 19:15:24"
+    },
+    {
+      "id": "40f254f6-12fa-43fe-9048-80f77bdde8c5",
+      "username": "foxwalker99",
+      "display_name": "Fox Walker",
+      "email": "foxwalker99@example.com",
+      "password_hash": "$2b$10$jt5oz604O9KGSGU2cgmp4.8ktfmTDg.eK3B5rD36o1L3VtdWHYI6e",
+      "bio": "",
+      "forest_name": "Fernhollow",
+      "is_owner": 0,
+      "village_id": "bramblewood",
+      "home_village_id": "bramblewood",
+      "reputation": 3,
+      "character_json": "{\"villageId\":\"bramblewood\",\"speciesId\":\"fox\",\"gender\":\"female\"}",
+      "collectibles_json": "{\"mushrooms\":0,\"leaves\":0,\"feathers\":0,\"lost-pages\":0,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":0,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":0,\"clover-cherries\":0,\"clover-honey\":0,\"clover-blossoms\":0,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":0,\"moon-lanterns\":0,\"moon-lilies\":0,\"moon-dreams\":0,\"moon-dust\":0,\"bramble-fox-tails\":1,\"bramble-maple\":1,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":1,\"bramble-compasses\":1,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":0,\"hearth-muffins\":0,\"hearth-recipes\":0,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":0}",
+      "visited_villages_json": "[\"bramblewood\"]",
+      "created_at": "2026-09-14 22:40:21"
     },
     {
       "id": "system-hearthwick",
@@ -46,6 +65,7 @@
       "village_id": "hearthwick",
       "home_village_id": "hearthwick",
       "reputation": 0,
+      "character_json": null,
       "collectibles_json": "{}",
       "visited_villages_json": "[]",
       "created_at": "2026-07-20 23:46:48"
@@ -59,9 +79,10 @@
       "bio": "",
       "forest_name": "mosshollow",
       "is_owner": 1,
-      "village_id": "mosshollow",
+      "village_id": "clovermeadow",
       "home_village_id": "moonmere",
       "reputation": 0,
+      "character_json": null,
       "collectibles_json": "{\"mushrooms\":1,\"leaves\":1,\"feathers\":1,\"lost-pages\":1,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":1,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":1,\"clover-cherries\":0,\"clover-honey\":1,\"clover-blossoms\":1,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":1,\"moon-lanterns\":1,\"moon-lilies\":1,\"moon-dreams\":1,\"moon-dust\":0,\"bramble-fox-tails\":1,\"bramble-maple\":1,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":1,\"bramble-compasses\":1,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":1,\"hearth-muffins\":1,\"hearth-recipes\":1,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":1}",
       "visited_villages_json": "[\"bramblewood\",\"clovermeadow\",\"hearthwick\",\"moonmere\",\"mosshollow\"]",
       "created_at": "2026-07-20 17:51:34"
@@ -78,8 +99,9 @@
       "village_id": "moonmere",
       "home_village_id": "moonmere",
       "reputation": 0,
+      "character_json": null,
       "collectibles_json": "{}",
-      "visited_villages_json": "[]",
+      "visited_villages_json": "[\"moonmere\"]",
       "created_at": "2026-07-20 21:16:39"
     },
     {
@@ -94,6 +116,7 @@
       "village_id": "mosshollow",
       "home_village_id": "mosshollow",
       "reputation": 0,
+      "character_json": null,
       "collectibles_json": "{}",
       "visited_villages_json": "[]",
       "created_at": "2026-07-20 19:08:57"
