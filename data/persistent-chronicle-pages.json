@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:40:56.084Z",
+  "updatedAt": "2026-09-17T23:41:18.180Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -138,13 +138,13 @@
       "id": "8a83f3d1-eaa7-4135-916b-0cb6b453d03b",
       "villageId": "hearthwick",
       "pageNumber": 4,
-      "title": "Home",
+      "title": "Every Stranger Is Welcomed Home",
       "body": "Visitors often ask what makes Hearthwick feel different from anywhere else. The villagers usually smile and shrug. Some say it's the smell of fresh bread. Others say it's the fire. Most simply point to the empty chair beside the hearth and say,\n\n\"It has been waiting for you.\"",
       "illustrationUrl": "",
       "unlockKey": "hearth.toggleRecipeFavorite",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:41:18"
     },
     {
       "id": "ddd080be-7e7c-420e-9684-1ab1cfd0c547",
