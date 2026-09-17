@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:20:14.178Z",
+  "updatedAt": "2026-09-17T23:28:23.585Z",
   "accounts": [
     {
       "id": "system-bramblewood",
@@ -79,7 +79,7 @@
       "bio": "",
       "forest_name": "mosshollow",
       "is_owner": 1,
-      "village_id": "mosshollow",
+      "village_id": "moonmere",
       "home_village_id": "moonmere",
       "reputation": 0,
       "character_json": null,
