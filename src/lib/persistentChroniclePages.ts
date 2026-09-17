@@ -100,13 +100,26 @@ export function exportPersistentChroniclePages(db: Database) {
   return pages.length;
 }
 
+function snapshotTimeMs(value: string): number {
+  const raw = String(value || "").trim();
+  if (!raw) return 0;
+  // SQLite datetime('now') → "YYYY-MM-DD HH:MM:SS" (UTC). ISO → with T/Z.
+  const normalized = /T/.test(raw)
+    ? raw
+    : raw.includes(" ")
+      ? `${raw.replace(" ", "T")}Z`
+      : raw;
+  const ms = Date.parse(normalized);
+  return Number.isFinite(ms) ? ms : 0;
+}
+
 /**
  * Restore owner-edited chronicle pages onto SQLite.
  * Always applies the snapshot (upsert) so a wiped DB gets custom text back
  * even after default seed rows are inserted.
  *
- * Prefer the snapshot whenever it is newer, longer, or the DB still holds
- * short seed lore — never let a fresh server silently drop yesterday's edits.
+ * Newer updatedAt always wins — never clobber a just-saved (possibly shorter)
+ * edit with an older longer snapshot.
  */
 export function importPersistentChroniclePages(db: Database) {
   const file = readFile();
@@ -154,23 +167,17 @@ export function importPersistentChroniclePages(db: Database) {
 
       if (existing) {
         const existingBody = String(existing.body || "");
-        const existingUpdated = String(existing.updated_at || "");
-        const snapshotNewer =
-          updatedAt.localeCompare(existingUpdated) > 0;
-        const snapshotRicher = body.length > existingBody.length + 40;
+        const existingTitle = String(existing.title || "").trim();
         const sameText =
-          existingBody.trim() === body &&
-          String(existing.title || "").trim() === title;
-        // Skip only when DB already matches the durable snapshot.
+          existingBody.trim() === body && existingTitle === title;
         if (sameText) continue;
-        // Keep a strictly newer DB edit that is at least as long (in-flight save
-        // that has not been exported yet). Otherwise prefer the snapshot.
-        if (
-          !snapshotNewer &&
-          !snapshotRicher &&
-          existingUpdated.localeCompare(updatedAt) > 0 &&
-          existingBody.length >= body.length
-        ) {
+
+        const snapMs = snapshotTimeMs(updatedAt);
+        const dbMs = snapshotTimeMs(existing.updated_at);
+        // Keep a strictly newer DB edit (in-flight or just-saved, even if shorter).
+        if (dbMs > snapMs) continue;
+        // Equal timestamps: only replace if snapshot text differs and is not empty.
+        if (dbMs === snapMs && existingBody.trim().length >= body.length) {
           continue;
         }
       }

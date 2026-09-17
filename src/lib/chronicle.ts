@@ -16,10 +16,7 @@ import {
   exportPersistentChroniclePages,
   importPersistentChroniclePages,
 } from "@/lib/persistentChroniclePages";
-import {
-  flushDurableTvGitSync,
-  scheduleDurableTvGitSync,
-} from "@/lib/tvPersist";
+import { scheduleDurableTvGitSync } from "@/lib/tvPersist";
 import type { VillageId } from "@/lib/villages";
 import { isVillageId } from "@/lib/villages";
 import { grantCollectible } from "@/lib/villageProgress";
@@ -436,18 +433,20 @@ export function upsertChroniclePage(input: ChroniclePageUpdate) {
     );
   }
 
+  let exported = false;
   try {
     exportPersistentChroniclePages(db);
-    // Debounced push for batching, plus an immediate flush so a restart
-    // cannot drop the just-saved manuscript before the timer fires.
+    exported = true;
+    // Queue durable git sync — the API awaits the flush so the snapshot is
+    // on disk + pushed before the editor reports "saved".
     scheduleDurableTvGitSync();
-    void flushDurableTvGitSync();
   } catch (err) {
     console.error("[persistent-chronicle-pages] export failed:", err);
   }
 
   return {
     ok: true as const,
+    exported,
     pages: getChroniclePages(input.villageId, { includeUnpublished: true }),
   };
 }
