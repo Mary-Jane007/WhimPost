@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-16T18:06:34.609Z",
+  "updatedAt": "2026-09-17T22:02:40.973Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -90,13 +90,13 @@
       "id": "0657d380-91b4-4b00-b298-3dff2e85c96c",
       "villageId": "clovermeadow",
       "pageNumber": 4,
-      "title": "The Meadow Remembers",
-      "body": "Every season adds another layer to Clovermeadow. New gardens bloom beside old ones, and each villager quietly leaves something behind for the next. Perhaps that is why the village never feels finished—there is always another corner waiting to be cared for.",
+      "title": "The Meadow Remembers Forever",
+      "body": "There was a clover lane that never forgot a footstep.\n\nKEEP-SAVED-20260917220240 — the path remembers every word.\n\nWhen villagers left and returned the next morning, the words were still there, pressed into the parchment like dew.",
       "illustrationUrl": "",
       "unlockKey": "garden.completeKindness",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 22:02:40"
     },
     {
       "id": "d3cc3800-a37b-41a9-ba72-9c96224d6a77",
