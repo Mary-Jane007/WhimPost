@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T22:03:20.352Z",
+  "updatedAt": "2026-09-17T23:12:32.103Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -54,13 +54,13 @@
       "id": "c58d4853-4a92-41bb-916f-277abdc9bf9b",
       "villageId": "clovermeadow",
       "pageNumber": 1,
-      "title": "Before the Footpaths",
+      "title": "The Meadow That Would Not Stay Empty",
       "body": "Long before cottages dotted the hills, there was only a meadow. Travelers often took a shortcut through it, yet many found themselves lingering far longer than they had planned. Some claimed it was the quiet, others the endless wildflowers. Whatever the reason, people kept returning until worn footpaths slowly became village lanes.",
       "illustrationUrl": "",
       "unlockKey": "garden.completeDaily",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:12:32"
     },
     {
       "id": "ab255a09-12d3-4e7c-8256-641d242e0f0e",
