@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:40:16.270Z",
+  "updatedAt": "2026-09-17T23:40:48.761Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -129,10 +129,10 @@
       "title": "The Winter the Fire Went Out",
       "body": "The coldest winter in Hearthwick's history began quietly.\n\nThere was frost along the rooftops and mist over the fields, but nothing seemed unusual at first.\n\nThen the winds arrived.\n\nFor several days, the temperature dropped lower and lower, and people began spending more time indoors. Firewood disappeared quickly. Chimneys smoked from morning until night, and the village baker had to wake before sunrise simply to keep the ovens warm enough to work.\n\nThen, one evening, the impossible happened.\n\nThe great fireplace in the village hall went out.\n\nIt had burned for years.\n\nPeople gathered around it during winter evenings, bringing blankets, knitting, books, unfinished projects, and plates of whatever happened to be cooling in their kitchens.\n\nBut that night there was nothing.\n\nNo fire.\n\nNo warmth.\n\nOnly cold stone.\n\nThe villagers tried everything they could think of.\n\nThey brought dry wood.\n\nThey cleaned the chimney.\n\nThey checked the hearth.\n\nNothing worked.\n\nFor the first time in living memory, the village hall was too cold to use.\n\nSo the villagers did something that seemed obvious afterward.\n\nThey opened their homes.\n\nFamilies who had space invited in neighbors.\n\nPeople carried chairs from one house to another.\n\nThose with larger fireplaces cooked for those without them.\n\nThe baker kept his oven going late into the night.\n\nThe Wren family brought blankets.\n\nSomeone brought soup.\n\nSomeone else brought card games.\n\nChildren slept in piles of blankets beside warm hearths while adults sat nearby telling stories.\n\nThe village hall remained dark for several days.\n\nAnd yet, strangely, those days became some of Hearthwick's fondest memories.\n\nPeople discovered neighbors they had barely spoken to.\n\nOld stories were told for the first time.\n\nRecipes were exchanged.\n\nSomeone taught half the village how to mend a torn coat.\n\nA young girl began reading aloud from an old book, and before long, every evening ended with another chapter.\n\nWhen the fireplace was finally repaired, the villagers gathered around it again.\n\nBut something had changed.\n\nThey realized the warmth of Hearthwick had never truly come from the fireplace.\n\nThe fireplace had simply given them a place to gather.\n\nThe warmth came from the people.\n\nFrom that winter onward, Hearthwick kept a tradition called **The Open Door**.\n\nWhenever someone in the village is alone, new to the area, having a difficult week, or simply in need of company, there should always be somewhere they can go.\n\nNo explanation is required.\n\nNo invitation is necessary.\n\nThere is simply a place at the table.",
       "illustrationUrl": "",
-      "unlockKey": "hearth.completeRitual",
+      "unlockKey": "hearth.toggleRecipeFavorite",
       "unlockCount": 3,
       "published": true,
-      "updatedAt": "2026-09-17 23:40:16"
+      "updatedAt": "2026-09-17 23:40:48"
     },
     {
       "id": "8a83f3d1-eaa7-4135-916b-0cb6b453d03b",
