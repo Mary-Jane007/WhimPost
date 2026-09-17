@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:27:40.300Z",
+  "updatedAt": "2026-09-17T23:29:00.705Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -150,13 +150,13 @@
       "id": "ddd080be-7e7c-420e-9684-1ab1cfd0c547",
       "villageId": "moonmere",
       "pageNumber": 1,
-      "title": "The Bench by the Lake",
+      "title": "The Village After Sunset",
       "body": "Before Moonmere became a village, there was only a weathered wooden bench overlooking the lake. No one knows who built it, yet someone always seemed to be sitting there after sunset. Over time, more benches appeared, followed by lanterns, cottages, and eventually the village itself.",
       "illustrationUrl": "",
       "unlockKey": "moon.completeRitual",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:29:00"
     },
     {
       "id": "47ff1e50-0141-48ff-9f21-4bb1adb556c2",
