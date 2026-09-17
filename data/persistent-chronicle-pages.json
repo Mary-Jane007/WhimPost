@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:38:15.178Z",
+  "updatedAt": "2026-09-17T23:38:37.863Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -114,13 +114,13 @@
       "id": "77f5616c-e70d-4fac-ac84-96fc5d89fea4",
       "villageId": "hearthwick",
       "pageNumber": 2,
-      "title": "The Unwritten Tradition",
+      "title": "The Great Baking Day",
       "body": "No document ever established Hearthwick's customs. There was never a meeting, nor a list of rules. Yet somehow everyone knew to bake an extra loaf, set another place at the table, and keep the kettle warm. No one can say exactly when these traditions began—only that they have always been there.",
       "illustrationUrl": "",
       "unlockKey": "hearth.leaveNote",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:38:37"
     },
     {
       "id": "69f2d265-a375-491a-9bd3-6137e855cfa9",
