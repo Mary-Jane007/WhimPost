@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:22:41.022Z",
+  "updatedAt": "2026-09-17T23:23:03.657Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -210,13 +210,13 @@
       "id": "770fdb1f-86e7-47e3-a363-306d3c6a22ad",
       "villageId": "mosshollow",
       "pageNumber": 2,
-      "title": "The Empty Shelf",
+      "title": "The Owl in the Bell Tower",
       "body": "For reasons no one remembers, one shelf in the library has always remained empty. Every librarian has considered filling it, and every librarian has quietly decided against it. Today, it remains exactly as it has for generations.",
       "illustrationUrl": "",
       "unlockKey": "library.solveMystery",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:23:03"
     },
     {
       "id": "e5b34025-7ef4-469f-848d-0d810f1c1795",
