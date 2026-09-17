@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:13:18.235Z",
+  "updatedAt": "2026-09-17T23:13:47.752Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -66,13 +66,13 @@
       "id": "ab255a09-12d3-4e7c-8256-641d242e0f0e",
       "villageId": "clovermeadow",
       "pageNumber": 2,
-      "title": "The Gardener Without a Name",
+      "title": "The Secret Gardeners",
       "body": "The oldest records mention someone simply called \"the gardener.\" No one knows who they were, only that every spring new flower beds appeared where there had been none before. The villagers continued the work without ever discovering who planted the very first ones.",
       "illustrationUrl": "",
       "unlockKey": "garden.spotFlower",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:13:47"
     },
     {
       "id": "588eeda9-47fa-4dcb-b037-32f4d4912c7e",
