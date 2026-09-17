@@ -27,11 +27,13 @@ export function CharacterCustomizeClient({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [status, setStatus] = useState("");
 
   async function save() {
     setSaving(true);
     setError("");
     setSaved(false);
+    setStatus("");
     try {
       const res = await fetch("/api/profile/character", {
         method: "PATCH",
@@ -39,13 +41,21 @@ export function CharacterCustomizeClient({
         credentials: "include",
         body: JSON.stringify({ character }),
       });
-      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      const data = (await res.json().catch(() => null)) as {
+        error?: string;
+        durable?: { ok?: boolean };
+      } | null;
       if (!res.ok) {
         setError(data?.error || "Could not save character");
         setSaving(false);
         return;
       }
       setSaved(true);
+      setStatus(
+        data?.durable?.ok === false
+          ? "Character saved on this server — durable copy may still be syncing."
+          : "Character saved permanently — it stays after logout and exit."
+      );
       setSaving(false);
     } catch {
       setError("Could not reach the forest post.");
@@ -61,13 +71,15 @@ export function CharacterCustomizeClient({
         onChange={(next) => {
           setCharacter(next);
           setSaved(false);
+          setStatus("");
         }}
         heading="Choose your village character"
       />
       {error ? <p className="form-error">{error}</p> : null}
       {saved ? (
         <p className="form-success" role="status">
-          Character saved — letters and your cottage now show this resident.
+          {status ||
+            "Character saved permanently — it stays after logout and exit."}
         </p>
       ) : null}
       <div className="character-customize-actions">

@@ -372,6 +372,22 @@ export function scheduleDurableTvGitSync() {
   }, DEBOUNCE_MS);
 }
 
+/**
+ * Cancel the debounce timer and push durable catalogs now.
+ * Used after character / chronicle saves so data cannot vanish on logout or restart.
+ */
+export async function flushDurableTvGitSync() {
+  if (!durablePersistEnabled() || !gitOk()) {
+    return { ok: true, committed: false, pushed: false };
+  }
+  const g = globalThis as GlobalPersist;
+  if (g.whimpostTvPersistTimer) {
+    clearTimeout(g.whimpostTvPersistTimer);
+    g.whimpostTvPersistTimer = undefined;
+  }
+  return runDurableTvGitSync();
+}
+
 function withLock(fn: () => void) {
   if (fs.existsSync(LOCK_PATH)) {
     try {

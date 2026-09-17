@@ -132,6 +132,10 @@ export function importPersistentAccounts(db: Database) {
      FROM users WHERE id = ?`
   );
 
+  const readLocalCharacter = db.prepare(
+    `SELECT character_json FROM users WHERE id = ?`
+  );
+
   const sync = db.transaction((accounts: PersistentAccount[]) => {
     for (const account of accounts) {
       const username = String(account.username || "").trim();
@@ -150,6 +154,19 @@ export function importPersistentAccounts(db: Database) {
         visited = mergeVisitedJson(visited, local?.visited_villages_json);
       }
 
+      // Prefer a non-null character from either side so a stale snapshot with
+      // character_json: null never wipes a saved resident after restart/logout.
+      let characterJson = account.character_json ?? null;
+      if (matched) {
+        const localChar = readLocalCharacter.get(matched.id) as
+          | { character_json: string | null }
+          | undefined;
+        characterJson = mergeCharacterJson(
+          characterJson,
+          localChar?.character_json
+        );
+      }
+
       const row = {
         id: matched?.id ?? account.id,
         username,
@@ -163,7 +180,7 @@ export function importPersistentAccounts(db: Database) {
         home_village_id:
           account.home_village_id || account.village_id || null,
         reputation: account.reputation ?? 0,
-        character_json: account.character_json ?? null,
+        character_json: characterJson,
         collectibles_json: account.collectibles_json || "{}",
         visited_villages_json: visited,
         created_at: account.created_at || new Date().toISOString(),
@@ -178,6 +195,17 @@ export function importPersistentAccounts(db: Database) {
   });
 
   sync(file.accounts);
+}
+
+function mergeCharacterJson(
+  snapshot: string | null | undefined,
+  local: string | null | undefined
+) {
+  const snap = typeof snapshot === "string" && snapshot.trim() ? snapshot : null;
+  const loc = typeof local === "string" && local.trim() ? local : null;
+  // Snapshot wins when it has a character (durable source of truth after save).
+  // Local wins when the snapshot is empty/null so restarts cannot erase picks.
+  return snap || loc;
 }
 
 function mergeVisitedJson(a: string | null | undefined, b: string | null | undefined) {

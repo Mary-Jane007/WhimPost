@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError, mapUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
+import { flushDurableTvGitSync } from "@/lib/tvPersist";
 import {
   normalizeVillagerCharacter,
   serializeVillagerCharacter,
@@ -35,6 +36,16 @@ export async function PATCH(req: NextRequest) {
   );
   exportPersistentAccounts(db);
 
+  // Flush durable accounts snapshot immediately so logout / restart cannot
+  // restore a stale null character from an older git copy.
+  let durable = { ok: true, committed: false, pushed: false as boolean };
+  try {
+    durable = await flushDurableTvGitSync();
+  } catch (err) {
+    console.error("[persistent-accounts] character durable flush failed:", err);
+    durable = { ok: false, committed: false, pushed: false };
+  }
+
   const row = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
@@ -46,6 +57,11 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json({
     user: mapUser(row as Parameters<typeof mapUser>[0]),
     character,
+    durable: {
+      ok: Boolean(durable?.ok),
+      committed: Boolean(durable?.committed),
+      pushed: Boolean(durable?.pushed),
+    },
   });
 }
 
