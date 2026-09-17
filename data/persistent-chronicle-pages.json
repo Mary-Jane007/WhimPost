@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:32:36.761Z",
+  "updatedAt": "2026-09-17T23:32:55.839Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -186,13 +186,13 @@
       "id": "35ce29b8-c03b-4531-b32b-2a0c7ef9bade",
       "villageId": "moonmere",
       "pageNumber": 4,
-      "title": "Looking Up",
+      "title": "The Light That Remained",
       "body": "Every clear evening, someone still unlocks the observatory before sunset. Sometimes it's a lifelong resident, sometimes a first-time visitor. The telescope is adjusted, the lanterns are lit, and another page is added to the logbook. No one knows how many pages it already holds—but everyone agrees it should never stop growing.",
       "illustrationUrl": "",
       "unlockKey": "moon.completeRitual",
       "unlockCount": 3,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:32:55"
     },
     {
       "id": "0da05598-9145-44ce-8c1a-763ac138108f",
