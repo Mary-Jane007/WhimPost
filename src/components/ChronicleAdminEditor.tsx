@@ -160,7 +160,7 @@ export function ChronicleAdminEditor({
       next[pageNumber] = draft;
       return next;
     });
-    setStatus("Chronicle page saved — text stays kept for this village.");
+    setStatus("Chronicle page saved — it stays written for every visit.");
   }
 
   async function uploadIllustration(file: File | null) {

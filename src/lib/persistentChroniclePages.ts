@@ -104,18 +104,19 @@ export function exportPersistentChroniclePages(db: Database) {
  * Restore owner-edited chronicle pages onto SQLite.
  * Always applies the snapshot (upsert) so a wiped DB gets custom text back
  * even after default seed rows are inserted.
+ *
+ * Prefer the snapshot whenever it is newer, longer, or the DB still holds
+ * short seed lore — never let a fresh server silently drop yesterday's edits.
  */
 export function importPersistentChroniclePages(db: Database) {
   const file = readFile();
   if (!file || file.pages.length === 0) return 0;
 
-  const update = db.prepare(
-    `UPDATE chronicle_pages SET
-      title = ?, body = ?, illustration_url = ?, unlock_key = ?,
-      unlock_count = ?, published = ?, updated_at = ?
+  const readExisting = db.prepare(
+    `SELECT title, body, updated_at FROM chronicle_pages
      WHERE village_id = ? AND page_number = ?`
   );
-  const insert = db.prepare(
+  const upsert = db.prepare(
     `INSERT INTO chronicle_pages (
       id, village_id, page_number, title, body, illustration_url,
       unlock_key, unlock_count, published, updated_at
@@ -147,23 +148,34 @@ export function importPersistentChroniclePages(db: Database) {
       const updatedAt = String(page.updatedAt || new Date().toISOString());
       const id = String(page.id || "").trim() || randomUUID();
 
-      const result = update.run(
-        title,
-        body,
-        illustrationUrl,
-        unlockKey,
-        unlockCount,
-        published,
-        updatedAt,
-        villageId,
-        pageNumber
-      );
-      if (result.changes > 0) {
-        restored += 1;
-        continue;
+      const existing = readExisting.get(villageId, pageNumber) as
+        | { title: string; body: string; updated_at: string }
+        | undefined;
+
+      if (existing) {
+        const existingBody = String(existing.body || "");
+        const existingUpdated = String(existing.updated_at || "");
+        const snapshotNewer =
+          updatedAt.localeCompare(existingUpdated) > 0;
+        const snapshotRicher = body.length > existingBody.length + 40;
+        const sameText =
+          existingBody.trim() === body &&
+          String(existing.title || "").trim() === title;
+        // Skip only when DB already matches the durable snapshot.
+        if (sameText) continue;
+        // Keep a strictly newer DB edit that is at least as long (in-flight save
+        // that has not been exported yet). Otherwise prefer the snapshot.
+        if (
+          !snapshotNewer &&
+          !snapshotRicher &&
+          existingUpdated.localeCompare(updatedAt) > 0 &&
+          existingBody.length >= body.length
+        ) {
+          continue;
+        }
       }
 
-      insert.run(
+      upsert.run(
         id,
         villageId,
         pageNumber,
