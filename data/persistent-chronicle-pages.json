@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-17T23:25:54.206Z",
+  "updatedAt": "2026-09-17T23:26:21.513Z",
   "pages": [
     {
       "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
@@ -234,13 +234,13 @@
       "id": "9e903af2-7f3f-4dba-88b2-1987f5a862b2",
       "villageId": "mosshollow",
       "pageNumber": 4,
-      "title": "Stories That Stay",
+      "title": "The Last Page",
       "body": "Mosshollow has never tried to collect every book in the world. It only asks that no story worth remembering is allowed to disappear. Every book returned, every page preserved, and every thoughtful conversation adds another line to its history.",
       "illustrationUrl": "",
       "unlockKey": "library.journalEntry",
       "unlockCount": 1,
       "published": true,
-      "updatedAt": "2026-09-13 01:37:29"
+      "updatedAt": "2026-09-17 23:26:21"
     }
   ]
 }
