@@ -11,6 +11,7 @@ import {
   isChronicleActivityKey,
   type ChroniclePageNumber,
 } from "@/lib/chronicleContent";
+import { flushDurableTvGitSync } from "@/lib/tvPersist";
 import { isVillageId, VILLAGES, type VillageId } from "@/lib/villages";
 
 async function requireOwner() {
@@ -70,8 +71,24 @@ export async function PUT(req: NextRequest) {
 
   if (!result.ok) return jsonError(result.error);
 
+  // Wait for the durable snapshot flush so leaving the page cannot race a
+  // restart that has not yet written persistent-chronicle-pages.json to git.
+  let durable = { ok: true, committed: false, pushed: false as boolean };
+  try {
+    durable = await flushDurableTvGitSync();
+  } catch (err) {
+    console.error("[persistent-chronicle-pages] durable flush failed:", err);
+    durable = { ok: false, committed: false, pushed: false };
+  }
+
   return NextResponse.json({
     pages: result.pages,
     meta: listChronicleAdmin(villageId).meta,
+    exported: result.exported,
+    durable: {
+      ok: Boolean(durable?.ok) && result.exported,
+      committed: Boolean(durable?.committed),
+      pushed: Boolean(durable?.pushed),
+    },
   });
 }

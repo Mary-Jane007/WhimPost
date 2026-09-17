@@ -100,22 +100,36 @@ export function exportPersistentChroniclePages(db: Database) {
   return pages.length;
 }
 
+function snapshotTimeMs(value: string): number {
+  const raw = String(value || "").trim();
+  if (!raw) return 0;
+  // SQLite datetime('now') → "YYYY-MM-DD HH:MM:SS" (UTC). ISO → with T/Z.
+  const normalized = /T/.test(raw)
+    ? raw
+    : raw.includes(" ")
+      ? `${raw.replace(" ", "T")}Z`
+      : raw;
+  const ms = Date.parse(normalized);
+  return Number.isFinite(ms) ? ms : 0;
+}
+
 /**
  * Restore owner-edited chronicle pages onto SQLite.
  * Always applies the snapshot (upsert) so a wiped DB gets custom text back
  * even after default seed rows are inserted.
+ *
+ * Newer updatedAt always wins — never clobber a just-saved (possibly shorter)
+ * edit with an older longer snapshot.
  */
 export function importPersistentChroniclePages(db: Database) {
   const file = readFile();
   if (!file || file.pages.length === 0) return 0;
 
-  const update = db.prepare(
-    `UPDATE chronicle_pages SET
-      title = ?, body = ?, illustration_url = ?, unlock_key = ?,
-      unlock_count = ?, published = ?, updated_at = ?
+  const readExisting = db.prepare(
+    `SELECT title, body, updated_at FROM chronicle_pages
      WHERE village_id = ? AND page_number = ?`
   );
-  const insert = db.prepare(
+  const upsert = db.prepare(
     `INSERT INTO chronicle_pages (
       id, village_id, page_number, title, body, illustration_url,
       unlock_key, unlock_count, published, updated_at
@@ -147,23 +161,28 @@ export function importPersistentChroniclePages(db: Database) {
       const updatedAt = String(page.updatedAt || new Date().toISOString());
       const id = String(page.id || "").trim() || randomUUID();
 
-      const result = update.run(
-        title,
-        body,
-        illustrationUrl,
-        unlockKey,
-        unlockCount,
-        published,
-        updatedAt,
-        villageId,
-        pageNumber
-      );
-      if (result.changes > 0) {
-        restored += 1;
-        continue;
+      const existing = readExisting.get(villageId, pageNumber) as
+        | { title: string; body: string; updated_at: string }
+        | undefined;
+
+      if (existing) {
+        const existingBody = String(existing.body || "");
+        const existingTitle = String(existing.title || "").trim();
+        const sameText =
+          existingBody.trim() === body && existingTitle === title;
+        if (sameText) continue;
+
+        const snapMs = snapshotTimeMs(updatedAt);
+        const dbMs = snapshotTimeMs(existing.updated_at);
+        // Keep a strictly newer DB edit (in-flight or just-saved, even if shorter).
+        if (dbMs > snapMs) continue;
+        // Equal timestamps: only replace if snapshot text differs and is not empty.
+        if (dbMs === snapMs && existingBody.trim().length >= body.length) {
+          continue;
+        }
       }
 
-      insert.run(
+      upsert.run(
         id,
         villageId,
         pageNumber,

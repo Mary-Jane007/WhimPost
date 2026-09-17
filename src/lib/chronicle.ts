@@ -14,6 +14,7 @@ import {
 } from "@/lib/chronicleContent";
 import {
   exportPersistentChroniclePages,
+  importPersistentChroniclePages,
 } from "@/lib/persistentChroniclePages";
 import { scheduleDurableTvGitSync } from "@/lib/tvPersist";
 import type { VillageId } from "@/lib/villages";
@@ -94,12 +95,40 @@ function ensureSeedPages() {
     .get() as { value: string } | undefined;
   const currentLore = Number(loreRow?.value || 0);
   if (currentLore < CHRONICLE_LORE_VERSION) {
-    // Bump lore version only — never overwrite title/body. Owner edits and the
-    // durable snapshot are the source of truth for customized manuscript text.
+    // Refresh short seed stubs from richer baked-in defaults without clobbering
+    // longer owner-edited manuscript text already in SQLite.
+    const refreshShort = db.prepare(
+      `UPDATE chronicle_pages SET
+        title = ?, body = ?, updated_at = datetime('now')
+       WHERE village_id = ? AND page_number = ?
+         AND length(trim(body)) < 500
+         AND length(?) >= 500`
+    );
+    for (const page of DEFAULT_CHRONICLE_PAGES) {
+      if ((page.body || "").trim().length < 500) continue;
+      refreshShort.run(
+        page.title,
+        page.body,
+        page.villageId,
+        page.pageNumber,
+        page.body
+      );
+    }
+
+    // Bump lore version — durable snapshot import below is still the primary
+    // source of truth for customized manuscript text.
     db.prepare(
       `INSERT INTO app_meta (key, value) VALUES ('chronicle_lore_v', ?)
        ON CONFLICT(key) DO UPDATE SET value = excluded.value`
     ).run(String(CHRONICLE_LORE_VERSION));
+  }
+
+  // Always re-apply the git-tracked manuscript snapshot after seed so owner
+  // edits survive wiped SQLite, redeploys, and any stale default rows.
+  try {
+    importPersistentChroniclePages(db);
+  } catch (err) {
+    console.error("[persistent-chronicle-pages] restore-on-read failed:", err);
   }
 }
 
@@ -404,8 +433,12 @@ export function upsertChroniclePage(input: ChroniclePageUpdate) {
     );
   }
 
+  let exported = false;
   try {
     exportPersistentChroniclePages(db);
+    exported = true;
+    // Queue durable git sync — the API awaits the flush so the snapshot is
+    // on disk + pushed before the editor reports "saved".
     scheduleDurableTvGitSync();
   } catch (err) {
     console.error("[persistent-chronicle-pages] export failed:", err);
@@ -413,6 +446,7 @@ export function upsertChroniclePage(input: ChroniclePageUpdate) {
 
   return {
     ok: true as const,
+    exported,
     pages: getChroniclePages(input.villageId, { includeUnpublished: true }),
   };
 }
