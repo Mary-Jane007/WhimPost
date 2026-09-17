@@ -10,6 +10,7 @@ import {
 import { getDb } from "@/lib/db";
 import { claimOwnerIfUnset } from "@/lib/owner";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
+import { flushDurableTvGitSync } from "@/lib/tvPersist";
 import { isVillageId } from "@/lib/villages";
 import {
   deliverWelcomeLetter,
@@ -87,6 +88,12 @@ export async function POST(req: NextRequest) {
   claimOwnerIfUnset(db, id);
   deliverWelcomeLetter(db, id, villageId);
   exportPersistentAccounts(db);
+  // Character chosen at signup must survive the next server boot.
+  try {
+    await flushDurableTvGitSync();
+  } catch (err) {
+    console.error("[persistent-accounts] register durable flush failed:", err);
+  }
   trackAnalyticsEvent({
     event: "user_registered",
     userId: id,

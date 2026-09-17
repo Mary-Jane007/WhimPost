@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, jsonError, mapUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { exportPersistentAccounts } from "@/lib/persistentAccounts";
+import { scheduleDurableTvGitSync } from "@/lib/tvPersist";
 import {
   readRequestFields,
   redirectSameHost,
@@ -17,7 +18,7 @@ function readUserRow(db: ReturnType<typeof getDb>, userId: string) {
   return db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, home_village_id, reputation
+              village_id, home_village_id, reputation, character_json
        FROM users WHERE id = ?`
     )
     .get(userId) as {
@@ -31,6 +32,7 @@ function readUserRow(db: ReturnType<typeof getDb>, userId: string) {
     village_id: string | null;
     home_village_id: string | null;
     reputation: number;
+    character_json?: string | null;
   };
 }
 
@@ -93,6 +95,7 @@ export async function POST(req: NextRequest) {
 
   deliverWelcomeLetter(db, user.id, villageId);
   exportPersistentAccounts(db);
+  scheduleDurableTvGitSync();
   trackAnalyticsEvent({
     event: intent === "makeHome" ? "village_joined" : "village_visited",
     userId: user.id,

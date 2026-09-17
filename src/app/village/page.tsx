@@ -85,7 +85,7 @@ export default async function VillagePage() {
   const neighbors = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
-              village_id, home_village_id, reputation
+              village_id, home_village_id, reputation, character_json
        FROM users
        WHERE village_id = ? AND id != ?
        ORDER BY reputation DESC, display_name COLLATE NOCASE
@@ -102,6 +102,7 @@ export default async function VillagePage() {
     village_id: string | null;
     home_village_id: string | null;
     reputation: number;
+    character_json?: string | null;
   }>;
 
   const notesDay = todayNoteDay();
