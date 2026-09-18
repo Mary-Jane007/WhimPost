@@ -95,8 +95,9 @@ export async function POST(req: NextRequest) {
     key = "workshop.bird";
   }
 
+  // Unlock the hub village Chronicle, not wherever the user is currently visiting.
   const chronicleUnlock = key
-    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    ? chronicleAfterActivity(gate.user.id, "bramblewood", key)
     : null;
 
   return NextResponse.json({ progress, grantedCollectibles, chronicleUnlock });

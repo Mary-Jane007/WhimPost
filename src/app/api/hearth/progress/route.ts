@@ -54,8 +54,9 @@ export async function POST(req: NextRequest) {
     body
   );
   const key = HEARTH_KEYS[body.type];
+  // Unlock the hub village Chronicle, not wherever the user is currently visiting.
   const chronicleUnlock = key
-    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    ? chronicleAfterActivity(gate.user.id, "hearthwick", key)
     : null;
   return NextResponse.json({
     progress,
