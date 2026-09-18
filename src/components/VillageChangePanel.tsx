@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { VillageJoinPicker } from "@/components/VillageJoinPicker";
 import type { VillageId } from "@/lib/villages";
 
@@ -16,13 +17,29 @@ export function VillageChangePanel({
   homeVillageName: string;
   isAway: boolean;
 }) {
+  const [returning, setReturning] = useState(false);
+  const [returnError, setReturnError] = useState("");
+
   async function returnHome() {
-    const res = await fetch("/api/village/join", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ intent: "returnHome" }),
-    });
-    if (res.ok) window.location.assign("/village");
+    setReturning(true);
+    setReturnError("");
+    try {
+      const res = await fetch("/api/village/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ intent: "returnHome" }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setReturnError(data.error || "Could not return home");
+        return;
+      }
+      window.location.assign("/village");
+    } catch {
+      setReturnError("Travel hitch — try again in a moment");
+    } finally {
+      setReturning(false);
+    }
   }
 
   return (
@@ -36,11 +53,19 @@ export function VillageChangePanel({
       </p>
       {isAway ? (
         <p className="village-return-row">
-          <button type="button" className="btn-primary" onClick={returnHome}>
-            Return home to {homeVillageName}
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={returning}
+            onClick={() => void returnHome()}
+          >
+            {returning
+              ? "Returning…"
+              : `Return home to ${homeVillageName}`}
           </button>
         </p>
       ) : null}
+      {returnError ? <p className="form-error">{returnError}</p> : null}
       <details className="village-change-details">
         <summary className="btn-secondary village-change-summary">
           Browse other villages
