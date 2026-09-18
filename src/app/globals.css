@@ -3147,6 +3147,97 @@ body.theme-hearthwick .notice-action.liked:not(.notice-delete) {
   margin: 0 auto;
 }
 
+/* Visitor wanderer welcome (not a letter — a short village greeting) */
+.visitor-welcome-modal {
+  width: min(100%, 32rem);
+  text-align: center;
+}
+
+.visitor-welcome-mascot {
+  width: 5.5rem;
+  height: 5.5rem;
+  object-fit: contain;
+  margin: 0 auto 0.65rem;
+  border-radius: 0.55rem;
+  filter: drop-shadow(0 6px 14px rgba(40, 28, 12, 0.28));
+}
+
+.visitor-welcome-mascot-emoji {
+  display: block;
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.visitor-welcome-village {
+  margin: 0 auto 0.85rem;
+  font-family: var(--font-stamp);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(92, 58, 30, 0.65);
+}
+
+.visitor-welcome-body {
+  margin: 0 auto 0.85rem;
+  max-width: 26rem;
+  text-align: left;
+}
+
+.visitor-welcome-body p {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-body);
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: rgba(47, 36, 24, 0.88);
+}
+
+.visitor-welcome-body p:last-child {
+  margin-bottom: 0;
+}
+
+.visitor-welcome-closing {
+  margin: 0 auto 1.25rem;
+  max-width: 24rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: rgba(31, 77, 58, 0.9);
+}
+
+.visitor-welcome-cta {
+  justify-self: center;
+}
+
+.visitor-welcome-moonmere {
+  background: linear-gradient(165deg, #e8e6f4, #d4d2e8);
+  border-color: rgba(70, 80, 120, 0.35);
+}
+
+.visitor-welcome-clovermeadow {
+  background: linear-gradient(165deg, #fff4f7, #f7d6e0);
+  border-color: rgba(212, 132, 154, 0.45);
+}
+
+.visitor-welcome-clovermeadow .welcome-modal-title {
+  color: #d4849a;
+}
+
+.visitor-welcome-mosshollow {
+  background: linear-gradient(165deg, #e6ecdf, #d2dbc8);
+  border-color: rgba(40, 70, 50, 0.28);
+}
+
+.visitor-welcome-bramblewood {
+  background: linear-gradient(165deg, #f4ebdc, #e6d7c0);
+  border-color: rgba(90, 60, 30, 0.28);
+}
+
+.visitor-welcome-hearthwick {
+  background: linear-gradient(165deg, #f3e4d0, #e6d0b4);
+  border-color: rgba(120, 70, 35, 0.28);
+}
+
 .welcome-letter-stage {
   display: grid;
   gap: 1rem;

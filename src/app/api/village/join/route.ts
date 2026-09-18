@@ -93,7 +93,10 @@ export async function POST(req: NextRequest) {
     ).run(villageId, villageId, user.id);
   }
 
-  deliverWelcomeLetter(db, user.id, villageId);
+  // Welcome letters are for home belonging only (visitors get a popup on /village).
+  if (intent === "makeHome" || intent === "returnHome") {
+    deliverWelcomeLetter(db, user.id, villageId);
+  }
   exportPersistentAccounts(db);
   scheduleDurableTvGitSync();
   trackAnalyticsEvent({
