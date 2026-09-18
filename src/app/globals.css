@@ -3226,25 +3226,33 @@ body.theme-hearthwick .notice-action.liked:not(.notice-delete) {
 @media (max-width: 640px) {
   .letter-paper.welcome-typewriter,
   .letter-paper.letter-has-mascot {
-    padding: 1.85rem 2.65rem 1.35rem;
+    /* Wider gutters so corner stickers stay outside the reading column */
+    padding: 1.65rem 3.75rem 1.15rem;
   }
 
   .letter-mascot-spacer {
-    height: 5.5rem;
+    height: 5.75rem;
+  }
+
+  .letter-paper.welcome-typewriter .letter-mascot,
+  .letter-paper.letter-has-mascot .letter-mascot {
+    right: 0.15rem;
+    bottom: 0.2rem;
+    max-width: 4.25rem;
   }
 
   .letter-paper.welcome-typewriter .letter-mascot img,
   .letter-paper.letter-has-mascot .letter-mascot img {
-    width: 3.6rem;
-    height: 3.6rem;
+    width: 3.2rem;
+    height: 3.2rem;
   }
 
   .letter-paper.welcome-typewriter .sticker-item .sticker-img,
   .letter-paper.welcome-typewriter .sticker-item svg,
   .letter-paper.letter-has-mascot .sticker-item .sticker-img,
   .letter-paper.letter-has-mascot .sticker-item svg {
-    width: 2.35rem;
-    height: 2.35rem;
+    width: 1.55rem;
+    height: 1.55rem;
   }
 }
 
