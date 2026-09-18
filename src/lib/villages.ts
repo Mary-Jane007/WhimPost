@@ -273,21 +273,29 @@ export function villageIdForWorkshopHref(href: string | null | undefined): Villa
 }
 
 /**
- * Workshop hubs belong only to that village's home villagers.
- * Visiting another village never grants workshop participation there.
- * The site owner may still enter/edit every hub for stewardship.
+ * Workshop hubs respect owner-configured access modes.
+ * Default remains home-villagers-only; owner may open to visitors/everyone,
+ * invite-only lists, or close a hub without changing workshop content.
+ * The site owner may always enter for stewardship.
  */
 export function canAccessVillageWorkshop(
   user: {
+    id?: string;
     isOwner: boolean;
     homeVillageId?: string | null;
     villageId?: string | null;
   },
   workshopVillageId: VillageId
 ): boolean {
-  if (user.isOwner) return true;
-  const home = user.homeVillageId || user.villageId;
-  return home === workshopVillageId;
+  // Runtime require avoids a circular import with workshopAccess.ts
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { evaluateWorkshopAccess } = require("./workshopAccess") as {
+    evaluateWorkshopAccess: (
+      u: typeof user,
+      villageId: VillageId
+    ) => { allowed: boolean };
+  };
+  return evaluateWorkshopAccess(user, workshopVillageId).allowed;
 }
 
 /** True when this account's home (not a visit) is the workshop's village. */
