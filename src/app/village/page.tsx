@@ -25,6 +25,7 @@ import { CollectibleIcon } from "@/components/CollectibleIcon";
 import { PageCrest } from "@/components/PageCrest";
 import { WelcomeLetterEditor } from "@/components/WelcomeLetterEditor";
 import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
+import { VisitorWelcomeModal } from "@/components/VisitorWelcomeModal";
 import { LostChronicles } from "@/components/LostChronicles";
 import { ChronicleAdminEditor } from "@/components/ChronicleAdminEditor";
 import { VillageTasksAdminEditor } from "@/components/VillageTasksAdminEditor";
@@ -36,6 +37,7 @@ import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
 } from "@/lib/welcomeLetters";
+import { getPendingVisitorWelcome } from "@/lib/visitorWelcome";
 import { markUnlocksSeen } from "@/lib/notifications";
 import { getChronicleProgress } from "@/lib/chronicle";
 import { getMeetingBenchTeaser } from "@/lib/meetingBench";
@@ -67,10 +69,24 @@ export default async function VillagePage() {
   const homeVillageId = (stats.homeVillageId || stats.villageId) as VillageId;
   const homeVillage = getVillage(homeVillageId)!;
   const isAway = homeVillageId !== stats.villageId;
-  deliverWelcomeLetter(db, user.id, stats.villageId);
+
+  // Home villagers get the village welcome letter; visitors get a wanderer popup.
+  let welcomeLetter = null;
+  let visitorWelcome = null;
+  if (isAway) {
+    visitorWelcome = getPendingVisitorWelcome(
+      db,
+      user.id,
+      stats.villageId,
+      homeVillageId
+    );
+  } else {
+    deliverWelcomeLetter(db, user.id, stats.villageId);
+    welcomeLetter = getUnreadWelcomeLetter(db, user.id, stats.villageId);
+  }
+
   // Re-read after welcome gifts so collectibles (and cottage unlocks) are current.
   const liveStats = getUserVillageStats(db, user.id);
-  const welcomeLetter = getUnreadWelcomeLetter(db, user.id, stats.villageId);
   const villageRep = getVillageReputation(db, stats.villageId);
   const members = getVillageMemberCount(db, stats.villageId);
   const unlock = villageUnlockLevel(villageRep);
@@ -171,6 +187,7 @@ export default async function VillagePage() {
         }
       />
       {welcomeLetter ? <WelcomeLetterModal letter={welcomeLetter} /> : null}
+      {visitorWelcome ? <VisitorWelcomeModal greeting={visitorWelcome} /> : null}
       {moonmereSkyAlerts.length ? (
         <MoonmereSkyEventPopup events={moonmereSkyAlerts} />
       ) : null}

@@ -25,6 +25,8 @@ export type PersistentAccount = {
   collectibles_json: string;
   /** Villages this account has already received a welcome letter for. */
   visited_villages_json: string;
+  /** Villages where this account has dismissed the visitor wanderer popup. */
+  visitor_welcomes_json?: string;
   created_at: string;
 };
 
@@ -68,6 +70,7 @@ function listUsersFromDb(db: Database): PersistentAccount[] {
       `SELECT id, username, display_name, email, password_hash, bio, forest_name,
               is_owner, village_id, home_village_id, reputation, character_json, collectibles_json,
               COALESCE(visited_villages_json, '[]') AS visited_villages_json,
+              COALESCE(visitor_welcomes_json, '[]') AS visitor_welcomes_json,
               created_at
        FROM users`
     )
@@ -101,10 +104,12 @@ export function importPersistentAccounts(db: Database) {
     `INSERT INTO users (
       id, username, display_name, email, password_hash, bio, forest_name,
       is_owner, village_id, home_village_id, reputation, character_json, collectibles_json, visited_villages_json,
+      visitor_welcomes_json,
       created_at
     ) VALUES (
       @id, @username, @display_name, @email, @password_hash, @bio, @forest_name,
       @is_owner, @village_id, @home_village_id, @reputation, @character_json, @collectibles_json, @visited_villages_json,
+      @visitor_welcomes_json,
       @created_at
     )`
   );
@@ -123,12 +128,14 @@ export function importPersistentAccounts(db: Database) {
       reputation = @reputation,
       character_json = @character_json,
       collectibles_json = @collectibles_json,
-      visited_villages_json = @visited_villages_json
+      visited_villages_json = @visited_villages_json,
+      visitor_welcomes_json = @visitor_welcomes_json
      WHERE id = @id`
   );
 
   const readVisited = db.prepare(
-    `SELECT COALESCE(visited_villages_json, '[]') AS visited_villages_json
+    `SELECT COALESCE(visited_villages_json, '[]') AS visited_villages_json,
+            COALESCE(visitor_welcomes_json, '[]') AS visitor_welcomes_json
      FROM users WHERE id = ?`
   );
 
@@ -147,11 +154,19 @@ export function importPersistentAccounts(db: Database) {
         | undefined;
 
       let visited = account.visited_villages_json || "[]";
+      let visitorWelcomes = account.visitor_welcomes_json || "[]";
       if (matched) {
         const local = readVisited.get(matched.id) as
-          | { visited_villages_json: string }
+          | {
+              visited_villages_json: string;
+              visitor_welcomes_json: string;
+            }
           | undefined;
         visited = mergeVisitedJson(visited, local?.visited_villages_json);
+        visitorWelcomes = mergeVisitedJson(
+          visitorWelcomes,
+          local?.visitor_welcomes_json
+        );
       }
 
       // Prefer a non-null character from either side so a stale snapshot with
@@ -183,6 +198,7 @@ export function importPersistentAccounts(db: Database) {
         character_json: characterJson,
         collectibles_json: account.collectibles_json || "{}",
         visited_villages_json: visited,
+        visitor_welcomes_json: visitorWelcomes,
         created_at: account.created_at || new Date().toISOString(),
       };
 

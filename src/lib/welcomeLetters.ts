@@ -838,8 +838,9 @@ function persistWelcomeState(db: Database.Database) {
 }
 
 /**
- * Idempotent: one welcome letter per villager per village.
- * Modal only appears on the first visit (unread). Later visits keep the
+ * Idempotent: one welcome letter per villager for their **home** village only.
+ * Visitors to other villages get a wanderer popup instead (see visitorWelcome).
+ * Modal only appears on the first home delivery (unread). Later visits keep the
  * letter in the inbox and never show the welcome overlay again.
  */
 export function deliverWelcomeLetter(
@@ -848,6 +849,18 @@ export function deliverWelcomeLetter(
   villageId: string
 ): LetterView | null {
   if (!isVillageId(villageId)) return null;
+
+  // Welcome letters are for belonging — never for casual visits.
+  const homeRow = db
+    .prepare(
+      `SELECT COALESCE(home_village_id, village_id) AS home_village_id
+       FROM users WHERE id = ?`
+    )
+    .get(recipientId) as { home_village_id: string | null } | undefined;
+  if (!homeRow?.home_village_id || homeRow.home_village_id !== villageId) {
+    return null;
+  }
+
   const template = getEffectiveWelcomeTemplate(db, villageId);
   const senderId = ensureVillageSystemUser(db, villageId);
   if (!template || !senderId) return null;

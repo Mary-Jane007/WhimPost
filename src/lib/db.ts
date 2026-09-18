@@ -73,6 +73,12 @@ function migrate(db: Database.Database) {
     "visited_villages_json",
     "visited_villages_json TEXT NOT NULL DEFAULT '[]'"
   );
+  ensureColumn(
+    db,
+    "users",
+    "visitor_welcomes_json",
+    "visitor_welcomes_json TEXT NOT NULL DEFAULT '[]'"
+  );
   ensureColumn(db, "users", "home_village_id", "home_village_id TEXT");
   ensureColumn(db, "users", "character_json", "character_json TEXT");
   // Quiz / belonging home — backfill from current membership for existing accounts.
