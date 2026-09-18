@@ -16227,3 +16227,128 @@ body.theme-hearthwick .char-portrait-caption em {
 .workshop-progress-link a:hover {
   opacity: 0.85;
 }
+
+/* ─── Workshop access (soft gates + owner panel) ─── */
+.workshop-access-denied .workshop-access-card {
+  max-width: 32rem;
+  margin: 1rem auto 0;
+  padding: 1.35rem 1.4rem 1.2rem;
+  border-radius: 18px;
+  background:
+    linear-gradient(165deg, rgba(255, 252, 245, 0.92), rgba(236, 226, 208, 0.88));
+  border: 1px solid rgba(90, 64, 40, 0.18);
+  box-shadow: 0 10px 28px rgba(60, 40, 20, 0.08);
+  text-align: center;
+}
+
+.workshop-access-emoji {
+  margin: 0 0 0.35rem;
+  font-size: 1.85rem;
+  line-height: 1;
+}
+
+.workshop-access-card h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.25rem;
+}
+
+.workshop-access-card p {
+  margin: 0.35rem 0;
+  line-height: 1.5;
+}
+
+.workshop-access-admin {
+  margin-top: 0.75rem;
+}
+
+.workshop-access-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16.5rem, 1fr));
+  gap: 0.9rem;
+  margin: 0.85rem 0 1rem;
+}
+
+.workshop-access-tile {
+  padding: 0.9rem 1rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(90, 64, 40, 0.16);
+  background: rgba(255, 252, 246, 0.72);
+}
+
+.workshop-access-tile header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.workshop-access-tile label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.55rem;
+  font-size: 0.86rem;
+}
+
+.workshop-access-tile select,
+.workshop-access-tile input[type="datetime-local"],
+.workshop-access-add-activity input,
+.workshop-access-add-activity select {
+  font: inherit;
+  padding: 0.35rem 0.45rem;
+  border-radius: 8px;
+  border: 1px solid rgba(90, 64, 40, 0.22);
+  background: #fffdf8;
+}
+
+.workshop-access-status {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.workshop-access-status.tone-open { color: #2f6b3a; }
+.workshop-access-status.tone-closed { color: #8a3a2a; }
+.workshop-access-status.tone-event { color: #2a5f8a; }
+
+.workshop-access-event {
+  margin-top: 0.65rem;
+  font-size: 0.88rem;
+}
+
+.workshop-access-activities {
+  margin-top: 0.75rem;
+}
+
+.workshop-access-activities h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+}
+
+.workshop-access-activities ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.workshop-access-activities li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.86rem;
+}
+
+.workshop-access-add-activity {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+
+.workshop-access-cross {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.84rem;
+}
