@@ -131,7 +131,7 @@ export function LetterPaper({
 
   return (
     <div
-      className={`letter-paper ${paperClass[paperStyle]} ${fontClass[fontStyle]} ${className}`}
+      className={`letter-paper ${paperClass[paperStyle]} ${fontClass[fontStyle]}${mascot ? " letter-has-mascot" : ""}${className ? ` ${className}` : ""}`}
       onClick={() => onSelectItem?.(null)}
     >
       {editable ? (
@@ -237,6 +237,9 @@ export function LetterPaper({
           <em>{mascot.name}</em>
         </div>
       ) : null}
+
+      {/* Reserves flow space so closing lines never sit under the corner mascot */}
+      {mascot ? <div className="letter-mascot-spacer" aria-hidden /> : null}
     </div>
   );
 }
