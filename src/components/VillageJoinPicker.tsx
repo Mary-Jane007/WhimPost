@@ -4,6 +4,17 @@ import { useState } from "react";
 import { VILLAGES, type VillageId } from "@/lib/villages";
 import { VillageMascot } from "@/components/VillageMascot";
 
+function defaultPick(
+  mode: "join" | "change",
+  currentVillageId: VillageId | null | undefined
+): VillageId | "" {
+  if (mode !== "change") return currentVillageId || "";
+  // Change mode: don't pre-select the village you're already in — that left
+  // "Visit this village" permanently disabled and looking stuck.
+  const elsewhere = VILLAGES.find((v) => v.id !== currentVillageId);
+  return elsewhere?.id || "";
+}
+
 export function VillageJoinPicker({
   currentVillageId = null,
   homeVillageId = null,
@@ -14,12 +25,14 @@ export function VillageJoinPicker({
   mode?: "join" | "change";
 }) {
   const resolvedHome = homeVillageId || currentVillageId;
-  const [villageId, setVillageId] = useState<VillageId | "">(
-    currentVillageId || ""
+  const [villageId, setVillageId] = useState<VillageId | "">(() =>
+    defaultPick(mode, currentVillageId)
   );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState<"visit" | "makeHome" | null>(null);
   const changing = mode === "change";
+  const alreadyHere = Boolean(villageId && villageId === currentVillageId);
+  const alreadyHome = Boolean(villageId && villageId === resolvedHome);
 
   async function submit(intent: "visit" | "makeHome") {
     if (!villageId) {
@@ -27,7 +40,7 @@ export function VillageJoinPicker({
       return;
     }
     if (intent === "visit" && villageId === currentVillageId) {
-      setError("You're already visiting here");
+      setError("You're already visiting here — pick another village");
       return;
     }
     if (intent === "makeHome" && villageId === resolvedHome) {
@@ -36,18 +49,23 @@ export function VillageJoinPicker({
     }
     setLoading(intent);
     setError("");
-    const res = await fetch("/api/village/join", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ villageId, intent }),
-    });
-    const data = await res.json().catch(() => ({}));
-    setLoading(null);
-    if (!res.ok) {
-      setError(data.error || "Could not update village");
-      return;
+    try {
+      const res = await fetch("/api/village/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ villageId, intent }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Could not update village");
+        return;
+      }
+      window.location.assign("/village");
+    } catch {
+      setError("Travel hitch — try again in a moment");
+    } finally {
+      setLoading(null);
     }
-    window.location.assign("/village");
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -74,8 +92,8 @@ export function VillageJoinPicker({
         </>
       ) : (
         <p className="lede village-change-lead">
-          Visit another woodland for a while, or remake a place your permanent
-          home. Your quiz belonging stays clear either way.
+          Pick a village below, then visit for a while or remake it your
+          permanent home. Your quiz belonging stays clear either way.
         </p>
       )}
       <div className="village-picker-grid">
@@ -100,7 +118,10 @@ export function VillageJoinPicker({
                 name="villageId"
                 value={v.id}
                 checked={villageId === v.id}
-                onChange={() => setVillageId(v.id)}
+                onChange={() => {
+                  setVillageId(v.id);
+                  setError("");
+                }}
                 className="village-card-radio"
               />
               <VillageMascot village={v} size="md" />
@@ -133,28 +154,26 @@ export function VillageJoinPicker({
           <button
             type="button"
             className="btn-primary"
-            disabled={
-              !villageId ||
-              loading !== null ||
-              villageId === currentVillageId
-            }
-            onClick={() => submit("visit")}
+            disabled={!villageId || loading !== null || alreadyHere}
+            onClick={() => void submit("visit")}
           >
-            {loading === "visit" ? "Traveling…" : "Visit this village"}
+            {loading === "visit"
+              ? "Traveling…"
+              : alreadyHere
+                ? "Already here"
+                : "Visit this village"}
           </button>
           <button
             type="button"
             className="btn-secondary"
-            disabled={
-              !villageId ||
-              loading !== null ||
-              villageId === resolvedHome
-            }
-            onClick={() => submit("makeHome")}
+            disabled={!villageId || loading !== null || alreadyHome}
+            onClick={() => void submit("makeHome")}
           >
             {loading === "makeHome"
               ? "Settling…"
-              : "Make this my home"}
+              : alreadyHome
+                ? "Already home"
+                : "Make this my home"}
           </button>
         </div>
       )}
