@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T13:00:59.558Z",
+  "updatedAt": "2026-09-18T14:05:33.455Z",
   "accounts": [
     {
       "id": "system-bramblewood",
@@ -25,7 +25,7 @@
       "username": "clovermeadow_bee",
       "display_name": "Clovermeadow",
       "email": "system+clovermeadow@whimpost.local",
-      "password_hash": "$2b$10$9jW57OOFNbEEk6IXHgjVJOikh.8v8QBQK5aEPx3DeasZeZHElAVXO",
+      "password_hash": "$2b$10$JHuwLX8M9dtqx7DzXyHQAOuj8m5Nw2XVP6CjVTKtjyJrb503b/W.y",
       "bio": "Where kindness grows.",
       "forest_name": "The Community Garden",
       "is_owner": 0,
@@ -33,8 +33,8 @@
       "home_village_id": "clovermeadow",
       "reputation": 0,
       "character_json": null,
-      "collectibles_json": "{}",
-      "visited_villages_json": "[]",
+      "collectibles_json": "{\"mushrooms\":0,\"leaves\":0,\"feathers\":0,\"lost-pages\":0,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":1,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":1,\"clover-cherries\":0,\"clover-honey\":1,\"clover-blossoms\":1,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":0,\"moon-lanterns\":0,\"moon-lilies\":0,\"moon-dreams\":0,\"moon-dust\":0,\"bramble-fox-tails\":0,\"bramble-maple\":0,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":0,\"bramble-compasses\":0,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":0,\"hearth-muffins\":0,\"hearth-recipes\":0,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":0}",
+      "visited_villages_json": "[\"clovermeadow\"]",
       "visitor_welcomes_json": "[]",
       "created_at": "2026-07-20 19:15:24"
     },
@@ -83,7 +83,7 @@
       "bio": "",
       "forest_name": "mosshollow",
       "is_owner": 1,
-      "village_id": "bramblewood",
+      "village_id": "mosshollow",
       "home_village_id": "moonmere",
       "reputation": 0,
       "character_json": "{\"villageId\":\"moonmere\",\"speciesId\":\"fox\",\"gender\":\"female\"}",
@@ -115,7 +115,7 @@
       "username": "mosshollow_owl",
       "display_name": "Mosshollow",
       "email": "system+mosshollow@whimpost.local",
-      "password_hash": "$2b$10$NvtOkdRcAXTC7S.gnDJE6u.Xc6WtvQGXFqqRtctTIApetHlEXiJwi",
+      "password_hash": "$2b$10$JHuwLX8M9dtqx7DzXyHQAOuj8m5Nw2XVP6CjVTKtjyJrb503b/W.y",
       "bio": "Where stories are preserved.",
       "forest_name": "The Great Library",
       "is_owner": 0,
@@ -133,7 +133,7 @@
       "username": "testaccount",
       "display_name": "testacc",
       "email": "jwbestlife11@gmail.com",
-      "password_hash": "$2b$10$863yLK6KeaQS/aCQM695euswN3JywS9TyvCrNvKP5bnOXC9jFZNLe",
+      "password_hash": "$2b$10$JHuwLX8M9dtqx7DzXyHQAOuj8m5Nw2XVP6CjVTKtjyJrb503b/W.y",
       "bio": "",
       "forest_name": "",
       "is_owner": 0,
@@ -143,7 +143,7 @@
       "character_json": "{\"villageId\":\"bramblewood\",\"speciesId\":\"fox\",\"gender\":\"female\"}",
       "collectibles_json": "{\"mushrooms\":1,\"leaves\":1,\"feathers\":1,\"lost-pages\":1,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":0,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":0,\"clover-cherries\":0,\"clover-honey\":0,\"clover-blossoms\":0,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":0,\"moon-lanterns\":0,\"moon-lilies\":0,\"moon-dreams\":0,\"moon-dust\":0,\"bramble-fox-tails\":1,\"bramble-maple\":1,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":1,\"bramble-compasses\":1,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":0,\"hearth-muffins\":0,\"hearth-recipes\":0,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":0}",
       "visited_villages_json": "[\"bramblewood\",\"mosshollow\"]",
-      "visitor_welcomes_json": "[\"mosshollow\"]",
+      "visitor_welcomes_json": "[\"clovermeadow\",\"mosshollow\"]",
       "created_at": "2026-09-18 12:06:04"
     }
   ]
