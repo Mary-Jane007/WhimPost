@@ -273,10 +273,12 @@ export function villageIdForWorkshopHref(href: string | null | undefined): Villa
 }
 
 /**
- * Workshop hubs respect owner-configured access modes.
- * Default remains home-villagers-only; owner may open to visitors/everyone,
- * invite-only lists, or close a hub without changing workshop content.
- * The site owner may always enter for stewardship.
+ * Workshop hubs respect owner-configured access modes on the server
+ * (`evaluateWorkshopAccess` in workshopAccess.ts).
+ *
+ * This helper stays client-safe (no SQLite): owner always, otherwise home
+ * villagers. SiteNav may still show a workshop link while visiting — the
+ * workshop page applies soft messaging when access is closed.
  */
 export function canAccessVillageWorkshop(
   user: {
@@ -287,15 +289,8 @@ export function canAccessVillageWorkshop(
   },
   workshopVillageId: VillageId
 ): boolean {
-  // Runtime require avoids a circular import with workshopAccess.ts
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { evaluateWorkshopAccess } = require("./workshopAccess") as {
-    evaluateWorkshopAccess: (
-      u: typeof user,
-      villageId: VillageId
-    ) => { allowed: boolean };
-  };
-  return evaluateWorkshopAccess(user, workshopVillageId).allowed;
+  if (user.isOwner) return true;
+  return isHomeVillagerOf(user, workshopVillageId);
 }
 
 /** True when this account's home (not a visit) is the workshop's village. */

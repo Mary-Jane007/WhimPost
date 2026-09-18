@@ -13,7 +13,7 @@ import {
   redirectSameHost,
   wantsHtmlRedirect,
 } from "@/lib/requestBody";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { canAccessVillageWorkshop } from "@/lib/workshopAccess";
 
 async function requireLibraryUser(): Promise<
   { user: UserPublic } | { error: NextResponse }

@@ -8,7 +8,7 @@ import {
   type WorkshopAccessMode,
   type WorkshopAccessSettings,
   type WorkshopActivityAccess,
-} from "@/lib/workshopAccess";
+} from "@/lib/workshopAccessShared";
 
 type Bundle = {
   workshops: WorkshopAccessSettings[];

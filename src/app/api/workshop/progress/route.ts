@@ -14,7 +14,7 @@ import {
 } from "@/lib/workshop";
 import { chronicleAfterActivity } from "@/lib/chronicle";
 import type { ChronicleActivityKey } from "@/lib/chronicleContent";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { canAccessVillageWorkshop } from "@/lib/workshopAccess";
 
 async function requireWorkshopUser(): Promise<
   { user: UserPublic } | { error: NextResponse }

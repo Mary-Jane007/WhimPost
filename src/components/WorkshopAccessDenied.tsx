@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { WorkshopAccessDecision } from "@/lib/workshopAccess";
+import type { WorkshopAccessDecision } from "@/lib/workshopAccessShared";
 import { PageCrest } from "@/components/PageCrest";
 import type { StickerKind } from "@/lib/types";
 

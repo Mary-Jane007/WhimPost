@@ -10,72 +10,27 @@ import {
   isVillageId,
   type VillageId,
 } from "@/lib/villages";
+import {
+  WORKSHOP_ACCESS_LABELS,
+  WORKSHOP_ACCESS_MODES,
+  isWorkshopAccessMode,
+  type WorkshopAccessDecision,
+  type WorkshopAccessGateKind,
+  type WorkshopAccessMode,
+  type WorkshopAccessSettings,
+  type WorkshopActivityAccess,
+} from "@/lib/workshopAccessShared";
 
-/** Workshop / activity participation modes (owner-configurable). */
-export type WorkshopAccessMode =
-  | "HOME_VILLAGERS_ONLY"
-  | "VISITORS_ALLOWED"
-  | "EVERYONE"
-  | "INVITATION_ONLY"
-  | "CLOSED";
-
-export const WORKSHOP_ACCESS_MODES: WorkshopAccessMode[] = [
-  "HOME_VILLAGERS_ONLY",
-  "VISITORS_ALLOWED",
-  "EVERYONE",
-  "INVITATION_ONLY",
-  "CLOSED",
-];
-
-export const WORKSHOP_ACCESS_LABELS: Record<WorkshopAccessMode, string> = {
-  HOME_VILLAGERS_ONLY: "Home Villagers Only",
-  VISITORS_ALLOWED: "Visitors Allowed",
-  EVERYONE: "Everyone",
-  INVITATION_ONLY: "Invitation Only",
-  CLOSED: "Closed",
-};
-
-export type WorkshopAccessGateKind =
-  | "allowed"
-  | "closed"
-  | "home_only"
-  | "visitors_welcome"
-  | "everyone"
-  | "invite_only";
-
-export type WorkshopAccessDecision = {
-  allowed: boolean;
-  mode: WorkshopAccessMode;
-  /** True when a scheduled event override is currently active. */
-  eventActive: boolean;
-  kind: WorkshopAccessGateKind;
-  headline: string;
-  body: string;
-};
-
-export type WorkshopAccessSettings = {
-  villageId: VillageId;
-  name: string;
-  buildingName: string;
-  accessMode: WorkshopAccessMode;
-  eventAccessMode: WorkshopAccessMode | null;
-  eventStartsAt: string | null;
-  eventEndsAt: string | null;
-  updatedAt: string | null;
-  effectiveMode: WorkshopAccessMode;
-  eventActive: boolean;
-  statusLabel: "Open" | "Closed" | "Event";
-  statusTone: "open" | "closed" | "event";
-};
-
-export type WorkshopActivityAccess = {
-  id: string;
-  villageId: VillageId;
-  activityKey: string;
-  label: string;
-  accessMode: WorkshopAccessMode;
-  isCrossVillage: boolean;
-};
+export {
+  WORKSHOP_ACCESS_LABELS,
+  WORKSHOP_ACCESS_MODES,
+  isWorkshopAccessMode,
+  type WorkshopAccessDecision,
+  type WorkshopAccessGateKind,
+  type WorkshopAccessMode,
+  type WorkshopAccessSettings,
+  type WorkshopActivityAccess,
+} from "@/lib/workshopAccessShared";
 
 type AccessUser = {
   id?: string;
@@ -91,10 +46,7 @@ const PERSISTENT_PATH = path.join(
 );
 
 function isAccessMode(raw: unknown): raw is WorkshopAccessMode {
-  return (
-    typeof raw === "string" &&
-    (WORKSHOP_ACCESS_MODES as string[]).includes(raw)
-  );
+  return isWorkshopAccessMode(raw);
 }
 
 export function ensureWorkshopAccessTables(db: Database.Database = getDb()) {

@@ -8,7 +8,7 @@ import {
 } from "@/lib/hearth";
 import { chronicleAfterActivity } from "@/lib/chronicle";
 import type { ChronicleActivityKey } from "@/lib/chronicleContent";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { canAccessVillageWorkshop } from "@/lib/workshopAccess";
 
 async function requireHearthUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
