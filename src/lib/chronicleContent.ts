@@ -42,6 +42,42 @@ export const CHRONICLE_ACTIVITY_LABELS: Record<ChronicleActivityKey, string> = {
 
 export type ChroniclePageNumber = 1 | 2 | 3 | 4;
 
+/** Who may read a recovered (or public) Chronicle leaf. */
+export type ChronicleVisibilityMode =
+  | "PUBLIC"
+  | "VILLAGE_MEMBERS_ONLY"
+  | "VISITORS_ALLOWED"
+  | "EVERYONE"
+  | "HIDDEN";
+
+export const CHRONICLE_VISIBILITY_MODES: ChronicleVisibilityMode[] = [
+  "PUBLIC",
+  "VILLAGE_MEMBERS_ONLY",
+  "VISITORS_ALLOWED",
+  "EVERYONE",
+  "HIDDEN",
+];
+
+export const CHRONICLE_VISIBILITY_LABELS: Record<
+  ChronicleVisibilityMode,
+  string
+> = {
+  PUBLIC: "Public",
+  VILLAGE_MEMBERS_ONLY: "Village Members Only",
+  VISITORS_ALLOWED: "Visitors Allowed",
+  EVERYONE: "Everyone",
+  HIDDEN: "Hidden",
+};
+
+export function isChronicleVisibilityMode(
+  raw: unknown
+): raw is ChronicleVisibilityMode {
+  return (
+    typeof raw === "string" &&
+    (CHRONICLE_VISIBILITY_MODES as string[]).includes(raw)
+  );
+}
+
 export type ChroniclePageContent = {
   villageId: VillageId;
   pageNumber: ChroniclePageNumber;
@@ -51,6 +87,8 @@ export type ChroniclePageContent = {
   unlockKey: ChronicleActivityKey;
   unlockCount: number;
   published: boolean;
+  /** Owner-configured read visibility (separate from unlock activity). */
+  visibilityMode: ChronicleVisibilityMode;
 };
 
 export type ChronicleMeta = {
@@ -160,6 +198,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "garden.completeDaily",
     unlockCount: 1,
     published: true,
+    visibilityMode: "PUBLIC",
   },
   {
     villageId: "clovermeadow",
@@ -170,6 +209,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "garden.spotFlower",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "clovermeadow",
@@ -180,6 +220,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "garden.completeDaily",
     unlockCount: 3,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "clovermeadow",
@@ -190,6 +231,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "garden.completeKindness",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   // Mosshollow
   {
@@ -201,6 +243,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "library.finishBook",
     unlockCount: 1,
     published: true,
+    visibilityMode: "PUBLIC",
   },
   {
     villageId: "mosshollow",
@@ -211,6 +254,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "library.solveMystery",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "mosshollow",
@@ -221,6 +265,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "library.claimSecret",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "mosshollow",
@@ -231,6 +276,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "library.journalEntry",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   // Hearthwick
   {
@@ -242,6 +288,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "hearth.completeRitual",
     unlockCount: 1,
     published: true,
+    visibilityMode: "PUBLIC",
   },
   {
     villageId: "hearthwick",
@@ -252,6 +299,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "hearth.leaveNote",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "hearthwick",
@@ -262,6 +310,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "hearth.completeRitual",
     unlockCount: 3,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "hearthwick",
@@ -272,6 +321,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "hearth.toggleRecipeFavorite",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   // Moonmere
   {
@@ -283,6 +333,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "moon.completeRitual",
     unlockCount: 1,
     published: true,
+    visibilityMode: "PUBLIC",
   },
   {
     villageId: "moonmere",
@@ -293,6 +344,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "moon.saveJournal",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "moonmere",
@@ -303,6 +355,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "moon.submitDream",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "moonmere",
@@ -313,6 +366,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "moon.completeRitual",
     unlockCount: 3,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   // Bramblewood
   {
@@ -324,6 +378,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "workshop.complete",
     unlockCount: 1,
     published: true,
+    visibilityMode: "PUBLIC",
   },
   {
     villageId: "bramblewood",
@@ -334,6 +389,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "workshop.journalEntry",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "bramblewood",
@@ -344,6 +400,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "workshop.bird",
     unlockCount: 1,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
   {
     villageId: "bramblewood",
@@ -354,6 +411,7 @@ export const DEFAULT_CHRONICLE_PAGES: ChroniclePageContent[] = [
     unlockKey: "workshop.complete",
     unlockCount: 3,
     published: true,
+    visibilityMode: "VILLAGE_MEMBERS_ONLY",
   },
 ];
 

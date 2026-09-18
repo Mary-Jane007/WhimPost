@@ -9,6 +9,7 @@ import {
 } from "@/lib/chronicle";
 import {
   isChronicleActivityKey,
+  isChronicleVisibilityMode,
   type ChroniclePageNumber,
 } from "@/lib/chronicleContent";
 import { isVillageId, VILLAGES, type VillageId } from "@/lib/villages";
@@ -57,6 +58,14 @@ export async function PUT(req: NextRequest) {
     return jsonError("Choose a valid unlock requirement");
   }
 
+  const visibilityMode = body.visibilityMode;
+  if (
+    visibilityMode != null &&
+    !isChronicleVisibilityMode(visibilityMode)
+  ) {
+    return jsonError("Invalid visibility mode");
+  }
+
   const result = upsertChroniclePage({
     villageId,
     pageNumber,
@@ -66,6 +75,9 @@ export async function PUT(req: NextRequest) {
     unlockKey,
     unlockCount: Number(body.unlockCount) || 1,
     published: body.published !== false,
+    visibilityMode: isChronicleVisibilityMode(visibilityMode)
+      ? visibilityMode
+      : undefined,
   });
 
   if (!result.ok) return jsonError(result.error);
