@@ -3152,12 +3152,100 @@ body.theme-hearthwick .notice-action.liked:not(.notice-delete) {
   gap: 1rem;
   justify-items: center;
   text-align: left;
+  width: 100%;
+  max-height: min(70vh, 42rem);
+  overflow: auto;
+  padding-inline: 0.25rem;
 }
 
 .welcome-letter-stage .letter-paper {
   width: min(100%, 34rem);
-  max-height: min(62vh, 36rem);
-  overflow: auto;
+  /* Scroll the stage, not the paper — otherwise absolute stickers/mascot
+     stay glued to the viewport and cover mid-letter text while scrolling. */
+  max-height: none;
+  overflow: visible;
+}
+
+/*
+ * Welcome / mascot letters: keep a clear reading column.
+ * Stickers/mascot stay in the margins; text paints above them if they ever overlap.
+ */
+.letter-paper.welcome-typewriter,
+.letter-paper.letter-has-mascot {
+  padding: 2.35rem clamp(3.25rem, 12vw, 5.1rem) 1.75rem;
+}
+
+.letter-mascot-spacer {
+  display: block;
+  width: 100%;
+  height: 6.75rem;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.letter-paper.welcome-typewriter .letter-subject-display,
+.letter-paper.welcome-typewriter .letter-subject-input,
+.letter-paper.welcome-typewriter .letter-body-display,
+.letter-paper.welcome-typewriter .letter-body-input,
+.letter-paper.letter-has-mascot .letter-subject-display,
+.letter-paper.letter-has-mascot .letter-subject-input,
+.letter-paper.letter-has-mascot .letter-body-display,
+.letter-paper.letter-has-mascot .letter-body-input {
+  position: relative;
+  z-index: 10;
+}
+
+.letter-paper.welcome-typewriter .placed-item,
+.letter-paper.letter-has-mascot .placed-item {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.letter-paper.welcome-typewriter .sticker-item .sticker-img,
+.letter-paper.welcome-typewriter .sticker-item svg,
+.letter-paper.letter-has-mascot .sticker-item .sticker-img,
+.letter-paper.letter-has-mascot .sticker-item svg {
+  width: 2.85rem;
+  height: 2.85rem;
+}
+
+.letter-paper.welcome-typewriter .letter-mascot,
+.letter-paper.letter-has-mascot .letter-mascot {
+  z-index: 4;
+  right: 0.35rem;
+  bottom: 0.4rem;
+  max-width: 5.75rem;
+}
+
+.letter-paper.welcome-typewriter .letter-mascot img,
+.letter-paper.letter-has-mascot .letter-mascot img {
+  width: 4.75rem;
+  height: 4.75rem;
+}
+
+@media (max-width: 640px) {
+  .letter-paper.welcome-typewriter,
+  .letter-paper.letter-has-mascot {
+    padding: 1.85rem 2.65rem 1.35rem;
+  }
+
+  .letter-mascot-spacer {
+    height: 5.5rem;
+  }
+
+  .letter-paper.welcome-typewriter .letter-mascot img,
+  .letter-paper.letter-has-mascot .letter-mascot img {
+    width: 3.6rem;
+    height: 3.6rem;
+  }
+
+  .letter-paper.welcome-typewriter .sticker-item .sticker-img,
+  .letter-paper.welcome-typewriter .sticker-item svg,
+  .letter-paper.letter-has-mascot .sticker-item .sticker-img,
+  .letter-paper.letter-has-mascot .sticker-item svg {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
 }
 
 /* Village welcome letters always read in vintage typewriter */
@@ -3182,6 +3270,15 @@ body.theme-hearthwick .notice-action.liked:not(.notice-delete) {
 .welcome-editor-preview.welcome-typewriter .letter-body-display {
   font-size: 1.08rem;
   line-height: 1.75;
+}
+
+.letter-paper.welcome-typewriter .letter-body-display,
+.letter-paper.welcome-typewriter .letter-body-input,
+.letter-paper.letter-has-mascot .letter-body-display,
+.letter-paper.letter-has-mascot .letter-body-input {
+  /* Keep closing lines above the mascot corner */
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .welcome-editor-form .welcome-typewriter-field {
