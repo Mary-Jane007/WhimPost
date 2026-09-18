@@ -526,6 +526,7 @@ export function TvCorner({
       error?: string;
       video?: TvVideo;
       channels?: TvChannel[];
+      durable?: { ok?: boolean };
     };
     if (!doneRes.ok) {
       throw new Error(doneData.error || `Could not finish ${shortName}`);
@@ -534,7 +535,12 @@ export function TvCorner({
     if (!doneData.video) {
       throw new Error(`Upload finished but no clip was saved for ${shortName}`);
     }
-    onProgress(`Saved ${shortName}`, 100);
+    onProgress(
+      doneData.durable?.ok === false
+        ? `Saved ${shortName} — durable shelf still syncing`
+        : `Saved permanently — ${shortName} stays on TV Corner`,
+      100
+    );
     return doneData.video;
   }
 

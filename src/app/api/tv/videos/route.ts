@@ -15,6 +15,7 @@ import {
   safeUploadFilename,
 } from "@/lib/tvCorner";
 import { redirectSameHost, wantsHtmlRedirect } from "@/lib/requestBody";
+import { durableSealTvMedia } from "@/lib/tvPersist";
 
 const UPLOAD_DIR = path.join(process.cwd(), "data", "uploads");
 
@@ -90,6 +91,16 @@ export async function POST(req: NextRequest) {
     channelId: channel.id,
   });
 
+  let durable: Awaited<ReturnType<typeof durableSealTvMedia>> | null = null;
+  try {
+    durable = await durableSealTvMedia([filename]);
+    if (!durable.ok) {
+      console.error("[tv videos] durable seal incomplete for", filename, durable);
+    }
+  } catch (err) {
+    console.error("[tv videos] durable seal failed:", err);
+  }
+
   const nextRaw = String(form.get("next") || "/tv-corner");
   const next =
     nextRaw.startsWith("/") && !nextRaw.startsWith("//")
@@ -106,6 +117,14 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     video,
     channels: listChannelsForUser(user),
+    durable: durable
+      ? {
+          ok: durable.ok,
+          published: durable.publish.uploaded,
+          committed: durable.flush.committed,
+          pushed: durable.flush.pushed,
+        }
+      : { ok: false },
   });
 }
 
