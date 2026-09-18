@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T01:40:02.450Z",
+  "updatedAt": "2026-09-18T12:06:04.175Z",
   "accounts": [
     {
       "id": "system-bramblewood",
@@ -120,6 +120,23 @@
       "collectibles_json": "{}",
       "visited_villages_json": "[]",
       "created_at": "2026-07-20 19:08:57"
+    },
+    {
+      "id": "2b55e6a2-75a7-41c4-8f7c-eb64bfc5072d",
+      "username": "testaccount",
+      "display_name": "testacc",
+      "email": "jwbestlife11@gmail.com",
+      "password_hash": "$2b$10$863yLK6KeaQS/aCQM695euswN3JywS9TyvCrNvKP5bnOXC9jFZNLe",
+      "bio": "",
+      "forest_name": "",
+      "is_owner": 0,
+      "village_id": "bramblewood",
+      "home_village_id": "bramblewood",
+      "reputation": 0,
+      "character_json": "{\"villageId\":\"bramblewood\",\"speciesId\":\"fox\",\"gender\":\"female\"}",
+      "collectibles_json": "{\"mushrooms\":0,\"leaves\":0,\"feathers\":0,\"lost-pages\":0,\"butterflies\":0,\"moonstones\":0,\"acorns\":0,\"clover-butterflies\":0,\"clover-bunnies\":0,\"clover-lotus\":0,\"clover-ribbon\":0,\"clover-cherries\":0,\"clover-honey\":0,\"clover-blossoms\":0,\"clover-hearts\":0,\"moon-shards\":0,\"moon-moths\":0,\"moon-starlight\":0,\"moon-pearls\":0,\"moon-lanterns\":0,\"moon-lilies\":0,\"moon-dreams\":0,\"moon-dust\":0,\"bramble-fox-tails\":1,\"bramble-maple\":1,\"bramble-pumpkins\":0,\"bramble-mushrooms\":0,\"bramble-candles\":1,\"bramble-compasses\":1,\"bramble-monarchs\":0,\"bramble-pinecones\":0,\"hearth-teacups\":0,\"hearth-blankets\":0,\"hearth-muffins\":0,\"hearth-recipes\":0,\"hearth-cinnamon-rolls\":0,\"hearth-embers\":0,\"hearth-kettles\":0,\"hearth-letters\":0}",
+      "visited_villages_json": "[\"bramblewood\"]",
+      "created_at": "2026-09-18 12:06:04"
     }
   ]
 }

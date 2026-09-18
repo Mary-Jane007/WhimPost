@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T01:02:16.297Z",
+  "updatedAt": "2026-09-18T12:06:04.171Z",
   "letters": [
+    {
+      "id": "df6594e1-dcdd-41d6-8df7-12660e7e623a",
+      "villageId": "bramblewood",
+      "recipientId": "2b55e6a2-75a7-41c4-8f7c-eb64bfc5072d",
+      "senderId": "system-bramblewood",
+      "subject": "Welcome to Bramblewood",
+      "body": "**Greetings, explorer,**\n\nWe were beginning to wonder when you'd find us.\n\nThe foxes insisted you'd taken the longer trail.\n\nThe ravens claimed you were distracted by something interesting.\n\nAs usual, they were probably both right.\n\nWelcome to **Bramblewood**, where every winding path hides a story, every forgotten ruin whispers a mystery, and every letter is the beginning of another adventure.\n\nBefore setting off, we've packed a travel satchel for you — the first pieces of your Bramblewood collection.\n\nInside you'll find:\n\n* ![Fox Tails](/stickers/collectibles/bramblewood/bramble-fox-tails.png) A soft fox tail for luck on every trail.\n* ![Maple Leaves](/stickers/collectibles/bramblewood/bramble-maple.png) A pressed maple leaf from the dens.\n* ![Hello Fall Candles](/stickers/collectibles/bramblewood/bramble-candles.png) A Hello Fall candle to warm your satchel.\n* ![Wonder Compasses](/stickers/collectibles/bramblewood/bramble-compasses.png) A compass that occasionally points toward wonder instead of north.\n\nThese are only the beginning. Write letters, welcome friends, and gather more keepsakes as you wander the trails. Your cottage will fill as your collection grows.\n\nShould you stumble upon something extraordinary, write about it.\n\nThe village has always loved a good tale.\n\nAnd remember—\n\nThe finest adventures are rarely planned.\n\nWelcome to **Bramblewood**.\n\n*May curiosity always know the way.*",
+      "paperStyle": "parchment",
+      "envelopeStyle": "kraft",
+      "waxSeal": "spiral",
+      "stampStyle": "fox-seated",
+      "fontStyle": "typewriter",
+      "stickersJson": "[{\"id\":\"welcome-fox\",\"kind\":\"bramble-fox-sitting\",\"x\":92,\"y\":8,\"scale\":0.68,\"rotation\":10},{\"id\":\"welcome-maple\",\"kind\":\"bramble-maple-leaf\",\"x\":8,\"y\":10,\"scale\":0.58,\"rotation\":-14},{\"id\":\"welcome-compass\",\"kind\":\"bramble-compass\",\"x\":9,\"y\":88,\"scale\":0.55,\"rotation\":-6},{\"id\":\"welcome-mushroom\",\"kind\":\"bramble-mushroom\",\"x\":93,\"y\":92,\"scale\":0.55,\"rotation\":8}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":6,\"scale\":0.5,\"rotation\":-8}]",
+      "isRead": false,
+      "sentAt": "2026-09-18 12:06:04",
+      "createdAt": "2026-09-18 12:06:04"
+    },
     {
       "id": "cfe689cd-4588-4893-a6de-d42090040234",
       "villageId": "bramblewood",
