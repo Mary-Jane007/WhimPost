@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-18T14:05:46.900Z",
+  "updatedAt": "2026-09-18T14:18:31.398Z",
   "letters": [
     {
       "id": "df6594e1-dcdd-41d6-8df7-12660e7e623a",
@@ -124,7 +124,7 @@
       "fontStyle": "typewriter",
       "stickersJson": "[{\"id\":\"welcome-moon-full\",\"kind\":\"moon-full-clouds\",\"x\":96,\"y\":4,\"scale\":0.44,\"rotation\":8},{\"id\":\"welcome-fairy\",\"kind\":\"moon-fairy-blue\",\"x\":4,\"y\":5,\"scale\":0.42,\"rotation\":-10},{\"id\":\"welcome-lantern\",\"kind\":\"moon-lantern\",\"x\":4,\"y\":95,\"scale\":0.42,\"rotation\":-4},{\"id\":\"welcome-seal\",\"kind\":\"moon-seal-sun\",\"x\":96,\"y\":18,\"scale\":0.35,\"rotation\":6}]",
       "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":5,\"y\":4,\"scale\":0.42,\"rotation\":-8}]",
-      "isRead": false,
+      "isRead": true,
       "sentAt": "2026-08-12 18:26:06",
       "createdAt": "2026-08-12 18:26:06"
     },
