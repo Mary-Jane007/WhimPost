@@ -3224,9 +3224,12 @@ body.theme-hearthwick .notice-action.liked:not(.notice-delete) {
 }
 
 @media (max-width: 640px) {
-  .letter-paper.welcome-typewriter,
-  .letter-paper.letter-has-mascot {
-    /* Wider gutters so corner stickers stay outside the reading column */
+  /*
+   * Beat the generic mobile .letter-paper:not(.paper-*) padding rule
+   * (higher :not() specificity) so welcome gutters actually apply.
+   */
+  .letter-paper.welcome-typewriter:not(.paper-mosshollow):not(.paper-clovermeadow):not(.paper-moonmere):not(.paper-bramblewood):not(.paper-hearthwick),
+  .letter-paper.letter-has-mascot:not(.paper-mosshollow):not(.paper-clovermeadow):not(.paper-moonmere):not(.paper-bramblewood):not(.paper-hearthwick) {
     padding: 1.65rem 3.75rem 1.15rem;
   }
 
