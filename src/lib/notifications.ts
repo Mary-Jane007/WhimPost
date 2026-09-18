@@ -5,11 +5,13 @@ import {
   type CottageDecorId,
 } from "@/lib/cottageDecor";
 import { parseCollectibles } from "@/lib/villages";
+import { countUnreadVillageNoteNotifications } from "@/lib/villageNotes";
 
 export type NavBadges = {
   inbox: number;
   friends: number;
   unlocks: number;
+  square: number;
 };
 
 type NotificationsState = {
@@ -124,5 +126,6 @@ export function getNavBadges(
     inbox: countUnreadLetters(db, userId),
     friends: countPendingFriendRequests(db, userId),
     unlocks: countUnseenUnlocks(db, userId),
+    square: countUnreadVillageNoteNotifications(db, userId),
   };
 }

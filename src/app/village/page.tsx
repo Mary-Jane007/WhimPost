@@ -31,7 +31,11 @@ import { VillageTasksAdminEditor } from "@/components/VillageTasksAdminEditor";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { MeetingBenchTeaser } from "@/components/MeetingBenchTeaser";
 import { VillageMascot } from "@/components/VillageMascot";
-import { listVillageNotes, todayNoteDay } from "@/lib/villageNotes";
+import {
+  listVillageNoteNotifications,
+  listVillageNotes,
+  todayNoteDay,
+} from "@/lib/villageNotes";
 import {
   deliverWelcomeLetter,
   getUnreadWelcomeLetter,
@@ -109,6 +113,7 @@ export default async function VillagePage() {
   const notes = listVillageNotes(db, stats.villageId, user.id, {
     day: notesDay,
   });
+  const noteNotifications = listVillageNoteNotifications(db, user.id);
 
   const unlockLabels = [
     "Lantern path lit",
@@ -328,6 +333,7 @@ export default async function VillagePage() {
       <NoticeBoard
         initialNotes={notes}
         initialDay={notesDay}
+        initialNotifications={noteNotifications}
         currentUserId={user.id}
       />
 

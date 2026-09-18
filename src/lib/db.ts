@@ -603,6 +603,19 @@ function migrate(db: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_village_note_comments_note
       ON village_note_comments(note_id, created_at);
+
+    CREATE TABLE IF NOT EXISTS village_note_notifications (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      actor_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      note_id TEXT NOT NULL REFERENCES village_notes(id) ON DELETE CASCADE,
+      kind TEXT NOT NULL CHECK(kind IN ('like', 'comment')),
+      body TEXT NOT NULL DEFAULT '',
+      is_read INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_village_note_notifications_user
+      ON village_note_notifications(user_id, is_read, created_at DESC);
   `);
 
   db.exec(`
