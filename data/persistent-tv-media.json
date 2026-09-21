@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T19:58:42.899Z",
+  "updatedAt": "2026-09-21T20:04:57.979Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -151,16 +151,6 @@
       "channelTitle": "Clovermeadow Exclusive",
       "villageId": "clovermeadow",
       "isGlobal": false
-    },
-    {
-      "title": "Anne of Green Gables: Carrots",
-      "filename": "132dc965-5b15-4c55-a95e-df9332bc57ce.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 100831185,
-      "durationMs": 1477741,
-      "channelTitle": "Cottage Cartoons",
-      "villageId": null,
-      "isGlobal": true
     },
     {
       "title": "Autumn fun - Guess how much I love you",
@@ -422,5 +412,8 @@
       "villageId": null,
       "isGlobal": true
     }
+  ],
+  "removedFilenames": [
+    "132dc965-5b15-4c55-a95e-df9332bc57ce.mp4"
   ]
 }
