@@ -892,8 +892,8 @@ export function TvCorner({
           <p>{uploadProgress || "Working…"}</p>
           <p className="tv-upload-banner-hint">
             Keep this tab open until 100%. Movies upload in small pieces — if a
-            piece fails it retries automatically. You can rename clips on the
-            shelf after they land.
+            piece fails it retries automatically. Renames and removals on shared
+            channels apply in every village lounge.
           </p>
         </div>
       ) : null}
@@ -1290,6 +1290,10 @@ export function TvCorner({
                 />
                 Share with every village
               </label>
+              <p className="muted tv-global-hint">
+                Rename or remove a clip on a shared channel and every village
+                lounge updates together.
+              </p>
               <button type="submit" className="btn-secondary" disabled={busy}>
                 Make channel
               </button>

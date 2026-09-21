@@ -435,6 +435,13 @@ function migrate(db: Database.Database) {
       removed_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    -- Owner-removed TV clips — keeps durable floors from reappearing them
+    -- after delete so every-village lounges stay in sync.
+    CREATE TABLE IF NOT EXISTS tv_removed_clips (
+      filename TEXT PRIMARY KEY,
+      removed_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
     CREATE TABLE IF NOT EXISTS library_club_state (
       id INTEGER PRIMARY KEY CHECK (id = 1),
       shuffle_salt INTEGER NOT NULL DEFAULT 0,

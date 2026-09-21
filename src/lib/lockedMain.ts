@@ -64,6 +64,57 @@ export function readLockedTvMediaClips(): LockedTvMediaClip[] {
   return file.clips.filter((c) => c?.filename && c?.title && c?.channelTitle);
 }
 
+function writeLockedTvMediaClips(clips: LockedTvMediaClip[]) {
+  const dir = path.dirname(LOCKED_TV_MEDIA_PATH);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  const previous = readJson<LockedTvMediaFile & { note?: string }>(
+    LOCKED_TV_MEDIA_PATH
+  );
+  const payload: LockedTvMediaFile & { note?: string } = {
+    version: 1,
+    lockedAt: previous?.lockedAt || new Date().toISOString(),
+    ...(previous?.note ? { note: previous.note } : {}),
+    clips: clips
+      .filter((c) => c?.filename && c?.title && c?.channelTitle)
+      .sort((a, b) =>
+        `${a.channelTitle}:${a.title}`.localeCompare(
+          `${b.channelTitle}:${b.title}`
+        )
+      ),
+  };
+  const tmp = `${LOCKED_TV_MEDIA_PATH}.tmp`;
+  fs.writeFileSync(tmp, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  fs.renameSync(tmp, LOCKED_TV_MEDIA_PATH);
+}
+
+/** Owner deleted a clip — drop it from the forever floor so every lounge stays clear. */
+export function removeLockedTvMediaClip(filename: string) {
+  const safe = path.basename(String(filename || "").trim());
+  if (!safe || safe !== filename) return false;
+  const clips = readLockedTvMediaClips();
+  const next = clips.filter((c) => c.filename !== safe);
+  if (next.length === clips.length) return false;
+  writeLockedTvMediaClips(next);
+  return true;
+}
+
+/** Owner renamed a clip — keep the forever floor title in sync for all villages. */
+export function renameLockedTvMediaClip(filename: string, title: string) {
+  const safe = path.basename(String(filename || "").trim());
+  const nextTitle = String(title || "").trim().slice(0, 80);
+  if (!safe || safe !== filename || !nextTitle) return false;
+  const clips = readLockedTvMediaClips();
+  let changed = false;
+  const next = clips.map((c) => {
+    if (c.filename !== safe || c.title === nextTitle) return c;
+    changed = true;
+    return { ...c, title: nextTitle };
+  });
+  if (!changed) return false;
+  writeLockedTvMediaClips(next);
+  return true;
+}
+
 /**
  * Raise an alarm (never throw) when the running tree is missing locked
  * Meeting Bench / TV forever markers. Helps agents notice branch drift.
