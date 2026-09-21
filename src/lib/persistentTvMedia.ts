@@ -13,7 +13,11 @@ import {
   isSharedTvChannelTitle,
   PROTECTED_SHARED_TV_TITLES,
 } from "@/lib/tvProtectedChannels";
-import { readLockedTvMediaClips } from "@/lib/lockedMain";
+import {
+  readLockedTvMediaClips,
+  removeLockedTvMediaClip,
+  renameLockedTvMediaClip,
+} from "@/lib/lockedMain";
 
 /**
  * Git-tracked catalog of uploaded TV files (metadata only).
@@ -46,6 +50,65 @@ function clipBytesPresent(filename: string) {
   const uploadPath = path.join(UPLOAD_DIR, safe);
   if (fs.existsSync(uploadPath)) return true;
   return isPlayableMediaFile(path.join(TV_CACHE_DIR, safe));
+}
+
+function normalizeFilename(filename: string) {
+  const safe = path.basename(String(filename || "").trim());
+  if (!safe || safe !== String(filename || "").trim()) return "";
+  return safe;
+}
+
+export function getRemovedTvClipFilenames(db: Database): Set<string> {
+  try {
+    const rows = db
+      .prepare(`SELECT filename FROM tv_removed_clips`)
+      .all() as Array<{ filename: string }>;
+    return new Set(
+      rows.map((r) => normalizeFilename(r.filename)).filter(Boolean)
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+export function markTvClipRemoved(db: Database, filename: string) {
+  const safe = normalizeFilename(filename);
+  if (!safe) return;
+  db.prepare(
+    `INSERT OR IGNORE INTO tv_removed_clips (filename) VALUES (?)`
+  ).run(safe);
+  try {
+    removeLockedTvMediaClip(safe);
+  } catch (err) {
+    console.warn("[persistent-tv-media] locked floor remove failed:", err);
+  }
+}
+
+export function clearTvClipRemoved(db: Database, filename: string) {
+  const safe = normalizeFilename(filename);
+  if (!safe) return;
+  try {
+    db.prepare(`DELETE FROM tv_removed_clips WHERE filename = ?`).run(safe);
+  } catch {
+    // table may not exist yet on very old checkouts mid-migrate
+  }
+}
+
+export function renameTvClipInDurableCatalogs(
+  db: Database,
+  filename: string,
+  title: string
+) {
+  const safe = normalizeFilename(filename);
+  const nextTitle = String(title || "").trim().slice(0, 80);
+  if (!safe || !nextTitle) return;
+  // Re-shelving under a new name clears any prior delete tombstone.
+  clearTvClipRemoved(db, safe);
+  try {
+    renameLockedTvMediaClip(safe, nextTitle);
+  } catch (err) {
+    console.warn("[persistent-tv-media] locked floor rename failed:", err);
+  }
 }
 
 /**
@@ -127,6 +190,8 @@ type PersistentTvMediaFile = {
   version: 1;
   updatedAt: string;
   clips: PersistentTvMediaClip[];
+  /** Owner-deleted filenames — never restore these into any village lounge. */
+  removedFilenames?: string[];
 };
 
 function readFile(): PersistentTvMediaFile | null {
@@ -142,7 +207,7 @@ function readFile(): PersistentTvMediaFile | null {
   }
 }
 
-function writeFile(clips: PersistentTvMediaClip[]) {
+function writeFile(clips: PersistentTvMediaClip[], removedFilenames: string[]) {
   const dir = path.dirname(PERSISTENT_TV_MEDIA_PATH);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
@@ -156,6 +221,11 @@ function writeFile(clips: PersistentTvMediaClip[]) {
           `${b.channelTitle}:${b.title}`
         )
       ),
+    removedFilenames: [
+      ...new Set(
+        removedFilenames.map((f) => normalizeFilename(f)).filter(Boolean)
+      ),
+    ].sort(),
   };
 
   const tmp = `${PERSISTENT_TV_MEDIA_PATH}.tmp`;
@@ -175,6 +245,8 @@ function shuffleIds(ids: string[]): string[] {
 /** Snapshot uploaded (file) TV clips so fresh servers can restore them. */
 export function exportPersistentTvMedia(db: Database) {
   const previous = readFile();
+  const removed = getRemovedTvClipFilenames(db);
+
   const rows = db
     .prepare(
       `SELECT v.title, v.filename, v.mime, v.size_bytes, v.duration_ms,
@@ -195,9 +267,21 @@ export function exportPersistentTvMedia(db: Database) {
     is_global: number | null;
   }>;
 
+  const liveFilenames = new Set(
+    rows.map((r) => r.filename).filter((f) => f && !f.startsWith("link-"))
+  );
+
+  // Keep prior catalog tombstones unless the clip is live in SQLite again
+  // (re-upload / restore clears the ban for every village lounge).
+  for (const name of previous?.removedFilenames || []) {
+    const safe = normalizeFilename(name);
+    if (safe && !liveFilenames.has(safe)) removed.add(safe);
+  }
+
   const byFilename = new Map<string, PersistentTvMediaClip>();
   for (const row of rows) {
     if (row.filename.startsWith("link-")) continue;
+    if (removed.has(row.filename)) continue;
     const filePath = path.join(UPLOAD_DIR, row.filename);
     if (!fs.existsSync(filePath) && !clipBytesPresent(row.filename)) continue;
     byFilename.set(row.filename, {
@@ -216,12 +300,15 @@ export function exportPersistentTvMedia(db: Database) {
 
   // Never thin the git catalog. Keep EVERY prior clip (all villages + forever
   // lounges) when a temporary empty DB or missing local bytes would drop them.
+  // Owner-deleted filenames (tombstones) are the exception — they stay gone
+  // so edits/deletes on a shared channel apply in every village after restart.
   const floorClips = [
     ...(previous?.clips || []),
     ...readLockedTvMediaClips(),
   ];
   for (const clip of floorClips) {
     if (!clip.filename || byFilename.has(clip.filename)) continue;
+    if (removed.has(clip.filename)) continue;
     const protectedChannel = isProtectedTvChannelTitle(clip.channelTitle);
     byFilename.set(clip.filename, {
       ...clip,
@@ -236,7 +323,7 @@ export function exportPersistentTvMedia(db: Database) {
     });
   }
 
-  writeFile(Array.from(byFilename.values()));
+  writeFile(Array.from(byFilename.values()), [...removed]);
 }
 
 /** Restore uploaded clips into owner channels (and seed shuffle schedules). */
@@ -261,6 +348,21 @@ export function importPersistentTvMedia(db: Database) {
     | undefined;
   const uploaderId = owner?.id || anyUser?.id;
   if (!uploaderId) return;
+
+  // Rehydrate delete tombstones so owner removals stay gone in every lounge.
+  const removed = getRemovedTvClipFilenames(db);
+  for (const name of file.removedFilenames || []) {
+    const safe = normalizeFilename(name);
+    if (!safe || removed.has(safe)) continue;
+    try {
+      db.prepare(
+        `INSERT OR IGNORE INTO tv_removed_clips (filename) VALUES (?)`
+      ).run(safe);
+      removed.add(safe);
+    } catch {
+      // ignore if table missing mid-migrate
+    }
+  }
 
   const findChannel = db.prepare(
     `SELECT id FROM tv_channels
@@ -299,6 +401,7 @@ export function importPersistentTvMedia(db: Database) {
         "Clip shelf";
       if (!filename || !title) continue;
       if (filename.startsWith("link-") || filename.includes("..")) continue;
+      if (removed.has(filename)) continue;
 
       if (!clipBytesPresent(filename)) {
         skippedMissing += 1;
