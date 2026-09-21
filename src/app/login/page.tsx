@@ -19,8 +19,8 @@ export default async function LoginPage() {
         </div>
         <h1>Welcome back</h1>
         <p className="lede">
-          Slip into your forest mailbox — you&apos;ll land in your village after
-          signing in.
+          Slip into your forest mailbox — you&apos;ll land in your{" "}
+          <strong>home village</strong> after signing in.
         </p>
         <p className="lede muted" style={{ marginTop: "-0.35rem" }}>
           If you only see a single “token” password box, open port 3333 from
