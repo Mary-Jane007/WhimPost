@@ -109,12 +109,12 @@ export function LoginForm() {
       {error && <p className="form-error">{error}</p>}
       {signedIn && (
         <p className="form-success" role="status">
-          Signed in — opening your village…
+          Signed in — opening your woodland…
         </p>
       )}
       <button type="submit" className="btn-primary" disabled={loading || signedIn}>
         {signedIn
-          ? "Heading to your village…"
+          ? "Heading back…"
           : loading
             ? "Opening mailbox…"
             : "Enter the forest post"}

@@ -143,6 +143,10 @@ export function importPersistentAccounts(db: Database) {
     `SELECT character_json FROM users WHERE id = ?`
   );
 
+  const readLocalStand = db.prepare(
+    `SELECT village_id, home_village_id FROM users WHERE id = ?`
+  );
+
   const sync = db.transaction((accounts: PersistentAccount[]) => {
     for (const account of accounts) {
       const username = String(account.username || "").trim();
@@ -182,6 +186,30 @@ export function importPersistentAccounts(db: Database) {
         );
       }
 
+      // home_village_id is durable belonging (snapshot wins when present).
+      // village_id is "where I am standing" (including visits). Never clobber a
+      // live visit with a stale snapshot on login/restart — that made every
+      // sign-in drop people back at home.
+      let homeVillageId =
+        account.home_village_id || account.village_id || null;
+      let villageId = account.village_id ?? null;
+      if (matched) {
+        const localStand = readLocalStand.get(matched.id) as
+          | { village_id: string | null; home_village_id: string | null }
+          | undefined;
+        if (!homeVillageId && localStand?.home_village_id) {
+          homeVillageId = localStand.home_village_id;
+        } else if (!homeVillageId && localStand?.village_id) {
+          homeVillageId = localStand.village_id;
+        }
+        // Keep the local stand whenever the account already exists locally.
+        if (localStand?.village_id) {
+          villageId = localStand.village_id;
+        } else if (!villageId && homeVillageId) {
+          villageId = homeVillageId;
+        }
+      }
+
       const row = {
         id: matched?.id ?? account.id,
         username,
@@ -191,9 +219,8 @@ export function importPersistentAccounts(db: Database) {
         bio: account.bio ?? "",
         forest_name: account.forest_name ?? "",
         is_owner: account.is_owner ? 1 : 0,
-        village_id: account.village_id,
-        home_village_id:
-          account.home_village_id || account.village_id || null,
+        village_id: villageId,
+        home_village_id: homeVillageId,
         reputation: account.reputation ?? 0,
         character_json: characterJson,
         collectibles_json: account.collectibles_json || "{}",
