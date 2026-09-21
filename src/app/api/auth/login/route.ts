@@ -57,9 +57,25 @@ export async function POST(req: NextRequest) {
   // The account you sign in with becomes the remembered site owner
   // when no owner has been claimed yet.
   const becameOwner = claimOwnerIfUnset(db, row.id);
+
+  // Always open at home on login — visits are temporary while signed in.
+  const homeId = row.home_village_id || row.village_id;
+  if (homeId && row.village_id !== homeId) {
+    db.prepare(
+      `UPDATE users SET village_id = COALESCE(home_village_id, village_id) WHERE id = ?`
+    ).run(row.id);
+  } else if (homeId && !row.home_village_id) {
+    db.prepare(
+      `UPDATE users SET home_village_id = ?, village_id = ? WHERE id = ?`
+    ).run(homeId, homeId, row.id);
+  }
+
   if (becameOwner && !row.is_owner) {
     exportPersistentAccounts(db);
+  } else if (homeId && row.village_id !== homeId) {
+    exportPersistentAccounts(db);
   }
+
   const refreshed = db
     .prepare(
       `SELECT id, username, display_name, bio, forest_name, created_at, is_owner,
