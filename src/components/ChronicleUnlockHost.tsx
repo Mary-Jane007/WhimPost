@@ -62,13 +62,13 @@ export function ChronicleUnlockHost() {
         {phase === "intro" ? (
           <>
             <p className="lc-discover-eyebrow">The Lost Chronicles</p>
-            <h2>A forgotten page has been recovered…</h2>
+            <h2>Something was hidden here…</h2>
             <p className="lc-discover-lead">
-              Ink gathers on ancient parchment. A piece of your village&apos;s
-              story returns.
+              You discovered a missing page from the{" "}
+              {payload.villageName || "village Chronicle"}.
             </p>
             <button type="button" className="lc-btn" onClick={advance}>
-              Unfold the page
+              Reveal the page
             </button>
           </>
         ) : null}
