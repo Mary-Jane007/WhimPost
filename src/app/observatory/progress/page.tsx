@@ -1,29 +1,25 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getMoonProgress } from "@/lib/moon";
 import { MOON_TITLES } from "@/lib/moonContent";
 import { MOON_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import { WorkshopProgressPanel } from "@/components/WorkshopProgressPanel";
 import { PageCrest } from "@/components/PageCrest";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { WorkshopAccessDenied } from "@/components/WorkshopAccessDenied";
+import { evaluateWorkshopAccess } from "@/lib/workshopAccess";
 
 export default async function ObservatoryProgressPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  if (!canAccessVillageWorkshop(user, "moonmere")) {
+  const decision = evaluateWorkshopAccess(user, "moonmere");
+  if (!decision.allowed) {
     return (
-      <main className="app-main forest-panel">
-        <PageCrest kinds={["moon-crescent", "moon-full", "dragonfly"]} />
-        <header className="page-header">
-          <h1>Observatory progress</h1>
-          <p>This path belongs to Moonmere villagers.</p>
-        </header>
-        <p className="muted">
-          <Link href="/village">Return to your village</Link>
-        </p>
-      </main>
+      <WorkshopAccessDenied
+        decision={decision}
+        workshopTitle="Observatory progress"
+        crestKinds={["moon-crescent", "moon-full", "dragonfly"]}
+      />
     );
   }
 

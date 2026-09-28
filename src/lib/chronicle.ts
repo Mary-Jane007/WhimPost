@@ -8,22 +8,26 @@ import {
   ROMAN_PAGES,
   defaultPagesForVillage,
   isChronicleActivityKey,
+  isChronicleVisibilityMode,
   type ChronicleActivityKey,
   type ChroniclePageContent,
   type ChroniclePageNumber,
+  type ChronicleVisibilityMode,
 } from "@/lib/chronicleContent";
 import {
   exportPersistentChroniclePages,
 } from "@/lib/persistentChroniclePages";
 import { scheduleDurableTvGitSync } from "@/lib/tvPersist";
 import type { VillageId } from "@/lib/villages";
-import { isVillageId } from "@/lib/villages";
+import { isHomeVillagerOf, isVillageId } from "@/lib/villages";
 import { grantCollectible } from "@/lib/villageProgress";
 import type { CollectibleKind } from "@/lib/villages";
 
 export type ChroniclePageView = ChroniclePageContent & {
   roman: string;
   unlocked: boolean;
+  /** True when this viewer may read the full title/body. */
+  readable: boolean;
   /** Hidden fields for locked pages shown to players */
   lockedLabel: string;
 };
@@ -49,6 +53,13 @@ type ProgressRow = {
   completed: number;
 };
 
+type ChronicleViewer = {
+  id?: string;
+  isOwner?: boolean;
+  homeVillageId?: string | null;
+  villageId?: string | null;
+};
+
 function parseJson<T>(raw: string | null | undefined, fallback: T): T {
   if (!raw) return fallback;
   try {
@@ -58,20 +69,76 @@ function parseJson<T>(raw: string | null | undefined, fallback: T): T {
   }
 }
 
+function defaultVisibility(pageNumber: number): ChronicleVisibilityMode {
+  return pageNumber === 1 ? "PUBLIC" : "VILLAGE_MEMBERS_ONLY";
+}
+
+/**
+ * Whether this viewer may read the page's title/body.
+ * Visibility is separate from workshop content; unlock tracks personal discovery.
+ */
+export function canReadChroniclePage(
+  viewer: ChronicleViewer,
+  villageId: VillageId,
+  page: Pick<ChroniclePageContent, "visibilityMode" | "pageNumber">,
+  personallyDiscovered: boolean
+): boolean {
+  if (viewer.isOwner) return true;
+  const mode = isChronicleVisibilityMode(page.visibilityMode)
+    ? page.visibilityMode
+    : defaultVisibility(page.pageNumber);
+
+  if (mode === "HIDDEN") return false;
+  if (mode === "PUBLIC" || mode === "EVERYONE") return true;
+
+  const home = isHomeVillagerOf(viewer, villageId);
+  if (mode === "VILLAGE_MEMBERS_ONLY") {
+    return home && personallyDiscovered;
+  }
+  if (mode === "VISITORS_ALLOWED") {
+    // Home villagers or visitors who personally uncovered the leaf.
+    return personallyDiscovered;
+  }
+  return home && personallyDiscovered;
+}
+
 function ensureSeedPages() {
   const db = getDb();
   db.exec(`
     CREATE TABLE IF NOT EXISTS app_meta (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
-    )
+    );
+    CREATE TABLE IF NOT EXISTS chronicle_discoveries (
+      user_id TEXT NOT NULL,
+      village_id TEXT NOT NULL,
+      page_number INTEGER NOT NULL,
+      discovered_at TEXT NOT NULL DEFAULT (datetime('now')),
+      discovery_method TEXT NOT NULL DEFAULT 'activity',
+      activity_key TEXT,
+      PRIMARY KEY (user_id, village_id, page_number)
+    );
   `);
+
+  // Additive column — never rewrite title/body here.
+  try {
+    const cols = db.prepare(`PRAGMA table_info(chronicle_pages)`).all() as Array<{
+      name: string;
+    }>;
+    if (!cols.some((c) => c.name === "visibility_mode")) {
+      db.exec(
+        `ALTER TABLE chronicle_pages ADD COLUMN visibility_mode TEXT NOT NULL DEFAULT 'VILLAGE_MEMBERS_ONLY'`
+      );
+    }
+  } catch {
+    /* ignore */
+  }
 
   const insert = db.prepare(
     `INSERT INTO chronicle_pages (
       id, village_id, page_number, title, body, illustration_url,
-      unlock_key, unlock_count, published, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      unlock_key, unlock_count, published, visibility_mode, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     ON CONFLICT(village_id, page_number) DO NOTHING`
   );
 
@@ -85,8 +152,24 @@ function ensureSeedPages() {
       page.illustrationUrl,
       page.unlockKey,
       page.unlockCount,
-      page.published ? 1 : 0
+      page.published ? 1 : 0,
+      page.visibilityMode || defaultVisibility(page.pageNumber)
     );
+  }
+
+  // One-time: page 1 of each village stays publicly readable for visitors.
+  const visRow = db
+    .prepare(`SELECT value FROM app_meta WHERE key = 'chronicle_visibility_v'`)
+    .get() as { value: string } | undefined;
+  if (Number(visRow?.value || 0) < 1) {
+    db.prepare(
+      `UPDATE chronicle_pages SET visibility_mode = 'PUBLIC'
+       WHERE page_number = 1`
+    ).run();
+    db.prepare(
+      `INSERT INTO app_meta (key, value) VALUES ('chronicle_visibility_v', '1')
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`
+    ).run();
   }
 
   const loreRow = db
@@ -117,6 +200,29 @@ function ensureProgressRow(userId: string, villageId: VillageId) {
   ).run(userId, villageId);
 }
 
+function loadViewer(userId: string): ChronicleViewer {
+  const db = getDb();
+  const row = db
+    .prepare(
+      `SELECT id, is_owner, home_village_id, village_id FROM users WHERE id = ?`
+    )
+    .get(userId) as
+    | {
+        id: string;
+        is_owner: number;
+        home_village_id: string | null;
+        village_id: string | null;
+      }
+    | undefined;
+  if (!row) return { id: userId };
+  return {
+    id: row.id,
+    isOwner: Boolean(row.is_owner),
+    homeVillageId: row.home_village_id,
+    villageId: row.village_id,
+  };
+}
+
 export function getChroniclePages(
   villageId: VillageId,
   opts?: { includeUnpublished?: boolean }
@@ -126,7 +232,7 @@ export function getChroniclePages(
   const rows = db
     .prepare(
       `SELECT village_id, page_number, title, body, illustration_url,
-              unlock_key, unlock_count, published
+              unlock_key, unlock_count, published, visibility_mode
        FROM chronicle_pages
        WHERE village_id = ?
        ORDER BY page_number ASC`
@@ -140,6 +246,7 @@ export function getChroniclePages(
     unlock_key: string;
     unlock_count: number;
     published: number;
+    visibility_mode: string | null;
   }>;
 
   if (rows.length === 0) {
@@ -159,6 +266,9 @@ export function getChroniclePages(
         : "garden.completeDaily") as ChronicleActivityKey,
       unlockCount: Math.max(1, Number(r.unlock_count) || 1),
       published: Boolean(r.published),
+      visibilityMode: isChronicleVisibilityMode(r.visibility_mode)
+        ? r.visibility_mode
+        : defaultVisibility(r.page_number),
     }));
 }
 
@@ -214,7 +324,8 @@ function grantKeeperIfComplete(
 
 export function getChronicleProgress(
   userId: string,
-  villageId: VillageId
+  villageId: VillageId,
+  viewer?: ChronicleViewer
 ): ChronicleProgressView {
   const pages = getChroniclePages(villageId, { includeUnpublished: false });
   const row = readProgress(userId, villageId);
@@ -224,6 +335,7 @@ export function getChronicleProgress(
     {}
   );
   const meta = CHRONICLE_META[villageId];
+  const who = viewer || loadViewer(userId);
 
   const views: ChroniclePageView[] = [1, 2, 3, 4].map((n) => {
     const pageNumber = n as ChroniclePageNumber;
@@ -232,20 +344,34 @@ export function getChronicleProgress(
       defaultPagesForVillage(villageId).find(
         (p) => p.pageNumber === pageNumber
       )!;
-    const isUnlocked = Boolean(unlocked[String(pageNumber)]);
+    const personallyDiscovered = Boolean(unlocked[String(pageNumber)]);
+    const readable = canReadChroniclePage(
+      who,
+      villageId,
+      content,
+      personallyDiscovered
+    );
     return {
       ...content,
       roman: ROMAN_PAGES[pageNumber],
-      unlocked: isUnlocked,
-      lockedLabel: "Unknown",
-      title: isUnlocked ? content.title : "❓ Unknown",
-      body: isUnlocked ? content.body : "",
-      illustrationUrl: isUnlocked ? content.illustrationUrl : "",
+      unlocked: readable,
+      readable,
+      lockedLabel:
+        content.visibilityMode === "HIDDEN"
+          ? "Hidden"
+          : content.visibilityMode === "VILLAGE_MEMBERS_ONLY"
+            ? "Villager discovery"
+            : "Unknown",
+      title: readable ? content.title : "❓ Unknown",
+      body: readable ? content.body : "",
+      illustrationUrl: readable ? content.illustrationUrl : "",
     };
   });
 
-  const recovered = views.filter((p) => p.unlocked).length;
-  const complete = recovered >= 4 || Boolean(row.completed);
+  const recovered = views.filter((p) => p.readable).length;
+  const personalCount = [1, 2, 3, 4].filter((n) => unlocked[String(n)]).length;
+  const complete =
+    personalCount >= 4 || Boolean(row.completed);
 
   return {
     villageId,
@@ -296,10 +422,21 @@ export function recordChronicleActivity(
   for (const page of pages) {
     const key = String(page.pageNumber);
     if (unlocked[key]) continue;
+    if (page.visibilityMode === "HIDDEN") continue;
     if (page.unlockKey !== activityKey) continue;
     if (activityCounts[activityKey] >= page.unlockCount) {
       unlocked[key] = true;
       newlyUnlocked.push(page.pageNumber);
+      try {
+        db.prepare(
+          `INSERT INTO chronicle_discoveries (
+             user_id, village_id, page_number, discovery_method, activity_key
+           ) VALUES (?, ?, ?, 'activity', ?)
+           ON CONFLICT(user_id, village_id, page_number) DO NOTHING`
+        ).run(userId, villageId, page.pageNumber, activityKey);
+      } catch {
+        /* discovery ledger is best-effort */
+      }
     }
   }
 
@@ -344,6 +481,7 @@ export type ChroniclePageUpdate = {
   unlockKey: ChronicleActivityKey;
   unlockCount: number;
   published: boolean;
+  visibilityMode?: ChronicleVisibilityMode;
 };
 
 export function upsertChroniclePage(input: ChroniclePageUpdate) {
@@ -363,6 +501,10 @@ export function upsertChroniclePage(input: ChroniclePageUpdate) {
   if (title.length < 2) return { ok: false as const, error: "Title is too short" };
   if (body.length < 8) return { ok: false as const, error: "Story text is too short" };
 
+  const visibilityMode = isChronicleVisibilityMode(input.visibilityMode)
+    ? input.visibilityMode
+    : defaultVisibility(input.pageNumber);
+
   const db = getDb();
   const existing = db
     .prepare(
@@ -374,7 +516,8 @@ export function upsertChroniclePage(input: ChroniclePageUpdate) {
     db.prepare(
       `UPDATE chronicle_pages SET
         title = ?, body = ?, illustration_url = ?, unlock_key = ?,
-        unlock_count = ?, published = ?, updated_at = datetime('now')
+        unlock_count = ?, published = ?, visibility_mode = ?,
+        updated_at = datetime('now')
        WHERE id = ?`
     ).run(
       title,
@@ -383,14 +526,15 @@ export function upsertChroniclePage(input: ChroniclePageUpdate) {
       input.unlockKey,
       Math.max(1, Math.min(99, Number(input.unlockCount) || 1)),
       input.published ? 1 : 0,
+      visibilityMode,
       existing.id
     );
   } else {
     db.prepare(
       `INSERT INTO chronicle_pages (
         id, village_id, page_number, title, body, illustration_url,
-        unlock_key, unlock_count, published, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
+        unlock_key, unlock_count, published, visibility_mode, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`
     ).run(
       randomUUID(),
       input.villageId,
@@ -400,7 +544,8 @@ export function upsertChroniclePage(input: ChroniclePageUpdate) {
       (input.illustrationUrl || "").slice(0, 400),
       input.unlockKey,
       Math.max(1, Math.min(99, Number(input.unlockCount) || 1)),
-      input.published ? 1 : 0
+      input.published ? 1 : 0,
+      visibilityMode
     );
   }
 
@@ -435,6 +580,7 @@ export type ChronicleUnlockPayload = {
   recovered: number;
   total: number;
   complete: boolean;
+  villageName?: string;
 };
 
 function toUnlockPayload(
@@ -456,6 +602,7 @@ function toUnlockPayload(
     recovered: progress.recovered,
     total: progress.total,
     complete: progress.complete || result.justCompleted,
+    villageName: CHRONICLE_META[villageId].name,
   };
 }
 
@@ -468,4 +615,3 @@ export function chronicleAfterActivity(
   const result = recordChronicleActivity(userId, villageId, activityKey);
   return toUnlockPayload(userId, villageId, result);
 }
-

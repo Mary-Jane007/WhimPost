@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import type { ChroniclePageContent } from "@/lib/chronicleContent";
 import {
   CHRONICLE_ACTIVITY_LABELS,
+  CHRONICLE_VISIBILITY_LABELS,
+  CHRONICLE_VISIBILITY_MODES,
   ROMAN_PAGES,
   type ChronicleActivityKey,
   type ChroniclePageNumber,
+  type ChronicleVisibilityMode,
 } from "@/lib/chronicleContent";
 import type { VillageId } from "@/lib/villages";
 
@@ -19,6 +22,7 @@ type PageDraft = {
   unlockKey: ChronicleActivityKey;
   unlockCount: number;
   published: boolean;
+  visibilityMode: ChronicleVisibilityMode;
 };
 
 function draftFromPage(page: ChroniclePageContent): PageDraft {
@@ -29,6 +33,7 @@ function draftFromPage(page: ChroniclePageContent): PageDraft {
     unlockKey: page.unlockKey,
     unlockCount: page.unlockCount,
     published: page.published,
+    visibilityMode: page.visibilityMode || "VILLAGE_MEMBERS_ONLY",
   };
 }
 
@@ -52,6 +57,8 @@ export function ChronicleAdminEditor({
     useState<ChronicleActivityKey>("garden.completeDaily");
   const [unlockCount, setUnlockCount] = useState(1);
   const [published, setPublished] = useState(true);
+  const [visibilityMode, setVisibilityMode] =
+    useState<ChronicleVisibilityMode>("VILLAGE_MEMBERS_ONLY");
   const [showPreview, setShowPreview] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
@@ -68,6 +75,7 @@ export function ChronicleAdminEditor({
     setUnlockKey(draft.unlockKey);
     setUnlockCount(draft.unlockCount);
     setPublished(draft.published);
+    setVisibilityMode(draft.visibilityMode || "VILLAGE_MEMBERS_ONLY");
   }
 
   function currentDraft(): PageDraft {
@@ -78,6 +86,7 @@ export function ChronicleAdminEditor({
       unlockKey,
       unlockCount,
       published,
+      visibilityMode,
     };
   }
 
@@ -141,6 +150,7 @@ export function ChronicleAdminEditor({
         unlockKey: draft.unlockKey,
         unlockCount: draft.unlockCount,
         published: draft.published,
+        visibilityMode: draft.visibilityMode,
       }),
     });
     const data = await res.json();
@@ -213,8 +223,9 @@ export function ChronicleAdminEditor({
         </button>
       </div>
       <p className="muted">
-        Edit each village&apos;s four manuscript pages, unlock rules, and
-        illustrations. Saved text is kept across reloads and fresh servers.
+        Edit each village&apos;s four manuscript pages, unlock rules,
+        visibility, and illustrations. Saved story text is kept across reloads
+        and fresh servers — never wiped by access settings.
       </p>
 
       {loading ? <p className="muted">Loading parchment…</p> : null}
@@ -327,6 +338,22 @@ export function ChronicleAdminEditor({
         ) : null}
 
         <label>
+          Visibility
+          <select
+            value={visibilityMode}
+            onChange={(e) =>
+              setVisibilityMode(e.target.value as ChronicleVisibilityMode)
+            }
+          >
+            {CHRONICLE_VISIBILITY_MODES.map((mode) => (
+              <option key={mode} value={mode}>
+                {CHRONICLE_VISIBILITY_LABELS[mode]}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
           Unlock requirement
           <select
             value={unlockKey}
@@ -392,7 +419,8 @@ export function ChronicleAdminEditor({
             {(body || "").trim().slice(1)}
           </p>
           <p className="lc-meta">
-            Unlocks after {unlockCount}× {CHRONICLE_ACTIVITY_LABELS[unlockKey]}
+            Visibility: {CHRONICLE_VISIBILITY_LABELS[visibilityMode]} · Unlocks
+            after {unlockCount}× {CHRONICLE_ACTIVITY_LABELS[unlockKey]}
             {published ? "" : " · draft"}
           </p>
         </article>

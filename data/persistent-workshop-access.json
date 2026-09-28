@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-18T13:43:59.733Z",
+  "workshops": [
+    {
+      "villageId": "mosshollow",
+      "accessMode": "HOME_VILLAGERS_ONLY",
+      "eventAccessMode": null,
+      "eventStartsAt": null,
+      "eventEndsAt": null
+    },
+    {
+      "villageId": "clovermeadow",
+      "accessMode": "HOME_VILLAGERS_ONLY",
+      "eventAccessMode": null,
+      "eventStartsAt": null,
+      "eventEndsAt": null
+    },
+    {
+      "villageId": "moonmere",
+      "accessMode": "HOME_VILLAGERS_ONLY",
+      "eventAccessMode": null,
+      "eventStartsAt": null,
+      "eventEndsAt": null
+    },
+    {
+      "villageId": "bramblewood",
+      "accessMode": "HOME_VILLAGERS_ONLY",
+      "eventAccessMode": null,
+      "eventStartsAt": null,
+      "eventEndsAt": null
+    },
+    {
+      "villageId": "hearthwick",
+      "accessMode": "HOME_VILLAGERS_ONLY",
+      "eventAccessMode": null,
+      "eventStartsAt": null,
+      "eventEndsAt": null
+    }
+  ],
+  "activities": [],
+  "invites": []
+}

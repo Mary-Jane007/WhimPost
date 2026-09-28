@@ -1,54 +1,25 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getGardenProgress } from "@/lib/garden";
 import { getVillageMediaOverrides } from "@/lib/villageMedia";
 import { BloomkeeperGarden } from "@/components/BloomkeeperGarden";
 import { VillageTasksBoard } from "@/components/VillageTasksBoard";
 import { PageCrest } from "@/components/PageCrest";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { WorkshopAccessDenied } from "@/components/WorkshopAccessDenied";
+import { evaluateWorkshopAccess } from "@/lib/workshopAccess";
 
 export default async function GardenPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const homeVillageId = user.homeVillageId || user.villageId;
 
-  if (!canAccessVillageWorkshop(user, "clovermeadow")) {
-    if (!homeVillageId) {
-      return (
-        <main className="app-main forest-panel">
-          <PageCrest
-            kinds={["clover-blossom", "clover-butterfly-small", "clover-bunny"]}
-          />
-          <header className="page-header">
-            <h1>The Bloomkeeper&apos;s Garden</h1>
-            <p>Join Clovermeadow first — every meadow needs a gentle heart.</p>
-          </header>
-          <p className="muted">
-            <Link href="/village">Visit the village square</Link> to find your
-            place among the clovers.
-          </p>
-        </main>
-      );
-    }
-
+  const decision = evaluateWorkshopAccess(user, "clovermeadow");
+  if (!decision.allowed) {
     return (
-      <main className="app-main forest-panel">
-        <PageCrest
-          kinds={["clover-blossom", "clover-butterfly-small", "clover-bunny"]}
-        />
-        <header className="page-header">
-          <h1>The Bloomkeeper&apos;s Garden</h1>
-          <p>
-            This garden is exclusive to Clovermeadow villagers. Visitors cannot
-            participate — settle among the wildflowers if you wish to become a
-            Bloomkeeper.
-          </p>
-        </header>
-        <p className="muted">
-          <Link href="/village">Return to your village</Link>
-        </p>
-      </main>
+      <WorkshopAccessDenied
+        decision={decision}
+        workshopTitle="The Bloomkeeper's Garden"
+        crestKinds={["clover-blossom", "clover-butterfly-small", "clover-bunny"]}
+      />
     );
   }
 

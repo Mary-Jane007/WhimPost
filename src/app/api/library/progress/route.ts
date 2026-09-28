@@ -13,7 +13,7 @@ import {
   redirectSameHost,
   wantsHtmlRedirect,
 } from "@/lib/requestBody";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { canAccessVillageWorkshop } from "@/lib/workshopAccess";
 
 async function requireLibraryUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
@@ -125,8 +125,9 @@ export async function POST(req: NextRequest) {
     action
   );
   const key = LIBRARY_KEYS[action.type];
+  // Unlock the hub village Chronicle, not wherever the user is currently visiting.
   const chronicleUnlock = key
-    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    ? chronicleAfterActivity(gate.user.id, "mosshollow", key)
     : null;
 
   if (wantsHtmlRedirect(req)) {

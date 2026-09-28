@@ -9,7 +9,7 @@ import { ensureMediaReleaseAsset } from "@/lib/mediaRelease";
 import { ensureLibraryBookBytes } from "@/lib/persistentLibraryBooks";
 import { isLfsPointerFile } from "@/lib/lfsPointer";
 import { LibraryReadClient } from "@/components/LibraryReadClient";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { canAccessVillageWorkshop } from "@/lib/workshopAccess";
 
 type Props = {
   params: Promise<{ bookId: string }>;

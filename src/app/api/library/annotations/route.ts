@@ -7,7 +7,7 @@ import {
   listAnnotations,
   type AnnotationInk,
 } from "@/lib/libraryReading";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { canAccessVillageWorkshop } from "@/lib/workshopAccess";
 
 export const runtime = "nodejs";
 

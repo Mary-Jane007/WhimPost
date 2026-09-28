@@ -225,7 +225,7 @@ export function LostChronicles({ villageId, initialProgress = null }: Props) {
                     <span className="lc-mystery-mark" aria-hidden>
                       ❓
                     </span>
-                    <h3 className="lc-page-title">Unknown</h3>
+                    <h3 className="lc-page-title">{current.lockedLabel || "Unknown"}</h3>
                     <p>
                       This leaf is faded, torn, and waiting. Keep tending your
                       village — the ink will return.

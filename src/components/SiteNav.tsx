@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import type { UserPublic } from "@/lib/types";
 import type { NavBadges } from "@/lib/notifications";
 import {
-  canAccessVillageWorkshop,
   VILLAGE_WORKSHOPS,
   type VillageId,
 } from "@/lib/villages";
@@ -46,14 +45,12 @@ export function SiteNav({
 }) {
   const pathname = usePathname();
 
-  // Workshop chrome stays on the village you are standing in, but only home
-  // villagers (and the owner) may open it — visitors never get a participate link.
+  // Workshop chrome follows the village you are standing in. Soft access gates
+  // on the workshop page decide participation (visitors welcome, closed, etc.).
   const currentVillageId = user?.villageId || user?.homeVillageId || null;
   const homeId = user?.homeVillageId || user?.villageId || null;
   const workshop = workshopForVillage(currentVillageId);
-  const canUseWorkshop =
-    Boolean(user && currentVillageId) &&
-    canAccessVillageWorkshop(user!, currentVillageId as VillageId);
+  const canUseWorkshop = Boolean(user && workshop);
   const visiting =
     Boolean(user?.villageId && user?.homeVillageId) &&
     user!.villageId !== user!.homeVillageId;

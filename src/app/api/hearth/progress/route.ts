@@ -8,7 +8,7 @@ import {
 } from "@/lib/hearth";
 import { chronicleAfterActivity } from "@/lib/chronicle";
 import type { ChronicleActivityKey } from "@/lib/chronicleContent";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { canAccessVillageWorkshop } from "@/lib/workshopAccess";
 
 async function requireHearthUser(): Promise<
   { user: UserPublic } | { error: NextResponse }
@@ -54,8 +54,9 @@ export async function POST(req: NextRequest) {
     body
   );
   const key = HEARTH_KEYS[body.type];
+  // Unlock the hub village Chronicle, not wherever the user is currently visiting.
   const chronicleUnlock = key
-    ? chronicleAfterActivity(gate.user.id, gate.user.villageId, key)
+    ? chronicleAfterActivity(gate.user.id, "hearthwick", key)
     : null;
   return NextResponse.json({
     progress,

@@ -12,11 +12,28 @@ export async function GET(req: NextRequest) {
   if (!villageId || !isVillageId(villageId)) {
     return jsonError("Join a village to open The Lost Chronicles");
   }
-  if (user.villageId !== villageId && !user.isOwner) {
-    return jsonError("That Chronicle belongs to another village", 403);
+
+  // Visitors may read public Chronicle leaves of the village they are exploring.
+  // Home villagers may always open their own Chronicle even while away.
+  const home = user.homeVillageId || user.villageId;
+  const visiting = user.villageId;
+  const allowed =
+    user.isOwner ||
+    visiting === villageId ||
+    home === villageId;
+  if (!allowed) {
+    return jsonError(
+      "Visit that village square to explore its Chronicle",
+      403
+    );
   }
 
   return NextResponse.json({
-    progress: getChronicleProgress(user.id, villageId),
+    progress: getChronicleProgress(user.id, villageId, {
+      id: user.id,
+      isOwner: user.isOwner,
+      homeVillageId: user.homeVillageId,
+      villageId: user.villageId,
+    }),
   });
 }

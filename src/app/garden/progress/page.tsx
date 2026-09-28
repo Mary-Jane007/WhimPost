@@ -1,31 +1,25 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getGardenProgress } from "@/lib/garden";
 import { GARDEN_TITLES } from "@/lib/gardenContent";
 import { GARDEN_XP_COLLECTIBLE_GIFTS } from "@/lib/workshopXpGifts";
 import { WorkshopProgressPanel } from "@/components/WorkshopProgressPanel";
 import { PageCrest } from "@/components/PageCrest";
-import { canAccessVillageWorkshop } from "@/lib/villages";
+import { WorkshopAccessDenied } from "@/components/WorkshopAccessDenied";
+import { evaluateWorkshopAccess } from "@/lib/workshopAccess";
 
 export default async function GardenProgressPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  if (!canAccessVillageWorkshop(user, "clovermeadow")) {
+  const decision = evaluateWorkshopAccess(user, "clovermeadow");
+  if (!decision.allowed) {
     return (
-      <main className="app-main forest-panel">
-        <PageCrest
-          kinds={["clover-blossom", "clover-butterfly-small", "clover-bunny"]}
-        />
-        <header className="page-header">
-          <h1>Garden progress</h1>
-          <p>This path belongs to Clovermeadow villagers.</p>
-        </header>
-        <p className="muted">
-          <Link href="/village">Return to your village</Link>
-        </p>
-      </main>
+      <WorkshopAccessDenied
+        decision={decision}
+        workshopTitle="Garden progress"
+        crestKinds={["clover-blossom", "clover-butterfly-small", "clover-bunny"]}
+      />
     );
   }
 

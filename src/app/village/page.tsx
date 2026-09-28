@@ -28,6 +28,7 @@ import { WelcomeLetterModal } from "@/components/WelcomeLetterModal";
 import { VisitorWelcomeModal } from "@/components/VisitorWelcomeModal";
 import { LostChronicles } from "@/components/LostChronicles";
 import { ChronicleAdminEditor } from "@/components/ChronicleAdminEditor";
+import { WorkshopAccessAdmin } from "@/components/WorkshopAccessAdmin";
 import { VillageTasksAdminEditor } from "@/components/VillageTasksAdminEditor";
 import { LibraryAdminEditor } from "@/components/LibraryAdminEditor";
 import { MeetingBenchTeaser } from "@/components/MeetingBenchTeaser";
@@ -94,7 +95,13 @@ export default async function VillagePage() {
     RANK_LADDER.find((r) => r.minRep > liveStats.reputation) || null;
   const chronicleProgress = getChronicleProgress(
     user.id,
-    stats.villageId as VillageId
+    stats.villageId as VillageId,
+    {
+      id: user.id,
+      isOwner: user.isOwner,
+      homeVillageId: user.homeVillageId,
+      villageId: user.villageId,
+    }
   );
   const meetingBenchTeaser = getMeetingBenchTeaser(village.id);
 
@@ -414,6 +421,9 @@ export default async function VillagePage() {
             <VillageTasksAdminEditor
               initialVillageId={stats.villageId as VillageId}
             />
+          </div>
+          <div style={{ marginTop: "0.75rem" }}>
+            <WorkshopAccessAdmin />
           </div>
           <div style={{ marginTop: "0.75rem" }}>
             <ChronicleAdminEditor

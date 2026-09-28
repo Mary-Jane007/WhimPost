@@ -21,6 +21,11 @@ function loadPersistentTvMedia() {
   return require("@/lib/persistentTvMedia") as typeof import("@/lib/persistentTvMedia");
 }
 
+function loadWorkshopAccess() {
+  // Lazy require: workshopAccess imports getDb(); avoid circular init.
+  return require("@/lib/workshopAccess") as typeof import("@/lib/workshopAccess");
+}
+
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
@@ -380,6 +385,7 @@ function migrate(db: Database.Database) {
       unlock_key TEXT NOT NULL,
       unlock_count INTEGER NOT NULL DEFAULT 1,
       published INTEGER NOT NULL DEFAULT 1,
+      visibility_mode TEXT NOT NULL DEFAULT 'VILLAGE_MEMBERS_ONLY',
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),
       UNIQUE(village_id, page_number)
     );
@@ -588,6 +594,13 @@ function migrate(db: Database.Database) {
     "workshop_journal",
     "shared",
     "shared INTEGER NOT NULL DEFAULT 0"
+  );
+  // Additive only — never rewrite title/body on chronicle_pages.
+  ensureColumn(
+    db,
+    "chronicle_pages",
+    "visibility_mode",
+    "visibility_mode TEXT NOT NULL DEFAULT 'VILLAGE_MEMBERS_ONLY'"
   );
 
   db.exec(`
@@ -826,6 +839,14 @@ function createDb() {
   } catch (err) {
     console.error("[persistent-chronicle-pages] import failed:", err);
   }
+  // Workshop access modes (owner-configured) — never touches chronicle text.
+  try {
+    const workshopAccess = loadWorkshopAccess();
+    workshopAccess.ensureWorkshopAccessTables(db);
+    workshopAccess.importPersistentWorkshopAccess(db);
+  } catch (err) {
+    console.error("[persistent-workshop-access] import failed:", err);
+  }
   return db;
 }
 
@@ -903,6 +924,13 @@ export function getDb() {
         importPersistentChroniclePages(globalForDb.whimpostDb);
       } catch (err) {
         console.error("[persistent-chronicle-pages] import failed:", err);
+      }
+      try {
+        const workshopAccess = loadWorkshopAccess();
+        workshopAccess.ensureWorkshopAccessTables(globalForDb.whimpostDb);
+        workshopAccess.importPersistentWorkshopAccess(globalForDb.whimpostDb);
+      } catch (err) {
+        console.error("[persistent-workshop-access] import failed:", err);
       }
       try {
         importPersistentWelcomeLetters(globalForDb.whimpostDb);
