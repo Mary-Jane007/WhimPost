@@ -8,6 +8,11 @@ import { getVillage, isVillageId } from "@/lib/villages";
 import { persistAllDurableState } from "@/lib/tvPersist";
 import { isProtectedTvChannelTitle, isSharedTvChannelTitle } from "@/lib/tvProtectedChannels";
 import {
+  clearTvClipRemoved,
+  markTvClipRemoved,
+  renameTvClipInDurableCatalogs,
+} from "@/lib/persistentTvMedia";
+import {
   addVideoToChannelSchedule,
   probeAndStoreDuration,
   removeVideoFromChannelSchedule,
@@ -283,6 +288,10 @@ export function deleteChannel(channelId: string, user: UserPublic) {
   db.prepare(`DELETE FROM tv_videos WHERE channel_id = ?`).run(channelId);
   db.prepare(`DELETE FROM tv_channels WHERE id = ?`).run(channelId);
 
+  for (const filename of filenames) {
+    markTvClipRemoved(db, filename);
+  }
+
   try {
     persistAllDurableState(db);
   } catch (err) {
@@ -302,6 +311,8 @@ export function createVideo(input: {
   channelId: string;
 }): TvVideo {
   const db = getDb();
+  // Re-uploading a previously deleted file brings it back for every lounge.
+  clearTvClipRemoved(db, input.filename);
   const id = randomUUID();
   db.prepare(
     `INSERT INTO tv_videos
@@ -360,13 +371,25 @@ export function deleteVideo(videoId: string, user: UserPublic) {
   }
   const db = getDb();
   const filename = video.url.replace("/api/uploads/", "");
-  if (video.channelId) {
-    removeVideoFromChannelSchedule(video.channelId, videoId);
+
+  // Remove every catalog row for this file so a shared channel stays in sync
+  // across all village lounges (imports can occasionally leave duplicates).
+  const siblings = db
+    .prepare(`SELECT id, channel_id FROM tv_videos WHERE filename = ?`)
+    .all(filename) as Array<{ id: string; channel_id: string | null }>;
+
+  for (const sibling of siblings) {
+    if (sibling.channel_id) {
+      removeVideoFromChannelSchedule(sibling.channel_id, sibling.id);
+    }
+    db.prepare(
+      `UPDATE tv_rooms SET current_video_id = NULL WHERE current_video_id = ?`
+    ).run(sibling.id);
+    db.prepare(`DELETE FROM tv_videos WHERE id = ?`).run(sibling.id);
   }
-  db.prepare(
-    `UPDATE tv_rooms SET current_video_id = NULL WHERE current_video_id = ?`
-  ).run(videoId);
-  db.prepare(`DELETE FROM tv_videos WHERE id = ?`).run(videoId);
+
+  markTvClipRemoved(db, filename);
+
   try {
     persistAllDurableState(db);
   } catch (err) {
@@ -393,7 +416,15 @@ export function renameVideo(
     return { ok: false as const, error: "Give the clip a name" };
   }
   const db = getDb();
-  db.prepare(`UPDATE tv_videos SET title = ? WHERE id = ?`).run(title, videoId);
+  const filename = video.url.replace("/api/uploads/", "");
+
+  // Rename every row for this file so every-village lounges see the same title.
+  db.prepare(`UPDATE tv_videos SET title = ? WHERE filename = ?`).run(
+    title,
+    filename
+  );
+  renameTvClipInDurableCatalogs(db, filename, title);
+
   try {
     persistAllDurableState(db);
   } catch (err) {
