@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-28T16:15:57.663Z",
+  "updatedAt": "2026-09-28T16:19:54.549Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -367,6 +367,7 @@
       "filename": "702859a4-90d6-4141-9bcf-d255974ce2f9.mp4",
       "mime": "video/mp4",
       "sizeBytes": 1,
+      "durationMs": 120000,
       "channelTitle": "The Storybook Cinema",
       "villageId": null,
       "isGlobal": true
@@ -380,20 +381,11 @@
       "channelTitle": "The Storybook Cinema",
       "villageId": null,
       "isGlobal": true
-    },
-    {
-      "title": "Pride and-Prejudice",
-      "filename": "34a22219-79ea-4b22-94b6-4d218e664e0e.mp4",
-      "mime": "video/mp4",
-      "sizeBytes": 7714796889,
-      "durationMs": 7388333,
-      "channelTitle": "The Storybook Cinema",
-      "villageId": null,
-      "isGlobal": true
     }
   ],
   "removedFilenames": [
     "1ef1a01e-ecf0-45d6-b86f-0c31897bb6b9.mp4",
+    "34a22219-79ea-4b22-94b6-4d218e664e0e.mp4",
     "3fa4a145-ae79-419a-9d26-b95fd864ba6d.mp4",
     "57d32cd3-3626-494f-a8e5-aab99f7453df.mp4"
   ]
