@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T20:07:55.865Z",
+  "updatedAt": "2026-09-28T16:09:38.231Z",
   "pages": [
     {
-      "id": "7cbff7fd-5e57-4552-bdc2-f40b94a310a1",
+      "id": "a35d630d-b83c-41ec-886a-6cca2f028324",
       "villageId": "bramblewood",
       "pageNumber": 1,
       "title": "Where the First Path Began",
@@ -12,10 +12,11 @@
       "unlockKey": "workshop.complete",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "PUBLIC",
       "updatedAt": "2026-09-16 17:57:18"
     },
     {
-      "id": "ff98f7f8-6121-46a3-b60a-4002fa3ed271",
+      "id": "f44091ce-ab92-4580-8f18-002aa3234a53",
       "villageId": "bramblewood",
       "pageNumber": 2,
       "title": "The Builders of the Wood",
@@ -24,10 +25,11 @@
       "unlockKey": "workshop.journalEntry",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-16 17:58:22"
     },
     {
-      "id": "0180a73e-880f-4d92-a0e9-4b150d24d8c0",
+      "id": "7913d569-0619-4c32-99d5-3a8a7a8d8727",
       "villageId": "bramblewood",
       "pageNumber": 3,
       "title": "The Year of the Great Storm",
@@ -36,10 +38,11 @@
       "unlockKey": "workshop.bird",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-16 17:59:24"
     },
     {
-      "id": "733e6368-ab9b-43eb-b9dd-e39846253414",
+      "id": "fed1d57d-d1d2-48b3-9b08-0bf8cea57242",
       "villageId": "bramblewood",
       "pageNumber": 4,
       "title": "The Trails Continue.",
@@ -48,10 +51,11 @@
       "unlockKey": "workshop.complete",
       "unlockCount": 3,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-16 18:00:17"
     },
     {
-      "id": "c58d4853-4a92-41bb-916f-277abdc9bf9b",
+      "id": "2f26d094-c110-4203-b7c4-5950adbc0a40",
       "villageId": "clovermeadow",
       "pageNumber": 1,
       "title": "The Meadow That Would Not Stay Empty",
@@ -60,10 +64,11 @@
       "unlockKey": "garden.completeDaily",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "PUBLIC",
       "updatedAt": "2026-09-17 23:13:18"
     },
     {
-      "id": "ab255a09-12d3-4e7c-8256-641d242e0f0e",
+      "id": "dac2ab54-13b2-4a9d-94cc-4099da92d1ad",
       "villageId": "clovermeadow",
       "pageNumber": 2,
       "title": "The Secret Gardeners",
@@ -72,10 +77,11 @@
       "unlockKey": "garden.spotFlower",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:18:37"
     },
     {
-      "id": "588eeda9-47fa-4dcb-b037-32f4d4912c7e",
+      "id": "0c74849e-c586-4f5f-bf9a-7d18fad3ae56",
       "villageId": "clovermeadow",
       "pageNumber": 3,
       "title": "The Night of the Lanterns",
@@ -84,10 +90,11 @@
       "unlockKey": "garden.completeDaily",
       "unlockCount": 3,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:16:46"
     },
     {
-      "id": "0657d380-91b4-4b00-b298-3dff2e85c96c",
+      "id": "34042375-ff1a-43c6-9576-ba0998bc1388",
       "villageId": "clovermeadow",
       "pageNumber": 4,
       "title": "The Garden Beneath the Meadow",
@@ -96,10 +103,11 @@
       "unlockKey": "garden.completeKindness",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:18:32"
     },
     {
-      "id": "d3cc3800-a37b-41a9-ba72-9c96224d6a77",
+      "id": "e96c99fe-b5cd-40e0-acfc-b3d3bf1f7b00",
       "villageId": "hearthwick",
       "pageNumber": 1,
       "title": "The House With the Red Door",
@@ -108,10 +116,11 @@
       "unlockKey": "hearth.completeRitual",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "PUBLIC",
       "updatedAt": "2026-09-17 23:38:15"
     },
     {
-      "id": "77f5616c-e70d-4fac-ac84-96fc5d89fea4",
+      "id": "86505443-0414-42e3-9ef2-9f9783aecee8",
       "villageId": "hearthwick",
       "pageNumber": 2,
       "title": "The Great Baking Day",
@@ -120,10 +129,11 @@
       "unlockKey": "hearth.leaveNote",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:39:11"
     },
     {
-      "id": "69f2d265-a375-491a-9bd3-6137e855cfa9",
+      "id": "b7719257-e195-45c5-8988-a3ba4ab3988b",
       "villageId": "hearthwick",
       "pageNumber": 3,
       "title": "The Winter the Fire Went Out",
@@ -132,10 +142,11 @@
       "unlockKey": "hearth.toggleRecipeFavorite",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:40:56"
     },
     {
-      "id": "8a83f3d1-eaa7-4135-916b-0cb6b453d03b",
+      "id": "a1444e66-2c4b-4f04-887d-b26307108afc",
       "villageId": "hearthwick",
       "pageNumber": 4,
       "title": "Every Stranger Is Welcomed Home",
@@ -144,10 +155,11 @@
       "unlockKey": "hearth.completeCandleCraft",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:42:40"
     },
     {
-      "id": "ddd080be-7e7c-420e-9684-1ab1cfd0c547",
+      "id": "a3a62408-06a0-4567-a419-df7b9a80c47b",
       "villageId": "moonmere",
       "pageNumber": 1,
       "title": "The Village After Sunset",
@@ -156,10 +168,11 @@
       "unlockKey": "moon.completeRitual",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "PUBLIC",
       "updatedAt": "2026-09-17 23:35:06"
     },
     {
-      "id": "47ff1e50-0141-48ff-9f21-4bb1adb556c2",
+      "id": "e7e4e081-5c99-49bf-8b88-dcbabb84dfe7",
       "villageId": "moonmere",
       "pageNumber": 2,
       "title": "The Night Watchers",
@@ -168,10 +181,11 @@
       "unlockKey": "moon.saveJournal",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:31:01"
     },
     {
-      "id": "bfa7f9dc-fac6-4ef3-b2e2-faf843c60fcd",
+      "id": "b8bead3d-fe5e-4d28-aa29-b608d3cc9916",
       "villageId": "moonmere",
       "pageNumber": 3,
       "title": "The Night the Moon Disappeared",
@@ -180,10 +194,11 @@
       "unlockKey": "moon.submitDream",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:32:36"
     },
     {
-      "id": "35ce29b8-c03b-4531-b32b-2a0c7ef9bade",
+      "id": "0ef7fffb-d13a-44a7-8aa1-b56beb23dc8a",
       "villageId": "moonmere",
       "pageNumber": 4,
       "title": "The Light That Remained",
@@ -192,10 +207,11 @@
       "unlockKey": "moon.completeRitual",
       "unlockCount": 3,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:34:51"
     },
     {
-      "id": "0da05598-9145-44ce-8c1a-763ac138108f",
+      "id": "95a06f73-c365-4f57-a274-b345e36a21f6",
       "villageId": "mosshollow",
       "pageNumber": 1,
       "title": "The Village That Kept Its Books",
@@ -204,10 +220,11 @@
       "unlockKey": "library.finishBook",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "PUBLIC",
       "updatedAt": "2026-09-17 23:22:41"
     },
     {
-      "id": "770fdb1f-86e7-47e3-a363-306d3c6a22ad",
+      "id": "4124b7cf-a8dd-468c-a927-03503f023225",
       "villageId": "mosshollow",
       "pageNumber": 2,
       "title": "The Owl in the Bell Tower",
@@ -216,10 +233,11 @@
       "unlockKey": "library.solveMystery",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:25:54"
     },
     {
-      "id": "e5b34025-7ef4-469f-848d-0d810f1c1795",
+      "id": "3be41294-af14-48f4-92ae-d3e3d60d05c8",
       "villageId": "mosshollow",
       "pageNumber": 3,
       "title": "The Book That Was Never Written",
@@ -228,10 +246,11 @@
       "unlockKey": "library.claimSecret",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:25:42"
     },
     {
-      "id": "9e903af2-7f3f-4dba-88b2-1987f5a862b2",
+      "id": "3605ef6e-6fcb-4f33-9855-10b86c9220e8",
       "villageId": "mosshollow",
       "pageNumber": 4,
       "title": "The Last Page",
@@ -240,6 +259,7 @@
       "unlockKey": "library.journalEntry",
       "unlockCount": 1,
       "published": true,
+      "visibilityMode": "VILLAGE_MEMBERS_ONLY",
       "updatedAt": "2026-09-17 23:27:40"
     }
   ]
