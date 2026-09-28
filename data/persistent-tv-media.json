@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-28T16:09:48.714Z",
+  "updatedAt": "2026-09-28T16:15:57.663Z",
   "clips": [
     {
       "title": "A Fox's Tale- Survival in the Alpine Wild",
@@ -366,8 +366,7 @@
       "title": "Anne with an e - season 1 ep 1",
       "filename": "702859a4-90d6-4141-9bcf-d255974ce2f9.mp4",
       "mime": "video/mp4",
-      "sizeBytes": 2400008556,
-      "durationMs": 5279500,
+      "sizeBytes": 1,
       "channelTitle": "The Storybook Cinema",
       "villageId": null,
       "isGlobal": true
