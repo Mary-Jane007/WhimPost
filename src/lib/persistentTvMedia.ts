@@ -114,6 +114,7 @@ export function renameTvClipInDurableCatalogs(
 /**
  * Promote shared channels (Cottage Cartoons, Storybook Cinema) to every-village
  * and clear village locks on their clips so all lounges can tune in.
+ * Also clears village locks on ANY channel already marked is_global=1.
  */
 export function ensureSharedTvChannelsGlobal(db: Database) {
   const channels = db
@@ -122,19 +123,22 @@ export function ensureSharedTvChannelsGlobal(db: Database) {
 
   let changed = 0;
   for (const ch of channels) {
-    if (!isSharedTvChannelTitle(ch.title)) continue;
-    if (!ch.is_global) {
+    const sharedTitle = isSharedTvChannelTitle(ch.title);
+    const isGlobal = Boolean(ch.is_global) || sharedTitle;
+    if (sharedTitle && !ch.is_global) {
       db.prepare(`UPDATE tv_channels SET is_global = 1 WHERE id = ?`).run(ch.id);
       changed += 1;
     }
-    const locked = db
+    if (!isGlobal) continue;
+    // Global channels are one shared catalog — never village-lock clips.
+    const unlocked = db
       .prepare(
         `UPDATE tv_videos
          SET village_id = NULL
          WHERE channel_id = ? AND village_id IS NOT NULL`
       )
       .run(ch.id).changes;
-    changed += locked;
+    changed += unlocked;
   }
   return changed;
 }
@@ -282,8 +286,8 @@ export function exportPersistentTvMedia(db: Database) {
   for (const row of rows) {
     if (row.filename.startsWith("link-")) continue;
     if (removed.has(row.filename)) continue;
-    const filePath = path.join(UPLOAD_DIR, row.filename);
-    if (!fs.existsSync(filePath) && !clipBytesPresent(row.filename)) continue;
+    // Keep the catalog row even when local bytes are briefly missing — uploads
+    // stay saved until the owner manually removes them. Bytes heal later.
     byFilename.set(row.filename, {
       title: row.title,
       filename: row.filename,
@@ -403,18 +407,21 @@ export function importPersistentTvMedia(db: Database) {
       if (filename.startsWith("link-") || filename.includes("..")) continue;
       if (removed.has(filename)) continue;
 
-      if (!clipBytesPresent(filename)) {
+      // Always restore catalog metadata — even when bytes are not on disk yet.
+      // Missing bytes are healed by ensureTvUploadBytes; the clip must never
+      // vanish from the channel shelf unless the owner deleted it.
+      const bytesReady = clipBytesPresent(filename);
+      if (!bytesReady) {
         skippedMissing += 1;
-        continue;
       }
 
       const uploadPath = path.join(UPLOAD_DIR, filename);
       const sizeBytes =
         clip.sizeBytes > 0
           ? clip.sizeBytes
-          : fs.existsSync(uploadPath)
+          : bytesReady && fs.existsSync(uploadPath)
             ? fs.statSync(uploadPath).size
-            : 0;
+            : Math.max(0, Number(clip.sizeBytes) || 0);
       const villageId =
         String(clip.villageId || "mosshollow").trim() || "mosshollow";
       const isGlobal =
@@ -519,7 +526,7 @@ export function importPersistentTvMedia(db: Database) {
 
   if (skippedMissing > 0) {
     console.warn(
-      `[persistent-tv-media] restored ${restored} clip(s); skipped ${skippedMissing} missing upload file(s)`
+      `[persistent-tv-media] restored ${restored} clip(s); ${skippedMissing} still waiting on upload bytes (kept on shelf)`
     );
   } else if (restored > 0) {
     console.info(`[persistent-tv-media] restored ${restored} uploaded clip(s)`);

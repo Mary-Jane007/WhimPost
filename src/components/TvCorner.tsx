@@ -897,9 +897,9 @@ export function TvCorner({
           </div>
           <p>{uploadProgress || "Working…"}</p>
           <p className="tv-upload-banner-hint">
-            Keep this tab open until 100%. Movies upload in small pieces — if a
-            piece fails it retries automatically. Renames and removals on shared
-            channels apply in every village lounge.
+            Keep this tab open until 100%. Uploaded clips stay saved on the site
+            until you remove them. Renames and removals on every-village channels
+            update that channel in every lounge.
           </p>
         </div>
       ) : null}
@@ -1245,7 +1245,7 @@ export function TvCorner({
           <h2>Channel shelf</h2>
           <p className="tv-shelf-copy">
             {user.isOwner
-              ? "Each channel has its own bar — add videos anytime and they join that channel’s shuffle for the whole village."
+              ? "Each channel has its own bar — add videos anytime and they stay saved until you remove them. Every-village channels share one catalog in every lounge."
               : "Tune a channel to watch with the village. Now playing and tonight’s shuffle stay in sync for everyone."}
           </p>
 
@@ -1297,8 +1297,9 @@ export function TvCorner({
                 Share with every village
               </label>
               <p className="muted tv-global-hint">
-                Rename or remove a clip on a shared channel and every village
-                lounge updates together.
+                Every-village channels (like Storybook Cinema) are one shared
+                shelf — rename or remove a clip and every lounge updates
+                together. Uploads stay saved until you remove them yourself.
               </p>
               <button type="submit" className="btn-secondary" disabled={busy}>
                 Make channel
