@@ -29,6 +29,12 @@ const DEBOUNCE_MS = 2500;
 type GlobalPersist = typeof globalThis & {
   whimpostTvPersistTimer?: ReturnType<typeof setTimeout>;
   whimpostTvPersistRunning?: boolean;
+  whimpostTvPersistPromise?: Promise<{
+    ok: boolean;
+    committed: boolean;
+    pushed: boolean;
+    error?: string;
+  }>;
 };
 
 function gitOk() {
@@ -374,7 +380,9 @@ export function scheduleDurableTvGitSync() {
 
 /**
  * Cancel the debounce timer and push durable catalogs now.
- * Used after character / chronicle saves so data cannot vanish on logout or restart.
+ * Used after TV uploads / character saves so media cannot vanish on logout
+ * or restart. Waits for any in-flight sync, then runs again so the latest
+ * catalogs are included.
  */
 export async function flushDurableTvGitSync() {
   if (!durablePersistEnabled() || !gitOk()) {
@@ -385,7 +393,54 @@ export async function flushDurableTvGitSync() {
     clearTimeout(g.whimpostTvPersistTimer);
     g.whimpostTvPersistTimer = undefined;
   }
+  if (g.whimpostTvPersistPromise) {
+    try {
+      await g.whimpostTvPersistPromise;
+    } catch {
+      // continue — we still try a fresh sync below
+    }
+  }
   return runDurableTvGitSync();
+}
+
+/**
+ * Publish clip bytes to the durable media shelf, then flush catalogs to git.
+ * Call after every TV Corner upload completes — awaited before the HTTP
+ * response — so logout / exit / idle restarts cannot drop the clip.
+ */
+export async function durableSealTvMedia(filenames: string[]) {
+  const names = filenames
+    .map((name) => path.basename(String(name || "").trim()))
+    .filter(Boolean);
+
+  let publish: { ok: boolean; uploaded: number; error?: string } = {
+    ok: true,
+    uploaded: 0,
+  };
+  if (names.length) {
+    try {
+      const { publishUploadedMediaNow } =
+        require("@/lib/mediaRelease") as typeof import("@/lib/mediaRelease");
+      publish = publishUploadedMediaNow(names);
+      if (!publish.ok) {
+        console.error(
+          "[persistent-tv] durable media publish incomplete:",
+          publish.error || names.join(", ")
+        );
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("[persistent-tv] durable media publish failed:", message);
+      publish = { ok: false, uploaded: 0, error: message };
+    }
+  }
+
+  const flush = await flushDurableTvGitSync();
+  return {
+    ok: Boolean(publish.ok) && Boolean(flush.ok),
+    publish,
+    flush,
+  };
 }
 
 function withLock(fn: () => void) {
@@ -533,151 +588,164 @@ export async function runDurableTvGitSync(): Promise<{
   }
 
   const g = globalThis as GlobalPersist;
-  if (g.whimpostTvPersistRunning) {
-    scheduleDurableTvGitSync();
-    return { ok: true, committed: false, pushed: false };
+  if (g.whimpostTvPersistRunning && g.whimpostTvPersistPromise) {
+    return g.whimpostTvPersistPromise;
   }
+
   g.whimpostTvPersistRunning = true;
+  let work!: Promise<{
+    ok: boolean;
+    committed: boolean;
+    pushed: boolean;
+    error?: string;
+  }>;
+  work = (async () => {
+    try {
+      let committed = false;
+      let pushed = false;
+      let error: string | undefined;
 
-  try {
-    let committed = false;
-    let pushed = false;
-    let error: string | undefined;
-
-    const ran = withLock(() => {
-      // Publish playable binaries to the GitHub Release shelf first so every
-      // server can restore them even when Git LFS quota is exhausted.
-      try {
-        const published = publishReleaseAssets(
-          listReleaseNamesForPlayableUploads()
-        );
-        if (published.uploaded) {
-          console.info(
-            `[media-release] published ${published.uploaded} durable asset(s)`
+      const ran = withLock(() => {
+        // Publish playable binaries to the GitHub Release shelf first so every
+        // server can restore them even when Git LFS quota is exhausted.
+        try {
+          const published = publishReleaseAssets(
+            listReleaseNamesForPlayableUploads()
           );
+          if (published.uploaded) {
+            console.info(
+              `[media-release] published ${published.uploaded} durable asset(s)`
+            );
+          }
+        } catch (err) {
+          console.warn("[media-release] publish failed:", err);
         }
-      } catch (err) {
-        console.warn("[media-release] publish failed:", err);
-      }
 
-      // Stage catalogs + small uploads (images / restored epubs / audio).
-      // Large video bytes live on the release shelf — do not rely on Git LFS.
-      const uploadPaths = listCatalogUploadPaths().filter((rel) => {
-        const abs = path.join(ROOT, rel);
-        if (isPointerOrTiny(abs)) return false;
-        // Keep committing modest files in git; skip huge videos.
-        return fs.statSync(abs).size < 95 * 1024 * 1024;
-      });
-      git([
-        "add",
-        "-f",
-        "--",
-        "data/persistent-tv.json",
-        "data/persistent-tv-media.json",
-        "data/persistent-library-books.json",
-        "data/persistent-moon-sounds.json",
-        "data/persistent-site-uploads.json",
-        "data/persistent-village-media.json",
-        "data/persistent-accounts.json",
-        "data/persistent-welcome-letters.json",
-        "data/persistent-meeting-bench.json",
-        "data/persistent-chronicle-pages.json",
-        "data/locked-main.json",
-        "data/locked-tv-media.json",
-        ...uploadPaths,
-      ]);
-
-      // Also stage deletions of previously tracked TV videos that left the catalog.
-      try {
-        const deleted = git([
-          "ls-files",
-          "--deleted",
+        // Stage catalogs + small uploads (images / restored epubs / audio).
+        // Large video bytes live on the release shelf — do not rely on Git LFS.
+        const uploadPaths = listCatalogUploadPaths().filter((rel) => {
+          const abs = path.join(ROOT, rel);
+          if (isPointerOrTiny(abs)) return false;
+          // Keep committing modest files in git; skip huge videos.
+          return fs.statSync(abs).size < 95 * 1024 * 1024;
+        });
+        git([
+          "add",
+          "-f",
           "--",
-          "data/uploads",
-        ])
+          "data/persistent-tv.json",
+          "data/persistent-tv-media.json",
+          "data/persistent-library-books.json",
+          "data/persistent-moon-sounds.json",
+          "data/persistent-site-uploads.json",
+          "data/persistent-village-media.json",
+          "data/persistent-accounts.json",
+          "data/persistent-welcome-letters.json",
+          "data/persistent-meeting-bench.json",
+          "data/persistent-chronicle-pages.json",
+          "data/locked-main.json",
+          "data/locked-tv-media.json",
+          ...uploadPaths,
+        ]);
+
+        // Also stage deletions of previously tracked TV videos that left the catalog.
+        try {
+          const deleted = git([
+            "ls-files",
+            "--deleted",
+            "--",
+            "data/uploads",
+          ])
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) =>
+              /\.(mp4|webm|mov|m4v|mkv|avi|mpeg|mpg|epub|pdf|mp3|wav|ogg|m4a|aac)$/i.test(
+                line
+              )
+            );
+          if (deleted.length) {
+            git(["add", "--", ...deleted]);
+          }
+        } catch {
+          // ignore
+        }
+
+        const staged = git(["diff", "--cached", "--name-only"])
           .split("\n")
           .map((line) => line.trim())
-          .filter((line) =>
-            /\.(mp4|webm|mov|m4v|mkv|avi|mpeg|mpg|epub|pdf|mp3|wav|ogg|m4a|aac)$/i.test(
-              line
-            )
+          .filter(Boolean)
+          .filter(
+            (line) =>
+              line === "data/persistent-tv.json" ||
+              line === "data/persistent-tv-media.json" ||
+              line === "data/persistent-library-books.json" ||
+              line === "data/persistent-moon-sounds.json" ||
+              line === "data/persistent-site-uploads.json" ||
+              line === "data/persistent-village-media.json" ||
+              line === "data/persistent-accounts.json" ||
+              line === "data/persistent-welcome-letters.json" ||
+              line === "data/persistent-meeting-bench.json" ||
+              line === "data/persistent-chronicle-pages.json" ||
+              line === "data/locked-main.json" ||
+              line === "data/locked-tv-media.json" ||
+              (line.startsWith("data/uploads/") &&
+                !line.includes("/.incoming/") &&
+                !line.includes("/.media-release-staging/"))
           );
-        if (deleted.length) {
-          git(["add", "--", ...deleted]);
+        if (staged.length === 0) {
+          return;
         }
-      } catch {
-        // ignore
-      }
 
-      const staged = git(["diff", "--cached", "--name-only"])
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean)
-        .filter(
-          (line) =>
-            line === "data/persistent-tv.json" ||
-            line === "data/persistent-tv-media.json" ||
-            line === "data/persistent-library-books.json" ||
-            line === "data/persistent-moon-sounds.json" ||
-            line === "data/persistent-site-uploads.json" ||
-            line === "data/persistent-village-media.json" ||
-            line === "data/persistent-accounts.json" ||
-            line === "data/persistent-welcome-letters.json" ||
-            line === "data/persistent-meeting-bench.json" ||
-            line === "data/persistent-chronicle-pages.json" ||
-            line === "data/locked-main.json" ||
-            line === "data/locked-tv-media.json" ||
-            (line.startsWith("data/uploads/") &&
-              !line.includes("/.incoming/") &&
-              !line.includes("/.media-release-staging/"))
+        git([
+          "commit",
+          "-m",
+          "Persist media catalogs and uploads so clips survive resets",
+          "--",
+          ...staged,
+        ]);
+        committed = true;
+
+        const branch = git(["rev-parse", "--abbrev-ref", "HEAD"]);
+        if (!branch || branch === "HEAD") {
+          console.warn(
+            "[persistent-tv] durable commit saved locally (detached HEAD; not pushed)"
+          );
+          // Still try to mirror catalogs onto main so media never strands.
+          pushDurableCatalogsToMain(staged);
+          return;
+        }
+
+        git(["push", "-u", "origin", "HEAD"], { timeout: 20 * 60_000 });
+        pushed = true;
+        console.info(
+          `[persistent-tv] durable shelf pushed to origin/${branch} (${staged.length} path(s))`
         );
-      if (staged.length === 0) {
-        return;
+
+        // Always mirror durable catalogs onto main so feature-branch drift cannot
+        // leave TV media / locks only on a throwaway branch.
+        if (branch !== "main") {
+          pushDurableCatalogsToMain(staged);
+        }
+      });
+
+      if (!ran) {
+        // Another sync holds the lock — try again shortly.
+        scheduleDurableTvGitSync();
       }
 
-      git([
-        "commit",
-        "-m",
-        "Persist media catalogs and uploads so clips survive resets",
-        "--",
-        ...staged,
-      ]);
-      committed = true;
-
-      const branch = git(["rev-parse", "--abbrev-ref", "HEAD"]);
-      if (!branch || branch === "HEAD") {
-        console.warn(
-          "[persistent-tv] durable commit saved locally (detached HEAD; not pushed)"
-        );
-        // Still try to mirror catalogs onto main so media never strands.
-        pushDurableCatalogsToMain(staged);
-        return;
+      return { ok: !error, committed, pushed, error };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("[persistent-tv] durable git sync failed:", message);
+      return { ok: false, committed: false, pushed: false, error: message };
+    } finally {
+      g.whimpostTvPersistRunning = false;
+      if (g.whimpostTvPersistPromise === work) {
+        g.whimpostTvPersistPromise = undefined;
       }
-
-      git(["push", "-u", "origin", "HEAD"], { timeout: 20 * 60_000 });
-      pushed = true;
-      console.info(
-        `[persistent-tv] durable shelf pushed to origin/${branch} (${staged.length} path(s))`
-      );
-
-      // Always mirror durable catalogs onto main so feature-branch drift cannot
-      // leave TV media / locks only on a throwaway branch.
-      if (branch !== "main") {
-        pushDurableCatalogsToMain(staged);
-      }
-    });
-
-    if (!ran) {
-      // Another sync holds the lock — try again shortly.
-      scheduleDurableTvGitSync();
     }
+  })();
 
-    return { ok: !error, committed, pushed, error };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error("[persistent-tv] durable git sync failed:", message);
-    return { ok: false, committed: false, pushed: false, error: message };
-  } finally {
-    g.whimpostTvPersistRunning = false;
-  }
+  g.whimpostTvPersistPromise = work;
+  return work;
 }
