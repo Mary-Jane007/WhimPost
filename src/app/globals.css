@@ -16377,3 +16377,24 @@ body.theme-hearthwick .char-portrait-caption em {
   font-size: 0.84rem;
   color: var(--workshop-admin-ink);
 }
+
+.workshop-access-tile .btn-secondary,
+body.theme-bramblewood .workshop-access-tile .btn-secondary,
+body.theme-clovermeadow .workshop-access-tile .btn-secondary,
+body.theme-mosshollow .workshop-access-tile .btn-secondary,
+body.theme-moonmere .workshop-access-tile .btn-secondary,
+body.theme-hearthwick .workshop-access-tile .btn-secondary {
+  color: #1f1610 !important;
+  border: 1px solid rgba(90, 64, 40, 0.35) !important;
+  background: #f3e8d8 !important;
+}
+
+.workshop-access-tile .btn-secondary:hover,
+body.theme-bramblewood .workshop-access-tile .btn-secondary:hover,
+body.theme-clovermeadow .workshop-access-tile .btn-secondary:hover,
+body.theme-mosshollow .workshop-access-tile .btn-secondary:hover,
+body.theme-moonmere .workshop-access-tile .btn-secondary:hover,
+body.theme-hearthwick .workshop-access-tile .btn-secondary:hover {
+  color: #140e0a !important;
+  background: #ead9c4 !important;
+}
