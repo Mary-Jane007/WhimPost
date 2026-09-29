@@ -16280,11 +16280,6 @@ body.theme-hearthwick .char-portrait-caption em {
   color: var(--workshop-admin-ink);
 }
 
-.workshop-access-tile,
-.workshop-access-tile * {
-  color: inherit;
-}
-
 .workshop-access-tile header h3 {
   margin: 0;
   font-size: 1.05rem;
