@@ -12663,6 +12663,15 @@ button.mh-card-cover {
   filter: var(--mb-photo-filter, none);
 }
 
+/* Real village notice board — pin surface stays centered for overlays */
+.mb-board-photo {
+  object-position: center 46%;
+  max-height: min(58vh, 32rem);
+}
+.mb-board-photo-wrap {
+  border-radius: 1.35rem 1.15rem 1.55rem 1.25rem / 1.15rem 1.45rem 1.1rem 1.4rem;
+}
+
 .mb-bench-photo-wrap::after {
   content: "";
   position: absolute;

@@ -147,19 +147,19 @@ export function MeetingBench({
           </header>
 
           <div className="mb-scene-ground">
-            <div className="mb-bench-figure">
-              <div className="mb-bench-photo-wrap">
+            <div className="mb-bench-figure mb-board-figure">
+              <div className="mb-bench-photo-wrap mb-board-photo-wrap">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  className="mb-bench-photo"
-                  src="/meeting-bench/bench-nature.png"
+                  className="mb-bench-photo mb-board-photo"
+                  src="/meeting-bench/village-notice-board.jpg"
                   alt=""
                   width={1280}
                   height={720}
                 />
               </div>
               <p className="mb-bench-caption">
-                {theme.boardLabel} · {theme.benchLabel}
+                {theme.boardLabel}
               </p>
             </div>
 
@@ -180,7 +180,7 @@ export function MeetingBench({
                 type="button"
                 className={`mb-discovery-nudge ${discoverySeen ? "seen" : ""}`}
                 onClick={openDiscovery}
-                aria-label="Something caught your eye under the bench"
+                aria-label="Something caught your eye behind the board"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -247,7 +247,7 @@ export function MeetingBench({
 
       <section className="mb-journal" aria-labelledby="mb-journal-title">
         <header className="mb-journal-head">
-          <h2 id="mb-journal-title">Bench Journal</h2>
+          <h2 id="mb-journal-title">Board Journal</h2>
           <p>A little village record of what has been left here.</p>
         </header>
         {journal.length === 0 ? (

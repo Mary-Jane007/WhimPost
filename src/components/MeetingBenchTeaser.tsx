@@ -10,7 +10,7 @@ export function MeetingBenchTeaser({
 }) {
   return (
     <section className={`village-panel mb-teaser season-${teaser.season}`}>
-      <h2>🪑 The Vilage Board</h2>
+      <h2>📋 The Vilage Board</h2>
       <p className="section-lead">
         Come sit for a little while — the keeper may have left something new to
         discover.
