@@ -16278,16 +16278,32 @@ body.theme-hearthwick .char-portrait-caption em {
   margin: 0.85rem 0 1rem;
 }
 
+/* Cream management tiles — dark ink for readability (village themes use pale
+   muted text meant for dark panels, which washes out on these cards). */
 .workshop-access-tile {
+  --workshop-admin-ink: #1f1610;
+  --workshop-admin-soft: #3d2e22;
   padding: 0.9rem 1rem 1rem;
   border-radius: 14px;
-  border: 1px solid rgba(90, 64, 40, 0.16);
-  background: rgba(255, 252, 246, 0.72);
+  border: 1px solid rgba(90, 64, 40, 0.22);
+  background: #fffaf2;
+  color: var(--workshop-admin-ink);
 }
 
 .workshop-access-tile header h3 {
   margin: 0;
   font-size: 1.05rem;
+  color: var(--workshop-admin-ink);
+  opacity: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: var(--font-display);
+}
+
+.workshop-access-tile .muted,
+.workshop-access-tile .section-lead {
+  color: var(--workshop-admin-soft) !important;
+  opacity: 1;
 }
 
 .workshop-access-tile label {
@@ -16296,6 +16312,8 @@ body.theme-hearthwick .char-portrait-caption em {
   gap: 0.25rem;
   margin-top: 0.55rem;
   font-size: 0.86rem;
+  color: var(--workshop-admin-ink);
+  font-weight: 600;
 }
 
 .workshop-access-tile select,
@@ -16305,8 +16323,9 @@ body.theme-hearthwick .char-portrait-caption em {
   font: inherit;
   padding: 0.35rem 0.45rem;
   border-radius: 8px;
-  border: 1px solid rgba(90, 64, 40, 0.22);
+  border: 1px solid rgba(90, 64, 40, 0.28);
   background: #fffdf8;
+  color: #1f1610;
 }
 
 .workshop-access-status {
@@ -16315,22 +16334,26 @@ body.theme-hearthwick .char-portrait-caption em {
   font-weight: 600;
 }
 
-.workshop-access-status.tone-open { color: #2f6b3a; }
-.workshop-access-status.tone-closed { color: #8a3a2a; }
-.workshop-access-status.tone-event { color: #2a5f8a; }
+.workshop-access-status.tone-open { color: #1f5a2c !important; }
+.workshop-access-status.tone-closed { color: #7a2a1c !important; }
+.workshop-access-status.tone-event { color: #1a4a72 !important; }
 
 .workshop-access-event {
   margin-top: 0.65rem;
   font-size: 0.88rem;
+  color: var(--workshop-admin-ink);
 }
 
 .workshop-access-activities {
   margin-top: 0.75rem;
+  color: var(--workshop-admin-ink);
 }
 
 .workshop-access-activities h4 {
   margin: 0 0 0.35rem;
   font-size: 0.92rem;
+  color: var(--workshop-admin-ink);
+  opacity: 1;
 }
 
 .workshop-access-activities ul {
@@ -16348,6 +16371,7 @@ body.theme-hearthwick .char-portrait-caption em {
   align-items: center;
   justify-content: space-between;
   font-size: 0.86rem;
+  color: var(--workshop-admin-ink);
 }
 
 .workshop-access-add-activity {
@@ -16361,4 +16385,26 @@ body.theme-hearthwick .char-portrait-caption em {
   align-items: center;
   gap: 0.35rem;
   font-size: 0.84rem;
+  color: var(--workshop-admin-ink);
+}
+
+.workshop-access-tile .btn-secondary,
+body.theme-bramblewood .workshop-access-tile .btn-secondary,
+body.theme-clovermeadow .workshop-access-tile .btn-secondary,
+body.theme-mosshollow .workshop-access-tile .btn-secondary,
+body.theme-moonmere .workshop-access-tile .btn-secondary,
+body.theme-hearthwick .workshop-access-tile .btn-secondary {
+  color: #1f1610 !important;
+  border: 1px solid rgba(90, 64, 40, 0.35) !important;
+  background: #f3e8d8 !important;
+}
+
+.workshop-access-tile .btn-secondary:hover,
+body.theme-bramblewood .workshop-access-tile .btn-secondary:hover,
+body.theme-clovermeadow .workshop-access-tile .btn-secondary:hover,
+body.theme-mosshollow .workshop-access-tile .btn-secondary:hover,
+body.theme-moonmere .workshop-access-tile .btn-secondary:hover,
+body.theme-hearthwick .workshop-access-tile .btn-secondary:hover {
+  color: #140e0a !important;
+  background: #ead9c4 !important;
 }
