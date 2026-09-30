@@ -12783,20 +12783,21 @@ button.mh-card-cover {
   font-family: var(--font-stamp, inherit);
 }
 
-.mb-place-pin-tl { left: 3%; top: 8%; }
-.mb-place-pin-tr { right: 3%; top: 10%; }
-.mb-place-pin-ml { left: 1.5%; top: 42%; }
-.mb-place-pin-mr { right: 1.5%; top: 44%; }
-.mb-place-pin-bl { left: 8%; bottom: 18%; }
-.mb-place-pin-br { right: 8%; bottom: 16%; }
-.mb-place-seat-left { left: 18%; bottom: 34%; }
-.mb-place-seat-mid { left: 50%; bottom: 38%; transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)); }
-.mb-place-seat-right { right: 18%; bottom: 34%; }
-.mb-place-ground-left { left: 6%; bottom: 10%; }
-.mb-place-ground-right { right: 6%; bottom: 10%; }
-.mb-place-air-left { left: 10%; top: 6%; }
-.mb-place-air-right { right: 10%; top: 8%; }
-.mb-place-under { left: 50%; bottom: 4%; transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)); }
+/* Pin placements sit on the cork face of the notice board (inside the posts). */
+.mb-place-pin-tl { left: 18%; top: 18%; }
+.mb-place-pin-tr { right: 18%; top: 20%; }
+.mb-place-pin-ml { left: 16%; top: 42%; }
+.mb-place-pin-mr { right: 16%; top: 44%; }
+.mb-place-pin-bl { left: 20%; bottom: 22%; }
+.mb-place-pin-br { right: 20%; bottom: 20%; }
+.mb-place-seat-left { left: 22%; bottom: 30%; }
+.mb-place-seat-mid { left: 50%; bottom: 34%; transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)); }
+.mb-place-seat-right { right: 22%; bottom: 30%; }
+.mb-place-ground-left { left: 18%; bottom: 14%; }
+.mb-place-ground-right { right: 18%; bottom: 14%; }
+.mb-place-air-left { left: 20%; top: 14%; }
+.mb-place-air-right { right: 20%; top: 16%; }
+.mb-place-under { left: 50%; bottom: 8%; transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)); }
 
 .mb-place-seat-mid:hover,
 .mb-place-seat-mid:focus-visible,
@@ -13112,15 +13113,15 @@ button.mh-card-cover {
   .mb-scene-ground { min-height: auto; }
   .mb-bench-photo { max-height: min(46vh, 22rem); }
   .mb-scene-hero { margin-top: 3.1rem; }
-  .mb-place-pin-tl { left: 1%; top: 4%; }
-  .mb-place-pin-tr { right: 1%; top: 6%; }
-  .mb-place-pin-ml { left: 0; top: 38%; }
-  .mb-place-pin-mr { right: 0; top: 40%; }
-  .mb-place-pin-bl { left: 4%; bottom: 16%; }
-  .mb-place-pin-br { right: 4%; bottom: 14%; }
-  .mb-place-seat-left { left: 8%; bottom: 32%; }
-  .mb-place-seat-mid { bottom: 36%; }
-  .mb-place-seat-right { right: 8%; bottom: 32%; }
+  .mb-place-pin-tl { left: 14%; top: 16%; }
+  .mb-place-pin-tr { right: 14%; top: 18%; }
+  .mb-place-pin-ml { left: 12%; top: 40%; }
+  .mb-place-pin-mr { right: 12%; top: 42%; }
+  .mb-place-pin-bl { left: 16%; bottom: 20%; }
+  .mb-place-pin-br { right: 16%; bottom: 18%; }
+  .mb-place-seat-left { left: 16%; bottom: 28%; }
+  .mb-place-seat-mid { bottom: 32%; }
+  .mb-place-seat-right { right: 16%; bottom: 28%; }
   .mb-object { max-width: 6.2rem; }
   .mb-object-sticker-wrap { width: 3rem; height: 3rem; }
   .mb-question-jar {
@@ -13177,15 +13178,15 @@ button.mh-card-cover {
   .mb-scene-ground { min-height: auto; }
   .mb-bench-photo { max-height: min(46vh, 22rem); }
   .mb-scene-hero { margin-top: 3.2rem; }
-  .mb-place-pin-tl { left: 1%; top: 4%; }
-  .mb-place-pin-tr { right: 1%; top: 6%; }
-  .mb-place-pin-ml { left: 0; top: 38%; }
-  .mb-place-pin-mr { right: 0; top: 40%; }
-  .mb-place-pin-bl { left: 4%; bottom: 16%; }
-  .mb-place-pin-br { right: 4%; bottom: 14%; }
-  .mb-place-seat-left { left: 8%; bottom: 32%; }
-  .mb-place-seat-mid { bottom: 36%; }
-  .mb-place-seat-right { right: 8%; bottom: 32%; }
+  .mb-place-pin-tl { left: 14%; top: 16%; }
+  .mb-place-pin-tr { right: 14%; top: 18%; }
+  .mb-place-pin-ml { left: 12%; top: 40%; }
+  .mb-place-pin-mr { right: 12%; top: 42%; }
+  .mb-place-pin-bl { left: 16%; bottom: 20%; }
+  .mb-place-pin-br { right: 16%; bottom: 18%; }
+  .mb-place-seat-left { left: 16%; bottom: 28%; }
+  .mb-place-seat-mid { bottom: 32%; }
+  .mb-place-seat-right { right: 16%; bottom: 28%; }
   .mb-object { max-width: 6.2rem; }
   .mb-object-sticker-wrap { width: 3rem; height: 3rem; }
   .mb-question-jar {
