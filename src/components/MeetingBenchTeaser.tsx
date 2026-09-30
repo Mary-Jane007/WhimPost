@@ -10,7 +10,7 @@ export function MeetingBenchTeaser({
 }) {
   return (
     <section className={`village-panel mb-teaser season-${teaser.season}`}>
-      <h2>🪑 The Meeting Bench</h2>
+      <h2>🪑 The Vilage Board</h2>
       <p className="section-lead">
         Come sit for a little while — the keeper may have left something new to
         discover.
@@ -71,11 +71,11 @@ export function MeetingBenchTeaser({
 
       <div className="mb-teaser-actions">
         <Link href="/meeting-bench" className="btn-primary">
-          Sit at the Bench
+          Open The Vilage Board
         </Link>
         {isOwner ? (
           <Link href="/meeting-bench#mb-owner-desk" className="btn-secondary">
-            Edit Meeting Bench
+            Edit The Vilage Board
           </Link>
         ) : null}
       </div>

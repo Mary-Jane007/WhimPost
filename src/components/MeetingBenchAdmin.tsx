@@ -133,7 +133,7 @@ const QUICK_LINKS = [
   { label: "Write a letter", href: "/compose" },
   { label: "Village", href: "/village" },
   { label: "TV Corner", href: "/tv-corner" },
-  { label: "Meeting Bench", href: "/meeting-bench" },
+  { label: "The Vilage Board", href: "/meeting-bench" },
 ];
 
 export function MeetingBenchAdmin({
@@ -170,7 +170,7 @@ export function MeetingBenchAdmin({
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error || "Could not load Meeting Bench");
+      setError(data.error || "Could not load The Vilage Board");
       return;
     }
     const list = (data.items || []) as BenchItem[];
@@ -367,7 +367,7 @@ export function MeetingBenchAdmin({
             className="btn-primary"
             onClick={() => setOpen(true)}
           >
-            Edit Meeting Bench
+            Edit The Vilage Board
           </button>
           <Link href="/compose" className="btn-secondary">
             ✉ Write a letter
@@ -385,7 +385,7 @@ export function MeetingBenchAdmin({
     <section className="mb-admin" id="mb-owner-desk">
       <div className="mb-admin-head">
         <div>
-          <h3>Edit Meeting Bench</h3>
+          <h3>Edit The Vilage Board</h3>
           <p className="mb-admin-lead">
             This board is global — every village sees the same papers. Add and
             rewrite notices, gatherings, seasonal activities, Chronicle stories,
@@ -680,7 +680,7 @@ export function MeetingBenchAdmin({
           <fieldset className="mb-admin-villages">
             <legend>Which villages does this mention?</legend>
             <p className="mb-admin-lead mb-admin-villages-hint">
-              The Meeting Bench itself is shared by everyone. Use this to tag
+              The Vilage Board itself is shared by everyone. Use this to tag
               which village(s) a paper is about — leave “All villages” for
               world-wide news.
             </p>

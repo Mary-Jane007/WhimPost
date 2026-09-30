@@ -63,7 +63,7 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   bramblewood: {
     villageId: "bramblewood",
     kicker: "Shared clearing · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "What's rustling in the woods?",
     sceneLabel: "A forest gathering board above a rustic wooden bench",
     benchLabel: "Forest bench",
@@ -94,7 +94,7 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   mosshollow: {
     villageId: "mosshollow",
     kicker: "Shared reading nook · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "Gather around — there's something to discuss.",
     sceneLabel: "A mossy reading board beside a woodland bench",
     benchLabel: "Mossy bench",
@@ -125,7 +125,7 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   hearthwick: {
     villageId: "hearthwick",
     kicker: "Shared cottage porch · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "Come sit a while.",
     sceneLabel: "A cozy cottage gathering board by the porch bench",
     benchLabel: "Cottage bench",
@@ -158,7 +158,7 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   clovermeadow: {
     villageId: "clovermeadow",
     kicker: "Shared meadow · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "Something new is blooming.",
     sceneLabel: "A meadow gathering board among wildflowers",
     benchLabel: "Meadow bench",
@@ -189,7 +189,7 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   moonmere: {
     villageId: "moonmere",
     kicker: "Shared lakeside · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "Something has washed ashore…",
     sceneLabel: "A lakeside gathering board beneath the moon",
     benchLabel: "Lakeside bench",

@@ -92,7 +92,7 @@ export default async function MeetingBenchPage() {
         {isOwner ? (
           <p className="mb-owner-banner">
             You&apos;re the board keeper — use{" "}
-            <a href="#mb-owner-desk">Edit Meeting Bench</a> to pin notes,
+            <a href="#mb-owner-desk">Edit The Vilage Board</a> to pin notes,
             events, activities, Chronicle stories, and community gatherings.
             For the full WhimPost picture, open{" "}
             <Link href="/admin/analytics">Owner Analytics</Link>.
