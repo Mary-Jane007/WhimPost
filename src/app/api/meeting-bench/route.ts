@@ -9,6 +9,7 @@ import {
   getMeetingBenchBoard,
   getMeetingBenchTeaser,
   listMeetingBenchItems,
+  updateMeetingBenchBoardPosition,
   updateMeetingBenchItem,
   type BenchItemKind,
   type BenchItemStatus,
@@ -156,6 +157,25 @@ export async function PATCH(req: NextRequest) {
     unknown
   > | null;
   if (!body?.id) return jsonError("Missing item id");
+
+  // Owner drag-to-place on the living board — only moves the pin.
+  if (body.action === "place") {
+    const boardX = Number(body.boardX);
+    const boardY = Number(body.boardY);
+    if (!Number.isFinite(boardX) || !Number.isFinite(boardY)) {
+      return jsonError("Need boardX and boardY");
+    }
+    const placed = updateMeetingBenchBoardPosition(
+      String(body.id),
+      boardX,
+      boardY
+    );
+    if (!placed.ok) return jsonError(placed.error);
+    return NextResponse.json({
+      item: placed.item,
+      board: getMeetingBenchBoard(),
+    });
+  }
 
   const patch: Parameters<typeof updateMeetingBenchItem>[1] = {};
   if (body.kind !== undefined) {

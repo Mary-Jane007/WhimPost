@@ -368,7 +368,21 @@ export type SceneObject = {
   placement: BenchObjectPlacement;
   featured: boolean;
   rotation: number;
+  /** Owner-saved percent position on the notice board face (0–100). */
+  boardPos: { x: number; y: number } | null;
 };
+
+function readBoardPos(
+  meta: Record<string, unknown>
+): { x: number; y: number } | null {
+  const x = Number(meta.boardX);
+  const y = Number(meta.boardY);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return {
+    x: Math.min(94, Math.max(6, x)),
+    y: Math.min(90, Math.max(8, y)),
+  };
+}
 
 /** Pick the most interesting items to pin as physical objects on the board. */
 export function buildSceneObjects(
@@ -401,6 +415,8 @@ export function buildSceneObjects(
     const objectId = objectForEntry(villageId, entryType);
     const meta = OBJECT_META[objectId];
     const rotations = [-8, 5, -4, 7, -6, 3, -2];
+    const boardPos =
+      entryType === "discovery" ? null : readBoardPos(item.meta || {});
     return {
       id: item.id,
       item,
@@ -415,6 +431,7 @@ export function buildSceneObjects(
           : BOARD_PLACEMENTS[index % BOARD_PLACEMENTS.length],
       featured: Boolean(item.pinned) || index === 0,
       rotation: rotations[index % rotations.length],
+      boardPos,
     };
   });
 }

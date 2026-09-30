@@ -12701,6 +12701,12 @@ button.mh-card-cover {
   z-index: 5;
   pointer-events: none;
 }
+.mb-scene-objects.mb-objects-editable {
+  touch-action: none;
+}
+.mb-scene-objects.is-dragging {
+  cursor: grabbing;
+}
 .mb-object {
   pointer-events: auto;
   position: absolute;
@@ -12717,12 +12723,39 @@ button.mh-card-cover {
   z-index: 6;
   transform: rotate(var(--mb-pin-rot, 0deg));
   transition: transform 0.25s cubic-bezier(0.34, 1.45, 0.64, 1), filter 0.25s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.mb-object.mb-object-draggable {
+  cursor: grab;
+  touch-action: none;
+}
+.mb-object.mb-object-draggable:active,
+.mb-object.mb-object-draggable.is-dragging {
+  cursor: grabbing;
+  z-index: 12;
+  transition: none;
+  filter: drop-shadow(0 10px 16px rgba(40, 28, 18, 0.28));
+}
+.mb-object.mb-object-placed {
+  /* Custom left/top from owner placement overrides slot classes. */
+  right: auto;
+  bottom: auto;
 }
 .mb-object:hover,
 .mb-object:focus-visible {
   transform: rotate(var(--mb-pin-rot, 0deg)) translateY(-6px) scale(1.06);
   outline: none;
   z-index: 7;
+}
+.mb-object.mb-object-placed:hover,
+.mb-object.mb-object-placed:focus-visible {
+  transform: translate(-50%, -45%) rotate(var(--mb-pin-rot, 0deg)) translateY(-6px) scale(1.06);
+}
+.mb-object.mb-object-placed.is-dragging,
+.mb-object.mb-object-placed.is-dragging:hover {
+  transform: translate(-50%, -45%) rotate(var(--mb-pin-rot, 0deg)) scale(1.08);
 }
 .mb-object:focus-visible .mb-object-sticker-wrap {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
