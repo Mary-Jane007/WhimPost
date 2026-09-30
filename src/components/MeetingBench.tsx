@@ -465,6 +465,7 @@ function BenchObjectButton({
     moved: boolean;
     pos: { x: number; y: number } | null;
   } | null>(null);
+  const suppressClickRef = useRef(false);
 
   const boardPos = livePos || obj.boardPos;
   const placed = Boolean(boardPos);

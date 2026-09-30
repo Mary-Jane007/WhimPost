@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-30T16:44:11.798Z",
+  "updatedAt": "2026-09-30T17:21:19.515Z",
   "items": [
     {
       "id": "e13155a5-27ae-4747-91dc-b6733fedcc3d",
@@ -17,9 +17,9 @@
       "cta_href": "/village",
       "pinned": 1,
       "sort_order": 10,
-      "meta_json": "{}",
+      "meta_json": "{\"boardX\":55,\"boardY\":40}",
       "created_at": "2026-08-14 15:23:30",
-      "updated_at": "2026-08-14 15:23:30",
+      "updated_at": "2026-09-30 17:21:19",
       "created_by": null
     },
     {
