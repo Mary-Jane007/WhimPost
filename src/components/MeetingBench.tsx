@@ -152,7 +152,7 @@ export function MeetingBench({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className="mb-bench-photo mb-board-photo"
-                  src="/meeting-bench/village-notice-board.jpg"
+                  src="/meeting-bench/village-notice-board.png"
                   alt=""
                   width={1280}
                   height={720}
