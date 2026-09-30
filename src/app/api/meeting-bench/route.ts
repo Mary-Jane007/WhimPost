@@ -46,7 +46,7 @@ async function requireOwner() {
   const db = getDb();
   if (!user.isOwner && !isSiteOwner(db, user.id)) {
     return {
-      error: jsonError("Only the site owner can edit the Meeting Bench", 403),
+      error: jsonError("Only the site owner can edit The Vilage Board", 403),
     };
   }
   return { user };
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     string,
     unknown
   > | null;
-  if (!body) return jsonError("Expected Meeting Bench item data");
+  if (!body) return jsonError("Expected The Vilage Board item data");
 
   const kind = String(body.kind || "") as BenchItemKind;
   if (!KINDS.has(kind)) return jsonError("Unknown board kind");

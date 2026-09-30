@@ -63,10 +63,10 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   bramblewood: {
     villageId: "bramblewood",
     kicker: "Shared clearing · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "What's rustling in the woods?",
-    sceneLabel: "A forest gathering board above a rustic wooden bench",
-    benchLabel: "Forest bench",
+    sceneLabel: "A forest village notice board in a mossy clearing",
+    benchLabel: "Forest board",
     boardLabel: "Bramblewood notice board",
     ambient: [
       "/stickers/villages/bramblewood/fox-face.png",
@@ -94,10 +94,10 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   mosshollow: {
     villageId: "mosshollow",
     kicker: "Shared reading nook · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "Gather around — there's something to discuss.",
-    sceneLabel: "A mossy reading board beside a woodland bench",
-    benchLabel: "Mossy bench",
+    sceneLabel: "A mossy reading notice board in the woodland nook",
+    benchLabel: "Mossy board",
     boardLabel: "Mosshollow reading board",
     ambient: [
       "/stickers/villages/mosshollow/pack/books-stack.png",
@@ -125,10 +125,10 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   hearthwick: {
     villageId: "hearthwick",
     kicker: "Shared cottage porch · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "Come sit a while.",
-    sceneLabel: "A cozy cottage gathering board by the porch bench",
-    benchLabel: "Cottage bench",
+    sceneLabel: "A cozy cottage porch notice board",
+    benchLabel: "Cottage board",
     boardLabel: "Hearthwick porch board",
     ambient: [
       "/stickers/villages/hearthwick/hedgehog.png",
@@ -158,10 +158,10 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   clovermeadow: {
     villageId: "clovermeadow",
     kicker: "Shared meadow · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "Something new is blooming.",
-    sceneLabel: "A meadow gathering board among wildflowers",
-    benchLabel: "Meadow bench",
+    sceneLabel: "A meadow village notice board among wildflowers",
+    benchLabel: "Meadow board",
     boardLabel: "Clovermeadow garden board",
     ambient: [
       "/stickers/villages/clovermeadow/butterfly-pink.png",
@@ -189,10 +189,10 @@ export const VILLAGE_BENCH_THEMES: Record<VillageId, VillageBenchTheme> = {
   moonmere: {
     villageId: "moonmere",
     kicker: "Shared lakeside · every village",
-    headline: "The Meeting Bench",
+    headline: "The Vilage Board",
     subtitle: "Something has washed ashore…",
-    sceneLabel: "A lakeside gathering board beneath the moon",
-    benchLabel: "Lakeside bench",
+    sceneLabel: "A lakeside village notice board beneath the moon",
+    benchLabel: "Lakeside board",
     boardLabel: "Moonmere shore board",
     ambient: [
       "/stickers/villages/moonmere/luna-moth.png",
