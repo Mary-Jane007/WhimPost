@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --webpack -H 0.0.0.0 -p ${PORT:-3333}",
     "build": "next build --webpack",
-    "start": "next start -H 0.0.0.0 -p ${PORT:-3333}",
+    "start": "node scripts/start.mjs",
     "lint": "eslint src --max-warnings 0",
     "persist-tv": "node scripts/persist-tv.mjs",
     "persist-tv:push": "node scripts/persist-tv.mjs --push",
