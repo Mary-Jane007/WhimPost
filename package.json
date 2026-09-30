@@ -14,28 +14,31 @@
     "persist-library-books": "node scripts/persist-library-books.mjs"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.11.1",
-    "epubjs": "^0.3.93",
-    "framer-motion": "^12.42.2",
-    "jose": "^6.2.3",
-    "next": "^16.2.10",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "uuid": "^14.0.1"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "^16.2.10",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.11.1",
+    "epubjs": "^0.3.93",
+    "framer-motion": "^12.42.2",
+    "jose": "^6.2.3",
+    "next": "^16.2.10",
     "postcss": "^8",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "eslint": "^9",
+    "eslint-config-next": "^16.2.10"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
