@@ -57,6 +57,7 @@ export function MeetingBenchWorkspace({
         isOwner={isOwner}
         onEditItem={isOwner ? editItem : undefined}
         onAddKind={isOwner ? addKind : undefined}
+        onBoardChange={setBoard}
       />
 
       {isOwner ? (
