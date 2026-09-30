@@ -620,7 +620,7 @@ export function MeetingBenchAdmin({
               <span className="mb-admin-lead">
                 Tip: use <code>poll</code> / <code>question</code> for the Question
                 Jar (put choices as bullet lines in the body), or{" "}
-                <code>discovery</code> for a hidden spark under the bench.
+                <code>discovery</code> for a hidden spark behind the board.
               </span>
             </label>
           </div>
