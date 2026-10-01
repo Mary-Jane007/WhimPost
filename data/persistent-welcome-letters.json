@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-30T16:44:22.417Z",
+  "updatedAt": "2026-10-01T17:02:44.317Z",
   "letters": [
     {
       "id": "df6594e1-dcdd-41d6-8df7-12660e7e623a",
@@ -68,8 +68,8 @@
       "waxSeal": "spiral",
       "stampStyle": "fox-seated",
       "fontStyle": "typewriter",
-      "stickersJson": "[{\"id\":\"welcome-fox\",\"kind\":\"bramble-fox-sitting\",\"x\":92,\"y\":8,\"scale\":0.68,\"rotation\":10},{\"id\":\"welcome-maple\",\"kind\":\"bramble-maple-leaf\",\"x\":8,\"y\":10,\"scale\":0.58,\"rotation\":-14},{\"id\":\"welcome-compass\",\"kind\":\"bramble-compass\",\"x\":9,\"y\":88,\"scale\":0.55,\"rotation\":-6},{\"id\":\"welcome-mushroom\",\"kind\":\"bramble-mushroom\",\"x\":93,\"y\":92,\"scale\":0.55,\"rotation\":8}]",
-      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":8,\"y\":6,\"scale\":0.5,\"rotation\":-8}]",
+      "stickersJson": "[{\"id\":\"welcome-fox\",\"kind\":\"bramble-fox-sitting\",\"x\":96,\"y\":4,\"scale\":0.48,\"rotation\":10},{\"id\":\"welcome-maple\",\"kind\":\"bramble-maple-leaf\",\"x\":4,\"y\":5,\"scale\":0.42,\"rotation\":-14},{\"id\":\"welcome-compass\",\"kind\":\"bramble-compass\",\"x\":4,\"y\":95,\"scale\":0.42,\"rotation\":-6},{\"id\":\"welcome-mushroom\",\"kind\":\"bramble-mushroom\",\"x\":96,\"y\":72,\"scale\":0.42,\"rotation\":8}]",
+      "scrapJson": "[{\"id\":\"welcome-stain\",\"kind\":\"tea-stain\",\"x\":5,\"y\":4,\"scale\":0.42,\"rotation\":-8}]",
       "isRead": true,
       "sentAt": "2026-08-14 16:02:03",
       "createdAt": "2026-08-14 16:02:03"
