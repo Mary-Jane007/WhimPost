@@ -9,6 +9,7 @@ import {
   getMeetingBenchBoard,
   getMeetingBenchTeaser,
   listMeetingBenchItems,
+  updateMeetingBenchBoardPosition,
   updateMeetingBenchItem,
   type BenchItemKind,
   type BenchItemStatus,
@@ -46,7 +47,7 @@ async function requireOwner() {
   const db = getDb();
   if (!user.isOwner && !isSiteOwner(db, user.id)) {
     return {
-      error: jsonError("Only the site owner can edit the Meeting Bench", 403),
+      error: jsonError("Only the site owner can edit The Vilage Board", 403),
     };
   }
   return { user };
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
     string,
     unknown
   > | null;
-  if (!body) return jsonError("Expected Meeting Bench item data");
+  if (!body) return jsonError("Expected The Vilage Board item data");
 
   const kind = String(body.kind || "") as BenchItemKind;
   if (!KINDS.has(kind)) return jsonError("Unknown board kind");
@@ -156,6 +157,25 @@ export async function PATCH(req: NextRequest) {
     unknown
   > | null;
   if (!body?.id) return jsonError("Missing item id");
+
+  // Owner drag-to-place on the living board — only moves the pin.
+  if (body.action === "place") {
+    const boardX = Number(body.boardX);
+    const boardY = Number(body.boardY);
+    if (!Number.isFinite(boardX) || !Number.isFinite(boardY)) {
+      return jsonError("Need boardX and boardY");
+    }
+    const placed = updateMeetingBenchBoardPosition(
+      String(body.id),
+      boardX,
+      boardY
+    );
+    if (!placed.ok) return jsonError(placed.error);
+    return NextResponse.json({
+      item: placed.item,
+      board: getMeetingBenchBoard(),
+    });
+  }
 
   const patch: Parameters<typeof updateMeetingBenchItem>[1] = {};
   if (body.kind !== undefined) {

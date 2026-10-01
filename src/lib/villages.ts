@@ -206,7 +206,7 @@ export const SHARED_FEATURES: Array<{
   { emoji: "🏘️", name: "Village Square" },
   { emoji: "📮", name: "Post Office" },
   { emoji: "🌳", name: "Notice Board" },
-  { emoji: "🪑", name: "Meeting Bench", href: "/meeting-bench" },
+  { emoji: "📋", name: "The Vilage Board", href: "/meeting-bench" },
   { emoji: "📬", name: "Daily Mail" },
 ];
 

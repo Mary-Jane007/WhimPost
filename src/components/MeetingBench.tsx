@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import type { BenchItem, BenchItemKind } from "@/lib/meetingBench";
 import type { VillageId } from "@/lib/villages";
 import { MeetingBenchReveal, entryTypeLabel } from "@/components/MeetingBenchReveal";
@@ -32,6 +38,7 @@ type Props = {
   isOwner?: boolean;
   onEditItem?: (id: string) => void;
   onAddKind?: (kind: BenchItemKind) => void;
+  onBoardChange?: (board: MeetingBenchBoard) => void;
 };
 
 export function MeetingBench({
@@ -42,11 +49,17 @@ export function MeetingBench({
   isOwner,
   onEditItem,
   onAddKind,
+  onBoardChange,
 }: Props) {
   const [board, setBoard] = useState(controlledBoard || initialBoard);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [discoverySeen, setDiscoverySeen] = useState(false);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [livePos, setLivePos] = useState<Record<string, { x: number; y: number }>>(
+    {}
+  );
+  const objectsLayerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (controlledBoard) setBoard(controlledBoard);
@@ -72,6 +85,70 @@ export function MeetingBench({
   const discovery = useMemo(() => findDiscoveryItem(allItems), [allItems]);
   const openObject = sceneObjects.find((o) => o.id === openId) || null;
   const ambient = theme.ambient.slice(0, 4);
+
+  function applyBoard(next: MeetingBenchBoard) {
+    setBoard(next);
+    onBoardChange?.(next);
+  }
+
+  function patchItemMeta(
+    prev: MeetingBenchBoard,
+    itemId: string,
+    metaPatch: Record<string, unknown>
+  ): MeetingBenchBoard {
+    const patchList = (list: BenchItem[]) =>
+      list.map((item) =>
+        item.id === itemId
+          ? { ...item, meta: { ...item.meta, ...metaPatch } }
+          : item
+      );
+    return {
+      ...prev,
+      notices: patchList(prev.notices),
+      gatherings: patchList(prev.gatherings),
+      seasonal: patchList(prev.seasonal),
+      chronicles: patchList(prev.chronicles),
+      communityEvents: patchList(prev.communityEvents),
+    };
+  }
+
+  async function saveBoardPosition(itemId: string, x: number, y: number) {
+    setBusyId(itemId);
+    try {
+      const res = await fetch("/api/meeting-bench", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: itemId,
+          action: "place",
+          boardX: x,
+          boardY: y,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not save place");
+      if (data.board) {
+        applyBoard(data.board as MeetingBenchBoard);
+      } else {
+        applyBoard(
+          patchItemMeta(board, itemId, { boardX: x, boardY: y })
+        );
+      }
+      setLivePos((prev) => {
+        const next = { ...prev };
+        delete next[itemId];
+        return next;
+      });
+    } catch {
+      setLivePos((prev) => {
+        const next = { ...prev };
+        delete next[itemId];
+        return next;
+      });
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   async function rsvp(itemId: string) {
     if (!canRsvp) return;
@@ -142,35 +219,56 @@ export function MeetingBench({
             <h2 className="mb-scene-title">{theme.headline}</h2>
             <p className="mb-scene-sub">{theme.subtitle}</p>
             <p className="mb-scene-hint">
-              Tap what the keeper pinned to the gathering board.
+              {isOwner
+                ? "Drag notes to arrange them — villagers can tap to read."
+                : "Tap what the keeper pinned to the gathering board."}
             </p>
           </header>
 
           <div className="mb-scene-ground">
-            <div className="mb-bench-figure">
-              <div className="mb-bench-photo-wrap">
+            <div className="mb-bench-figure mb-board-figure">
+              <div className="mb-bench-photo-wrap mb-board-photo-wrap">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  className="mb-bench-photo"
-                  src="/meeting-bench/bench-nature.png"
+                  className="mb-bench-photo mb-board-photo"
+                  src="/meeting-bench/village-notice-board.png"
                   alt=""
                   width={1280}
                   height={720}
                 />
               </div>
               <p className="mb-bench-caption">
-                {theme.boardLabel} · {theme.benchLabel}
+                {theme.boardLabel}
               </p>
             </div>
 
-            <div className="mb-scene-objects" role="list">
+            <div
+              className={`mb-scene-objects ${isOwner ? "mb-objects-editable" : ""} ${
+                dragId ? "is-dragging" : ""
+              }`}
+              role="list"
+              ref={objectsLayerRef}
+            >
               {sceneObjects
                 .filter((o) => o.placement !== "under")
                 .map((obj) => (
                   <BenchObjectButton
                     key={obj.id}
                     obj={obj}
+                    livePos={livePos[obj.id] || null}
+                    canDrag={Boolean(isOwner)}
+                    dragging={dragId === obj.id}
+                    layerRef={objectsLayerRef}
                     onOpen={() => setOpenId(obj.id)}
+                    onDragStart={() => setDragId(obj.id)}
+                    onDragMove={(pos) =>
+                      setLivePos((prev) => ({ ...prev, [obj.id]: pos }))
+                    }
+                    onDragEnd={async (pos, moved) => {
+                      setDragId(null);
+                      if (!moved || !pos) return;
+                      await saveBoardPosition(obj.id, pos.x, pos.y);
+                    }}
                   />
                 ))}
             </div>
@@ -180,7 +278,7 @@ export function MeetingBench({
                 type="button"
                 className={`mb-discovery-nudge ${discoverySeen ? "seen" : ""}`}
                 onClick={openDiscovery}
-                aria-label="Something caught your eye under the bench"
+                aria-label="Something caught your eye behind the board"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -199,6 +297,10 @@ export function MeetingBench({
                 <BenchObjectButton
                   key={obj.id}
                   obj={obj}
+                  livePos={null}
+                  canDrag={false}
+                  dragging={false}
+                  layerRef={objectsLayerRef}
                   onOpen={() => {
                     try {
                       localStorage.setItem(
@@ -211,6 +313,9 @@ export function MeetingBench({
                     setDiscoverySeen(true);
                     setOpenId(obj.id);
                   }}
+                  onDragStart={() => {}}
+                  onDragMove={() => {}}
+                  onDragEnd={() => {}}
                 />
               ))}
           </div>
@@ -218,7 +323,10 @@ export function MeetingBench({
 
         {isOwner ? (
           <div className="mb-scene-owner-row">
-            <p>Keeper tools — pin something new on the board:</p>
+            <p>
+              Keeper tools — drag notes on the board to place them, or pin
+              something new:
+            </p>
             <div className="mb-scene-owner-actions">
               {(
                 [
@@ -247,7 +355,7 @@ export function MeetingBench({
 
       <section className="mb-journal" aria-labelledby="mb-journal-title">
         <header className="mb-journal-head">
-          <h2 id="mb-journal-title">Bench Journal</h2>
+          <h2 id="mb-journal-title">Board Journal</h2>
           <p>A little village record of what has been left here.</p>
         </header>
         {journal.length === 0 ? (
@@ -328,21 +436,132 @@ export function MeetingBench({
 
 function BenchObjectButton({
   obj,
+  livePos,
+  canDrag,
+  dragging,
+  layerRef,
   onOpen,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
 }: {
   obj: SceneObject;
+  livePos: { x: number; y: number } | null;
+  canDrag: boolean;
+  dragging: boolean;
+  layerRef: RefObject<HTMLDivElement | null>;
   onOpen: () => void;
+  onDragStart: () => void;
+  onDragMove: (pos: { x: number; y: number }) => void;
+  onDragEnd: (
+    pos: { x: number; y: number } | null,
+    moved: boolean
+  ) => void | Promise<void>;
 }) {
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    moved: boolean;
+    pos: { x: number; y: number } | null;
+  } | null>(null);
+  const suppressClickRef = useRef(false);
+
+  const boardPos = livePos || obj.boardPos;
+  const placed = Boolean(boardPos);
+
+  function percentFromEvent(clientX: number, clientY: number) {
+    const layer = layerRef.current;
+    if (!layer) return null;
+    const rect = layer.getBoundingClientRect();
+    if (rect.width < 8 || rect.height < 8) return null;
+    const x = ((clientX - rect.left) / rect.width) * 100;
+    const y = ((clientY - rect.top) / rect.height) * 100;
+    return {
+      x: Math.min(94, Math.max(6, x)),
+      y: Math.min(90, Math.max(8, y)),
+    };
+  }
+
   return (
     <button
       type="button"
       role="listitem"
       className={`mb-object mb-place-${obj.placement} mb-obj-${obj.objectId} ${
         obj.featured ? "featured" : ""
-      }`}
-      style={{ ["--mb-pin-rot" as string]: `${obj.rotation}deg` }}
-      onClick={onOpen}
-      aria-label={`${obj.openVerb} — ${obj.label}`}
+      } ${placed ? "mb-object-placed" : ""} ${
+        canDrag ? "mb-object-draggable" : ""
+      } ${dragging ? "is-dragging" : ""}`}
+      style={{
+        ["--mb-pin-rot" as string]: `${obj.rotation}deg`,
+        ...(boardPos
+          ? {
+              left: `${boardPos.x}%`,
+              top: `${boardPos.y}%`,
+              right: "auto",
+              bottom: "auto",
+              transform: `translate(-50%, -45%) rotate(var(--mb-pin-rot, 0deg))`,
+            }
+          : null),
+      }}
+      onClick={(e) => {
+        if (dragRef.current?.moved) {
+          e.preventDefault();
+          return;
+        }
+        onOpen();
+      }}
+      onPointerDown={(e) => {
+        if (!canDrag || e.button !== 0) return;
+        const pos = percentFromEvent(e.clientX, e.clientY);
+        dragRef.current = {
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          moved: false,
+          pos: pos || boardPos,
+        };
+        onDragStart();
+        e.currentTarget.setPointerCapture(e.pointerId);
+      }}
+      onPointerMove={(e) => {
+        const drag = dragRef.current;
+        if (!canDrag || !drag || drag.pointerId !== e.pointerId) return;
+        const dist = Math.hypot(
+          e.clientX - drag.startX,
+          e.clientY - drag.startY
+        );
+        if (dist > 6) drag.moved = true;
+        if (!drag.moved) return;
+        const pos = percentFromEvent(e.clientX, e.clientY);
+        if (!pos) return;
+        drag.pos = pos;
+        onDragMove(pos);
+      }}
+      onPointerUp={(e) => {
+        const drag = dragRef.current;
+        if (!canDrag || !drag || drag.pointerId !== e.pointerId) return;
+        try {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
+          /* ignore */
+        }
+        const moved = drag.moved;
+        const pos = drag.pos;
+        dragRef.current = null;
+        void onDragEnd(pos, moved);
+      }}
+      onPointerCancel={() => {
+        const drag = dragRef.current;
+        dragRef.current = null;
+        void onDragEnd(drag?.pos || null, false);
+      }}
+      aria-label={
+        canDrag
+          ? `${obj.openVerb} — ${obj.label}. Drag to move.`
+          : `${obj.openVerb} — ${obj.label}`
+      }
+      title={canDrag ? "Drag to move · click to open" : undefined}
     >
       <span className="mb-object-pin" aria-hidden />
       <span className="mb-object-sticker-wrap">

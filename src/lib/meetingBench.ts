@@ -636,6 +636,25 @@ function getItemById(id: string) {
   return row ? mapItem(row) : null;
 }
 
+/** Clamp + store an owner-chosen pin position on the notice board (percent). */
+export function updateMeetingBenchBoardPosition(
+  id: string,
+  boardX: number,
+  boardY: number
+) {
+  const existing = getItemById(id);
+  if (!existing) return { ok: false as const, error: "Item not found" };
+  const x = Math.round(Math.min(94, Math.max(6, boardX)) * 10) / 10;
+  const y = Math.round(Math.min(90, Math.max(8, boardY)) * 10) / 10;
+  return updateMeetingBenchItem(id, {
+    meta: {
+      ...existing.meta,
+      boardX: x,
+      boardY: y,
+    },
+  });
+}
+
 export function updateMeetingBenchItem(
   id: string,
   patch: Partial<{

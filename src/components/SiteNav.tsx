@@ -65,7 +65,7 @@ export function SiteNav({
       ? [{ href: workshop.href, label: workshop.navLabel }]
       : []),
     { href: "/tv-corner", label: "TV Corner" },
-    { href: "/meeting-bench", label: "Meeting Bench" },
+    { href: "/meeting-bench", label: "The Vilage Board" },
     ...(user?.isOwner
       ? [{ href: "/admin/analytics", label: "Owner Analytics" }]
       : []),

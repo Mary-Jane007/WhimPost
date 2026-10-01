@@ -12663,6 +12663,15 @@ button.mh-card-cover {
   filter: var(--mb-photo-filter, none);
 }
 
+/* Real village notice board — pin surface stays centered for overlays */
+.mb-board-photo {
+  object-position: center 46%;
+  max-height: min(58vh, 32rem);
+}
+.mb-board-photo-wrap {
+  border-radius: 1.35rem 1.15rem 1.55rem 1.25rem / 1.15rem 1.45rem 1.1rem 1.4rem;
+}
+
 .mb-bench-photo-wrap::after {
   content: "";
   position: absolute;
@@ -12692,6 +12701,12 @@ button.mh-card-cover {
   z-index: 5;
   pointer-events: none;
 }
+.mb-scene-objects.mb-objects-editable {
+  touch-action: none;
+}
+.mb-scene-objects.is-dragging {
+  cursor: grabbing;
+}
 .mb-object {
   pointer-events: auto;
   position: absolute;
@@ -12708,12 +12723,39 @@ button.mh-card-cover {
   z-index: 6;
   transform: rotate(var(--mb-pin-rot, 0deg));
   transition: transform 0.25s cubic-bezier(0.34, 1.45, 0.64, 1), filter 0.25s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.mb-object.mb-object-draggable {
+  cursor: grab;
+  touch-action: none;
+}
+.mb-object.mb-object-draggable:active,
+.mb-object.mb-object-draggable.is-dragging {
+  cursor: grabbing;
+  z-index: 12;
+  transition: none;
+  filter: drop-shadow(0 10px 16px rgba(40, 28, 18, 0.28));
+}
+.mb-object.mb-object-placed {
+  /* Custom left/top from owner placement overrides slot classes. */
+  right: auto;
+  bottom: auto;
 }
 .mb-object:hover,
 .mb-object:focus-visible {
   transform: rotate(var(--mb-pin-rot, 0deg)) translateY(-6px) scale(1.06);
   outline: none;
   z-index: 7;
+}
+.mb-object.mb-object-placed:hover,
+.mb-object.mb-object-placed:focus-visible {
+  transform: translate(-50%, -45%) rotate(var(--mb-pin-rot, 0deg)) translateY(-6px) scale(1.06);
+}
+.mb-object.mb-object-placed.is-dragging,
+.mb-object.mb-object-placed.is-dragging:hover {
+  transform: translate(-50%, -45%) rotate(var(--mb-pin-rot, 0deg)) scale(1.08);
 }
 .mb-object:focus-visible .mb-object-sticker-wrap {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--village-color, #6b8f71) 40%, transparent);
@@ -12774,20 +12816,21 @@ button.mh-card-cover {
   font-family: var(--font-stamp, inherit);
 }
 
-.mb-place-pin-tl { left: 3%; top: 8%; }
-.mb-place-pin-tr { right: 3%; top: 10%; }
-.mb-place-pin-ml { left: 1.5%; top: 42%; }
-.mb-place-pin-mr { right: 1.5%; top: 44%; }
-.mb-place-pin-bl { left: 8%; bottom: 18%; }
-.mb-place-pin-br { right: 8%; bottom: 16%; }
-.mb-place-seat-left { left: 18%; bottom: 34%; }
-.mb-place-seat-mid { left: 50%; bottom: 38%; transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)); }
-.mb-place-seat-right { right: 18%; bottom: 34%; }
-.mb-place-ground-left { left: 6%; bottom: 10%; }
-.mb-place-ground-right { right: 6%; bottom: 10%; }
-.mb-place-air-left { left: 10%; top: 6%; }
-.mb-place-air-right { right: 10%; top: 8%; }
-.mb-place-under { left: 50%; bottom: 4%; transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)); }
+/* Pin placements sit on the cork face of the notice board (inside the posts). */
+.mb-place-pin-tl { left: 18%; top: 18%; }
+.mb-place-pin-tr { right: 18%; top: 20%; }
+.mb-place-pin-ml { left: 16%; top: 42%; }
+.mb-place-pin-mr { right: 16%; top: 44%; }
+.mb-place-pin-bl { left: 20%; bottom: 22%; }
+.mb-place-pin-br { right: 20%; bottom: 20%; }
+.mb-place-seat-left { left: 22%; bottom: 30%; }
+.mb-place-seat-mid { left: 50%; bottom: 34%; transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)); }
+.mb-place-seat-right { right: 22%; bottom: 30%; }
+.mb-place-ground-left { left: 18%; bottom: 14%; }
+.mb-place-ground-right { right: 18%; bottom: 14%; }
+.mb-place-air-left { left: 20%; top: 14%; }
+.mb-place-air-right { right: 20%; top: 16%; }
+.mb-place-under { left: 50%; bottom: 8%; transform: translateX(-50%) rotate(var(--mb-pin-rot, 0deg)); }
 
 .mb-place-seat-mid:hover,
 .mb-place-seat-mid:focus-visible,
@@ -13103,15 +13146,15 @@ button.mh-card-cover {
   .mb-scene-ground { min-height: auto; }
   .mb-bench-photo { max-height: min(46vh, 22rem); }
   .mb-scene-hero { margin-top: 3.1rem; }
-  .mb-place-pin-tl { left: 1%; top: 4%; }
-  .mb-place-pin-tr { right: 1%; top: 6%; }
-  .mb-place-pin-ml { left: 0; top: 38%; }
-  .mb-place-pin-mr { right: 0; top: 40%; }
-  .mb-place-pin-bl { left: 4%; bottom: 16%; }
-  .mb-place-pin-br { right: 4%; bottom: 14%; }
-  .mb-place-seat-left { left: 8%; bottom: 32%; }
-  .mb-place-seat-mid { bottom: 36%; }
-  .mb-place-seat-right { right: 8%; bottom: 32%; }
+  .mb-place-pin-tl { left: 14%; top: 16%; }
+  .mb-place-pin-tr { right: 14%; top: 18%; }
+  .mb-place-pin-ml { left: 12%; top: 40%; }
+  .mb-place-pin-mr { right: 12%; top: 42%; }
+  .mb-place-pin-bl { left: 16%; bottom: 20%; }
+  .mb-place-pin-br { right: 16%; bottom: 18%; }
+  .mb-place-seat-left { left: 16%; bottom: 28%; }
+  .mb-place-seat-mid { bottom: 32%; }
+  .mb-place-seat-right { right: 16%; bottom: 28%; }
   .mb-object { max-width: 6.2rem; }
   .mb-object-sticker-wrap { width: 3rem; height: 3rem; }
   .mb-question-jar {
@@ -13168,15 +13211,15 @@ button.mh-card-cover {
   .mb-scene-ground { min-height: auto; }
   .mb-bench-photo { max-height: min(46vh, 22rem); }
   .mb-scene-hero { margin-top: 3.2rem; }
-  .mb-place-pin-tl { left: 1%; top: 4%; }
-  .mb-place-pin-tr { right: 1%; top: 6%; }
-  .mb-place-pin-ml { left: 0; top: 38%; }
-  .mb-place-pin-mr { right: 0; top: 40%; }
-  .mb-place-pin-bl { left: 4%; bottom: 16%; }
-  .mb-place-pin-br { right: 4%; bottom: 14%; }
-  .mb-place-seat-left { left: 8%; bottom: 32%; }
-  .mb-place-seat-mid { bottom: 36%; }
-  .mb-place-seat-right { right: 8%; bottom: 32%; }
+  .mb-place-pin-tl { left: 14%; top: 16%; }
+  .mb-place-pin-tr { right: 14%; top: 18%; }
+  .mb-place-pin-ml { left: 12%; top: 40%; }
+  .mb-place-pin-mr { right: 12%; top: 42%; }
+  .mb-place-pin-bl { left: 16%; bottom: 20%; }
+  .mb-place-pin-br { right: 16%; bottom: 18%; }
+  .mb-place-seat-left { left: 16%; bottom: 28%; }
+  .mb-place-seat-mid { bottom: 32%; }
+  .mb-place-seat-right { right: 16%; bottom: 28%; }
   .mb-object { max-width: 6.2rem; }
   .mb-object-sticker-wrap { width: 3rem; height: 3rem; }
   .mb-question-jar {
@@ -16268,16 +16311,32 @@ body.theme-hearthwick .char-portrait-caption em {
   margin: 0.85rem 0 1rem;
 }
 
+/* Cream management tiles — dark ink for readability (village themes use pale
+   muted text meant for dark panels, which washes out on these cards). */
 .workshop-access-tile {
+  --workshop-admin-ink: #1f1610;
+  --workshop-admin-soft: #3d2e22;
   padding: 0.9rem 1rem 1rem;
   border-radius: 14px;
-  border: 1px solid rgba(90, 64, 40, 0.16);
-  background: rgba(255, 252, 246, 0.72);
+  border: 1px solid rgba(90, 64, 40, 0.22);
+  background: #fffaf2;
+  color: var(--workshop-admin-ink);
 }
 
 .workshop-access-tile header h3 {
   margin: 0;
   font-size: 1.05rem;
+  color: var(--workshop-admin-ink);
+  opacity: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: var(--font-display);
+}
+
+.workshop-access-tile .muted,
+.workshop-access-tile .section-lead {
+  color: var(--workshop-admin-soft) !important;
+  opacity: 1;
 }
 
 .workshop-access-tile label {
@@ -16286,6 +16345,8 @@ body.theme-hearthwick .char-portrait-caption em {
   gap: 0.25rem;
   margin-top: 0.55rem;
   font-size: 0.86rem;
+  color: var(--workshop-admin-ink);
+  font-weight: 600;
 }
 
 .workshop-access-tile select,
@@ -16295,8 +16356,9 @@ body.theme-hearthwick .char-portrait-caption em {
   font: inherit;
   padding: 0.35rem 0.45rem;
   border-radius: 8px;
-  border: 1px solid rgba(90, 64, 40, 0.22);
+  border: 1px solid rgba(90, 64, 40, 0.28);
   background: #fffdf8;
+  color: #1f1610;
 }
 
 .workshop-access-status {
@@ -16305,22 +16367,26 @@ body.theme-hearthwick .char-portrait-caption em {
   font-weight: 600;
 }
 
-.workshop-access-status.tone-open { color: #2f6b3a; }
-.workshop-access-status.tone-closed { color: #8a3a2a; }
-.workshop-access-status.tone-event { color: #2a5f8a; }
+.workshop-access-status.tone-open { color: #1f5a2c !important; }
+.workshop-access-status.tone-closed { color: #7a2a1c !important; }
+.workshop-access-status.tone-event { color: #1a4a72 !important; }
 
 .workshop-access-event {
   margin-top: 0.65rem;
   font-size: 0.88rem;
+  color: var(--workshop-admin-ink);
 }
 
 .workshop-access-activities {
   margin-top: 0.75rem;
+  color: var(--workshop-admin-ink);
 }
 
 .workshop-access-activities h4 {
   margin: 0 0 0.35rem;
   font-size: 0.92rem;
+  color: var(--workshop-admin-ink);
+  opacity: 1;
 }
 
 .workshop-access-activities ul {
@@ -16338,6 +16404,7 @@ body.theme-hearthwick .char-portrait-caption em {
   align-items: center;
   justify-content: space-between;
   font-size: 0.86rem;
+  color: var(--workshop-admin-ink);
 }
 
 .workshop-access-add-activity {
@@ -16351,4 +16418,26 @@ body.theme-hearthwick .char-portrait-caption em {
   align-items: center;
   gap: 0.35rem;
   font-size: 0.84rem;
+  color: var(--workshop-admin-ink);
+}
+
+.workshop-access-tile .btn-secondary,
+body.theme-bramblewood .workshop-access-tile .btn-secondary,
+body.theme-clovermeadow .workshop-access-tile .btn-secondary,
+body.theme-mosshollow .workshop-access-tile .btn-secondary,
+body.theme-moonmere .workshop-access-tile .btn-secondary,
+body.theme-hearthwick .workshop-access-tile .btn-secondary {
+  color: #1f1610 !important;
+  border: 1px solid rgba(90, 64, 40, 0.35) !important;
+  background: #f3e8d8 !important;
+}
+
+.workshop-access-tile .btn-secondary:hover,
+body.theme-bramblewood .workshop-access-tile .btn-secondary:hover,
+body.theme-clovermeadow .workshop-access-tile .btn-secondary:hover,
+body.theme-mosshollow .workshop-access-tile .btn-secondary:hover,
+body.theme-moonmere .workshop-access-tile .btn-secondary:hover,
+body.theme-hearthwick .workshop-access-tile .btn-secondary:hover {
+  color: #140e0a !important;
+  background: #ead9c4 !important;
 }
