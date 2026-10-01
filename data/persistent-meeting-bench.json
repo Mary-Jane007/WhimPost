@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-30T17:21:19.515Z",
+  "updatedAt": "2026-09-30T17:28:33.891Z",
   "items": [
+    {
+      "id": "76c979cf-13d8-487a-851a-303c6a941b68",
+      "kind": "chronicle",
+      "title": "A Curious Parcel Has Arrived in Mosshollow",
+      "body": "A small wooden parcel was discovered outside the library this morning. Nobody seems to know who left it there. The librarian has apparently decided to leave it unopened until someone finds the courage to investigate.",
+      "status": "published",
+      "season": null,
+      "starts_at": null,
+      "ends_at": null,
+      "activity_type": "lore",
+      "villages_json": "[\"mosshollow\"]",
+      "cta_label": null,
+      "cta_href": null,
+      "pinned": 1,
+      "sort_order": 10,
+      "meta_json": "{\"boardX\":49.2,\"boardY\":57.6}",
+      "created_at": "2026-08-14 15:23:30",
+      "updated_at": "2026-09-30 17:28:33",
+      "created_by": null
+    },
     {
       "id": "e13155a5-27ae-4747-91dc-b6733fedcc3d",
       "kind": "notice",
@@ -17,9 +37,9 @@
       "cta_href": "/village",
       "pinned": 1,
       "sort_order": 10,
-      "meta_json": "{\"boardX\":55,\"boardY\":40}",
+      "meta_json": "{\"boardX\":28.6,\"boardY\":33.6}",
       "created_at": "2026-08-14 15:23:30",
-      "updated_at": "2026-09-30 17:21:19",
+      "updated_at": "2026-09-30 17:28:22",
       "created_by": null
     },
     {
@@ -43,26 +63,6 @@
       "created_by": null
     },
     {
-      "id": "76c979cf-13d8-487a-851a-303c6a941b68",
-      "kind": "chronicle",
-      "title": "A Curious Parcel Has Arrived in Mosshollow",
-      "body": "A small wooden parcel was discovered outside the library this morning. Nobody seems to know who left it there. The librarian has apparently decided to leave it unopened until someone finds the courage to investigate.",
-      "status": "published",
-      "season": null,
-      "starts_at": null,
-      "ends_at": null,
-      "activity_type": "lore",
-      "villages_json": "[\"mosshollow\"]",
-      "cta_label": null,
-      "cta_href": null,
-      "pinned": 1,
-      "sort_order": 10,
-      "meta_json": "{}",
-      "created_at": "2026-08-14 15:23:30",
-      "updated_at": "2026-08-14 15:23:30",
-      "created_by": null
-    },
-    {
       "id": "b76ed79b-aaa7-45ef-a95b-c4e82f8bc35b",
       "kind": "gathering",
       "title": "Stargazing Night",
@@ -77,9 +77,9 @@
       "cta_href": "/observatory",
       "pinned": 0,
       "sort_order": 20,
-      "meta_json": "{}",
+      "meta_json": "{\"boardX\":64,\"boardY\":33.6}",
       "created_at": "2026-08-14 15:23:30",
-      "updated_at": "2026-08-14 15:23:30",
+      "updated_at": "2026-09-30 17:28:30",
       "created_by": null
     },
     {
