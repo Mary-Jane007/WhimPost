@@ -505,14 +505,17 @@ function BenchObjectButton({
           : null),
       }}
       onClick={(e) => {
-        if (dragRef.current?.moved) {
+        if (suppressClickRef.current || dragRef.current?.moved) {
           e.preventDefault();
+          e.stopPropagation();
+          suppressClickRef.current = false;
           return;
         }
         onOpen();
       }}
       onPointerDown={(e) => {
         if (!canDrag || e.button !== 0) return;
+        suppressClickRef.current = false;
         const pos = percentFromEvent(e.clientX, e.clientY);
         dragRef.current = {
           pointerId: e.pointerId,
@@ -548,11 +551,13 @@ function BenchObjectButton({
         }
         const moved = drag.moved;
         const pos = drag.pos;
+        if (moved) suppressClickRef.current = true;
         dragRef.current = null;
         void onDragEnd(pos, moved);
       }}
       onPointerCancel={() => {
         const drag = dragRef.current;
+        if (drag?.moved) suppressClickRef.current = true;
         dragRef.current = null;
         void onDragEnd(drag?.pos || null, false);
       }}
