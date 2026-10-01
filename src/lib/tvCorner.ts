@@ -9,6 +9,7 @@ import { persistAllDurableState } from "@/lib/tvPersist";
 import { isProtectedTvChannelTitle, isSharedTvChannelTitle } from "@/lib/tvProtectedChannels";
 import {
   clearTvClipRemoved,
+  ensureSharedTvChannelsGlobal,
   markTvClipRemoved,
   renameTvClipInDurableCatalogs,
 } from "@/lib/persistentTvMedia";
@@ -338,6 +339,8 @@ export function createVideo(input: {
   addVideoToChannelSchedule(input.channelId, id);
 
   try {
+    // Keep every-village channels as one shared catalog after each upload.
+    ensureSharedTvChannelsGlobal(db);
     persistAllDurableState(db);
   } catch (err) {
     console.error("[tv] persist after create failed:", err);
@@ -378,6 +381,7 @@ export function deleteVideo(videoId: string, user: UserPublic) {
   markTvClipRemoved(db, filename);
 
   try {
+    ensureSharedTvChannelsGlobal(db);
     persistAllDurableState(db);
   } catch (err) {
     console.error("[tv] persist after delete failed:", err);
@@ -413,6 +417,7 @@ export function renameVideo(
   renameTvClipInDurableCatalogs(db, filename, title);
 
   try {
+    ensureSharedTvChannelsGlobal(db);
     persistAllDurableState(db);
   } catch (err) {
     console.error("[tv] persist after rename failed:", err);
