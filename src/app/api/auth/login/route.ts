@@ -17,12 +17,23 @@ import {
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
 
 export async function POST(req: NextRequest) {
+  try {
   const fields = await readRequestFields(req);
   const login = String(fields.login || "").trim();
   const password = String(fields.password || "");
   if (!login || !password) return jsonError("Login and password are required");
 
-  const db = getDb();
+  let db;
+  try {
+    db = getDb();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[auth/login] database unavailable:", message);
+    return jsonError(
+      "Mailbox storage is waking up. Wait a few seconds and try again.",
+      503
+    );
+  }
   const loginKey = login.toLowerCase();
   const row = db
     .prepare(
@@ -124,4 +135,12 @@ export async function POST(req: NextRequest) {
   const res = NextResponse.json({ user: mapUser(refreshed) });
   await attachSessionCookie(res, token);
   return res;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[auth/login] failed:", message);
+    return jsonError(
+      "Could not open your mailbox right now. Please try again.",
+      500
+    );
+  }
 }

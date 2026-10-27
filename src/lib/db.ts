@@ -31,7 +31,13 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const dbPath = path.join(dataDir, "whimpost.db");
+function resolveDbPath() {
+  const fromEnv = process.env.WHIMPOST_DB_PATH?.trim();
+  if (fromEnv) return fromEnv;
+  return path.join(dataDir, "whimpost.db");
+}
+
+let dbPath = resolveDbPath();
 
 const globalForDb = globalThis as unknown as {
   whimpostDb?: Database.Database;
@@ -692,10 +698,37 @@ function migrate(db: Database.Database) {
   `);
 }
 
-function createDb() {
-  const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
+function openSqlite(filePath: string) {
+  const db = new Database(filePath);
+  try {
+    db.pragma("journal_mode = WAL");
+  } catch (err) {
+    // Some mounted disks reject WAL — fall back to DELETE journal.
+    console.warn("[db] WAL unavailable, using DELETE journal:", err);
+    try {
+      db.pragma("journal_mode = DELETE");
+    } catch {
+      /* ignore */
+    }
+  }
   db.pragma("foreign_keys = ON");
+  return db;
+}
+
+function createDb() {
+  dbPath = resolveDbPath();
+  let db: Database.Database;
+  try {
+    db = openSqlite(dbPath);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[db] primary open failed:", dbPath, message);
+    // Last-resort writable path so login is not bricked on a bad mount.
+    const fallback = path.join("/tmp", "whimpost-fallback.db");
+    console.error("[db] trying fallback:", fallback);
+    db = openSqlite(fallback);
+    dbPath = fallback;
+  }
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (

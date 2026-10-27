@@ -1,0 +1,22 @@
+# Render Blueprint — WhimPost
+# https://dashboard.render.com — New → Blueprint
+services:
+  - type: web
+    name: whimpost
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm rebuild better-sqlite3 --build-from-source && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: WHIMPOST_SECRET
+        generateValue: true
+      - key: WHIMPOST_HTTPS
+        value: "true"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: WHIMPOST_MEDIA_RELEASE_TAG
+        value: whimpost-media
+      - key: WHIMPOST_TV_AUTOPUSH
+        value: "1"
+      # Do NOT set NODE_ENV or PORT yourself — Render provides them.

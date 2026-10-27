@@ -7,6 +7,26 @@ const nextConfig: NextConfig = {
     "p-3333-pod-76mmtecog5grnfq5gfbzcqcgpi-993871809423eb35ee7f-us3.agent.cvm.dev",
     "*.agent.cvm.dev",
   ],
+  // Keep the native package name unhashed so Render can require('better-sqlite3').
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      const previous = config.externals;
+      config.externals = [
+        ...(Array.isArray(previous)
+          ? previous
+          : previous
+            ? [previous]
+            : []),
+        ({ request }: { request?: string }, callback: (err?: Error | null, result?: string) => void) => {
+          if (request === "better-sqlite3" || request?.startsWith("better-sqlite3/")) {
+            return callback(null, `commonjs ${request}`);
+          }
+          callback();
+        },
+      ];
+    }
+    return config;
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: "10gb",

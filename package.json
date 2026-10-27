@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack -H 0.0.0.0 -p ${PORT:-3333}",
-    "build": "next build --webpack",
+    "build": "npm rebuild better-sqlite3 && next build --webpack",
     "start": "node scripts/start.mjs",
+    "postinstall": "npm rebuild better-sqlite3 || true",
     "lint": "eslint src --max-warnings 0",
     "persist-tv": "node scripts/persist-tv.mjs",
     "persist-tv:push": "node scripts/persist-tv.mjs --push",
