@@ -73,16 +73,35 @@ async function requestIsHttps() {
 
 async function sessionCookieOptions() {
   // HTTP localhost must stay non-Secure + Lax or the browser drops the cookie.
-  // HTTPS preview hosts need Secure + SameSite=None so login survives redirects
-  // (including Cursor embedded browser / port-forward panels).
+  // First-party HTTPS (Render, custom domain) should use Secure + Lax.
+  // Only embedded preview iframes need SameSite=None + Partitioned.
   const secure = await requestIsHttps();
+  let embeddedPreview = false;
+  try {
+    const hdrs = await headers();
+    const host = (
+      hdrs.get("x-forwarded-host") ||
+      hdrs.get("host") ||
+      ""
+    )
+      .split(",")[0]
+      ?.trim()
+      .toLowerCase();
+    embeddedPreview =
+      host.includes("agent.cvm.dev") ||
+      host.includes("cursor.") ||
+      Boolean(process.env.VERCEL);
+  } catch {
+    embeddedPreview = Boolean(process.env.VERCEL);
+  }
+  const sameSite = secure && embeddedPreview ? "none" : "lax";
   return {
     httpOnly: true as const,
-    sameSite: (secure ? "none" : "lax") as "none" | "lax",
+    sameSite: sameSite as "none" | "lax",
     secure,
     path: "/",
     maxAge: 60 * 60 * 24 * 14,
-    ...(secure ? { partitioned: true as const } : {}),
+    ...(sameSite === "none" ? { partitioned: true as const } : {}),
   };
 }
 
