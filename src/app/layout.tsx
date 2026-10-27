@@ -6,6 +6,7 @@ import { SiteForestStickers } from "@/components/SiteForestStickers";
 import { ChronicleUnlockHost } from "@/components/ChronicleUnlockHost";
 import { XpCelebrationHost } from "@/components/XpCelebrationHost";
 import { AnalyticsBeacon } from "@/components/AnalyticsBeacon";
+import { PwaRegister } from "@/components/PwaRegister";
 import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { getNavBadges } from "@/lib/notifications";
@@ -16,12 +17,33 @@ export const metadata: Metadata = {
   title: "WhimPost — Letters from the woods",
   description:
     "Write whimsical cottagecore letters with stickers, scraps, envelopes, and seals. Stay connected with friends through the forest post.",
+  applicationName: "WhimPost",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "WhimPost",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#5f7f65" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a2a22" },
+  ],
 };
 
 export default async function RootLayout({
@@ -70,6 +92,7 @@ export default async function RootLayout({
           <ChronicleUnlockHost />
           <XpCelebrationHost />
           <AnalyticsBeacon />
+          <PwaRegister />
         </div>
       </body>
     </html>
