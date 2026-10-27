@@ -38,7 +38,7 @@ function villageEmoji(villageId: string | null | undefined) {
 
 export function SiteNav({
   user,
-  badges = { inbox: 0, friends: 0, unlocks: 0 },
+  badges = { inbox: 0, friends: 0, unlocks: 0, square: 0 },
 }: {
   user: UserPublic | null;
   badges?: NavBadges;
@@ -58,9 +58,9 @@ export function SiteNav({
   const links: Array<{
     href: string;
     label: string;
-    badgeKey?: keyof NavBadges;
+    badgeKey?: keyof NavBadges | "village";
   }> = [
-    { href: "/village", label: "Village", badgeKey: "unlocks" },
+    { href: "/village", label: "Village", badgeKey: "village" },
     ...(workshop && canUseWorkshop
       ? [{ href: workshop.href, label: workshop.navLabel }]
       : []),
@@ -96,15 +96,36 @@ export function SiteNav({
       {user ? (
         <nav className="nav-links" aria-label="Main">
           {links.map((link) => {
-            const count = link.badgeKey ? badges[link.badgeKey] : 0;
+            const count =
+              link.badgeKey === "village"
+                ? (badges.unlocks || 0) + (badges.square || 0)
+                : link.badgeKey === "inbox" ||
+                    link.badgeKey === "friends" ||
+                    link.badgeKey === "unlocks" ||
+                    link.badgeKey === "square"
+                  ? badges[link.badgeKey]
+                  : 0;
             const badge = formatBadge(count);
             const title =
               link.badgeKey === "inbox" && count
                 ? `${count} unread letter${count === 1 ? "" : "s"}`
                 : link.badgeKey === "friends" && count
                   ? `${count} friend request${count === 1 ? "" : "s"}`
-                  : link.badgeKey === "unlocks" && count
-                    ? `${count} new cottage unlock${count === 1 ? "" : "s"}`
+                  : link.badgeKey === "village" && count
+                    ? [
+                        badges.square
+                          ? `${badges.square} square note update${
+                              badges.square === 1 ? "" : "s"
+                            }`
+                          : null,
+                        badges.unlocks
+                          ? `${badges.unlocks} new cottage unlock${
+                              badges.unlocks === 1 ? "" : "s"
+                            }`
+                          : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")
                     : undefined;
             return (
               <Link

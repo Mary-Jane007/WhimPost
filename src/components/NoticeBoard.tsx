@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import type {
   VillageNoteCommentView,
+  VillageNoteNotificationView,
   VillageNoteView,
 } from "@/lib/villageNotes";
 import { todayNoteDay } from "@/lib/villageNoteDays";
@@ -27,16 +28,19 @@ function formatDayLabel(day: string) {
 export function NoticeBoard({
   initialNotes,
   initialDay,
+  initialNotifications = [],
   currentUserId,
 }: {
   initialNotes: VillageNote[];
   initialDay: string;
+  initialNotifications?: VillageNoteNotificationView[];
   currentUserId: string;
 }) {
   const [notes, setNotes] = useState(initialNotes);
   const [day, setDay] = useState(initialDay);
   const [dayDraft, setDayDraft] = useState(initialDay);
   const [loadingDay, setLoadingDay] = useState(false);
+  const [notifications, setNotifications] = useState(initialNotifications);
   const [body, setBody] = useState("");
   const [anonymous, setAnonymous] = useState(false);
   const [error, setError] = useState("");
@@ -48,6 +52,33 @@ export function NoticeBoard({
   const [openComments, setOpenComments] = useState<Record<string, boolean>>(
     {}
   );
+
+  async function markNotificationsRead(ids?: string[]) {
+    const res = await fetch("/api/village/notes/notifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(ids ? { ids } : {}),
+    });
+    const data = await res.json();
+    if (res.ok && Array.isArray(data.notifications)) {
+      setNotifications(data.notifications);
+    } else if (ids) {
+      setNotifications((prev) =>
+        prev.map((n) => (ids.includes(n.id) ? { ...n, isRead: true } : n))
+      );
+    } else {
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    }
+  }
+
+  async function openNotification(note: VillageNoteNotificationView) {
+    if (!note.isRead) {
+      void markNotificationsRead([note.id]);
+    }
+    if (note.noteDay) {
+      await loadDay(note.noteDay);
+    }
+  }
 
   async function loadDay(nextDay: string) {
     setLoadingDay(true);
@@ -205,8 +236,52 @@ export function NoticeBoard({
       <p className="section-lead">
         Today&apos;s notes stay on the board. Scroll when the square fills up,
         or search another day to read older keepsakes. Writers can take their
-        own notes down; everyone can like and leave a short reply.
+        own notes down; everyone can like and leave a short reply. You&apos;ll
+        be notified when neighbors like or comment on yours.
       </p>
+
+      {notifications.length > 0 ? (
+        <div className="notice-alerts">
+          <div className="notice-alerts-head">
+            <h3>Updates on your notes</h3>
+            {notifications.some((n) => !n.isRead) ? (
+              <button
+                type="button"
+                className="nav-ghost"
+                onClick={() => void markNotificationsRead()}
+              >
+                Mark all read
+              </button>
+            ) : null}
+          </div>
+          <ul className="notice-alert-list">
+            {notifications.slice(0, 8).map((n) => (
+              <li key={n.id} className={n.isRead ? undefined : "unread"}>
+                <button
+                  type="button"
+                  className="notice-alert-item"
+                  onClick={() => void openNotification(n)}
+                >
+                  <span className="notice-alert-kind">
+                    {n.kind === "like" ? "♥" : "💬"}
+                  </span>
+                  <span>
+                    <strong>
+                      {n.actor.displayName || n.actor.username}
+                    </strong>{" "}
+                    {n.kind === "like" ? "liked" : "commented on"} your note
+                    {n.kind === "comment" && n.body.includes(":")
+                      ? ` — “${n.body.split(":").slice(1).join(":").trim().slice(0, 60)}”`
+                      : ""}
+                    <em>{n.notePreview ? ` · “${n.notePreview}”` : ""}</em>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       <form className="notice-form" onSubmit={postNote}>
         <textarea
           value={body}
